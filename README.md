@@ -1,6 +1,5 @@
 # 🕹️ Lucas Begins - Retro Gaming Journal
 
-![Lucas Begins Banner](./src/assets/lucas_begins_horizontal_bar_1776704034852.png)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade."**
 
