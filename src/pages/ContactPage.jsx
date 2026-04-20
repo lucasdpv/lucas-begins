@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Mail, Send } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { useAppContext } from "../context/AppContext";
 
 /**
  * Página de contato com formulário e card de e-mail.
  */
-export default function ContactPage({ isDark, showToast }) {
+export default function ContactPage() {
+  const { isDark, showToast } = useAppContext();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
   const handleSubmit = (e) => {
@@ -19,6 +22,10 @@ export default function ContactPage({ isDark, showToast }) {
 
   return (
     <div className="animate-in fade-in max-w-5xl mx-auto py-8">
+      <Helmet>
+        <title>Fale Conosco | Lucas Begins</title>
+        <meta name="description" content="Entre em contato para parcerias, pautas ou reclamações." />
+      </Helmet>
       <div className="text-center mb-16">
         <h1 className="font-retro font-bold text-5xl md:text-6xl uppercase tracking-widest mb-4 drop-shadow-[3px_3px_0px_rgba(168,85,247,0.5)]">
           Fale <span className="text-purple-500">Conosco</span>

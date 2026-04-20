@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 
-// Dados
-import { initialPosts, INITIAL_CATEGORIES } from "./data/mockData";
+// Controle de estado
+import { useAppContext } from "./context/AppContext";
 
-// Layout
+// Layout & UI
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-
-// UI
 import Toast from "./components/ui/Toast";
 import LoginModal from "./components/ui/LoginModal";
 
@@ -19,40 +18,12 @@ import ContactPage from "./pages/ContactPage";
 import AdminPage from "./pages/AdminPage";
 import PostEditorPage from "./pages/PostEditorPage";
 
-export default function RetroBlogApp() {
-  // --- TEMA ---
-  const [isDark, setIsDark] = useState(true);
-  const toggleTheme = () => setIsDark((prev) => !prev);
+import NotFoundPage from "./pages/NotFoundPage";
 
-  // --- DADOS ---
-  const [posts, setPosts] = useState(initialPosts);
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+export default function App() {
+  const { isDark, toast, isLoginModalOpen } = useAppContext();
 
-  // --- NAVEGAÇÃO ---
-  const [currentView, setCurrentView] = useState("home");
-  const [activePost, setActivePost] = useState(null);
-  const [editingPost, setEditingPost] = useState(null);
-
-  // --- FILTROS ---
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("Todos");
-
-  // --- MENUS ---
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
-
-  // --- AUTH ---
-  const [currentUser, setCurrentUser] = useState(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
-  // --- TOAST ---
-  const [toast, setToast] = useState(null);
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  // --- INJEÇÃO DE ESTILOS GLOBAIS (dependente do tema) ---
+  // Injetar estilos base que dependem do tema
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
@@ -107,226 +78,32 @@ export default function RetroBlogApp() {
     return () => document.head.removeChild(style);
   }, [isDark]);
 
-  // --- NAVEGAÇÃO ---
-  const goHome = () => {
-    setCurrentView("home");
-    setActivePost(null);
-    setEditingPost(null);
-    window.scrollTo(0, 0);
-  };
-  const goToPost = (post) => {
-    setActivePost(post);
-    setCurrentView("post");
-    window.scrollTo(0, 0);
-  };
-  const goToAdmin = () => { setCurrentView("admin"); window.scrollTo(0, 0); };
-  const goToEditor = (post = null) => { setEditingPost(post); setCurrentView("editor"); window.scrollTo(0, 0); };
-  const goToAbout = () => {
-    setCurrentView("about");
-    setActivePost(null);
-    setActiveCategory("Todos");
-    setSearchQuery("");
-    window.scrollTo(0, 0);
-  };
-  const goToContact = () => {
-    setCurrentView("contact");
-    setActivePost(null);
-    setActiveCategory("Todos");
-    setSearchQuery("");
-    window.scrollTo(0, 0);
-  };
-
-  // --- HANDLERS DE POSTS ---
-  const handleLike = (postId, e) => {
-    if (e) e.stopPropagation();
-    setPosts((curr) => curr.map((p) => (p.id === postId ? { ...p, likes: p.likes + 1 } : p)));
-    if (activePost?.id === postId) setActivePost((prev) => ({ ...prev, likes: prev.likes + 1 }));
-  };
-
-  const handleAddComment = (postId, commentText) => {
-    if (!commentText.trim() || !currentUser) return;
-    const newComment = { id: Date.now(), authorId: currentUser.id, author: currentUser.name, text: commentText };
-    setPosts((curr) =>
-      curr.map((p) => {
-        if (p.id === postId) {
-          const updated = { ...p, comments: [...p.comments, newComment] };
-          if (activePost?.id === postId) setActivePost(updated);
-          return updated;
-        }
-        return p;
-      })
-    );
-    showToast("Comentário publicado!");
-  };
-
-  const handleDeleteComment = (postId, commentId) => {
-    setPosts((curr) =>
-      curr.map((p) => {
-        if (p.id === postId) {
-          const updated = { ...p, comments: p.comments.filter((c) => c.id !== commentId) };
-          if (activePost?.id === postId) setActivePost(updated);
-          return updated;
-        }
-        return p;
-      })
-    );
-    showToast("Comentário removido.", "success");
-  };
-
-  const handleSavePost = (postData) => {
-    if (postData.id) {
-      setPosts((curr) => curr.map((p) => (p.id === postData.id ? postData : p)));
-      showToast("Artigo atualizado com sucesso!");
-    } else {
-      const newPost = {
-        ...postData,
-        id: Date.now(),
-        date: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
-        likes: 0,
-        comments: [],
-        author: { name: currentUser.name, role: "Editor Chefe" },
-        gradient: "from-purple-600 to-blue-600",
-      };
-      setPosts([newPost, ...posts]);
-      showToast("Novo artigo publicado na capa!");
-    }
-    goToAdmin();
-  };
-
-  const handleDeletePost = (postId) => {
-    if (!window.confirm("Tem certeza que deseja excluir definitivamente este artigo?")) return;
-    setPosts((curr) => curr.filter((p) => p.id !== postId));
-    showToast("Artigo removido permanentemente.", "success");
-  };
-
-  // --- HANDLERS DE CATEGORIAS ---
-  const handleAddCategory = (newCat) => {
-    if (!newCat.trim() || categories.includes(newCat.trim())) {
-      showToast("Categoria inválida ou já existe.", "error");
-      return;
-    }
-    setCategories([...categories, newCat.trim()]);
-    showToast(`Categoria "${newCat}" adicionada!`);
-  };
-
-  const handleDeleteCategory = (catToDelete) => {
-    const isUsed = posts.some((p) => p.category === catToDelete);
-    if (isUsed) {
-      showToast("Não é possível excluir: existem artigos usando esta categoria.", "error");
-      return;
-    }
-    setCategories(categories.filter((c) => c !== catToDelete));
-    if (activeCategory === catToDelete) setActiveCategory("Todos");
-    showToast(`Categoria "${catToDelete}" excluída.`);
-  };
-
-  // --- DADOS DERIVADOS ---
-  const filteredPosts = posts.filter((post) => {
-    const matchesCat = activeCategory === "Todos" || post.category === activeCategory;
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesSearch;
-  });
-
-  const trendingPosts = [...posts].sort((a, b) => b.likes - a.likes).slice(0, 3);
   const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-gray-50 text-gray-900";
 
   return (
     <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>
-
       <Toast toast={toast} isDark={isDark} />
+      
+      {/* Wrapper flex para empurrar o footer pra baixo, caso a tela tenha pouco conteudo */}
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
 
-      <Navbar
-        isDark={isDark}
-        currentView={currentView}
-        currentUser={currentUser}
-        categories={categories}
-        activeCategory={activeCategory}
-        searchQuery={searchQuery}
-        isMobileMenuOpen={isMobileMenuOpen}
-        isCategoryMenuOpen={isCategoryMenuOpen}
-        setIsCategoryMenuOpen={setIsCategoryMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-        setSearchQuery={setSearchQuery}
-        setActiveCategory={setActiveCategory}
-        onLogout={() => { setCurrentUser(null); goHome(); }}
-        goHome={goHome}
-        goToAbout={goToAbout}
-        goToContact={goToContact}
-        goToAdmin={goToAdmin}
-        onOpenLogin={() => setShowLoginModal(true)}
-        toggleTheme={toggleTheme}
-      />
+        <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/post/:id" element={<PostDetailPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/editor" element={<PostEditorPage />} />
+            <Route path="/editor/:id" element={<PostEditorPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-        {currentView === "home" && (
-          <HomePage
-            isDark={isDark}
-            posts={posts}
-            filteredPosts={filteredPosts}
-            trendingPosts={trendingPosts}
-            activeCategory={activeCategory}
-            searchQuery={searchQuery}
-            onPostClick={goToPost}
-            onLike={handleLike}
-          />
-        )}
-
-        {currentView === "post" && activePost && (
-          <PostDetailPage
-            post={activePost}
-            onBack={goHome}
-            onLike={() => handleLike(activePost.id)}
-            onAddComment={handleAddComment}
-            onDeleteComment={handleDeleteComment}
-            currentUser={currentUser}
-            isDark={isDark}
-            trendingPosts={trendingPosts}
-            onTrendingClick={goToPost}
-            showToast={showToast}
-          />
-        )}
-
-        {currentView === "admin" && currentUser?.role === "admin" && (
-          <AdminPage
-            posts={posts}
-            categories={categories}
-            isDark={isDark}
-            onEdit={goToEditor}
-            onDelete={handleDeletePost}
-            onBack={goHome}
-            onAddCategory={handleAddCategory}
-            onDeleteCategory={handleDeleteCategory}
-          />
-        )}
-
-        {currentView === "editor" && currentUser?.role === "admin" && (
-          <PostEditorPage
-            post={editingPost}
-            categories={categories}
-            isDark={isDark}
-            currentUser={currentUser}
-            onSave={handleSavePost}
-            onCancel={goToAdmin}
-            showToast={showToast}
-          />
-        )}
-
-        {currentView === "about" && <AboutPage isDark={isDark} />}
-        {currentView === "contact" && <ContactPage isDark={isDark} showToast={showToast} />}
-      </main>
-
-      <Footer isDark={isDark} onAbout={goToAbout} onContact={goToContact} />
-
-      {showLoginModal && (
-        <LoginModal
-          isDark={isDark}
-          onClose={() => setShowLoginModal(false)}
-          onLogin={setCurrentUser}
-          showToast={showToast}
-        />
-      )}
+        <Footer />
+        {isLoginModalOpen && <LoginModal />}
+      </div>
     </div>
   );
 }

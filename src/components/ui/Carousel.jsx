@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
  * Carrossel automático com autoplay a cada 6 segundos.
  * Exibe os posts em destaque na home.
  */
-export default function Carousel({ posts, onPostClick, isDark }) {
+export default function Carousel({ posts, onPostClick }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {

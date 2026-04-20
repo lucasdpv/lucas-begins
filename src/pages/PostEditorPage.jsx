@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Edit,
   Plus,
@@ -8,34 +9,34 @@ import {
   Star,
   Image as ImageIcon,
 } from "lucide-react";
-import { calculateReadingTime } from "../lib/utils";
+import { calculateReadingTime, cn } from "../lib/utils";
 import PostDetailPage from "./PostDetailPage";
+import { useAppContext } from "../context/AppContext";
+import MDEditor from '@uiw/react-md-editor';
+import { Helmet } from "react-helmet-async";
 
 const DRAFT_KEY = "retro_blog_draft";
 
 /**
  * Editor de artigos com abas Editar / Preview e auto-save no localStorage.
  */
-export default function PostEditorPage({
-  post,
-  categories,
-  isDark,
-  currentUser,
-  onSave,
-  onCancel,
-  showToast,
-}) {
+export default function PostEditorPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { posts, categories, isDark, currentUser, handleSavePost } = useAppContext();
+
   const [activeTab, setActiveTab] = useState("edit");
 
+  const post = id ? posts.find(p => String(p.id) === String(id)) : null;
+
   // Inicializa com o post existente ou com o rascunho salvo
-  const initialData = post || (() => {
+  const [formData, setFormData] = useState(() => {
+    if (post) return post;
     const savedDraft = localStorage.getItem(DRAFT_KEY);
     return savedDraft
       ? JSON.parse(savedDraft)
       : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "" };
-  })();
-
-  const [formData, setFormData] = useState(initialData);
+  });
 
   // Auto-save do rascunho a cada 1 segundo (só para novos posts)
   useEffect(() => {
@@ -58,17 +59,14 @@ export default function PostEditorPage({
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
     if (!post) localStorage.removeItem(DRAFT_KEY);
-    onSave(formData);
+    handleSavePost(formData);
+    navigate("/admin");
   };
 
-  const insertImageTag = () => {
-    const imgTag = `\n\n![Coloque aqui a legenda da imagem](COLE_A_URL_AQUI)\n\n`;
-    setFormData((prev) => ({ ...prev, content: prev.content + imgTag }));
-  };
-
-  const inputClass = `w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all ${
+  const inputClass = cn(
+    "w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all",
     isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
-  }`;
+  );
 
   const previewPost = {
     ...formData,
@@ -82,7 +80,9 @@ export default function PostEditorPage({
 
   return (
     <div className="animate-in fade-in max-w-5xl mx-auto">
-
+      <Helmet>
+        <title>{post ? "Editar Fase" : "Nova Fase"} | Lucas Begins</title>
+      </Helmet>
       {/* Cabeçalho com abas */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <h2 className="font-retro text-3xl font-bold uppercase flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(168,85,247,0.5)]">
@@ -91,7 +91,7 @@ export default function PostEditorPage({
         </h2>
 
         <div className="flex items-center gap-4">
-          <div className={`flex p-1.5 rounded-xl border-2 retro-card ${isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black"}`}>
+          <div className={cn("flex p-1.5 rounded-xl border-2 retro-card", isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black")}>
             {[
               { key: "edit", icon: <Pencil className="w-4 h-4" />, label: "Editar" },
               { key: "preview", icon: <Eye className="w-4 h-4" />, label: "Preview" },
@@ -100,23 +100,23 @@ export default function PostEditorPage({
                 key={key}
                 type="button"
                 onClick={() => setActiveTab(key)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all ${
+                className={cn(
+                  "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all",
                   activeTab === key
                     ? "bg-purple-600 text-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                     : "text-gray-500 hover:text-purple-500"
-                }`}
+                )}
               >
                 {icon} {label}
               </button>
             ))}
           </div>
           <button
-            onClick={onCancel}
-            className={`px-5 py-3 rounded-xl text-sm font-retro uppercase font-bold transition-colors retro-button ${
-              isDark
-                ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
-                : "bg-white text-black border-black hover:bg-gray-100"
-            }`}
+            onClick={() => navigate("/admin")}
+            className={cn(
+              "px-5 py-3 rounded-xl text-sm font-retro uppercase font-bold transition-colors retro-button",
+              isDark ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700" : "bg-white text-black border-black hover:bg-gray-100"
+            )}
           >
             Cancelar
           </button>
@@ -127,7 +127,7 @@ export default function PostEditorPage({
       {activeTab === "edit" ? (
         <form
           onSubmit={handleSubmit}
-          className={`p-8 md:p-10 rounded-2xl retro-card space-y-8 ${isDark ? "bg-gray-800" : "bg-white"}`}
+          className={cn("p-8 md:p-10 rounded-2xl retro-card space-y-8", isDark ? "bg-gray-800" : "bg-white")}
         >
           <div className="flex justify-between items-center opacity-60 text-xs uppercase font-retro font-bold">
             <span>{post ? "Editando artigo existente" : "Salvo automaticamente no memory card 💾"}</span>
@@ -175,29 +175,18 @@ export default function PostEditorPage({
 
             <div className="md:col-span-2 space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Resumo (Linha Fina) *</label>
-              <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} required rows="2" className={`${inputClass} resize-none`} placeholder="Breve introdução chamativa para as capas..." />
+              <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} required rows="2" className={cn(inputClass, "resize-none")} placeholder="Breve introdução chamativa para as capas..." />
             </div>
 
             <div className="md:col-span-2 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
-                <button
-                  type="button"
-                  onClick={insertImageTag}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-retro text-xs uppercase font-bold retro-button border-black"
-                >
-                  <ImageIcon className="w-4 h-4" /> Inserir Imagem no Texto
-                </button>
+              <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
+              <div data-color-mode={isDark ? "dark" : "light"}>
+                <MDEditor
+                  value={formData.content}
+                  onChange={(val) => setFormData((prev) => ({ ...prev, content: val || "" }))}
+                  height={500}
+                />
               </div>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                required
-                rows="20"
-                className={`${inputClass} font-mono text-sm leading-relaxed`}
-                placeholder="Escreva o seu artigo completo aqui..."
-              />
             </div>
           </div>
 
@@ -209,26 +198,18 @@ export default function PostEditorPage({
         </form>
       ) : (
         /* Aba: Preview */
-        <div className={`border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8 ${isDark ? "border-purple-500/50 bg-gray-900/50" : "border-black/20 bg-gray-50"}`}>
+        <div className={cn("border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8", isDark ? "border-purple-500/50 bg-gray-900/50" : "border-black/20 bg-gray-50")}>
           <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase retro-card border-black">
             Modo de Pré-Visualização
           </div>
-          <PostDetailPage
-            post={previewPost}
-            onBack={() => setActiveTab("edit")}
-            onLike={() => showToast("Modo Preview: Curtidas desativadas.", "success")}
-            onAddComment={() => showToast("Modo Preview: Comentários desativados.", "success")}
-            onDeleteComment={() => {}}
-            currentUser={currentUser}
-            isDark={isDark}
-            trendingPosts={[]}
-            onTrendingClick={() => {}}
-            showToast={showToast}
-          />
-          <div className="mt-12 flex justify-center pb-8">
+          <PostDetailPage previewPost={previewPost} />
+          <div className="mt-12 flex justify-center pb-8 border-t-4 border-dashed border-purple-500/50 pt-8 relative">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase border-2 border-black z-10">
+              Ação de Teste
+            </div>
             <button
               onClick={handleSubmit}
-              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl"
+              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20"
             >
               <Save className="w-7 h-7" /> Lançar Revista (Publicar)
             </button>

@@ -1,4 +1,13 @@
 import React from "react";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Combina classes utilitárias do Tailwind CSS de forma segura.
+ */
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 
 /**
  * Calcula o tempo de leitura estimado de um texto.

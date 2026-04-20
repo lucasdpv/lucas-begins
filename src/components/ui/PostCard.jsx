@@ -1,26 +1,29 @@
 import React from "react";
 import { Heart, MessageSquare, Clock } from "lucide-react";
-import { calculateReadingTime } from "../../lib/utils";
+import { calculateReadingTime, cn } from "../../lib/utils";
+import { useAppContext } from "../../context/AppContext";
 
-/**
- * Card de post exibido na listagem da página inicial.
- */
-export default function PostCard({ post, onClick, onLike, isDark }) {
+export default function PostCard({ post, onClick }) {
+  const { isDark, handleLike } = useAppContext();
+
   const bgStyle = post.imageUrl
     ? { backgroundImage: `url(${post.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
     : {};
 
   return (
     <article
-      className={`flex flex-col rounded-3xl overflow-hidden retro-card cursor-pointer ${
+      className={cn(
+        "flex flex-col rounded-3xl overflow-hidden retro-card cursor-pointer",
         isDark ? "bg-gray-800" : "bg-white"
-      }`}
+      )}
       onClick={onClick}
     >
       <div
-        className={`h-56 md:h-64 w-full relative overflow-hidden group border-b-4 ${
-          isDark ? "border-purple-600" : "border-black"
-        } ${post.imageUrl ? "" : `bg-gradient-to-br ${post.gradient}`}`}
+        className={cn(
+          "h-56 md:h-64 w-full relative overflow-hidden group border-b-4",
+          isDark ? "border-purple-600" : "border-black",
+          !post.imageUrl && `bg-gradient-to-br ${post.gradient}`
+        )}
         style={bgStyle}
       >
         <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -40,10 +43,10 @@ export default function PostCard({ post, onClick, onLike, isDark }) {
         <h3 className="font-retro font-bold text-2xl md:text-3xl mb-4 line-clamp-3 leading-tight group-hover:text-purple-500 transition-colors">
           {post.title}
         </h3>
-        <p className={`text-base mb-8 line-clamp-3 flex-grow leading-relaxed font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+        <p className={cn("text-base mb-8 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
           {post.excerpt}
         </p>
-        <div className={`flex items-center justify-between text-sm mt-auto pt-6 border-t-2 ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+        <div className={cn("flex items-center justify-between text-sm mt-auto pt-6 border-t-2", isDark ? "border-gray-700" : "border-gray-200")}>
           <div className="flex flex-col gap-2">
             <span className="font-retro font-bold text-[11px] uppercase tracking-wider opacity-70">{post.date}</span>
             <span className="text-xs flex items-center gap-1.5 font-bold uppercase opacity-50">
@@ -54,7 +57,10 @@ export default function PostCard({ post, onClick, onLike, isDark }) {
           <div className="flex gap-4">
             <button
               className="flex items-center gap-2 hover:text-red-500 transition-colors font-bold text-lg"
-              onClick={(e) => onLike(post.id, e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike(post.id, e);
+              }}
             >
               <Heart className="w-5 h-5" /> {post.likes}
             </button>

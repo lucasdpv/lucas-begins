@@ -1,12 +1,19 @@
 import React from "react";
 import { Gamepad2, Mail } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { useAppContext } from "../context/AppContext";
 
 /**
  * Página Sobre: hero, texto de origem do blog e perfil do autor.
  */
-export default function AboutPage({ isDark }) {
+export default function AboutPage() {
+  const { isDark } = useAppContext();
   return (
     <div className="animate-in fade-in max-w-4xl mx-auto py-8">
+      <Helmet>
+        <title>A História | Lucas Begins</title>
+        <meta name="description" content="Conheça a história de Player 1 por trás do Lucas Begins e porque amamos games retro." />
+      </Helmet>
       {/* Hero */}
       <div className="w-full h-64 rounded-2xl relative overflow-hidden mb-12 retro-card bg-gradient-to-br from-purple-800 to-indigo-900 flex items-center justify-center">
         <div className="absolute inset-0 scanline-overlay opacity-40" />
