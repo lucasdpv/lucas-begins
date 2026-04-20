@@ -3,7 +3,7 @@ import { ArrowLeft, Settings, Plus, Edit, Trash2, Tag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { Helmet } from "react-helmet-async";
-import { cn } from "../lib/utils";
+import { cn, formatDate } from "../lib/utils";
 
 /**
  * Painel administrativo com abas: Artigos (tabela CRUD) e Categorias (criar/excluir).
@@ -108,7 +108,7 @@ export default function AdminPage() {
                           {post.category}
                         </span>
                       </td>
-                      <td className="px-6 py-4 hidden sm:table-cell opacity-70 font-mono">{post.date}</td>
+                      <td className="px-6 py-4 hidden sm:table-cell opacity-70 font-mono">{formatDate(post.createdAt, post.date)}</td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3">
                           <button

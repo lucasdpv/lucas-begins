@@ -1,6 +1,6 @@
 import React from "react";
 import { Heart, MessageSquare, Clock } from "lucide-react";
-import { calculateReadingTime, cn } from "../../lib/utils";
+import { calculateReadingTime, formatDate, cn } from "../../lib/utils";
 import { useAppContext } from "../../context/AppContext";
 
 export default function PostCard({ post, onClick }) {
@@ -50,7 +50,7 @@ export default function PostCard({ post, onClick }) {
         </p>
         <div className={cn("flex items-center justify-between text-sm mt-auto pt-6 border-t-2", isDark ? "border-gray-700" : "border-gray-200")}>
           <div className="flex flex-col gap-2">
-            <span className="font-retro font-bold text-[11px] uppercase tracking-wider opacity-70">{post.date}</span>
+            <span className="font-retro font-bold text-[11px] uppercase tracking-wider opacity-70">{formatDate(post.createdAt, post.date)}</span>
             <span className="text-xs flex items-center gap-1.5 font-bold uppercase opacity-50">
               <Clock className="w-4 h-4" />
               {calculateReadingTime(post.content || "")}

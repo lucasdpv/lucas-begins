@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { db } from '../lib/firebase';
 import { 
   collection, 
-  onSnapshot, 
+  getDocs,
   addDoc, 
   updateDoc, 
   deleteDoc, 
@@ -10,7 +10,9 @@ import {
   query, 
   orderBy,
   limit,
-  serverTimestamp 
+  startAfter,
+  serverTimestamp,
+  getDoc
 } from 'firebase/firestore';
 
 import { slugify } from '../lib/utils';
@@ -19,16 +21,13 @@ const POSTS_PER_PAGE = 6;
 
 /**
  * Hook para gerenciar os artigos do blog via Firebase Firestore.
+ * Refatorado para usar Pagination baseada em Cursors (Performance & Custo)
+ * e atualizações Otimistas (Optimistic UI).
  */
 export function usePosts(currentUser, showToast) {
   const [posts, setPosts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
-  const [limitCount, setLimitCount] = useState(POSTS_PER_PAGE);
   const [hasMore, setHasMore] = useState(true);
-
-  // Escuta o banco de dados em tempo real com limite dinâmico
-  useEffect(() => {
-    const q = query(
       collection(db, "posts"), 
       orderBy("createdAt", "desc"),
       limit(limitCount)

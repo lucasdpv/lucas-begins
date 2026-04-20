@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "../hooks/useToast";
 import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
@@ -102,7 +102,7 @@ export function AppProvider({ children }) {
     }
   };
 
-  const value = {
+  const value = useMemo(() => ({
     isDark, toggleTheme,
     currentUser, login, logout, authLoading,
     toast, showToast,
@@ -112,7 +112,10 @@ export function AppProvider({ children }) {
     activeCategory, setActiveCategory,
     searchQuery, setSearchQuery,
     isLoginModalOpen, setIsLoginModalOpen
-  };
+  }), [
+    isDark, currentUser, authLoading, toast, showToast, posts, isLoadingPosts, hasMore,
+    categories, activeCategory, searchQuery, isLoginModalOpen
+  ]);
 
   return (
     <AppContext.Provider value={value}>

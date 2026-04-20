@@ -11,7 +11,7 @@ import {
   Clock,
   Gamepad2,
 } from "lucide-react";
-import { calculateReadingTime, renderArticleContent, cn } from "../lib/utils";
+import { calculateReadingTime, renderArticleContent, formatDate, cn } from "../lib/utils";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
 
@@ -101,7 +101,7 @@ export default function PostDetailPage({ previewPost }) {
                   <span className={cn("text-xs uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-gray-100 border-gray-300 text-purple-600")}>
                     {post.author?.role}
                   </span>
-                  <span className="text-gray-500 font-bold text-xs uppercase">{post.date}</span>
+                  <span className="text-gray-500 font-bold text-xs uppercase">{formatDate(post.createdAt, post.date)}</span>
                   <span className="text-gray-500 font-bold text-xs flex items-center gap-1 uppercase">
                     <Clock className="w-3 h-3" /> {calculateReadingTime(post.content || "")}
                   </span>
