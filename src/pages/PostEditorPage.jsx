@@ -1,0 +1,240 @@
+import React, { useState, useEffect } from "react";
+import {
+  Edit,
+  Plus,
+  Pencil,
+  Eye,
+  Save,
+  Star,
+  Image as ImageIcon,
+} from "lucide-react";
+import { calculateReadingTime } from "../lib/utils";
+import PostDetailPage from "./PostDetailPage";
+
+const DRAFT_KEY = "retro_blog_draft";
+
+/**
+ * Editor de artigos com abas Editar / Preview e auto-save no localStorage.
+ */
+export default function PostEditorPage({
+  post,
+  categories,
+  isDark,
+  currentUser,
+  onSave,
+  onCancel,
+  showToast,
+}) {
+  const [activeTab, setActiveTab] = useState("edit");
+
+  // Inicializa com o post existente ou com o rascunho salvo
+  const initialData = post || (() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    return savedDraft
+      ? JSON.parse(savedDraft)
+      : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "" };
+  })();
+
+  const [formData, setFormData] = useState(initialData);
+
+  // Auto-save do rascunho a cada 1 segundo (só para novos posts)
+  useEffect(() => {
+    if (!post) {
+      const timeoutId = setTimeout(() => {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [formData, post]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "score" ? (value === "" ? "" : Number(value)) : value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (!post) localStorage.removeItem(DRAFT_KEY);
+    onSave(formData);
+  };
+
+  const insertImageTag = () => {
+    const imgTag = `\n\n![Coloque aqui a legenda da imagem](COLE_A_URL_AQUI)\n\n`;
+    setFormData((prev) => ({ ...prev, content: prev.content + imgTag }));
+  };
+
+  const inputClass = `w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all ${
+    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+  }`;
+
+  const previewPost = {
+    ...formData,
+    id: "preview-id",
+    date: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
+    likes: 0,
+    comments: [],
+    author: { name: currentUser?.name || "Autor", role: "Editor Chefe" },
+    gradient: "from-purple-600 to-blue-600",
+  };
+
+  return (
+    <div className="animate-in fade-in max-w-5xl mx-auto">
+
+      {/* Cabeçalho com abas */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <h2 className="font-retro text-3xl font-bold uppercase flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(168,85,247,0.5)]">
+          {post ? <Edit className="text-purple-500 w-8 h-8" /> : <Plus className="text-purple-500 w-8 h-8" />}
+          {post ? "Editando Level" : "Nova Fase (Post)"}
+        </h2>
+
+        <div className="flex items-center gap-4">
+          <div className={`flex p-1.5 rounded-xl border-2 retro-card ${isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black"}`}>
+            {[
+              { key: "edit", icon: <Pencil className="w-4 h-4" />, label: "Editar" },
+              { key: "preview", icon: <Eye className="w-4 h-4" />, label: "Preview" },
+            ].map(({ key, icon, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActiveTab(key)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all ${
+                  activeTab === key
+                    ? "bg-purple-600 text-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    : "text-gray-500 hover:text-purple-500"
+                }`}
+              >
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={onCancel}
+            className={`px-5 py-3 rounded-xl text-sm font-retro uppercase font-bold transition-colors retro-button ${
+              isDark
+                ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                : "bg-white text-black border-black hover:bg-gray-100"
+            }`}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      {/* Aba: Edição */}
+      {activeTab === "edit" ? (
+        <form
+          onSubmit={handleSubmit}
+          className={`p-8 md:p-10 rounded-2xl retro-card space-y-8 ${isDark ? "bg-gray-800" : "bg-white"}`}
+        >
+          <div className="flex justify-between items-center opacity-60 text-xs uppercase font-retro font-bold">
+            <span>{post ? "Editando artigo existente" : "Salvo automaticamente no memory card 💾"}</span>
+            {formData.content && <span>{calculateReadingTime(formData.content)}</span>}
+          </div>
+
+          {formData.imageUrl && (
+            <div
+              className="w-full h-56 rounded-2xl bg-cover bg-center border-4 border-dashed border-purple-500/50 shadow-inner"
+              style={{ backgroundImage: `url(${formData.imageUrl})` }}
+            />
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="md:col-span-2 space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80">Título da Matéria *</label>
+              <input type="text" name="title" value={formData.title} onChange={handleChange} required className={inputClass} placeholder="Ex: Análise Completa de Silent Hill 2..." />
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
+              <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4" /> URL da Imagem de Capa
+              </label>
+              <input type="url" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className={inputClass} placeholder="https://..." />
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500 flex items-center gap-2">
+                <Star className="w-4 h-4" /> Nota / Score (0 a 10)
+              </label>
+              <input type="number" step="0.1" min="0" max="10" name="score" value={formData.score} onChange={handleChange} className={inputClass} placeholder="Opcional. Ex: 9.5" />
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500">Veredito</label>
+              <input type="text" name="verdict" value={formData.verdict} onChange={handleChange} className={inputClass} placeholder="Ex: Obra-prima, Fraco..." disabled={!formData.score} />
+            </div>
+
+            <div className="md:col-span-2 space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80">Resumo (Linha Fina) *</label>
+              <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} required rows="2" className={`${inputClass} resize-none`} placeholder="Breve introdução chamativa para as capas..." />
+            </div>
+
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
+                <button
+                  type="button"
+                  onClick={insertImageTag}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-retro text-xs uppercase font-bold retro-button border-black"
+                >
+                  <ImageIcon className="w-4 h-4" /> Inserir Imagem no Texto
+                </button>
+              </div>
+              <textarea
+                name="content"
+                value={formData.content}
+                onChange={handleChange}
+                required
+                rows="20"
+                className={`${inputClass} font-mono text-sm leading-relaxed`}
+                placeholder="Escreva o seu artigo completo aqui..."
+              />
+            </div>
+          </div>
+
+          <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex justify-end gap-4">
+            <button type="submit" className="flex items-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black">
+              <Save className="w-6 h-6" /> Publicar Matéria
+            </button>
+          </div>
+        </form>
+      ) : (
+        /* Aba: Preview */
+        <div className={`border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8 ${isDark ? "border-purple-500/50 bg-gray-900/50" : "border-black/20 bg-gray-50"}`}>
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase retro-card border-black">
+            Modo de Pré-Visualização
+          </div>
+          <PostDetailPage
+            post={previewPost}
+            onBack={() => setActiveTab("edit")}
+            onLike={() => showToast("Modo Preview: Curtidas desativadas.", "success")}
+            onAddComment={() => showToast("Modo Preview: Comentários desativados.", "success")}
+            onDeleteComment={() => {}}
+            currentUser={currentUser}
+            isDark={isDark}
+            trendingPosts={[]}
+            onTrendingClick={() => {}}
+            showToast={showToast}
+          />
+          <div className="mt-12 flex justify-center pb-8">
+            <button
+              onClick={handleSubmit}
+              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl"
+            >
+              <Save className="w-7 h-7" /> Lançar Revista (Publicar)
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
