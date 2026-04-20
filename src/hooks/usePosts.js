@@ -28,112 +28,168 @@ export function usePosts(currentUser, showToast) {
   const [posts, setPosts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-      collection(db, "posts"), 
-      orderBy("createdAt", "desc"),
-      limit(limitCount)
-    );
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  const [lastDoc, setLastDoc] = useState(null);
+
+  // Busca inicial e de paginação
+  const fetchPosts = useCallback(async (isLoadMore = false) => {
+    try {
+      let q = query(
+        collection(db, "posts"), 
+        orderBy("createdAt", "desc"),
+        limit(POSTS_PER_PAGE)
+      );
+      
+      if (isLoadMore && lastDoc) {
+        q = query(
+          collection(db, "posts"), 
+          orderBy("createdAt", "desc"), 
+          startAfter(lastDoc), 
+          limit(POSTS_PER_PAGE)
+        );
+      }
+
+      const snapshot = await getDocs(q);
       const postsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setPosts(postsData);
-      
-      // Verifica se ainda existem mais posts no banco
-      // Nota: Se o número retornado for menor que o limite solicitado, 
-      // e não for a primeira carga vazia, chegamos ao fim.
-      setHasMore(snapshot.docs.length >= limitCount);
-      setIsLoadingPosts(false);
-    }, (error) => {
-      console.error("Erro ao carregar posts:", error);
-      setIsLoadingPosts(false);
-    });
 
-    return () => unsubscribe();
-  }, [limitCount]);
+      setPosts(prev => isLoadMore ? [...prev, ...postsData] : postsData);
+      
+      if (snapshot.docs.length > 0) {
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      }
+      setHasMore(snapshot.docs.length >= POSTS_PER_PAGE);
+    } catch (error) {
+      console.error("[usePosts:fetchPosts]", error);
+      showToast("Erro ao carregar posts.", "error");
+    } finally {
+      setIsLoadingPosts(false);
+    }
+  }, [lastDoc, showToast]);
+
+  // Carregamento inicial (somente na montagem)
+  useEffect(() => {
+    fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadMore = () => {
-    setLimitCount(prev => prev + POSTS_PER_PAGE);
+    if (!isLoadingPosts && hasMore) {
+      fetchPosts(true);
+    }
   };
 
-  // Handlers Assíncronos
+  // -------------------------
+  // Handlers Assíncronos (Com Optimistic UI)
+  // -------------------------
+
   const handleLike = async (postId, e) => {
     if (e) e.stopPropagation();
     if (!currentUser) return;
 
+    // Acha o post no estado local (Cache)
+    const postIndex = posts.findIndex(p => p.id === postId);
+    if (postIndex === -1) return;
+    const post = posts[postIndex];
+
+    const likedBy = post.likedBy || [];
+    const hasLiked = likedBy.includes(currentUser.id);
+    let newLikedBy = hasLiked 
+      ? likedBy.filter(id => id !== currentUser.id) 
+      : [...likedBy, currentUser.id];
+
+    // 1. Optimistic Update (UI responde instantaneamente)
+    const originalPosts = [...posts];
+    setPosts(prev => {
+      const updated = [...prev];
+      updated[postIndex] = { ...post, likedBy: newLikedBy, likes: newLikedBy.length };
+      return updated;
+    });
+
+    // 2. Persistência no Banco
     try {
       const postRef = doc(db, "posts", postId);
-      const post = posts.find(p => p.id === postId);
-      
-      // Inicializa likedBy se não existir (suporte a posts antigos)
-      const likedBy = post.likedBy || [];
-      const hasLiked = likedBy.includes(currentUser.id);
-      
-      let newLikedBy;
-      if (hasLiked) {
-        // Unlike: remove o ID do usuário
-        newLikedBy = likedBy.filter(id => id !== currentUser.id);
-      } else {
-        // Like: adiciona o ID do usuário
-        newLikedBy = [...likedBy, currentUser.id];
-      }
-
       await updateDoc(postRef, {
         likedBy: newLikedBy,
-        likes: newLikedBy.length // Mantemos o contador para facilitar queries básicas
+        likes: newLikedBy.length
       });
-    } catch {
-      showToast("Erro ao curtir o post.");
+    } catch (error) {
+      console.error("[usePosts:handleLike]", error);
+      showToast("Erro ao curtir o post.", "error");
+      setPosts(originalPosts); // Rollback em caso de erro
     }
   };
 
   const handleAddComment = async (postId, commentText) => {
     if (!commentText.trim() || !currentUser) return;
     
+    const postIndex = posts.findIndex(p => p.id === postId);
+    if (postIndex === -1) return;
+    const post = posts[postIndex];
+    
+    const newComment = { 
+      id: Date.now(), 
+      authorId: currentUser.id, 
+      author: currentUser.name, 
+      authorAvatar: currentUser.avatar,
+      text: commentText,
+      createdAt: new Date().toISOString()
+    };
+
+    const newCommentsList = [...(post.comments || []), newComment];
+    const originalPosts = [...posts];
+
+    // Optimistic Update
+    setPosts(prev => {
+      const updated = [...prev];
+      updated[postIndex] = { ...post, comments: newCommentsList };
+      return updated;
+    });
+
     try {
       const postRef = doc(db, "posts", postId);
-      const post = posts.find(p => p.id === postId);
-      
-      const newComment = { 
-        id: Date.now(), 
-        authorId: currentUser.id, 
-        author: currentUser.name, 
-        authorAvatar: currentUser.avatar,
-        text: commentText,
-        createdAt: new Date().toISOString()
-      };
-
-      await updateDoc(postRef, {
-        comments: [...(post.comments || []), newComment]
-      });
+      await updateDoc(postRef, { comments: newCommentsList });
       showToast("Comentário publicado!");
-    } catch {
-      showToast("Erro ao comentar.");
+    } catch (error) {
+      console.error("[usePosts:handleAddComment]", error);
+      showToast("Erro ao comentar.", "error");
+      setPosts(originalPosts); // Rollback
     }
   };
 
   const handleDeleteComment = async (postId, commentId) => {
+    const postIndex = posts.findIndex(p => p.id === postId);
+    if (postIndex === -1) return;
+    const post = posts[postIndex];
+
+    const comment = post.comments?.find(c => c.id === commentId);
+    const isOwner = comment && comment.authorId === currentUser?.id;
+    const isAdmin = currentUser?.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      showToast("Você não tem permissão para excluir este comentário.", "error");
+      return;
+    }
+
+    const newCommentsList = post.comments.filter((c) => c.id !== commentId);
+    const originalPosts = [...posts];
+
+    // Optimistic Update
+    setPosts(prev => {
+      const updated = [...prev];
+      updated[postIndex] = { ...post, comments: newCommentsList };
+      return updated;
+    });
+
     try {
       const postRef = doc(db, "posts", postId);
-      const post = posts.find(p => p.id === postId);
-      const comment = post.comments?.find(c => c.id === commentId);
-
-      // Trava de Segurança: Só autor ou admin pode deletar
-      const isOwner = comment && comment.authorId === currentUser?.id;
-      const isAdmin = currentUser?.role === "admin";
-
-      if (!isOwner && !isAdmin) {
-        showToast("Você não tem permissão para excluir este comentário.", "error");
-        return;
-      }
-
-      await updateDoc(postRef, {
-        comments: post.comments.filter((c) => c.id !== commentId)
-      });
+      await updateDoc(postRef, { comments: newCommentsList });
       showToast("Comentário removido.", "success");
-    } catch {
-      showToast("Erro ao remover comentário.");
+    } catch (error) {
+      console.error("[usePosts:handleDeleteComment]", error);
+      showToast("Erro ao remover comentário.", "error");
+      setPosts(originalPosts); // Rollback
     }
   };
 
@@ -142,45 +198,65 @@ export function usePosts(currentUser, showToast) {
       if (postData.id) {
         // Atualizar Post Existente
         const postRef = doc(db, "posts", postData.id);
-        // eslint-disable-next-line no-unused-vars
         const { id, ...dataToUpdate } = postData;
         await updateDoc(postRef, {
           ...dataToUpdate,
           updatedAt: serverTimestamp()
         });
+        
+        // Obter post atualizado do banco para ter os timestamps corretos caso precise local
+        const updatedSnap = await getDoc(postRef);
+        const updatedPost = { id: updatedSnap.id, ...updatedSnap.data() };
+
+        setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
         showToast("Artigo atualizado com sucesso!");
-        return postData;
+        return updatedPost;
       } else {
-        // Criar Novo Post
+        // Criar Novo Post com Colision Prevention (Hash curto)
+        const baseSlug = slugify(postData.title);
+        const uniqueHash = Math.random().toString(36).substring(2, 7);
+        
         const newPost = {
           ...postData,
-          date: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
           likes: 0,
           likedBy: [],
-          slug: slugify(postData.title),
+          slug: `${baseSlug}-${uniqueHash}`, 
           comments: [],
           author: { name: currentUser.name, role: "Editor Chefe" },
           gradient: postData.gradient || "from-purple-600 to-blue-600",
           createdAt: serverTimestamp()
         };
+        // Remove 'date' string hardcoded (vamos usar apenas createdAt na UI)
+        delete newPost.date;
+
         const docRef = await addDoc(collection(db, "posts"), newPost);
+        const createdSnap = await getDoc(docRef);
+        const createdPostObj = { id: createdSnap.id, ...createdSnap.data() };
+        
+        setPosts(prev => [createdPostObj, ...prev]);
         showToast("Novo artigo publicado na capa!");
-        return { id: docRef.id, ...newPost };
+        return createdPostObj;
       }
     } catch (error) {
-      showToast("Erro ao salvar o artigo.");
-      console.error(error);
+      console.error("[usePosts:handleSavePost]", error);
+      showToast("Erro ao salvar o artigo.", "error");
       return null;
     }
   };
 
   const handleDeletePost = async (postId) => {
+    const originalPosts = [...posts];
+    // Optimistic Delete
+    setPosts(prev => prev.filter(p => p.id !== postId));
+    
     try {
       await deleteDoc(doc(db, "posts", postId));
       showToast("Artigo removido permanentemente.", "success");
       return true;
-    } catch {
-      showToast("Erro ao excluir artigo.");
+    } catch (error) {
+      console.error("[usePosts:handleDeletePost]", error);
+      showToast("Erro ao excluir artigo.", "error");
+      setPosts(originalPosts); // Rollback
       return false;
     }
   };
