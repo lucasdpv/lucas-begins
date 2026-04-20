@@ -1,62 +1,67 @@
 import React from "react";
-import { X, MessageSquare, Mail } from "lucide-react";
-import { MOCK_USERS } from "../../data/mockData";
+import { X, Mail, Gamepad2 } from "lucide-react";
 import { useAppContext } from "../../context/AppContext";
 import { cn } from "../../lib/utils";
 
 export default function LoginModal() {
-  const { isDark, setIsLoginModalOpen, login, showToast } = useAppContext();
+  const { isDark, setIsLoginModalOpen, login } = useAppContext();
 
-  const handleLogin = (user) => {
-    login(user);
+  const handleGoogleLogin = async () => {
+    await login();
     setIsLoginModalOpen(false);
-    showToast(`Bem-vindo, ${user.name}`);
   };
 
   const onClose = () => setIsLoginModalOpen(false);
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4">
-      <div className={cn("w-full max-w-sm rounded-xl p-8 retro-card", isDark ? "bg-gray-900" : "bg-white")}>
-        <div className="flex justify-between items-center mb-8 border-b-2 border-purple-500 pb-4">
-          <h3 className="font-retro text-2xl font-bold uppercase">Acesso Retro</h3>
+      <div className={cn(
+        "w-full max-w-md rounded-3xl p-10 retro-card relative overflow-hidden",
+        isDark ? "bg-gray-900" : "bg-white"
+      )}>
+        {/* Decoração Retro */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl" />
+        
+        <div className="flex justify-between items-center mb-8 border-b-2 border-purple-500 pb-6">
+          <h3 className="font-retro text-3xl font-bold uppercase tracking-tight flex items-center gap-3">
+            <Gamepad2 className="text-purple-500 w-8 h-8" />
+            Login Player 1
+          </h3>
           <button
             onClick={onClose}
-            className="retro-button p-1 rounded-md bg-red-500 text-white border-black"
+            className="retro-button p-2 rounded-xl bg-red-500 text-white border-black hover:scale-110 active:scale-95 transition-transform"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <p className="text-sm mb-6 opacity-80 font-medium">
-          No mundo real, checaríamos seu e-mail no banco de dados. Para testar aqui:
-        </p>
-
-        <div className="space-y-4">
-          <button
-            onClick={() => handleLogin(MOCK_USERS.admin)}
-            className="w-full flex items-center justify-between p-4 rounded-lg font-bold font-retro uppercase transition-transform retro-button bg-[#5865F2] text-white border-black"
-          >
-            <span className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5" /> Discord
-            </span>
-            <span className="text-[10px] opacity-80">(Simula o Admin)</span>
-          </button>
+        <div className="space-y-8">
+          <div className="text-center space-y-3">
+            <p className={cn("text-lg font-medium leading-relaxed", isDark ? "text-gray-300" : "text-gray-600")}>
+              Identifique-se para salvar seu progresso, curtir artigos e participar da discussão em nossa revista digital.
+            </p>
+            <p className="text-xs uppercase font-retro font-bold opacity-40 tracking-widest">
+              Conexão Segura estabelecida
+            </p>
+          </div>
 
           <button
-            onClick={() => handleLogin(MOCK_USERS.reader)}
-            className="w-full flex items-center justify-between p-4 rounded-lg font-bold font-retro uppercase transition-transform retro-button bg-white text-black border-black"
+            onClick={handleGoogleLogin}
+            className={cn(
+              "group w-full flex items-center justify-center gap-4 p-5 rounded-2xl font-bold font-retro text-xl uppercase transition-all retro-button border-4",
+              isDark 
+                ? "bg-white text-black border-purple-500 hover:bg-purple-500 hover:text-white" 
+                : "bg-white text-black border-black hover:bg-black hover:text-white"
+            )}
           >
-            <span className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-red-500" /> Google
-            </span>
-            <span className="text-[10px] text-gray-500">(Simula Leitor)</span>
+            <Mail className="w-6 h-6 group-hover:scale-125 transition-transform" />
+            Acessar com Google
           </button>
+
+          <p className="text-[10px] text-center opacity-40 uppercase font-bold tracking-tighter">
+            Ao entrar, você concorda com nossos termos de conduta e privacidade.
+          </p>
         </div>
-
-        <p className="text-xs mt-6 text-center opacity-50 italic">
-          Ao entrar, você concorda com nossos Termos de Serviço.
-        </p>
       </div>
     </div>
   );

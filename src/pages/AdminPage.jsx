@@ -119,7 +119,11 @@ export default function AdminPage() {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeletePost(post.id)}
+                            onClick={() => {
+                              if (window.confirm("Tem certeza que deseja excluir definitivamente este artigo?")) {
+                                handleDeletePost(post.id);
+                              }
+                            }}
                             className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500 rounded-lg transition-colors retro-button"
                             title="Excluir"
                           >

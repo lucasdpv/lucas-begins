@@ -57,40 +57,40 @@ export default function Footer() {
         <div>
           <h3 className="font-retro font-bold text-lg uppercase tracking-wider mb-6 flex items-center gap-3">
             <span className={cn("w-3 h-6 shrink-0 retro-card", isDark ? "bg-yellow-400" : "bg-yellow-500")} />
-            <span>Multiplayer</span>
+            <span>Multiplayer <span className="text-[10px] opacity-70">(Em Breve)</span></span>
           </h3>
-          <div className="flex flex-wrap gap-4 pl-6">
+          <div className="flex flex-wrap gap-4 pl-6 opacity-40 pointer-events-none filter grayscale">
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500 hover:bg-purple-600" : "bg-white text-black hover:bg-purple-500 hover:text-white")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="X (Antigo Twitter)"
             >
               <XIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500 hover:bg-purple-600" : "bg-white text-black hover:bg-purple-500 hover:text-white")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="Threads"
             >
               <ThreadsIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500 hover:bg-purple-600" : "bg-white text-black hover:bg-purple-500 hover:text-white")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="Instagram"
             >
               <InstagramIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500 hover:bg-red-600" : "bg-white text-black hover:bg-red-600 hover:text-white")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="YouTube"
             >
               <YoutubeIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500 hover:bg-purple-500" : "bg-white text-black hover:bg-purple-500 hover:text-white")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="Twitch"
             >
               <TwitchIcon className="w-5 h-5 shrink-0" />

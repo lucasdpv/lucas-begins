@@ -19,6 +19,7 @@ import AdminPage from "./pages/AdminPage";
 import PostEditorPage from "./pages/PostEditorPage";
 
 import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   const { isDark, toast, isLoginModalOpen } = useAppContext();
@@ -29,7 +30,7 @@ export default function App() {
     style.innerHTML = `
       @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;700&display=swap');
       :root { --font-retro: 'Chakra Petch', sans-serif; --font-body: 'Inter', sans-serif; }
-      body { background-color: ${isDark ? "#111827" : "#f3f4f6"}; color: ${isDark ? "#e5e7eb" : "#1f2937"}; }
+      body { background-color: ${isDark ? "#111827" : "#F8F9FB"}; color: ${isDark ? "#e5e7eb" : "#111827"}; }
       .font-retro { font-family: var(--font-retro); }
       .font-body { font-family: var(--font-body); }
 
@@ -51,21 +52,21 @@ export default function App() {
 
       .retro-card {
         border: 2px solid ${isDark ? "#a855f7" : "#000000"};
-        box-shadow: ${isDark ? "4px 4px 0px 0px rgba(168,85,247,0.5)" : "5px 5px 0px 0px rgba(0,0,0,1)"};
+        box-shadow: ${isDark ? "4px 4px 0px 0px rgba(168,85,247,0.5)" : "6px 6px 0px 0px #000000"};
         transition: all 0.2s ease-in-out;
       }
       .retro-card:hover {
         transform: translate(-2px, -2px);
-        box-shadow: ${isDark ? "6px 6px 0px 0px rgba(168,85,247,0.7)" : "7px 7px 0px 0px rgba(0,0,0,1)"};
+        box-shadow: ${isDark ? "6px 6px 0px 0px rgba(168,85,247,0.7)" : "8px 8px 0px 0px #000000"};
       }
       .retro-button {
         border: 2px solid ${isDark ? "#c084fc" : "#000000"};
-        box-shadow: ${isDark ? "3px 3px 0px 0px #c084fc" : "3px 3px 0px 0px #000000"};
+        box-shadow: ${isDark ? "3px 3px 0px 0px #c084fc" : "4px 4px 0px 0px #000000"};
         transition: all 0.1s ease-in-out;
       }
       .retro-button:active {
         transform: translate(2px, 2px);
-        box-shadow: 1px 1px 0px 0px ${isDark ? "#c084fc" : "#000"};
+        box-shadow: 1px 1px 0px 0px ${isDark ? "#c084fc" : "#000000"};
       }
 
       @keyframes slideUpFade {
@@ -78,7 +79,7 @@ export default function App() {
     return () => document.head.removeChild(style);
   }, [isDark]);
 
-  const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-gray-50 text-gray-900";
+  const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-snes-light text-snes-accent";
 
   return (
     <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>
@@ -91,12 +92,12 @@ export default function App() {
         <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/post/:id" element={<PostDetailPage />} />
+            <Route path="/post/:slug" element={<PostDetailPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/editor" element={<PostEditorPage />} />
-            <Route path="/editor/:id" element={<PostEditorPage />} />
+            <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+            <Route path="/editor" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
+            <Route path="/editor/:id" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

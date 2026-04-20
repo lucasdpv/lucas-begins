@@ -1,9 +1,3 @@
-// --- USUÁRIOS FALSOS (MOCK AUTH) ---
-export const MOCK_USERS = {
-  admin: { id: 1, name: "Admin_Retro", role: "admin", avatar: "👑" },
-  reader: { id: 2, name: "PlayerOne", role: "user", avatar: "👾" },
-};
-
 // --- CATEGORIAS INICIAIS ---
 export const INITIAL_CATEGORIES = ["Notícias", "Artigos", "Nostalgia", "Reviews", "Indies"];
 

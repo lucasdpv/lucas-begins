@@ -51,7 +51,7 @@ export default function Navbar() {
     <header
       className={cn(
         "sticky top-0 z-50 border-b-4 backdrop-blur-md",
-        isDark ? "border-purple-600 bg-gray-900/95" : "border-black bg-white/95"
+        isDark ? "border-purple-600 bg-gray-900/95" : "border-snes-dark bg-snes-light/95"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
@@ -61,8 +61,8 @@ export default function Navbar() {
             className={cn("w-8 h-8 transition-transform group-hover:rotate-12", isDark ? "text-purple-400" : "text-purple-600")}
           />
           <h1 className="font-retro font-bold text-xl sm:text-3xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">
-            <span className={isDark ? "text-white" : "text-black"}>Lucas</span>
-            <span className={isDark ? "text-purple-400" : "text-purple-600"}>Begins</span>
+            <span className={isDark ? "text-white" : "text-snes-accent"}>Lucas</span>
+            <span className={isDark ? "text-purple-400" : "text-snes-purple-deep"}>Begins</span>
           </h1>
         </Link>
 
@@ -131,15 +131,15 @@ export default function Navbar() {
           {/* Barra de Pesquisa */}
           <div
             className={cn(
-              "hidden md:flex max-w-xs items-center rounded-lg px-4 py-2 border-2 transition-colors focus-within:border-purple-500",
-              isDark ? "bg-gray-800 border-purple-500/50 text-white" : "bg-white border-black text-black"
+              "hidden md:flex max-w-xs items-center rounded-lg px-4 py-2 border-2 transition-colors focus-within:border-snes-purple-deep",
+              isDark ? "bg-gray-800 border-purple-500/50 text-white" : "bg-snes-mid border-snes-dark text-snes-accent"
             )}
           >
-            <Search className="w-4 h-4 text-gray-400 mr-2" />
+            <Search className="w-4 h-4 text-snes-dark mr-2" />
             <input
               type="text"
               placeholder="Pesquisar jogos..."
-              className="bg-transparent outline-none w-full text-sm font-retro"
+              className="bg-transparent outline-none w-full text-sm font-retro placeholder:text-snes-dark"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -172,9 +172,12 @@ export default function Navbar() {
 
           {currentUser ? (
             <div className="flex items-center gap-3">
-              <span className="text-2xl drop-shadow-md" title={currentUser.name}>
-                {currentUser.avatar}
-              </span>
+              <img 
+                src={currentUser.avatar} 
+                alt={currentUser.name}
+                className="w-8 h-8 rounded-full border-2 border-purple-500 object-cover shadow-sm"
+                title={currentUser.name}
+              />
               <button
                 onClick={() => {
                   logout();

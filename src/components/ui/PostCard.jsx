@@ -4,7 +4,9 @@ import { calculateReadingTime, cn } from "../../lib/utils";
 import { useAppContext } from "../../context/AppContext";
 
 export default function PostCard({ post, onClick }) {
-  const { isDark, handleLike } = useAppContext();
+  const { isDark, handleLike, currentUser } = useAppContext();
+  
+  const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
 
   const bgStyle = post.imageUrl
     ? { backgroundImage: `url(${post.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
@@ -14,7 +16,7 @@ export default function PostCard({ post, onClick }) {
     <article
       className={cn(
         "flex flex-col rounded-3xl overflow-hidden retro-card cursor-pointer",
-        isDark ? "bg-gray-800" : "bg-white"
+        isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}
     >
@@ -56,13 +58,18 @@ export default function PostCard({ post, onClick }) {
           </div>
           <div className="flex gap-4">
             <button
-              className="flex items-center gap-2 hover:text-red-500 transition-colors font-bold text-lg"
+              className={cn(
+                "flex items-center gap-2 transition-all font-bold text-lg",
+                !currentUser ? "opacity-30 cursor-not-allowed" : "hover:scale-110 active:scale-95",
+                hasLiked ? "text-red-500" : "hover:text-red-500"
+              )}
+              title={!currentUser ? "Faça login para curtir" : ""}
               onClick={(e) => {
                 e.stopPropagation();
-                handleLike(post.id, e);
+                if (currentUser) handleLike(post.id, e);
               }}
             >
-              <Heart className="w-5 h-5" /> {post.likes}
+              <Heart className={cn("w-5 h-5", hasLiked && "fill-current")} /> {post.likes}
             </button>
             <div className="flex items-center gap-2 font-bold text-lg opacity-70">
               <MessageSquare className="w-5 h-5" /> {post.comments?.length || 0}

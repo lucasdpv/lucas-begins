@@ -45,7 +45,7 @@ export default function ContactPage() {
             </div>
             <h3 className="font-retro font-bold text-xl uppercase mb-2">E-mail</h3>
             <p className={`font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-              lucasdpv@gmail.com
+              {import.meta.env.VITE_CONTACT_EMAIL || "contato@lucasbegins.com"}
             </p>
           </div>
         </div>

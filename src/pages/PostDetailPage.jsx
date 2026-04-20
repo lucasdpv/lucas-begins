@@ -16,11 +16,11 @@ import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
 
 export default function PostDetailPage({ previewPost }) {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast } = useAppContext();
 
-  const post = previewPost || posts.find((p) => String(p.id) === String(id));
+  const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
 
   const trendingPosts = useMemo(() => {
     return [...posts].sort((a, b) => b.likes - a.likes).slice(0, 3);
@@ -116,10 +116,18 @@ export default function PostDetailPage({ previewPost }) {
                 <Share2 className="w-6 h-6" />
               </button>
               <button
-                onClick={() => handleLike(post.id)}
-                className={cn("flex items-center gap-3 px-6 py-4 rounded-xl font-retro font-bold text-lg uppercase retro-button border-2 group hover:bg-red-500 hover:border-red-500 hover:text-white", isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black")}
+                onClick={() => currentUser && handleLike(post.id)}
+                disabled={!currentUser}
+                className={cn(
+                  "flex items-center gap-3 px-6 py-4 rounded-xl font-retro font-bold text-lg uppercase retro-button border-2 group transition-all",
+                  !currentUser ? "opacity-30 cursor-not-allowed" : "hover:scale-105 active:scale-95",
+                  currentUser && post.likedBy?.includes(currentUser.id) 
+                    ? "bg-red-500 border-red-600 text-white" 
+                    : (isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black")
+                )}
+                title={!currentUser ? "Faça login para curtir" : ""}
               >
-                <Heart className={cn("w-6 h-6 transition-colors", post.likes > 0 ? "text-red-500 fill-red-500 group-hover:text-white group-hover:fill-white" : "text-gray-400 group-hover:text-white")} />
+                <Heart className={cn("w-6 h-6 transition-colors", currentUser && post.likedBy?.includes(currentUser.id) ? "fill-current" : "group-hover:fill-current")} />
                 {post.likes}
               </button>
             </div>
@@ -155,9 +163,11 @@ export default function PostDetailPage({ previewPost }) {
             {currentUser ? (
               <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
                 <div className="flex items-center gap-4 mb-6 pb-6 border-b-2 border-dashed border-gray-500/30">
-                  <span className="text-4xl bg-gray-200 dark:bg-gray-700 p-3 rounded-2xl border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                    {currentUser.avatar}
-                  </span>
+                  <img 
+                    src={currentUser.avatar} 
+                    alt={currentUser.name}
+                    className="w-12 h-12 rounded-2xl border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] object-cover"
+                  />
                   <span className="text-lg font-bold uppercase font-retro tracking-wide">
                     Comentando como <span className="text-purple-500">{currentUser.name}</span>
                   </span>
@@ -180,7 +190,7 @@ export default function PostDetailPage({ previewPost }) {
                 </div>
               </form>
             ) : (
-              <div className={cn("mb-12 p-12 text-center rounded-3xl border-4 border-dashed", isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-400 bg-gray-50")}>
+              <div className={cn("mb-12 p-12 text-center rounded-3xl border-4 border-dashed", isDark ? "border-gray-700 bg-gray-800/50" : "border-snes-dark bg-snes-mid/30")}>
                 <Gamepad2 className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p className="mb-4 text-xl font-bold font-retro uppercase tracking-wide">
                   Insert Coin para Comentar
@@ -197,18 +207,31 @@ export default function PostDetailPage({ previewPost }) {
                   currentUser &&
                   (currentUser.role === "admin" || currentUser.id === comment.authorId);
                 return (
-                  <div key={comment.id} className={cn("p-8 rounded-2xl flex justify-between gap-6 retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+                  <div key={comment.id} className={cn("p-8 rounded-2xl flex justify-between gap-6 retro-card", isDark ? "bg-gray-800" : "bg-snes-light")}>
                     <div className="flex-1">
-                      <div className="font-retro font-bold text-lg mb-3 uppercase tracking-wider text-purple-500">
+                    <div className="flex items-center gap-4 mb-3">
+                      {comment.authorAvatar && (
+                        <img 
+                          src={comment.authorAvatar} 
+                          alt={comment.author}
+                          className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover"
+                        />
+                      )}
+                      <div className={cn("font-retro font-bold text-lg uppercase tracking-wider", isDark ? "text-purple-500" : "text-snes-purple-deep")}>
                         {comment.author}
                       </div>
+                    </div>
                       <p className={cn("text-lg font-medium leading-relaxed", isDark ? "text-gray-300" : "text-gray-700")}>
                         {comment.text}
                       </p>
                     </div>
                     {canDelete && (
                       <button
-                        onClick={() => handleDeleteComment(post.id, comment.id)}
+                        onClick={() => {
+                          if (window.confirm("Deseja apagar este comentário?")) {
+                            handleDeleteComment(post.id, comment.id);
+                          }
+                        }}
                         className="text-white h-fit p-3 bg-red-500 border-2 border-black rounded-xl font-bold retro-button hover:bg-red-600"
                         title="Excluir"
                       >
@@ -224,16 +247,16 @@ export default function PostDetailPage({ previewPost }) {
 
         {trendingPosts.length > 0 && (
           <aside className="lg:col-span-1 space-y-10">
-            <div className={cn("p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
-              <h3 className="font-retro font-bold text-2xl uppercase mb-8 flex items-center gap-3 border-b-2 border-purple-500 pb-3">
-                <Star className="text-yellow-400 w-8 h-8" fill="currentColor" /> Veja Também
+            <div className={cn("p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-light")}>
+              <h3 className={cn("font-retro font-bold text-2xl uppercase mb-8 flex items-center gap-3 border-b-2 pb-3", isDark ? "border-purple-500" : "border-snes-dark")}>
+                <Star className={cn("w-8 h-8", isDark ? "text-yellow-400" : "text-snes-purple-deep")} fill="currentColor" /> Veja Também
               </h3>
               <div className="space-y-8">
                 {trendingPosts
                   .filter((p) => p.id !== post.id)
                   .slice(0, 3)
                   .map((p) => (
-                    <Link to={`/post/${p.id}`} key={p.id} className="block cursor-pointer group">
+                    <Link to={`/post/${p.slug || slugify(p.title)}`} key={p.id} className="block cursor-pointer group">
                       <div
                         className={cn(
                           "h-32 w-full rounded-xl mb-4 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all",

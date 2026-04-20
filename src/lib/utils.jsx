@@ -22,6 +22,27 @@ export const calculateReadingTime = (text) => {
 };
 
 /**
+ * Converte um título em um slug (URL amigável).
+ * Ex: "A Magia dos 16-bits" -> "a-magia-dos-16-bits"
+ * @param {string} text 
+ * @returns {string}
+ */
+export const slugify = (text) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .normalize('NFD') // Decompõe caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, '') // Remove os acentos
+    .replace(/\s+/g, '-') // Troca espaços por -
+    .replace(/[^\w-]+/g, '') // Remove caracteres especiais
+    .replace(/--+/g, '-') // Evita múltiplos hífenes
+    .replace(/^-+/, '') // Remove hífen do início
+    .replace(/-+$/, ''); // Remove hífen do fim
+};
+
+/**
  * Renderiza o conteúdo de um artigo, tratando imagens no formato Markdown
  * `![alt](url)` e parágrafos de texto.
  * @param {string} content

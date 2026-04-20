@@ -1,92 +1,68 @@
 # 🕹️ Lucas Begins - Retro Gaming Journal
 
-![Lucas Begins Banner](./public/banner.png)
+![Lucas Begins Banner](./src/assets/lucas_begins_horizontal_bar_1776704034852.png)
 
-> **"Uma jornada nostálgica pela era de ouro dos videogames, direto no seu navegador."**
+> **"A essência dos 16-bits em uma experiência web de alta fidelidade."**
 
-O **Lucas Begins** não é apenas um blog, é uma cápsula do tempo digital inspirada nas clássicas revistas de videogame dos anos 90 como Ação Games e Super GamePower. Desenvolvido com uma estética *retro-moderna*, o projeto combina a nostalgia do pixel art com as tecnologias mais robustas do desenvolvimento web atual.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-Este projeto foi construído utilizando o estado da arte do ecossistema React:
-
--   **React 19**: Performance e hooks modernos.
--   **Vite**: Build system ultra-rápido.
--   **Tailwind CSS**: Estilização dinâmica e responsiva.
--   **React Router 7**: Gerenciamento de rotas e navegação fluída.
--   **Context API**: Gerenciamento de estado global centralizado (Auth, Temas, Posts).
--   **Lucide React**: Biblioteca de ícones minimalistas.
--   **React Helmet Async**: Otimização de SEO dinâmico por página.
--   **UIW React MD Editor**: Editor de Markdown imersivo para criação de conteúdo.
+O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Inspirado na estética nítida dos consoles clássicos e na sofisticação das interfaces modernas, o projeto oferece uma jornada imersiva através de análises, notícias e memórias da era dourada dos videogames.
 
 ---
 
-## ✨ Funcionalidades Principais
+## 📘 Documentação do Projeto
 
-### 🎨 Estética Retro Gaming
-Layout inspirado em scans de revistas antigas, com efeitos de "scanline", paletas de cores vibrantes e tipografia Chakra Petch para aquele feeling de fliperama.
+Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
-### 📝 Painel de Editor (CMS Interno)
-Um sistema administrativo completo para gerenciar o conteúdo:
--   Criar, editar e excluir artigos.
--   Editor de Markdown com preview em tempo real.
--   Upload e gerenciamento de imagens e categorias.
-
-### 📱 Experiência do Usuário (UX)
--   **Tema Dark/Light**: Escolha seu modo de jogo.
--   **Responsividade Total**: Deixe sua leitura confortável no PC ou no Celular.
--   **Scroll Restoration**: Nunca perca o foco ao navegar pelos artigos.
--   **Skeletons de Loading**: Feedback visual polido enquanto os dados são processados.
-
-### 🔍 SEO & Desempenho
--   Metadados dinâmicos para melhor indexação e compartilhamento em redes sociais.
--   Componentização modular para garantir manutenibilidade e performance.
+-   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Como postar, gerir categorias e adicionar administradores.
+-   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre arquitetura, hooks, componentes e banco de dados.
 
 ---
 
-## 🛠️ Como Executar o Projeto
+## ✨ Destaques do Projeto
 
-Para rodar o **Lucas Begins** localmente, siga estes passos:
+### 🎨 Design "Modern Arcade"
+Uma evolução da estética do SNES Americano. Fundo perolado limpo, roxos elétricos e **sombras pretas sólidas** que dão profundidade e peso visual à interface.
 
-1.  **Clone o repositório:**
+### 📝 CMS Imersivo
+Editor de Markdown integrado com sistema de rascunhos automático (`LocalStorage`) para garantir que nenhum conteúdo seja perdido durante a criação.
+
+### 🔐 Segurança Pro
+Sistema de autenticação via Google e proteção de rotas administrativas com verificação de papéis (Admin/User) direto no Firestore.
+
+---
+
+## 🛠️ Tecnologias de Ponta
+
+-   **React 19** + **Vite**
+-   **Firebase** (Auth & Firestore Database)
+-   **Tailwind CSS** + **Neo-Retro Design System**
+-   **React Router 7**
+-   **Lucide Icons**
+
+---
+
+## 🚀 Como Executar
+
+1.  **Clone e Instale:**
     ```bash
     git clone https://github.com/lucasdpv/lucas-begins.git
-    ```
-
-2.  **Entre na pasta do projeto:**
-    ```bash
     cd lucas-begins
-    ```
-
-3.  **Instale as dependências:**
-    ```bash
     npm install
     ```
 
-4.  **Inicie o servidor de desenvolvimento:**
+2.  **Variáveis de Ambiente:**
+    Crie um arquivo `.env` na raiz com suas credenciais do Firebase:
+    ```env
+    VITE_FIREBASE_API_KEY=...
+    VITE_FIREBASE_AUTH_DOMAIN=...
+    VITE_FIREBASE_PROJECT_ID=...
+    ```
+
+3.  **Inicie o Motor:**
     ```bash
     npm run dev
     ```
 
-5.  **Acesse no seu navegador:**
-    `http://localhost:5173`
-
 ---
-
-## 🗺️ Roadmap de Evolução
-
-- [x] Refatoração de Arquitetura (Modularização).
-- [x] Implementação de Context API e React Router.
-- [x] Integração de Editor de Markdown.
-- [/] Integração com **Firebase** (Auth & Firestore).
-- [ ] Deploy Automático via Vercel.
-
----
-
-## 🤝 Contribuições
-
-Sinta-se à vontade para abrir uma *Issue* ou enviar um *Pull Request*. Feedbacks são sempre bem-vindos para tornar essa jornada retro ainda mais épica!
 
 **Desenvolvido com 💜 por Lucas Vieira.**
+*"Insert Coin to Continue"*

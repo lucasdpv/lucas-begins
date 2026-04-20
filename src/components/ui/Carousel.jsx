@@ -15,9 +15,10 @@ export default function Carousel({ posts, onPostClick }) {
     return () => clearInterval(timer);
   }, [posts.length]);
 
-  if (!posts.length) return null;
-
   const currentPost = posts[currentIndex];
+
+  if (!currentPost) return null;
+
   const bgStyle = currentPost.imageUrl
     ? {
         backgroundImage: `url(${currentPost.imageUrl})`,

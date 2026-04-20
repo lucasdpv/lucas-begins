@@ -12,7 +12,7 @@ import {
 import { calculateReadingTime, cn } from "../lib/utils";
 import PostDetailPage from "./PostDetailPage";
 import { useAppContext } from "../context/AppContext";
-import MDEditor from '@uiw/react-md-editor';
+import BlockEditor from "../components/editor/BlockEditor";
 import { Helmet } from "react-helmet-async";
 
 const DRAFT_KEY = "retro_blog_draft";
@@ -181,10 +181,10 @@ export default function PostEditorPage() {
             <div className="md:col-span-2 space-y-4">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
               <div data-color-mode={isDark ? "dark" : "light"}>
-                <MDEditor
+                <BlockEditor
                   value={formData.content}
                   onChange={(val) => setFormData((prev) => ({ ...prev, content: val || "" }))}
-                  height={500}
+                  isDark={isDark}
                 />
               </div>
             </div>

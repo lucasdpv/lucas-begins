@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import App from './App.jsx'
 import ErrorBoundary from './components/layout/ErrorBoundary.jsx'
-import { AppProvider } from './context/AppContext.jsx'
+import { AppProvider } from './context/AppProvider'
 import ScrollToTop from './components/layout/ScrollToTop.jsx'
 import './index.css'
 
