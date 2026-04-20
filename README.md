@@ -24,6 +24,9 @@ Uma evolução da estética do SNES Americano. Fundo perolado limpo, roxos elét
 ### 📝 CMS Imersivo
 Editor de Markdown integrado com sistema de rascunhos automático (`LocalStorage`) para garantir que nenhum conteúdo seja perdido durante a criação.
 
+### ⚡ Arquitetura "Enterprise-Ready"
+O coração do blog foi reescrito com foco em **Performance Extrema e Custos Zero** no Firebase. Utilizamos **Optimistic UI** para interações em tempo real (Sem lag), **Cursor Pagination** (`startAfter`) para economia de requisições e **Memoização Profunda** (`useMemo`) global para prevenir renderizações em cascata ("Render Hell").
+
 ### 🔐 Segurança Pro
 Sistema de autenticação via Google e proteção de rotas administrativas com verificação de papéis (Admin/User) direto no Firestore.
 

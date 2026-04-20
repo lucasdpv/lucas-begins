@@ -9,7 +9,7 @@ Este documento detalha a arquitetura de software e as decisões de engenharia to
 O projeto utiliza um **Estado Global Centralizado** via `AppProvider.jsx`. Isso evita o *prop drilling* e garante que informações como o usuário logado e o tema estejam disponíveis em qualquer nível da aplicação.
 
 - **`AppContext`**: Define os tipos de dados.
-- **`AppProvider`**: Gerencia a lógica de autenticação (Firebase Auth), tema (Dark/SNES) e integra os hooks de dados.
+- **`AppProvider`**: Gerencia a lógica de autenticação (Firebase Auth), tema (Dark/SNES) e integra os hooks de dados. Protegido ferozmente contra "Render Hell" através da **memoização completa (`useMemo`)** do seu objeto de `value`.
 
 ---
 
@@ -19,8 +19,9 @@ Toda a interação com o Firestore foi abstraída em hooks para manter os compon
 
 ### 1. `usePosts.js`
 - **Função**: CRUD completo da coleção `posts`.
-- **Destaque**: Implementa carregamento infinito (pagination) e filtragem por categoria.
-- **Segurança**: As operações de `delete` verificam se o usuário é o autor ou admin.
+- **Destaque (Performance)**: Implementa paginação infinita através de **Cursores Nativos do Firestore** (`getDocs` + `startAfter`), reduzindo brutalmente o custo por leitura da base de dados.
+- **Optimistic UI**: Curtidas, criação e exclusão de comentários refletem na tela instantaneamente, atualizando o *cache local* do React antes mesmo do servidor responder.
+- **Segurança Anticolisão**: O algoritmo de geração de Slugs (`slugify`) inclui um hash alfanumérico garantindo que títulos idênticos gerem rotas Web (`URL`) absolutamente únicas.
 
 ### 2. `useCategories.js`
 - **Função**: Gerencia a coleção `categories`.
@@ -57,10 +58,10 @@ A sentinela.
 ```json
 {
   "title": "String",
-  "slug": "String (URL index)",
+  "slug": "String (ex: review-do-jogo-a7m9p)",
   "content": "String (Markdown)",
   "category": "String",
-  "createdAt": "Timestamp",
+  "createdAt": "Timestamp (Livre de strings hardcoded redundantes)",
   "likes": "Number",
   "likedBy": "Array (UIDs)",
   "comments": [
