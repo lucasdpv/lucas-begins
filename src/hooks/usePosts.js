@@ -32,11 +32,15 @@ export function usePosts(currentUser, showToast) {
 
   // Busca inicial e de paginação
   const fetchPosts = useCallback(async (isLoadMore = false) => {
+    setIsLoadingPosts(true);
     try {
+      // Busca um a mais do que o limite para saber se há próxima página
+      const fetchLimit = POSTS_PER_PAGE + 1;
+
       let q = query(
         collection(db, "posts"), 
         orderBy("createdAt", "desc"),
-        limit(POSTS_PER_PAGE)
+        limit(fetchLimit)
       );
       
       if (isLoadMore && lastDoc) {
@@ -44,22 +48,27 @@ export function usePosts(currentUser, showToast) {
           collection(db, "posts"), 
           orderBy("createdAt", "desc"), 
           startAfter(lastDoc), 
-          limit(POSTS_PER_PAGE)
+          limit(fetchLimit)
         );
       }
 
       const snapshot = await getDocs(q);
-      const postsData = snapshot.docs.map(doc => ({
+      const hasNextPage = snapshot.docs.length > POSTS_PER_PAGE;
+
+      // Mantém apenas os docs da página atual (sem o extra de sondagem)
+      const pageDocs = hasNextPage ? snapshot.docs.slice(0, POSTS_PER_PAGE) : snapshot.docs;
+
+      const postsData = pageDocs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
       setPosts(prev => isLoadMore ? [...prev, ...postsData] : postsData);
       
-      if (snapshot.docs.length > 0) {
-        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+      if (pageDocs.length > 0) {
+        setLastDoc(pageDocs[pageDocs.length - 1]);
       }
-      setHasMore(snapshot.docs.length >= POSTS_PER_PAGE);
+      setHasMore(hasNextPage);
     } catch (error) {
       console.error("[usePosts:fetchPosts]", error);
       showToast("Erro ao carregar posts.", "error");

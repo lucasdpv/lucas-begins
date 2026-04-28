@@ -6,7 +6,7 @@ import Carousel from "../components/ui/Carousel";
 import PostCard from "../components/ui/PostCard";
 import PostSkeleton from "../components/ui/PostSkeleton";
 import { useAppContext } from "../context/AppContext";
-import { cn } from "../lib/utils";
+import { cn, slugify } from "../lib/utils";
 
 export default function HomePage() {
   const { isDark, posts, isLoadingPosts, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();

@@ -8,6 +8,12 @@ import {
   Save,
   Star,
   Image as ImageIcon,
+  Move,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
 } from "lucide-react";
 import { calculateReadingTime, cn } from "../lib/utils";
 import PostDetailPage from "./PostDetailPage";
@@ -17,8 +23,22 @@ import { Helmet } from "react-helmet-async";
 
 const DRAFT_KEY = "retro_blog_draft";
 
+// Posições predefinidas de imagem
+const IMAGE_POSITIONS = [
+  { value: "top left",    label: "↖", title: "Topo Esquerda" },
+  { value: "top center",  label: "↑", title: "Topo Centro" },
+  { value: "top right",   label: "↗", title: "Topo Direita" },
+  { value: "center left", label: "←", title: "Centro Esquerda" },
+  { value: "center",      label: "⊙", title: "Centro" },
+  { value: "center right",label: "→", title: "Centro Direita" },
+  { value: "bottom left", label: "↙", title: "Base Esquerda" },
+  { value: "bottom center",label: "↓", title: "Base Centro" },
+  { value: "bottom right",label: "↘", title: "Base Direita" },
+];
+
 /**
  * Editor de artigos com abas Editar / Preview e auto-save no localStorage.
+ * Inclui controle de posicionamento da imagem de capa.
  */
 export default function PostEditorPage() {
   const { id } = useParams();
@@ -27,15 +47,20 @@ export default function PostEditorPage() {
 
   const [activeTab, setActiveTab] = useState("edit");
 
-  const post = id ? posts.find(p => String(p.id) === String(id)) : null;
+  const post = id ? posts.find((p) => String(p.id) === String(id)) : null;
 
   // Inicializa com o post existente ou com o rascunho salvo
   const [formData, setFormData] = useState(() => {
     if (post) return post;
-    const savedDraft = localStorage.getItem(DRAFT_KEY);
-    return savedDraft
-      ? JSON.parse(savedDraft)
-      : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "" };
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      return savedDraft
+        ? JSON.parse(savedDraft)
+        : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", imagePosition: "center", score: "", verdict: "" };
+    } catch {
+      localStorage.removeItem(DRAFT_KEY);
+      return { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", imagePosition: "center", score: "", verdict: "" };
+    }
   });
 
   // Auto-save do rascunho a cada 1 segundo (só para novos posts)
@@ -56,11 +81,11 @@ export default function PostEditorPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     if (!post) localStorage.removeItem(DRAFT_KEY);
-    handleSavePost(formData);
-    navigate("/admin");
+    const saved = await handleSavePost(formData);
+    if (saved) navigate("/admin");
   };
 
   const inputClass = cn(
@@ -83,6 +108,7 @@ export default function PostEditorPage() {
       <Helmet>
         <title>{post ? "Editar Fase" : "Nova Fase"} | Lucas Begins</title>
       </Helmet>
+
       {/* Cabeçalho com abas */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <h2 className="font-retro text-3xl font-bold uppercase flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(168,85,247,0.5)]">
@@ -134,19 +160,22 @@ export default function PostEditorPage() {
             {formData.content && <span>{calculateReadingTime(formData.content)}</span>}
           </div>
 
-          {formData.imageUrl && (
-            <div
-              className="w-full h-56 rounded-2xl bg-cover bg-center border-4 border-dashed border-purple-500/50 shadow-inner"
-              style={{ backgroundImage: `url(${formData.imageUrl})` }}
-            />
-          )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Título */}
             <div className="md:col-span-2 space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Título da Matéria *</label>
-              <input type="text" name="title" value={formData.title} onChange={handleChange} required className={inputClass} placeholder="Ex: Análise Completa de Silent Hill 2..." />
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                className={inputClass}
+                placeholder="Ex: Análise Completa de Silent Hill 2..."
+              />
             </div>
 
+            {/* Categoria */}
             <div className="space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
               <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
@@ -154,30 +183,117 @@ export default function PostEditorPage() {
               </select>
             </div>
 
+            {/* Imagem de Capa */}
             <div className="space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80 flex items-center gap-2">
                 <ImageIcon className="w-4 h-4" /> URL da Imagem de Capa
               </label>
-              <input type="url" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className={inputClass} placeholder="https://..." />
+              <input
+                type="url"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="https://..."
+              />
             </div>
 
+            {/* Preview da imagem + Controle de posição */}
+            {formData.imageUrl && (
+              <div className="md:col-span-2 space-y-4">
+                <label className="text-sm font-bold uppercase font-retro opacity-80 flex items-center gap-2">
+                  <Move className="w-4 h-4" /> Posição da Imagem de Capa
+                </label>
+                <div className={cn("p-4 rounded-2xl border-2 space-y-4", isDark ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300")}>
+                  {/* Preview em tempo real */}
+                  <div
+                    className="w-full h-40 rounded-xl bg-cover border-2 border-purple-500/40 transition-all duration-300 shadow-inner"
+                    style={{
+                      backgroundImage: `url(${formData.imageUrl})`,
+                      backgroundPosition: formData.imagePosition || "center",
+                      backgroundSize: "cover",
+                    }}
+                  />
+                  {/* Grid de posições */}
+                  <div className="space-y-2">
+                    <p className={cn("text-xs font-bold uppercase font-retro opacity-60")}>
+                      Clique para posicionar o foco da imagem:
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 max-w-[200px]">
+                      {IMAGE_POSITIONS.map(({ value, label, title }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          title={title}
+                          onClick={() => setFormData((prev) => ({ ...prev, imagePosition: value }))}
+                          className={cn(
+                            "h-10 rounded-lg border-2 font-bold text-lg transition-all hover:scale-105 active:scale-95 retro-button",
+                            formData.imagePosition === value
+                              ? "bg-purple-600 text-white border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                              : isDark
+                              ? "bg-gray-800 border-gray-600 text-gray-300 hover:border-purple-500"
+                              : "bg-white border-gray-300 text-gray-600 hover:border-black"
+                          )}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className={cn("text-xs opacity-40 font-medium italic")}>
+                      Posição atual: <strong>{formData.imagePosition || "center"}</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Score */}
             <div className="space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500 flex items-center gap-2">
                 <Star className="w-4 h-4" /> Nota / Score (0 a 10)
               </label>
-              <input type="number" step="0.1" min="0" max="10" name="score" value={formData.score} onChange={handleChange} className={inputClass} placeholder="Opcional. Ex: 9.5" />
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="10"
+                name="score"
+                value={formData.score}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Opcional. Ex: 9.5"
+              />
             </div>
 
+            {/* Veredito */}
             <div className="space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500">Veredito</label>
-              <input type="text" name="verdict" value={formData.verdict} onChange={handleChange} className={inputClass} placeholder="Ex: Obra-prima, Fraco..." disabled={!formData.score} />
+              <input
+                type="text"
+                name="verdict"
+                value={formData.verdict}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Ex: Obra-prima, Fraco..."
+                disabled={!formData.score}
+              />
             </div>
 
+            {/* Resumo */}
             <div className="md:col-span-2 space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Resumo (Linha Fina) *</label>
-              <textarea name="excerpt" value={formData.excerpt} onChange={handleChange} required rows="2" className={cn(inputClass, "resize-none")} placeholder="Breve introdução chamativa para as capas..." />
+              <textarea
+                name="excerpt"
+                value={formData.excerpt}
+                onChange={handleChange}
+                required
+                rows="2"
+                className={cn(inputClass, "resize-none")}
+                placeholder="Breve introdução chamativa para as capas..."
+              />
             </div>
 
+            {/* Conteúdo */}
             <div className="md:col-span-2 space-y-4">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
               <div data-color-mode={isDark ? "dark" : "light"}>
@@ -191,7 +307,10 @@ export default function PostEditorPage() {
           </div>
 
           <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex justify-end gap-4">
-            <button type="submit" className="flex items-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black">
+            <button
+              type="submit"
+              className="flex items-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black hover:bg-purple-500 transition-colors"
+            >
               <Save className="w-6 h-6" /> Publicar Matéria
             </button>
           </div>
@@ -209,7 +328,7 @@ export default function PostEditorPage() {
             </div>
             <button
               onClick={handleSubmit}
-              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20"
+              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20 hover:bg-yellow-300 transition-colors"
             >
               <Save className="w-7 h-7" /> Lançar Revista (Publicar)
             </button>

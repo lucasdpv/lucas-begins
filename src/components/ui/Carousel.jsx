@@ -1,70 +1,147 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
+import { calculateReadingTime, cn } from "../../lib/utils";
 
 /**
- * Carrossel automático com autoplay a cada 6 segundos.
- * Exibe os posts em destaque na home.
+ * Carrossel automático com autoplay, pausa no hover, navegação por teclado.
+ * Respeita o campo imagePosition de cada post.
  */
-export default function Carousel({ posts, onPostClick }) {
+export default function Carousel({ posts, onPostClick, isDark }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    const timer = setInterval(
-      () => setCurrentIndex((prev) => (prev + 1) % posts.length),
-      6000
-    );
-    return () => clearInterval(timer);
+  const next = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % posts.length);
   }, [posts.length]);
 
-  const currentPost = posts[currentIndex];
+  const prev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + posts.length) % posts.length);
+  }, [posts.length]);
 
+  // Autoplay com pausa no hover
+  useEffect(() => {
+    if (isPaused || posts.length <= 1) return;
+    const timer = setInterval(next, 6000);
+    return () => clearInterval(timer);
+  }, [isPaused, next, posts.length]);
+
+  // Navegação por teclado
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [next, prev]);
+
+  const currentPost = posts[currentIndex];
   if (!currentPost) return null;
 
   const bgStyle = currentPost.imageUrl
     ? {
         backgroundImage: `url(${currentPost.imageUrl})`,
         backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundPosition: currentPost.imagePosition || "center",
       }
     : {};
 
   return (
-    <div className="relative rounded-3xl overflow-hidden retro-card">
+    <div
+      className="relative rounded-3xl overflow-hidden retro-card group/carousel"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Slide */}
       <div
-        className={`w-full h-[400px] md:h-[600px] relative transition-all duration-1000 cursor-pointer ${
-          currentPost.imageUrl ? "" : `bg-gradient-to-br ${currentPost.gradient}`
-        }`}
+        className={cn(
+          "w-full h-[400px] md:h-[560px] relative cursor-pointer transition-all duration-700",
+          !currentPost.imageUrl && `bg-gradient-to-br ${currentPost.gradient}`
+        )}
         style={bgStyle}
         onClick={() => onPostClick(currentPost)}
       >
-        <div className="absolute inset-0 scanline-overlay opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white max-w-5xl">
-          <div className="flex gap-3 mb-6">
-            <span className="bg-purple-600 font-retro text-xs md:text-sm px-5 py-2.5 rounded-lg uppercase font-bold tracking-widest border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+        {/* Scanlines */}
+        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover/carousel:opacity-50 transition-opacity" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent" />
+
+        {/* Content */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-14 text-white max-w-5xl">
+          <div className="flex gap-3 mb-4">
+            <span className="bg-purple-600 font-retro text-xs md:text-sm px-5 py-2 rounded-lg uppercase font-bold tracking-widest border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
               {currentPost.category}
             </span>
+            {currentPost.score && (
+              <span className="bg-yellow-400 text-black font-retro text-xs md:text-sm px-4 py-2 rounded-lg border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] font-bold flex items-center gap-1">
+                ★ {currentPost.score}
+              </span>
+            )}
           </div>
-          <h3 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl mb-6 leading-tight hover:text-purple-400 transition-colors drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+
+          <h2 className="font-retro font-bold text-3xl md:text-5xl lg:text-6xl mb-4 leading-tight drop-shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:text-purple-300 transition-colors">
             {currentPost.title}
-          </h3>
-          <p className="hidden md:block text-gray-200 text-xl font-medium mb-10 line-clamp-2 max-w-3xl drop-shadow-md">
+          </h2>
+
+          <p className="hidden md:block text-gray-200 text-lg font-medium mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
             {currentPost.excerpt}
           </p>
+
+          {/* Meta info */}
+          <div className="flex items-center gap-5 text-sm text-gray-300 font-bold">
+            <span className="flex items-center gap-1.5">
+              <Heart className="w-4 h-4 text-red-400" fill="currentColor" />
+              {currentPost.likes || 0}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-purple-300" />
+              {calculateReadingTime(currentPost.content || "")}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Dots de navegação */}
-      <div className="absolute bottom-8 right-8 flex gap-4">
+      {/* Botões de navegação — aparecem no hover */}
+      {posts.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            aria-label="Próximo"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </>
+      )}
+
+      {/* Dots + barra de progresso */}
+      <div className="absolute bottom-6 right-6 flex items-center gap-3">
         {posts.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => setCurrentIndex(idx)}
-            className={`h-3 rounded-full border-2 border-black transition-all duration-500 shadow-[2px_2px_0px_rgba(0,0,0,1)] ${
-              idx === currentIndex ? "w-12 bg-purple-500" : "w-4 bg-white/80 hover:bg-white"
-            }`}
+            onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+            className={cn(
+              "h-2.5 rounded-full border border-white/30 transition-all duration-500 shadow-sm",
+              idx === currentIndex ? "w-10 bg-purple-500" : "w-2.5 bg-white/60 hover:bg-white"
+            )}
+            aria-label={`Slide ${idx + 1}`}
           />
         ))}
       </div>
+
+      {/* Indicador de pausa */}
+      {isPaused && (
+        <div className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-black/50 text-white text-xs font-retro font-bold uppercase tracking-wider border border-white/20 backdrop-blur-sm">
+          ⏸ Pausado
+        </div>
+      )}
     </div>
   );
 }
