@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "../hooks/useToast";
 import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
-import { db, auth, googleProvider } from "../lib/firebase";
+import { db, auth, googleProvider, facebookProvider } from "../lib/firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
@@ -33,19 +33,21 @@ export function AppProvider({ children }) {
         // Busca se o usuário está na lista VIP de admins no Firestore
         let role = "user";
         try {
-          const adminDoc = await getDoc(doc(db, "admins", user.email));
-          if (adminDoc.exists()) {
-            role = "admin";
+          if (user.email) {
+            const adminDoc = await getDoc(doc(db, "admins", user.email));
+            if (adminDoc.exists()) {
+              role = "admin";
+            }
           }
-        } catch {
-          console.error("Erro ao verificar permissões:");
+        } catch (error) {
+          console.error("Erro ao verificar permissões:", error);
         }
 
         setCurrentUser({
           id: user.uid,
-          name: user.displayName || user.email.split('@')[0],
-          email: user.email,
-          avatar: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`,
+          name: user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
+          email: user.email || "",
+          avatar: user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || "P"}`,
           role: role
         });
       } else {
@@ -82,16 +84,21 @@ export function AppProvider({ children }) {
   // Handlers Firebase
   const toggleTheme = () => setIsDark(prev => !prev);
   
-  const login = async () => {
+  const loginWithProvider = async (provider, providerName) => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      showToast("Bem-vindo de volta, Player 1!");
+      await signInWithPopup(auth, provider);
+      showToast("Bem-vindo de volta, Player 1! 🎮");
       setIsLoginModalOpen(false);
     } catch (err) {
       console.error(err);
-      showToast("Falha na autenticação com o Google.", "error");
+      // Erros comuns: popup fechado pelo usuário, provider não configurado
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+      showToast(`Falha na autenticação com ${providerName}.`, "error");
     }
   };
+
+  const login = () => loginWithProvider(googleProvider, "Google");
+  const loginWithFacebook = () => loginWithProvider(facebookProvider, "Facebook");
 
   const logout = async () => {
     try {
@@ -102,9 +109,9 @@ export function AppProvider({ children }) {
     }
   };
 
-  const value = useMemo(() => ({
+  const value = {
     isDark, toggleTheme,
-    currentUser, login, logout, authLoading,
+    currentUser, login, loginWithFacebook, logout, authLoading,
     toast, showToast,
     posts, isLoadingPosts, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
     loadMore, hasMore,
@@ -112,10 +119,7 @@ export function AppProvider({ children }) {
     activeCategory, setActiveCategory,
     searchQuery, setSearchQuery,
     isLoginModalOpen, setIsLoginModalOpen
-  }), [
-    isDark, currentUser, authLoading, toast, showToast, posts, isLoadingPosts, hasMore,
-    categories, activeCategory, searchQuery, isLoginModalOpen
-  ]);
+  };
 
   return (
     <AppContext.Provider value={value}>

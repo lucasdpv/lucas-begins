@@ -196,11 +196,15 @@ export default function Navbar() {
             <button
               onClick={() => setIsLoginModalOpen(true)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg font-retro text-sm font-bold uppercase retro-button",
-                isDark ? "bg-purple-600 text-white" : "bg-purple-500 text-white border-black"
+                "flex items-center gap-2 px-4 py-2 rounded-lg font-retro text-sm font-bold uppercase retro-button transition-all hover:scale-105",
+                isDark ? "bg-purple-600 text-white border-purple-800 hover:bg-purple-500" : "bg-purple-600 text-white border-purple-800 hover:bg-purple-700"
               )}
             >
-              <User className="w-4 h-4" /> Entrar
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-300 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400" />
+              </span>
+              Entrar
             </button>
           )}
 

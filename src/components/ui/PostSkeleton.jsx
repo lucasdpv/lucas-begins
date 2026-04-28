@@ -3,23 +3,33 @@ import { cn } from "../../lib/utils";
 
 export default function PostSkeleton({ isDark }) {
   return (
-    <div className={cn("p-6 rounded-2xl border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row gap-6 h-full transition-colors", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300")}>
-      {/* Cover Skeleton */}
-      <div className="w-full sm:w-48 h-48 sm:h-auto rounded-xl bg-gray-300 dark:bg-gray-700 animate-pulse shrink-0" />
-      
-      {/* Content Skeleton */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-20 h-6 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse" />
+    <div
+      className={cn(
+        "flex flex-col rounded-3xl overflow-hidden border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
+      )}
+    >
+      {/* Thumb Skeleton */}
+      <div className={cn("h-56 md:h-64 w-full animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")}>
+        {/* Badge skeleton */}
+        <div className="p-4">
+          <div className={cn("w-20 h-6 rounded-lg animate-pulse", isDark ? "bg-gray-600" : "bg-gray-300")} />
         </div>
-        
-        <div className="w-3/4 h-8 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse mb-4" />
-        <div className="w-full h-4 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse mb-2" />
-        <div className="w-5/6 h-4 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse mb-6" />
-        
-        <div className="mt-auto pt-4 border-t-2 border-dashed border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <div className="w-16 h-4 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse" />
-          <div className="w-24 h-4 bg-gray-300 dark:bg-gray-700 rounded-lg animate-pulse" />
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="p-6 md:p-7 flex flex-col flex-grow space-y-4">
+        <div className={cn("w-4/5 h-7 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+        <div className={cn("w-full h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+        <div className={cn("w-3/4 h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+        <div className={cn("w-5/6 h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+
+        <div className={cn("mt-auto pt-4 border-t-2 flex justify-between items-center", isDark ? "border-gray-700" : "border-gray-200")}>
+          <div className={cn("w-20 h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+          <div className="flex gap-3">
+            <div className={cn("w-12 h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+            <div className={cn("w-12 h-4 rounded-lg animate-pulse", isDark ? "bg-gray-700" : "bg-gray-200")} />
+          </div>
         </div>
       </div>
     </div>

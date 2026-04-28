@@ -16,6 +16,10 @@ export const formatDate = (createdAt, oldDate) => {
   if (createdAt && typeof createdAt.toDate === 'function') {
     return createdAt.toDate().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
   }
+  // Firestore plain object { seconds, nanoseconds } sem o método toDate()
+  if (createdAt && typeof createdAt === 'object' && typeof createdAt.seconds === 'number') {
+    return new Date(createdAt.seconds * 1000).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
   if (createdAt && typeof createdAt === 'string') {
     return new Date(createdAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
   }
@@ -28,6 +32,7 @@ export const formatDate = (createdAt, oldDate) => {
  * @returns {string} Ex: "3 min de leitura"
  */
 export const calculateReadingTime = (text) => {
+  if (!text || !text.trim()) return "1 min de leitura";
   const wordsPerMinute = 200;
   const words = text.trim().split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
@@ -56,59 +61,99 @@ export const slugify = (text) => {
 };
 
 /**
- * Renderiza o conteúdo de um artigo, tratando imagens no formato Markdown
- * `![alt](url)` e parágrafos de texto.
+ * Renderiza o conteúdo de um artigo, tratando elementos Markdown linha por linha.
  * @param {string} content
  * @param {boolean} isDark
  * @returns {JSX.Element[]}
  */
 export function renderArticleContent(content, isDark) {
-  const regex = /!\[([^\]]*)\]\((.*?)\)/g;
-  const parts = [];
-  let lastIndex = 0;
-  let match;
+  const lines = content.split('\n');
 
-  while ((match = regex.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({ type: "text", text: content.substring(lastIndex, match.index) });
-    }
-    parts.push({ type: "image", alt: match[1], url: match[2], key: match.index });
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < content.length) {
-    parts.push({ type: "text", text: content.substring(lastIndex) });
-  }
+  // Aplica bold e italic via dangerouslySetInnerHTML (conteúdo vem apenas do editor admin, sem risco XSS externo)
+  const formatInline = (text) =>
+    text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-  return parts.map((part, index) => {
-    if (part.type === "text") {
+  // Drop cap só aparece se o parágrafo for o PRIMEIRO elemento do artigo
+  // (sem headings, dividers ou imagens antes dele)
+  let firstElementRendered = false;
+  let firstParagraphRendered = false;
+
+  return lines.map((line, index) => {
+    // Linha vazia — pular
+    if (!line.trim()) return null;
+
+    // ## Heading — estilo retro do blog
+    if (line.startsWith('## ')) {
+      const headingText = line.slice(3).trim();
+      firstElementRendered = true;
       return (
-        <div key={index} className={`${index === 0 ? "magazine-article" : ""} whitespace-pre-line mb-8`}>
-          {part.text}
+        <h2
+          key={index}
+          className={`font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide ${
+            isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700'
+          }`}
+        >
+          {headingText}
+        </h2>
+      );
+    }
+
+    // --- Divider decorativo
+    if (line.trim() === '---') {
+      firstElementRendered = true;
+      return (
+        <div key={index} className="my-12 flex items-center gap-4">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
+          <span className={`font-retro text-lg ${isDark ? 'text-purple-400' : 'text-purple-500'} opacity-50`}>
+            ✦
+          </span>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
         </div>
       );
-    } else {
+    }
+
+    // ![alt](url) — Imagem
+    const imgMatch = line.match(/^!\[([^\]]*)\]\((.+?)\)$/);
+    if (imgMatch) {
+      firstElementRendered = true;
       return (
-        <figure key={part.key} className="my-16 w-full animate-in fade-in duration-700 relative group">
+        <figure key={index} className="my-14 w-full animate-in fade-in duration-700 relative group">
           <img
-            src={part.url}
-            alt={part.alt}
+            src={imgMatch[2]}
+            alt={imgMatch[1]}
             className={`w-full rounded-2xl border-4 ${
               isDark
-                ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)]"
-                : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]"
+                ? 'border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)]'
+                : 'border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]'
             } object-cover max-h-[600px] transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1`}
           />
-          {part.alt && (
+          {imgMatch[1] && (
             <figcaption
-              className={`text-center text-sm mt-6 font-retro font-bold tracking-widest uppercase ${
-                isDark ? "text-purple-400" : "text-purple-600"
+              className={`text-center text-sm mt-5 font-retro font-bold tracking-widest uppercase ${
+                isDark ? 'text-purple-400' : 'text-purple-600'
               }`}
             >
-              ▲ {part.alt}
+              ▲ {imgMatch[1]}
             </figcaption>
           )}
         </figure>
       );
     }
-  });
+
+    // Parágrafo de texto
+    // Drop cap apenas se este for o PRIMEIRO elemento do artigo (sem headings antes)
+    const isFirst = !firstParagraphRendered && !firstElementRendered;
+    firstParagraphRendered = true;
+    firstElementRendered = true;
+
+    return (
+      <p
+        key={index}
+        className={`${isFirst ? 'magazine-article' : ''} mb-6 leading-loose text-lg md:text-xl font-medium`}
+        dangerouslySetInnerHTML={{ __html: formatInline(line) }}
+      />
+    );
+  }).filter(Boolean);
 }
