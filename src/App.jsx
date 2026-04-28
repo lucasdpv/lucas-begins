@@ -55,10 +55,6 @@ export default function App() {
         box-shadow: ${isDark ? "4px 4px 0px 0px rgba(168,85,247,0.5)" : "6px 6px 0px 0px #000000"};
         transition: all 0.2s ease-in-out;
       }
-      .retro-card:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: ${isDark ? "6px 6px 0px 0px rgba(168,85,247,0.7)" : "8px 8px 0px 0px #000000"};
-      }
       .retro-button {
         border: 2px solid ${isDark ? "#c084fc" : "#000000"};
         box-shadow: ${isDark ? "3px 3px 0px 0px #c084fc" : "4px 4px 0px 0px #000000"};

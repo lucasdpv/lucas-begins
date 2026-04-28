@@ -127,7 +127,7 @@ export function renderArticleContent(content, isDark) {
               isDark
                 ? 'border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)]'
                 : 'border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]'
-            } object-cover max-h-[600px] transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1`}
+            } object-cover max-h-[600px]`}
           />
           {imgMatch[1] && (
             <figcaption
