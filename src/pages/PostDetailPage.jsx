@@ -11,7 +11,8 @@ import {
   Clock,
   CheckCheck,
 } from "lucide-react";
-import { calculateReadingTime, renderArticleContent, formatDate, cn, slugify } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify } from "../lib/utils";
+import ArticleRenderer from "../components/ui/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
 import AuthGate from "../components/ui/AuthGate";
@@ -73,6 +74,19 @@ export default function PostDetailPage({ previewPost }) {
       <Helmet>
         <title>{post.title ? `${post.title} | Lucas Begins` : "Matéria | Lucas Begins"}</title>
         <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
+        {/* Open Graph — para preview no WhatsApp, Twitter, etc. */}
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="pt_BR" />
+        <meta property="og:site_name" content="Lucas Begins" />
+        <meta property="og:title" content={post.title || "Lucas Begins"} />
+        <meta property="og:description" content={post.excerpt || ""} />
+        {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
+        <meta property="og:url" content={typeof window !== "undefined" ? window.location.href : ""} />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title || "Lucas Begins"} />
+        <meta name="twitter:description" content={post.excerpt || ""} />
+        {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
       </Helmet>
 
       {/* Voltar */}
@@ -200,10 +214,10 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
-            {renderArticleContent(
-              post.content || "O seu artigo não tem texto ainda. Adicione algum conteúdo no editor!",
-              isDark
-            )}
+            <ArticleRenderer
+              content={post.content || "O seu artigo não tem texto ainda. Adicione algum conteúdo no editor!"}
+              isDark={isDark}
+            />
           </div>
 
           {/* Seção de Comentários */}

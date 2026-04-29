@@ -24,56 +24,29 @@ import ProtectedRoute from "./components/ProtectedRoute";
 export default function App() {
   const { isDark, toast, isLoginModalOpen } = useAppContext();
 
-  // Injetar estilos base que dependem do tema
+  // Atualiza os CSS Custom Properties do tema (definidos em index.css)
+  // Muito mais eficiente do que criar/destruir elementos <style> no DOM
   useEffect(() => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;700&display=swap');
-      :root { --font-retro: 'Chakra Petch', sans-serif; --font-body: 'Inter', sans-serif; }
-      body { background-color: ${isDark ? "#111827" : "#F8F9FB"}; color: ${isDark ? "#e5e7eb" : "#111827"}; }
-      .font-retro { font-family: var(--font-retro); }
-      .font-body { font-family: var(--font-body); }
-
-      .scanline-overlay {
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        background-size: 100% 4px, 3px 100%; pointer-events: none;
-      }
-
-      .magazine-article::first-letter {
-        font-family: var(--font-retro);
-        font-size: 4.5em;
-        float: left;
-        line-height: 0.8;
-        margin-right: 0.1em;
-        margin-top: 0.1em;
-        color: ${isDark ? "#c084fc" : "#9333ea"};
-        text-shadow: ${isDark ? "3px 3px 0px rgba(0,0,0,1)" : "3px 3px 0px rgba(147,51,234,0.3)"};
-      }
-
-      .retro-card {
-        border: 2px solid ${isDark ? "#a855f7" : "#000000"};
-        box-shadow: ${isDark ? "4px 4px 0px 0px rgba(168,85,247,0.5)" : "6px 6px 0px 0px #000000"};
-        transition: all 0.2s ease-in-out;
-      }
-      .retro-button {
-        border: 2px solid ${isDark ? "#c084fc" : "#000000"};
-        box-shadow: ${isDark ? "3px 3px 0px 0px #c084fc" : "4px 4px 0px 0px #000000"};
-        transition: all 0.1s ease-in-out;
-      }
-      .retro-button:active {
-        transform: translate(2px, 2px);
-        box-shadow: 1px 1px 0px 0px ${isDark ? "#c084fc" : "#000000"};
-      }
-
-      @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .animate-toast { animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    const root = document.documentElement;
+    if (isDark) {
+      root.style.setProperty('--retro-border-color', '#a855f7');
+      root.style.setProperty('--retro-card-shadow', '4px 4px 0px 0px rgba(168,85,247,0.5)');
+      root.style.setProperty('--retro-button-border', '#c084fc');
+      root.style.setProperty('--retro-button-shadow', '3px 3px 0px 0px #c084fc');
+      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #c084fc');
+      root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0,0,0,1)');
+    } else {
+      root.style.setProperty('--retro-border-color', '#000000');
+      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #000000');
+      root.style.setProperty('--retro-button-border', '#000000');
+      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #000000');
+      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #000000');
+      root.style.setProperty('--magazine-drop-cap-color', '#9333ea');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(147,51,234,0.3)');
+    }
   }, [isDark]);
+
 
   const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-snes-light text-snes-accent";
 
