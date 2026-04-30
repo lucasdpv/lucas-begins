@@ -1,29 +1,18 @@
 import React from "react";
 import { Heart, MessageSquare, Clock } from "lucide-react";
-import { calculateReadingTime, formatDate, cn } from "../../lib/utils";
+import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../lib/utils";
 import { useAppContext } from "../../context/AppContext";
+import { useImageFallback } from "../../hooks/useImageFallback";
+import { CategoryBadge, ScoreBadge } from "./Badge";
 import AuthGate from "./AuthGate";
 
 export default function PostCard({ post, onClick }) {
   const { isDark, handleLike, currentUser } = useAppContext();
-  const [imgError, setImgError] = React.useState(false);
+  const imgError = useImageFallback(post.imageUrl);
+  const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
-
-  // Verifica se a imagem é válida
-  React.useEffect(() => {
-    if (post.imageUrl) {
-      const img = new Image();
-      img.src = post.imageUrl;
-      img.onerror = () => setImgError(true);
-      img.onload = () => setImgError(false);
-    }
-  }, [post.imageUrl]);
-
-  const bgStyle = post.imageUrl && !imgError
-    ? { backgroundImage: `url(${post.imageUrl})`, backgroundSize: "cover", backgroundPosition: post.imagePosition || "center" }
-    : {};
 
   return (
     <article
@@ -66,14 +55,8 @@ export default function PostCard({ post, onClick }) {
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
         <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
-          <span className="bg-purple-600 text-white font-retro font-bold text-xs px-4 py-1.5 rounded-lg uppercase tracking-widest border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-            {post.category}
-          </span>
-          {post.score && (
-            <span className="bg-yellow-400 text-black font-retro font-bold text-xs px-3 py-1.5 rounded-lg border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center gap-1">
-              ★ {post.score}
-            </span>
-          )}
+          <CategoryBadge>{post.category}</CategoryBadge>
+          {post.score && <ScoreBadge score={post.score} />}
         </div>
       </div>
 

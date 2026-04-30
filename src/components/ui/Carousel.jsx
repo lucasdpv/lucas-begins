@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
-import { calculateReadingTime, cn } from "../../lib/utils";
+import { calculateReadingTime, cn, coverBgStyle } from "../../lib/utils";
+import { CategoryBadge, ScoreBadge } from "./Badge";
 
 /**
  * Carrossel automático com autoplay, pausa no hover, navegação por teclado.
@@ -38,13 +39,7 @@ export default function Carousel({ posts, onPostClick, isDark }) {
   const currentPost = posts[currentIndex];
   if (!currentPost) return null;
 
-  const bgStyle = currentPost.imageUrl
-    ? {
-        backgroundImage: `url(${currentPost.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: currentPost.imagePosition || "center",
-      }
-    : {};
+  const bgStyle = coverBgStyle(currentPost.imageUrl, currentPost.imagePosition);
 
   return (
     <div
@@ -69,14 +64,8 @@ export default function Carousel({ posts, onPostClick, isDark }) {
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-14 text-white max-w-5xl">
           <div className="flex gap-3 mb-4">
-            <span className="bg-purple-600 font-retro text-xs md:text-sm px-5 py-2 rounded-lg uppercase font-bold tracking-widest border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
-              {currentPost.category}
-            </span>
-            {currentPost.score && (
-              <span className="bg-yellow-400 text-black font-retro text-xs md:text-sm px-4 py-2 rounded-lg border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] font-bold flex items-center gap-1">
-                ★ {currentPost.score}
-              </span>
-            )}
+            <CategoryBadge size="md">{currentPost.category}</CategoryBadge>
+            {currentPost.score && <ScoreBadge score={currentPost.score} size="md" />}
           </div>
 
           <h2 className="font-retro font-bold text-3xl md:text-5xl lg:text-6xl mb-4 leading-tight drop-shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:text-purple-300 transition-colors">

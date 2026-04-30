@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -12,10 +12,12 @@ import {
   CheckCheck,
   ChevronDown,
 } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, slugify } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
 import ArticleRenderer from "../components/ui/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
+import { useImageFallback } from "../hooks/useImageFallback";
+import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../components/ui/AuthGate";
 import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
 
@@ -34,19 +36,9 @@ export default function PostDetailPage({ previewPost }) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
-  const [imgError, setImgError] = useState(false);
+  const imgError = useImageFallback(post?.imageUrl);
   const COMMENTS_PER_PAGE = 5;
   const [visibleComments, setVisibleComments] = useState(COMMENTS_PER_PAGE);
-
-  // Verifica se a imagem de capa é válida
-  React.useEffect(() => {
-    if (post?.imageUrl) {
-      const img = new Image();
-      img.src = post.imageUrl;
-      img.onerror = () => setImgError(true);
-      img.onload = () => setImgError(false);
-    }
-  }, [post?.imageUrl]);
 
   // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
   if (isLoadingPosts && !post) {
@@ -106,13 +98,7 @@ export default function PostDetailPage({ previewPost }) {
     }
   };
 
-  const heroStyle = post.imageUrl && !imgError
-    ? {
-      backgroundImage: `url(${post.imageUrl})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }
-    : {};
+  const heroStyle = imgError ? {} : coverBgStyle(post.imageUrl);
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
 
@@ -173,9 +159,7 @@ export default function PostDetailPage({ previewPost }) {
         <div className="absolute inset-0 scanline-overlay opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-[5]" />
         <div className="absolute bottom-0 p-8 md:p-16 text-white w-full max-w-5xl">
-          <span className="bg-purple-600 font-retro text-xs md:text-sm px-4 py-2 rounded-lg uppercase tracking-wider mb-6 inline-block font-bold border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
-            {post.category}
-          </span>
+          <CategoryBadge size="md" className="mb-6 inline-block">{post.category}</CategoryBadge>
           <h1 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl leading-tight drop-shadow-[4px_4px_0px_rgba(0,0,0,0.8)]">
             {post.title || "Sem Título"}
           </h1>
