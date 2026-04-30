@@ -9,7 +9,7 @@ import { useAppContext } from "../context/AppContext";
 import { cn, slugify } from "../lib/utils";
 
 export default function HomePage() {
-  const { isDark, posts, isLoadingPosts, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();
+  const { isDark, posts, isLoadingPosts, isFetchingMore, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();
   const navigate = useNavigate();
   const observerTarget = useRef(null);
 
@@ -144,8 +144,18 @@ export default function HomePage() {
             ) : filteredPosts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredPosts.map((post) => (
-                  <PostCard key={post.id} post={post} onClick={() => onPostClick(post)} />
+                  <div key={post.id} className="animate-fade-in h-full">
+                    <PostCard post={post} onClick={() => onPostClick(post)} />
+                  </div>
                 ))}
+                {/* Skeletons de Rodapé para o Scroll Infinito */}
+                {isFetchingMore && (
+                  <>
+                    <PostSkeleton isDark={isDark} />
+                    <PostSkeleton isDark={isDark} />
+                    <PostSkeleton isDark={isDark} />
+                  </>
+                )}
               </div>
             ) : (
               <div className={cn("p-12 text-center rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white border-2 border-black")}>
