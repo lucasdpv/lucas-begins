@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DOMPurify from "dompurify";
 import { cn } from "../../lib/utils";
 
 /**
@@ -88,10 +89,12 @@ export default function ArticleRenderer({ content, isDark }) {
   if (!content) return null;
   const lines = content.split('\n');
 
-  const formatInline = (text) =>
-    text
+  const formatInline = (text) => {
+    const raw = text
       .replace(/\*\*(.*?)\*\*/g, `<strong class="font-bold text-purple-600 ${isDark ? 'dark:text-purple-400' : ''}">$1</strong>`)
       .replace(/\*(.*?)\*/g, `<em class="italic text-yellow-600 ${isDark ? 'dark:text-yellow-400' : ''}">$1</em>`);
+    return DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em'], ALLOWED_ATTR: ['class'] });
+  };
 
   let firstElementRendered = false;
   let firstParagraphRendered = false;

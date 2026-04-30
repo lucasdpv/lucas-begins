@@ -1,6 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, query, where, limit } from "firebase/firestore";
 
+// Valida as variáveis de ambiente antes de inicializar
+const requiredEnvVars = [
+  "VITE_FIREBASE_API_KEY",
+  "VITE_FIREBASE_AUTH_DOMAIN",
+  "VITE_FIREBASE_PROJECT_ID",
+];
+for (const key of requiredEnvVars) {
+  if (!process.env[key]) {
+    throw new Error(`[og.js] Variável de ambiente obrigatória não definida: ${key}`);
+  }
+}
+
 // Inicializa o Firebase usando as variáveis de ambiente do Vercel
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY,

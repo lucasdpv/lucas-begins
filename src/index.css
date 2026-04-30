@@ -30,6 +30,7 @@
 
 /* ============================================================
    Efeito scanline (overlay CRT)
+   Respeitamos prefers-reduced-motion para acessibilidade
    ============================================================ */
 .scanline-overlay {
   background:
@@ -42,6 +43,12 @@
     );
   background-size: 100% 4px, 3px 100%;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanline-overlay {
+    display: none;
+  }
 }
 
 /* ============================================================

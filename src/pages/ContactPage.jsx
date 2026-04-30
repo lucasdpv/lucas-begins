@@ -55,10 +55,11 @@ export default function ContactPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase font-retro opacity-80">
+                <label htmlFor="contact-name" className="text-sm font-bold uppercase font-retro opacity-80">
                   Player 1 (Seu Nome)
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
                   required
                   value={formData.name}
@@ -68,8 +69,9 @@ export default function ContactPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold uppercase font-retro opacity-80">E-mail</label>
+                <label htmlFor="contact-email" className="text-sm font-bold uppercase font-retro opacity-80">E-mail</label>
                 <input
+                  id="contact-email"
                   type="email"
                   required
                   value={formData.email}
@@ -80,8 +82,9 @@ export default function ContactPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold uppercase font-retro opacity-80">Sua Mensagem</label>
+              <label htmlFor="contact-message" className="text-sm font-bold uppercase font-retro opacity-80">Sua Mensagem</label>
               <textarea
+                id="contact-message"
                 required
                 rows="6"
                 value={formData.message}

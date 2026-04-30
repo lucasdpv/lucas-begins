@@ -8,10 +8,11 @@ import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
 import { AppContext } from "./AppContext";
+import { STORAGE_KEYS, MIGRATION_VERSION } from "../constants";
 
 export function AppProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('lucas_begins_theme');
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME);
     return saved !== null ? JSON.parse(saved) : true;
   });
 
@@ -75,16 +76,14 @@ export function AppProvider({ children }) {
 
   // 2. Roda o Seed de dados inicial e Limpeza de migração (apenas quando necessário)
   useEffect(() => {
-    // Incrementar MIGRATION_VERSION quando houver uma nova migração necessária
-    const MIGRATION_VERSION = "v1.2";
-    const lastMigration = localStorage.getItem("lucas_migration");
+    const lastMigration = localStorage.getItem(STORAGE_KEYS.MIGRATION_VERSION);
 
     const runInitialSetup = async () => {
       await seedDatabase();
       // Só roda o cleanup se ainda não rodou esta versão
       if (lastMigration !== MIGRATION_VERSION) {
         await cleanupDuplicates();
-        localStorage.setItem("lucas_migration", MIGRATION_VERSION);
+        localStorage.setItem(STORAGE_KEYS.MIGRATION_VERSION, MIGRATION_VERSION);
       }
     };
     runInitialSetup();
@@ -92,7 +91,7 @@ export function AppProvider({ children }) {
 
   // Efeitos para persistência do tema
   useEffect(() => {
-    localStorage.setItem('lucas_begins_theme', JSON.stringify(isDark));
+    localStorage.setItem(STORAGE_KEYS.THEME, JSON.stringify(isDark));
   }, [isDark]);
 
   // Handlers Firebase

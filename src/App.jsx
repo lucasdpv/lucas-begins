@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 
 // Controle de estado
@@ -9,16 +9,17 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Toast from "./components/ui/Toast";
 import LoginModal from "./components/ui/LoginModal";
+import PostSkeleton from "./components/ui/PostSkeleton";
 
-// Páginas
-import HomePage from "./pages/HomePage";
-import PostDetailPage from "./pages/PostDetailPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import AdminPage from "./pages/AdminPage";
-import PostEditorPage from "./pages/PostEditorPage";
+// Páginas (lazy loaded para reduzir bundle inicial)
+const HomePage = lazy(() => import("./pages/HomePage"));
+const PostDetailPage = lazy(() => import("./pages/PostDetailPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const PostEditorPage = lazy(() => import("./pages/PostEditorPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -57,6 +58,11 @@ export default function App() {
         <Navbar />
 
         <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+              {[1,2,3].map(i => <PostSkeleton key={i} isDark={isDark} />)}
+            </div>
+          }>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/post/:slug" element={<PostDetailPage />} />
@@ -67,6 +73,7 @@ export default function App() {
             <Route path="/editor/:id" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
+          </Suspense>
         </main>
 
         <Footer />

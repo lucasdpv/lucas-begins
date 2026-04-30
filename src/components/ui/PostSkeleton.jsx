@@ -4,6 +4,9 @@ import { cn } from "../../lib/utils";
 export default function PostSkeleton({ isDark }) {
   return (
     <div
+      role="status"
+      aria-busy="true"
+      aria-label="Carregando artigo..."
       className={cn(
         "flex flex-col h-full rounded-3xl overflow-hidden border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
         isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"

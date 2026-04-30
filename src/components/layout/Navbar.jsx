@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Gamepad2,
@@ -35,6 +35,24 @@ export default function Navbar() {
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const mobileMenuRef = useRef(null);
+
+  // Fecha menu mobile ao clicar fora dele
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    if (isMobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   // Lógica de esconder Navbar ao rolar
   useEffect(() => {
@@ -67,6 +85,7 @@ export default function Navbar() {
 
   return (
     <header
+      ref={mobileMenuRef}
       className={cn(
         "sticky top-0 z-50 transition-all duration-300 border-b-4 backdrop-blur-md",
         isDark ? "border-purple-600 bg-gray-900/95" : "border-black bg-white/95",
@@ -133,6 +152,7 @@ export default function Navbar() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
             <input
               type="text"
+              aria-label="Pesquisar artigos"
               placeholder="Pesquisar..."
               value={searchQuery}
               onChange={handleSearch}
@@ -205,6 +225,7 @@ export default function Navbar() {
         )}>
           <input
             type="text"
+            aria-label="Pesquisar artigos"
             placeholder="Pesquisar..."
             value={searchQuery}
             onChange={handleSearch}

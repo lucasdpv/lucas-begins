@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Edit,
@@ -20,8 +20,9 @@ import PostDetailPage from "./PostDetailPage";
 import { useAppContext } from "../context/AppContext";
 import BlockEditor from "../components/editor/BlockEditor";
 import { Helmet } from "react-helmet-async";
+import { STORAGE_KEYS } from "../constants";
 
-const DRAFT_KEY = "retro_blog_draft";
+const DRAFT_KEY = STORAGE_KEYS.DRAFT;
 
 
 
@@ -35,6 +36,8 @@ export default function PostEditorPage() {
   const { posts, categories, isDark, currentUser, handleSavePost } = useAppContext();
 
   const [activeTab, setActiveTab] = useState("edit");
+  const [lastSaved, setLastSaved] = useState(null);
+  const autoSaveTimerRef = useRef(null);
 
   const post = id ? posts.find((p) => String(p.id) === String(id)) : null;
 
@@ -52,13 +55,15 @@ export default function PostEditorPage() {
     }
   });
 
-  // Auto-save do rascunho a cada 1 segundo (só para novos posts)
+  // Auto-save do rascunho com debounce de 1s (só para novos posts)
   useEffect(() => {
     if (!post) {
-      const timeoutId = setTimeout(() => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = setTimeout(() => {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+        setLastSaved(new Date());
       }, 1000);
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(autoSaveTimerRef.current);
     }
   }, [formData, post]);
 
@@ -166,7 +171,13 @@ export default function PostEditorPage() {
           className={cn("p-8 md:p-10 rounded-2xl retro-card space-y-8", isDark ? "bg-gray-800" : "bg-white")}
         >
           <div className="flex justify-between items-center opacity-60 text-xs uppercase font-retro font-bold">
-            <span>{post ? "Editando artigo existente" : "Salvo automaticamente no memory card 💾"}</span>
+            <span>
+              {post
+                ? "Editando artigo existente"
+                : lastSaved
+                  ? `Salvo às ${lastSaved.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 💾`
+                  : "Auto-save ativo 💾"}
+            </span>
             {formData.content && <span>{calculateReadingTime(formData.content)}</span>}
           </div>
 

@@ -6,7 +6,7 @@ export default function PostDetailSkeleton({ isDark }) {
   const accentColor = isDark ? "bg-gray-700" : "bg-gray-300";
 
   return (
-    <div className="max-w-5xl mx-auto animate-pulse">
+    <div role="status" aria-busy="true" aria-label="Carregando artigo..." className="max-w-5xl mx-auto animate-pulse">
       {/* Voltar Skeleton */}
       <div className={cn("w-32 h-4 mb-10 rounded", accentColor)} />
 
