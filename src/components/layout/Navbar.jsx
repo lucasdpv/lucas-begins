@@ -10,7 +10,8 @@ import {
   User,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  PlusCircle
 } from "lucide-react";
 import { useAppContext } from "../../context/AppContext";
 import { cn } from "../../lib/utils";
@@ -153,6 +154,20 @@ export default function Navbar() {
           >
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
+          
+          {/* Botão Admin: Painel de Moderação */}
+          {currentUser?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className={cn(
+                "hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl font-retro font-bold text-[10px] md:text-xs bg-purple-600 text-white border-2 border-black retro-button shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                "hover:bg-purple-500 transition-all"
+              )}
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden xl:inline">PAINEL ADMIN</span>
+            </Link>
+          )}
 
           {currentUser ? (
             <div className="flex items-center gap-3">
@@ -201,6 +216,11 @@ export default function Navbar() {
           <div className="flex flex-col gap-4">
              <Link to="/about" className="font-retro font-bold uppercase tracking-widest text-sm">Sobre Nós</Link>
              <Link to="/contact" className="font-retro font-bold uppercase tracking-widest text-sm">Contatos</Link>
+             {currentUser?.role === 'admin' && (
+               <Link to="/admin" className="font-retro font-bold uppercase tracking-widest text-sm text-purple-500 flex items-center gap-2">
+                 <Settings className="w-4 h-4" /> Painel Admin
+               </Link>
+             )}
           </div>
           <div className="border-t border-gray-500/20 pt-4">
             <p className="text-[10px] opacity-50 uppercase font-bold mb-3">Categorias</p>

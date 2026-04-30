@@ -39,38 +39,41 @@ export default function AdminPage() {
           </h2>
         </div>
 
-        {/* Abas */}
-        <div className="flex gap-4">
-          {["posts", "categories"].map((tab) => (
+        {/* Ações e Abas */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex gap-2">
+            {["posts", "categories"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setAdminTab(tab)}
+                className={cn(
+                  "px-6 py-3 rounded-xl font-retro text-sm uppercase font-bold retro-button",
+                  adminTab === tab
+                    ? "bg-purple-600 text-white border-black"
+                    : isDark
+                    ? "bg-gray-800 text-gray-400 border-transparent"
+                    : "bg-gray-200 text-gray-600 border-transparent"
+                )}
+              >
+                {tab === "posts" ? "Artigos" : "Categorias"}
+              </button>
+            ))}
+          </div>
+
+          {adminTab === "posts" && (
             <button
-              key={tab}
-              onClick={() => setAdminTab(tab)}
-              className={cn(
-                "px-6 py-3 rounded-xl font-retro text-sm uppercase font-bold retro-button",
-                adminTab === tab
-                  ? "bg-purple-600 text-white border-black"
-                  : isDark
-                  ? "bg-gray-800 text-gray-400 border-transparent"
-                  : "bg-gray-200 text-gray-600 border-transparent"
-              )}
+              onClick={() => navigate("/editor")}
+              className="flex items-center gap-2 bg-yellow-400 text-black px-6 py-3 rounded-xl font-retro uppercase text-sm font-bold retro-button border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:scale-105 transition-transform"
             >
-              {tab === "posts" ? "Artigos" : "Categorias"}
+              <Plus className="w-5 h-5" /> Nova Publicação
             </button>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Aba: Artigos */}
       {adminTab === "posts" && (
         <div className="space-y-6">
-          <div className="flex justify-end">
-            <button
-              onClick={() => navigate("/editor")}
-              className="flex items-center gap-2 bg-yellow-400 text-black px-6 py-3 rounded-xl font-retro uppercase text-sm font-bold retro-button border-2 border-black"
-            >
-              <Plus className="w-5 h-5" /> Nova Publicação
-            </button>
-          </div>
           <div className={cn("rounded-2xl retro-card overflow-hidden", isDark ? "bg-gray-800" : "bg-white")}>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm font-medium">
