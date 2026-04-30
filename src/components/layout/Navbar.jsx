@@ -78,7 +78,7 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2 group shrink-0" onClick={() => { setActiveCategory("Todos"); setSearchQuery(""); }}>
           <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:rotate-12", isDark ? "text-purple-400" : "text-purple-600")} />
           <h1 className="font-retro font-bold text-xl md:text-3xl tracking-tighter uppercase">
-            Lucas<span className="text-purple-500">Begins</span>
+            Lucas<span className="text-purple-500 inline-block animate-glitch">Begins</span>
           </h1>
         </Link>
 

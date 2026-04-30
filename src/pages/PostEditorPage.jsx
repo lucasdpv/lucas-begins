@@ -45,10 +45,10 @@ export default function PostEditorPage() {
       const savedDraft = localStorage.getItem(DRAFT_KEY);
       return savedDraft
         ? JSON.parse(savedDraft)
-        : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false };
+        : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false, showAuthorBox: false };
     } catch {
       localStorage.removeItem(DRAFT_KEY);
-      return { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false };
+      return { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false, showAuthorBox: false };
     }
   });
 
@@ -74,7 +74,18 @@ export default function PostEditorPage() {
     if (e) e.preventDefault();
     if (!post) localStorage.removeItem(DRAFT_KEY);
     
-    const postToSave = { ...formData, isDraft: forceDraft };
+    const postToSave = { 
+      ...formData, 
+      isDraft: forceDraft,
+      author: {
+        id: currentUser?.id,
+        name: currentUser?.name,
+        avatar: currentUser?.avatar,
+        bio: currentUser?.bio,
+        level: currentUser?.level || 1,
+        aka: currentUser?.aka || ""
+      }
+    };
     const saved = await handleSavePost(postToSave);
     if (saved) navigate("/admin");
   };
@@ -90,8 +101,16 @@ export default function PostEditorPage() {
     date: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
     likes: 0,
     comments: [],
-    author: { name: currentUser?.name || "Autor", role: "Editor Chefe" },
+    author: { 
+      name: currentUser?.name || "Autor", 
+      role: "Editor Chefe", 
+      avatar: currentUser?.avatar, 
+      bio: currentUser?.bio,
+      level: currentUser?.level || 1,
+      aka: currentUser?.aka
+    },
     gradient: "from-purple-600 to-blue-600",
+    showAuthorBox: formData.showAuthorBox !== false,
   };
 
   return (
@@ -247,6 +266,27 @@ export default function PostEditorPage() {
                   isDark={isDark}
                 />
               </div>
+            </div>
+            
+            {/* Toggle Author Box */}
+            <div className={cn(
+              "md:col-span-2 flex items-center gap-4 p-6 rounded-2xl border-2 border-dashed transition-all",
+              isDark ? "bg-purple-900/10 border-purple-500/30" : "bg-purple-50 border-purple-500/20"
+            )}>
+              <input
+                type="checkbox"
+                id="showAuthorBox"
+                name="showAuthorBox"
+                checked={formData.showAuthorBox !== false}
+                onChange={(e) => setFormData(prev => ({ ...prev, showAuthorBox: e.target.checked }))}
+                className="w-6 h-6 accent-purple-600 cursor-pointer"
+              />
+              <label htmlFor="showAuthorBox" className="font-retro font-bold uppercase text-sm cursor-pointer select-none flex-1">
+                Exibir Caixa de Autor ("Sobre o Autor") no final da matéria
+                <span className="block text-[10px] opacity-60 font-medium normal-case mt-1 tracking-normal">
+                  Se desativado, sua foto e bio não aparecerão nesta matéria específica.
+                </span>
+              </label>
             </div>
           </div>
 

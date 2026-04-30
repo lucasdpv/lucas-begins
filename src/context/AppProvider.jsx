@@ -4,7 +4,7 @@ import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
 import { db, auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
 import { AppContext } from "./AppContext";
@@ -43,11 +43,25 @@ export function AppProvider({ children }) {
           console.error("Erro ao verificar permissões:", error);
         }
 
+        // Busca dados extras do perfil (Bio, AKA, Level, Avatar Custom)
+        let profileData = {};
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            profileData = userDoc.data();
+          }
+        } catch (error) {
+          console.error("Erro ao buscar perfil:", error);
+        }
+
         setCurrentUser({
           id: user.uid,
-          name: user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
+          name: profileData.name || user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
           email: user.email || "",
-          avatar: user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || "P"}`,
+          avatar: profileData.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || "P"}`,
+          bio: profileData.bio || "",
+          aka: profileData.aka || "",
+          level: profileData.level || 1,
           role: role
         });
       } else {
@@ -138,6 +152,19 @@ export function AppProvider({ children }) {
     }
   };
 
+  const handleUpdateProfile = async (data) => {
+    if (!currentUser) return;
+    try {
+      const userRef = doc(db, "users", currentUser.id);
+      await setDoc(userRef, data, { merge: true });
+      setCurrentUser(prev => ({ ...prev, ...data }));
+      showToast("Perfil atualizado com sucesso! 🎮");
+    } catch (err) {
+      console.error(err);
+      showToast("Erro ao atualizar perfil.");
+    }
+  };
+
   const value = {
     isDark, toggleTheme,
     currentUser, login, handleLogout, authLoading,
@@ -147,7 +174,8 @@ export function AppProvider({ children }) {
     categories, handleAddCategory, handleDeleteCategory,
     activeCategory, setActiveCategory,
     searchQuery, setSearchQuery,
-    isLoginModalOpen, setIsLoginModalOpen
+    isLoginModalOpen, setIsLoginModalOpen,
+    handleUpdateProfile
   };
 
   return (

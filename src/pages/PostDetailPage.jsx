@@ -187,9 +187,17 @@ export default function PostDetailPage({ previewPost }) {
           <div className={cn("flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b-4", isDark ? "border-gray-800" : "border-gray-200")}>
             {/* Autor */}
             <div className="flex items-center gap-4">
-              <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", isDark ? "bg-purple-900" : "bg-purple-200")}>
-                ✍️
-              </div>
+              {post.author?.avatar ? (
+                <img 
+                  src={post.author.avatar} 
+                  alt={post.author.name} 
+                  className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
+                />
+              ) : (
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", isDark ? "bg-purple-900" : "bg-purple-200")}>
+                  ✍️
+                </div>
+              )}
               <div>
                 <p className="font-retro font-bold text-lg uppercase tracking-wide">
                   {post.author?.name || "Autor Desconhecido"}
@@ -255,21 +263,6 @@ export default function PostDetailPage({ previewPost }) {
             <AuthGate variant="banner" />
           )}
 
-          {/* Score / Veredito */}
-          {post.score && (
-            <div className={cn("p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card", isDark ? "bg-gray-800" : "bg-white")}>
-              <div>
-                <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
-                  Veredito da Redação
-                </h4>
-                <p className="text-lg font-bold uppercase tracking-widest">{post.verdict}</p>
-              </div>
-              <div className="flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                <span className="font-retro font-bold text-5xl leading-none -mt-2">{post.score}</span>
-              </div>
-            </div>
-          )}
-
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
             <ArticleRenderer
@@ -277,6 +270,61 @@ export default function PostDetailPage({ previewPost }) {
               isDark={isDark}
             />
           </div>
+
+          {/* Score / Veredito — Movido para o fim */}
+          {post.score && (
+            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-white")}>
+              <div>
+                <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
+                  Veredito da Redação
+                </h4>
+                <p className="text-lg font-bold uppercase tracking-widest leading-relaxed">{post.verdict}</p>
+              </div>
+              <div className="flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] shrink-0">
+                <span className="font-retro font-bold text-5xl leading-none -mt-2">{post.score}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Seção: Sobre o Autor — Estilo Premium (Opcional) */}
+          {post.showAuthorBox === true && (
+            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-gray-50 border-black/10")}>
+              {/* Background Decorativo */}
+              <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-600/5 rounded-full blur-3xl" />
+              
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
+                <div className="relative">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden border-4 border-purple-600 shadow-[6px_6px_0px_rgba(0,0,0,1)] transform -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                    <img 
+                      src={post.author?.avatar} 
+                      alt={post.author?.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black p-2 rounded-xl border-2 border-black font-bold text-xs shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                    LVL {post.author?.level || 1}
+                  </div>
+                </div>
+
+                <div className="flex-1 text-center md:text-left">
+                  <span className="font-retro text-[10px] md:text-xs uppercase font-bold tracking-[0.2em] text-purple-500 mb-2 block">
+                    Escrito por
+                  </span>
+                  <h3 className="font-retro text-3xl md:text-4xl font-bold uppercase mb-4 tracking-tighter">
+                    {post.author?.name}
+                    {post.author?.aka && (
+                      <span className="text-sm md:text-lg text-purple-500 ml-3 normal-case opacity-80">
+                        (aka {post.author.aka})
+                      </span>
+                    )}
+                  </h3>
+                  <p className={cn("text-lg leading-relaxed font-medium max-w-2xl", isDark ? "text-gray-400" : "text-gray-600")}>
+                    {post.author?.bio}
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Seção de Comentários */}
           <section className={cn("mt-24 pt-12 border-t-4", isDark ? "border-gray-800" : "border-gray-200")}>

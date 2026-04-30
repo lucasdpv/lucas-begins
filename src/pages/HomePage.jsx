@@ -89,27 +89,33 @@ export default function HomePage() {
 
             {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
             <aside className="hidden lg:block lg:col-span-1">
-              <div className={cn("h-full md:h-[560px] p-6 rounded-2xl retro-card flex flex-col", isDark ? "bg-gray-800" : "bg-white")}>
-                <div className="flex flex-col justify-between h-full">
+              <div className={cn("h-full md:h-[560px] p-6 rounded-3xl glass-card flex flex-col relative overflow-hidden", isDark ? "" : "bg-white/40")}>
+                {/* Efeito sutil de luz de fundo */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="flex flex-col justify-between h-full relative z-10">
                   {trendingPosts.map((post, idx) => (
                     <div
                       key={post.id}
                       onClick={() => onPostClick(post)}
                       className={cn(
-                        "flex gap-4 cursor-pointer group pb-4 border-b last:border-0 last:pb-0",
-                        isDark ? "border-gray-700" : "border-gray-100"
+                        "flex gap-4 cursor-pointer group pb-4 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1",
+                        isDark ? "border-purple-500/20" : "border-gray-100"
                       )}
                     >
-                      <div className="text-3xl font-retro font-bold text-purple-500 opacity-50 group-hover:opacity-100 transition-opacity shrink-0">
-                        0{idx + 1}
+                      <div className={cn(
+                        "text-2xl md:text-3xl font-retro font-bold opacity-30 group-hover:opacity-100 group-hover:text-purple-500 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]",
+                        isDark ? "text-purple-400" : "text-purple-600"
+                      )}>
+                        {(idx + 1).toString().padStart(2, "0")}
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-bold text-sm group-hover:text-purple-500 transition-colors line-clamp-2 leading-tight">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-sm leading-snug line-clamp-2 group-hover:text-purple-500 transition-colors">
                           {post.title}
                         </h4>
-                        <span className="text-[10px] opacity-60 font-retro mt-1 block uppercase font-bold tracking-widest">
-                          {post.likes} curtidas
-                        </span>
+                        <div className="flex items-center gap-2 mt-1 opacity-40 text-[10px] font-bold uppercase">
+                           <span>{post.likes || 0} curtidas</span>
+                        </div>
                       </div>
                     </div>
                   ))}
