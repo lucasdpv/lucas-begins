@@ -10,6 +10,7 @@ import {
   Star,
   Clock,
   CheckCheck,
+  ChevronDown,
 } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, slugify } from "../lib/utils";
 import ArticleRenderer from "../components/ui/ArticleRenderer";
@@ -34,6 +35,8 @@ export default function PostDetailPage({ previewPost }) {
 
   const [commentText, setCommentText] = useState("");
   const [imgError, setImgError] = useState(false);
+  const COMMENTS_PER_PAGE = 5;
+  const [visibleComments, setVisibleComments] = useState(COMMENTS_PER_PAGE);
 
   // Verifica se a imagem de capa é válida
   React.useEffect(() => {
@@ -191,6 +194,8 @@ export default function PostDetailPage({ previewPost }) {
                 <img 
                   src={post.author.avatar} 
                   alt={post.author.name} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
                 />
               ) : (
@@ -298,6 +303,8 @@ export default function PostDetailPage({ previewPost }) {
                     <img 
                       src={post.author?.avatar} 
                       alt={post.author?.name} 
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -373,7 +380,7 @@ export default function PostDetailPage({ previewPost }) {
 
             {/* Lista de comentários */}
             <div className="space-y-5">
-              {post.comments?.map((comment) => {
+              {post.comments?.slice(0, visibleComments).map((comment) => {
                 const canDelete =
                   currentUser &&
                   (currentUser.role === "admin" || currentUser.id === comment.authorId);
@@ -390,8 +397,8 @@ export default function PostDetailPage({ previewPost }) {
                         {comment.authorAvatar && (
                           <img
                             src={comment.authorAvatar}
-                            alt={comment.author}
-                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
+                            alt={comment.author}                            loading="lazy"
+                            decoding="async"                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
                           />
                         )}
                         <div className={cn("font-retro font-bold text-base uppercase tracking-wider", isDark ? "text-purple-400" : "text-purple-600")}>
@@ -432,6 +439,21 @@ export default function PostDetailPage({ previewPost }) {
                     Nenhum comentário ainda. Seja o primeiro!
                   </p>
                 </div>
+              )}
+
+              {/* Botão "Ver mais comentários" */}
+              {post.comments && post.comments.length > visibleComments && (
+                <button
+                  onClick={() => setVisibleComments(v => v + COMMENTS_PER_PAGE)}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-retro font-bold text-sm uppercase tracking-wider transition-all retro-button",
+                    isDark ? "border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400" : "border-gray-200 text-gray-500 hover:border-black hover:text-black"
+                  )}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  Ver mais {Math.min(COMMENTS_PER_PAGE, post.comments.length - visibleComments)} comentários
+                  <span className="opacity-50">({post.comments.length - visibleComments} restantes)</span>
+                </button>
               )}
             </div>
           </section>

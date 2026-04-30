@@ -1,9 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { serverTimestamp } from 'firebase/firestore';
 import { PostService } from '../services/postService';
 import { slugify } from '../lib/utils';
+import DOMPurify from 'dompurify';
 
 const POSTS_PER_PAGE = 6;
+
+/**
+ * Sanitiza o conteúdo Markdown de um post removendo qualquer HTML/JS injetado.
+ * Permite apenas texto puro e a sintaxe Markdown do projeto.
+ */
+function sanitizePostContent(content) {
+  if (!content) return '';
+  return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+}
 
 /**
  * Hook para gerenciar os artigos do blog.
@@ -16,6 +26,8 @@ export function usePosts(currentUser, showToast) {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastDoc, setLastDoc] = useState(null);
+  // Timestamp do último comentário para rate limiting (30s de cooldown)
+  const lastCommentTimeRef = useRef(0);
 
   // Busca inicial e paginação por cursor
   const fetchPosts = useCallback(async (isLoadMore = false) => {
@@ -98,6 +110,15 @@ export function usePosts(currentUser, showToast) {
   const handleAddComment = async (postId, commentText) => {
     if (!commentText.trim() || !currentUser) return;
 
+    // Rate limiting: 30 segundos entre comentários
+    const COMMENT_COOLDOWN_MS = 30_000;
+    const now = Date.now();
+    if (now - lastCommentTimeRef.current < COMMENT_COOLDOWN_MS) {
+      const remaining = Math.ceil((COMMENT_COOLDOWN_MS - (now - lastCommentTimeRef.current)) / 1000);
+      showToast(`Aguarde ${remaining}s antes de comentar novamente.`, 'error');
+      return;
+    }
+
     const postIndex = posts.findIndex(p => p.id === postId);
     if (postIndex === -1) return;
     const post = posts[postIndex];
@@ -122,6 +143,7 @@ export function usePosts(currentUser, showToast) {
 
     try {
       await PostService.updatePost(postId, { comments: newCommentsList });
+      lastCommentTimeRef.current = Date.now();
       showToast('Comentário publicado!');
     } catch (error) {
       console.error('[usePosts:handleAddComment]', error);
@@ -173,6 +195,7 @@ export function usePosts(currentUser, showToast) {
     try {
       if (postData.id) {
         const { id, ...dataToUpdate } = postData;
+        dataToUpdate.content = sanitizePostContent(dataToUpdate.content);
         await PostService.updatePost(id, dataToUpdate);
         
         const freshPost = await PostService.getPostById(id);
@@ -180,7 +203,10 @@ export function usePosts(currentUser, showToast) {
         showToast('Artigo atualizado com sucesso!');
         return freshPost;
       } else {
-        const createdPost = await PostService.createPost(postData, currentUser);
+        const createdPost = await PostService.createPost({
+          ...postData,
+          content: sanitizePostContent(postData.content),
+        }, currentUser);
         if (createdPost) setPosts(prev => [createdPost, ...prev]);
         showToast('Novo artigo publicado na capa!');
         return createdPost;

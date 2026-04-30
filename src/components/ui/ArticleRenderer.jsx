@@ -20,6 +20,8 @@ function ArticleImage({ src, alt, isDark }) {
           <img
             src={src}
             alt={alt}
+            loading="lazy"
+            decoding="async"
             onError={() => setError(true)}
             className="w-full h-auto object-cover max-h-[700px]"
           />

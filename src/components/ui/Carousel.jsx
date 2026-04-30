@@ -106,14 +106,16 @@ export default function Carousel({ posts, onPostClick, isDark }) {
         <>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            tabIndex={0}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 focus:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 focus:bg-purple-600 focus:border-purple-500 focus:outline-none retro-button"
             aria-label="Anterior"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            tabIndex={0}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 focus:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 focus:bg-purple-600 focus:border-purple-500 focus:outline-none retro-button"
             aria-label="Próximo"
           >
             <ChevronRight className="w-6 h-6" />
