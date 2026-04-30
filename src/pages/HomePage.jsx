@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 import { Gamepad2, Star, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -11,9 +11,32 @@ import { cn, slugify } from "../lib/utils";
 export default function HomePage() {
   const { isDark, posts, isLoadingPosts, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();
   const navigate = useNavigate();
+  const observerTarget = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos") {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) observer.disconnect();
+    };
+  }, [hasMore, isLoadingPosts, searchQuery, activeCategory, loadMore]);
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
+      // Esconder rascunhos se o usuário não for admin
+      if (post.isDraft) return false;
+
       const matchesCat = activeCategory === "Todos" || post.category === activeCategory;
       const matchesSearch =
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -23,7 +46,10 @@ export default function HomePage() {
   }, [posts, activeCategory, searchQuery]);
 
   const trendingPosts = useMemo(() => {
-    return [...posts].sort((a, b) => b.likes - a.likes).slice(0, 3);
+    return [...posts]
+      .filter((p) => !p.isDraft)
+      .sort((a, b) => b.likes - a.likes)
+      .slice(0, 3);
   }, [posts]);
 
   const onPostClick = (post) => {
@@ -87,21 +113,14 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Botão Carregar Mais / Próxima Fase */}
+          {/* Trigger para Scroll Infinito */}
           {hasMore && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos" && (
-            <div className="mt-16 flex justify-center">
-              <button
-                onClick={loadMore}
-                className={cn(
-                  "group relative flex items-center gap-4 px-10 py-5 rounded-2xl font-retro text-xl font-bold uppercase tracking-widest transition-all retro-button border-4",
-                  isDark 
-                    ? "bg-gray-800 border-purple-500 text-purple-400 hover:bg-purple-600 hover:text-white" 
-                    : "bg-white border-black text-black hover:bg-black hover:text-white"
-                )}
-              >
-                Próxima Fase
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </button>
+            <div ref={observerTarget} className="mt-16 flex justify-center py-10">
+              <div className="flex items-center gap-3 opacity-50">
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" />
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce delay-100" />
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce delay-200" />
+              </div>
             </div>
           )}
         </section>

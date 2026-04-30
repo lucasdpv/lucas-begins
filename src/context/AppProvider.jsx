@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "../hooks/useToast";
 import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
-import { db, auth, googleProvider, facebookProvider } from "../lib/firebase";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { db, auth, googleProvider } from "../lib/firebase";
+import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
@@ -84,21 +84,50 @@ export function AppProvider({ children }) {
   // Handlers Firebase
   const toggleTheme = () => setIsDark(prev => !prev);
   
+  // Monitora o retorno do signInWithRedirect
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          showToast("Bem-vindo de volta, Player 1! 🎮");
+          setIsLoginModalOpen(false);
+        }
+      } catch (err) {
+        console.error("Erro no redirecionamento:", err);
+        showToast("Falha na autenticação.", "error");
+      }
+    };
+    handleRedirectResult();
+  }, []);
+
   const loginWithProvider = async (provider, providerName) => {
     try {
+      // Tenta popup primeiro (melhor para desktop e localhost)
       await signInWithPopup(auth, provider);
       showToast("Bem-vindo de volta, Player 1! 🎮");
       setIsLoginModalOpen(false);
     } catch (err) {
-      console.error(err);
-      // Erros comuns: popup fechado pelo usuário, provider não configurado
-      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
-      showToast(`Falha na autenticação com ${providerName}.`, "error");
+      console.error("Erro no popup:", err);
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        return; // Usuário fechou a janela
+      }
+      // Se falhar por bloqueio de popup ou storage (comum em navegadores in-app no celular), tenta redirect
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/web-storage-unsupported' || err.message.includes('localStorage')) {
+        showToast("Redirecionando para login seguro...", "info");
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (redirectErr) {
+          console.error("Erro no redirect fallback:", redirectErr);
+          showToast(`Falha total ao autenticar com ${providerName}.`, "error");
+        }
+      } else {
+        showToast(`Falha na autenticação com ${providerName}.`, "error");
+      }
     }
   };
 
   const login = () => loginWithProvider(googleProvider, "Google");
-  const loginWithFacebook = () => loginWithProvider(facebookProvider, "Facebook");
 
   const logout = async () => {
     try {
@@ -111,7 +140,7 @@ export function AppProvider({ children }) {
 
   const value = {
     isDark, toggleTheme,
-    currentUser, login, loginWithFacebook, logout, authLoading,
+    currentUser, login, logout, authLoading,
     toast, showToast,
     posts, isLoadingPosts, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
     loadMore, hasMore,

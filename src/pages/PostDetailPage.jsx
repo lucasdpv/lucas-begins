@@ -11,7 +11,8 @@ import {
   Clock,
   CheckCheck,
 } from "lucide-react";
-import { calculateReadingTime, renderArticleContent, formatDate, cn, slugify } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify } from "../lib/utils";
+import ArticleRenderer from "../components/ui/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
 import AuthGate from "../components/ui/AuthGate";
@@ -24,7 +25,10 @@ export default function PostDetailPage({ previewPost }) {
   const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
 
   const trendingPosts = useMemo(() => {
-    return [...posts].sort((a, b) => b.likes - a.likes).slice(0, 4);
+    return [...posts]
+      .filter((p) => !p.isDraft)
+      .sort((a, b) => b.likes - a.likes)
+      .slice(0, 4);
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
@@ -50,6 +54,26 @@ export default function PostDetailPage({ previewPost }) {
 
   const handleShare = async () => {
     const url = window.location.href;
+    const shareData = {
+      title: post.title || "Lucas Begins",
+      text: post.excerpt ? `Confira: ${post.excerpt}` : "Dá uma olhada nessa matéria no Lucas Begins!",
+      url: url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          fallbackCopy(url);
+        }
+      }
+    } else {
+      fallbackCopy(url);
+    }
+  };
+
+  const fallbackCopy = async (url) => {
     try {
       await navigator.clipboard.writeText(url);
       showToast("Link copiado! Compartilhe com seus amigos 🎮");
@@ -60,10 +84,10 @@ export default function PostDetailPage({ previewPost }) {
 
   const heroStyle = post.imageUrl
     ? {
-        backgroundImage: `url(${post.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: post.imagePosition || "center",
-      }
+      backgroundImage: `url(${post.imageUrl})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }
     : {};
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
@@ -73,6 +97,19 @@ export default function PostDetailPage({ previewPost }) {
       <Helmet>
         <title>{post.title ? `${post.title} | Lucas Begins` : "Matéria | Lucas Begins"}</title>
         <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
+        {/* Open Graph — para preview no WhatsApp, Twitter, etc. */}
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="pt_BR" />
+        <meta property="og:site_name" content="Lucas Begins" />
+        <meta property="og:title" content={post.title || "Lucas Begins"} />
+        <meta property="og:description" content={post.excerpt || ""} />
+        {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
+        <meta property="og:url" content={typeof window !== "undefined" ? window.location.href : ""} />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title || "Lucas Begins"} />
+        <meta name="twitter:description" content={post.excerpt || ""} />
+        {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
       </Helmet>
 
       {/* Voltar */}
@@ -200,10 +237,10 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
-            {renderArticleContent(
-              post.content || "O seu artigo não tem texto ainda. Adicione algum conteúdo no editor!",
-              isDark
-            )}
+            <ArticleRenderer
+              content={post.content || "O seu artigo não tem texto ainda. Adicione algum conteúdo no editor!"}
+              isDark={isDark}
+            />
           </div>
 
           {/* Seção de Comentários */}
@@ -336,7 +373,7 @@ export default function PostDetailPage({ previewPost }) {
                           "h-28 w-full rounded-xl mb-3 bg-cover bg-center border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] group-hover:shadow-[5px_5px_0px_rgba(168,85,247,1)] transition-all",
                           !p.imageUrl && `bg-gradient-to-br ${p.gradient}`
                         )}
-                        style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundPosition: p.imagePosition || "center" } : {}}
+                        style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundPosition: "center" } : {}}
                       />
                       <span className="text-[10px] font-retro font-bold uppercase tracking-widest opacity-50 bg-purple-600/10 text-purple-500 px-2 py-0.5 rounded mb-1 inline-block">
                         {p.category}

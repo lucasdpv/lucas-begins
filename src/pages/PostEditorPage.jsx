@@ -23,18 +23,7 @@ import { Helmet } from "react-helmet-async";
 
 const DRAFT_KEY = "retro_blog_draft";
 
-// Posições predefinidas de imagem
-const IMAGE_POSITIONS = [
-  { value: "top left",    label: "↖", title: "Topo Esquerda" },
-  { value: "top center",  label: "↑", title: "Topo Centro" },
-  { value: "top right",   label: "↗", title: "Topo Direita" },
-  { value: "center left", label: "←", title: "Centro Esquerda" },
-  { value: "center",      label: "⊙", title: "Centro" },
-  { value: "center right",label: "→", title: "Centro Direita" },
-  { value: "bottom left", label: "↙", title: "Base Esquerda" },
-  { value: "bottom center",label: "↓", title: "Base Centro" },
-  { value: "bottom right",label: "↘", title: "Base Direita" },
-];
+
 
 /**
  * Editor de artigos com abas Editar / Preview e auto-save no localStorage.
@@ -56,10 +45,10 @@ export default function PostEditorPage() {
       const savedDraft = localStorage.getItem(DRAFT_KEY);
       return savedDraft
         ? JSON.parse(savedDraft)
-        : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", imagePosition: "center", score: "", verdict: "" };
+        : { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false };
     } catch {
       localStorage.removeItem(DRAFT_KEY);
-      return { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", imagePosition: "center", score: "", verdict: "" };
+      return { title: "", excerpt: "", content: "", category: categories[0] || "", imageUrl: "", score: "", verdict: "", isDraft: false };
     }
   });
 
@@ -81,10 +70,12 @@ export default function PostEditorPage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, forceDraft = false) => {
     if (e) e.preventDefault();
     if (!post) localStorage.removeItem(DRAFT_KEY);
-    const saved = await handleSavePost(formData);
+    
+    const postToSave = { ...formData, isDraft: forceDraft };
+    const saved = await handleSavePost(postToSave);
     if (saved) navigate("/admin");
   };
 
@@ -175,13 +166,7 @@ export default function PostEditorPage() {
               />
             </div>
 
-            {/* Categoria */}
-            <div className="space-y-3">
-              <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
-              <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
-                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
+
 
             {/* Imagem de Capa */}
             <div className="space-y-3">
@@ -198,54 +183,13 @@ export default function PostEditorPage() {
               />
             </div>
 
-            {/* Preview da imagem + Controle de posição */}
-            {formData.imageUrl && (
-              <div className="md:col-span-2 space-y-4">
-                <label className="text-sm font-bold uppercase font-retro opacity-80 flex items-center gap-2">
-                  <Move className="w-4 h-4" /> Posição da Imagem de Capa
-                </label>
-                <div className={cn("p-4 rounded-2xl border-2 space-y-4", isDark ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300")}>
-                  {/* Preview em tempo real */}
-                  <div
-                    className="w-full h-40 rounded-xl bg-cover border-2 border-purple-500/40 transition-all duration-300 shadow-inner"
-                    style={{
-                      backgroundImage: `url(${formData.imageUrl})`,
-                      backgroundPosition: formData.imagePosition || "center",
-                      backgroundSize: "cover",
-                    }}
-                  />
-                  {/* Grid de posições */}
-                  <div className="space-y-2">
-                    <p className={cn("text-xs font-bold uppercase font-retro opacity-60")}>
-                      Clique para posicionar o foco da imagem:
-                    </p>
-                    <div className="grid grid-cols-3 gap-2 max-w-[200px]">
-                      {IMAGE_POSITIONS.map(({ value, label, title }) => (
-                        <button
-                          key={value}
-                          type="button"
-                          title={title}
-                          onClick={() => setFormData((prev) => ({ ...prev, imagePosition: value }))}
-                          className={cn(
-                            "h-10 rounded-lg border-2 font-bold text-lg transition-all hover:scale-105 active:scale-95 retro-button",
-                            formData.imagePosition === value
-                              ? "bg-purple-600 text-white border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-                              : isDark
-                              ? "bg-gray-800 border-gray-600 text-gray-300 hover:border-purple-500"
-                              : "bg-white border-gray-300 text-gray-600 hover:border-black"
-                          )}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                    <p className={cn("text-xs opacity-40 font-medium italic")}>
-                      Posição atual: <strong>{formData.imagePosition || "center"}</strong>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Categoria */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
+              <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
 
             {/* Score */}
             <div className="space-y-3">
@@ -306,10 +250,19 @@ export default function PostEditorPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex justify-end gap-4">
+          <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row justify-end gap-4">
             <button
-              type="submit"
-              className="flex items-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black hover:bg-purple-500 transition-colors"
+              type="button"
+              onClick={(e) => handleSubmit(e, true)}
+              className={cn("flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold border-2 transition-colors", 
+                isDark ? "bg-gray-700 text-white border-gray-600 hover:bg-gray-600" : "bg-gray-200 text-gray-800 border-gray-400 hover:bg-gray-300")}
+            >
+              💾 Salvar Rascunho
+            </button>
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, false)}
+              className="flex items-center justify-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black hover:bg-purple-500 transition-colors"
             >
               <Save className="w-6 h-6" /> Publicar Matéria
             </button>
@@ -327,7 +280,7 @@ export default function PostEditorPage() {
               Ação de Teste
             </div>
             <button
-              onClick={handleSubmit}
+              onClick={(e) => handleSubmit(e, false)}
               className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20 hover:bg-yellow-300 transition-colors"
             >
               <Save className="w-7 h-7" /> Lançar Revista (Publicar)
