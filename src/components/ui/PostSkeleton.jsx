@@ -5,7 +5,7 @@ export default function PostSkeleton({ isDark }) {
   return (
     <div
       className={cn(
-        "flex flex-col rounded-3xl overflow-hidden border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+        "flex flex-col h-full rounded-3xl overflow-hidden border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
         isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
       )}
     >

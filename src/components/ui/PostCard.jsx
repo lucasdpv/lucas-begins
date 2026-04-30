@@ -17,7 +17,7 @@ export default function PostCard({ post, onClick }) {
   return (
     <article
       className={cn(
-        "flex flex-col rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-200",
+        "flex flex-col h-full rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-200",
         isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}

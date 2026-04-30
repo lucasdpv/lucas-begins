@@ -13,12 +13,17 @@ const POSTS_PER_PAGE = 6;
 export function usePosts(currentUser, showToast) {
   const [posts, setPosts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastDoc, setLastDoc] = useState(null);
 
   // Busca inicial e paginação por cursor
   const fetchPosts = useCallback(async (isLoadMore = false) => {
-    setIsLoadingPosts(true);
+    if (isLoadMore) {
+      setIsFetchingMore(true);
+    } else if (posts.length === 0) {
+      setIsLoadingPosts(true);
+    }
     try {
       // Busca N+1 para detectar se há próxima página sem custo extra
       const fetchLimit = POSTS_PER_PAGE + 1;
@@ -42,8 +47,9 @@ export function usePosts(currentUser, showToast) {
       showToast('Erro ao carregar posts.', 'error');
     } finally {
       setIsLoadingPosts(false);
+      setIsFetchingMore(false);
     }
-  }, [lastDoc, showToast]);
+  }, [lastDoc, showToast, posts.length]);
 
   // Carregamento inicial (somente na montagem)
   useEffect(() => {
@@ -210,6 +216,7 @@ export function usePosts(currentUser, showToast) {
   return {
     posts,
     isLoadingPosts,
+    isFetchingMore,
     handleLike,
     handleAddComment,
     handleDeleteComment,
