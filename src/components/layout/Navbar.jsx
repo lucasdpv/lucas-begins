@@ -34,7 +34,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const mobileMenuRef = useRef(null);
 
   // Fecha menu mobile ao clicar fora dele
@@ -54,21 +54,16 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
-  // Lógica de esconder Navbar ao rolar
+  // Esconde a Navbar ao rolar para baixo
   useEffect(() => {
     const controlNavbar = () => {
-      if (typeof window !== 'undefined') {
-        if (window.scrollY > lastScrollY && window.scrollY > 120) {
-          setIsVisible(false);
-        } else {
-          setIsVisible(true);
-        }
-        setLastScrollY(window.scrollY);
-      }
+      const current = window.scrollY;
+      setIsVisible(current < lastScrollYRef.current || current <= 120);
+      lastScrollYRef.current = current;
     };
-    window.addEventListener('scroll', controlNavbar);
+    window.addEventListener('scroll', controlNavbar, { passive: true });
     return () => window.removeEventListener('scroll', controlNavbar);
-  }, [lastScrollY]);
+  }, []);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);

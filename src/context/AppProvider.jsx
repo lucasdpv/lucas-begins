@@ -4,7 +4,7 @@ import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
 import { db, auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
 import { AppContext } from "./AppContext";
