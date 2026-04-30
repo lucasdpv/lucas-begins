@@ -25,7 +25,6 @@ export default function App() {
   const { isDark, toast, isLoginModalOpen } = useAppContext();
 
   // Atualiza os CSS Custom Properties do tema (definidos em index.css)
-  // Muito mais eficiente do que criar/destruir elementos <style> no DOM
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
@@ -53,8 +52,7 @@ export default function App() {
   return (
     <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>
       <Toast toast={toast} isDark={isDark} />
-      
-      {/* Wrapper flex para empurrar o footer pra baixo, caso a tela tenha pouco conteudo */}
+
       <div className="flex flex-col min-h-screen">
         <Navbar />
 

@@ -84,10 +84,10 @@ export default function PostDetailPage({ previewPost }) {
 
   const heroStyle = post.imageUrl
     ? {
-        backgroundImage: `url(${post.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
+      backgroundImage: `url(${post.imageUrl})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }
     : {};
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
