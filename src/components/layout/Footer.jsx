@@ -12,7 +12,7 @@ export default function Footer() {
     <footer
       className={cn(
         "border-t-4 mt-16 pt-16 pb-8 transition-colors duration-300",
-        isDark ? "border-purple-600 bg-gray-900" : "border-black bg-white"
+        isDark ? "border-purple-600 bg-gray-900" : "border-black bg-snes-mid"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
@@ -62,35 +62,35 @@ export default function Footer() {
           <div className="flex flex-wrap gap-4 pl-6 opacity-40 pointer-events-none filter grayscale">
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-snes-light text-black")}
               title="X (Antigo Twitter)"
             >
               <XIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-snes-light text-black")}
               title="Threads"
             >
               <ThreadsIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-snes-light text-black")}
               title="Instagram"
             >
               <InstagramIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-snes-light text-black")}
               title="YouTube"
             >
               <YoutubeIcon className="w-5 h-5 shrink-0" />
             </a>
             <a
               href="#"
-              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              className={cn("p-4 rounded-xl retro-button border-black", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-snes-light text-black")}
               title="Twitch"
             >
               <TwitchIcon className="w-5 h-5 shrink-0" />

@@ -8,12 +8,12 @@ export default {
     extend: {
       colors: {
         snes: {
-          light: "#F8F9FB", // Gelo perolado limpo
-          mid: "#F1F5F9",   // Cinza azulado suave
-          dark: "#000000",  // Preto para bordas e sombras (Troca do 8C8C8C)
-          accent: "#000000", // Texto e detalhes
-          "purple-light": "#C084FC", // Roxo vibrante suave
-          "purple-deep": "#7E22CE",   // Roxo elétrico
+          light: "#F8F9FB", // Gelo perolado (Cards)
+          mid: "#D4D2DB",   // Cinza suave da paleta (Fundo)
+          dark: "#000000",  // Preto (Bordas)
+          accent: "#000000", // Texto
+          "purple-light": "#C084FC", // Roxo original
+          "purple-deep": "#7E22CE",   // Roxo original
         }
       }
     },

@@ -42,12 +42,12 @@ export default function App() {
       root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #000000');
       root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #000000');
       root.style.setProperty('--magazine-drop-cap-color', '#9333ea');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(147,51,234,0.3)');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0,0,0,0.1)');
     }
   }, [isDark]);
 
 
-  const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-snes-light text-snes-accent";
+  const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-snes-mid text-snes-accent";
 
   return (
     <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>

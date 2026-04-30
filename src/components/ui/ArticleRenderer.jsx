@@ -13,7 +13,7 @@ function ArticleImage({ src, alt, isDark }) {
         "w-full rounded-2xl border-4 relative overflow-hidden flex items-center justify-center min-h-[300px]",
         isDark 
           ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)] bg-gray-900" 
-          : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-gray-100"
+          : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-snes-mid/30"
       )}>
         {!error ? (
           <img
