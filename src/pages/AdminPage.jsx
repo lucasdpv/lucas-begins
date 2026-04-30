@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Settings, Plus, Edit, Trash2, Tag } from "lucide-react";
+import { ArrowLeft, Settings, Plus, Edit, Trash2, Tag, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { Helmet } from "react-helmet-async";
@@ -9,10 +9,30 @@ import { cn, formatDate } from "../lib/utils";
  * Painel administrativo com abas: Artigos (tabela CRUD) e Categorias (criar/excluir).
  */
 export default function AdminPage() {
-  const { posts, categories, isDark, handleDeletePost, handleAddCategory, handleDeleteCategory } = useAppContext();
+  const { posts, categories, isDark, currentUser, handleDeletePost, handleAddCategory, handleDeleteCategory, handleUpdateProfile } = useAppContext();
   const navigate = useNavigate();
   const [adminTab, setAdminTab] = useState("posts");
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [profileData, setProfileData] = useState({
+    name: currentUser?.name || "",
+    avatar: currentUser?.avatar || "",
+    bio: currentUser?.bio || "",
+    level: currentUser?.level || 1,
+    aka: currentUser?.aka || ""
+  });
+
+  // Sincroniza o formulário quando o currentUser for carregado
+  React.useEffect(() => {
+    if (currentUser) {
+      setProfileData({
+        name: currentUser.name || "",
+        avatar: currentUser.avatar || "",
+        bio: currentUser.bio || "",
+        level: currentUser.level || 1,
+        aka: currentUser.aka || ""
+      });
+    }
+  }, [currentUser]);
 
   const handleAddCat = (e) => {
     e.preventDefault();
@@ -42,7 +62,7 @@ export default function AdminPage() {
         {/* Ações e Abas */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex gap-2">
-            {["posts", "categories"].map((tab) => (
+            {["posts", "categories", "profile"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setAdminTab(tab)}
@@ -55,7 +75,7 @@ export default function AdminPage() {
                     : "bg-gray-200 text-gray-600 border-transparent"
                 )}
               >
-                {tab === "posts" ? "Artigos" : "Categorias"}
+                {tab === "posts" ? "Artigos" : tab === "categories" ? "Categorias" : "Meu Perfil"}
               </button>
             ))}
           </div>
@@ -204,6 +224,127 @@ export default function AdminPage() {
             </div>
             <p className="text-xs opacity-60 mt-6 font-medium italic">
               * Atenção: Categorias em uso pelos artigos não podem ser excluídas.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Aba: Perfil */}
+      {adminTab === "profile" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Formulário */}
+          <div className={cn("lg:col-span-2 p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+            <h3 className="font-retro text-2xl font-bold uppercase mb-8 flex items-center gap-3 border-b-2 border-purple-500 pb-3">
+              <User className="w-6 h-6 text-purple-500" /> Editar Perfil de Autor
+            </h3>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold uppercase font-retro opacity-80">Nome de Exibição</label>
+                  <input
+                    type="text"
+                    value={profileData.name}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                    className={cn(
+                      "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    )}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold uppercase font-retro opacity-80">AKA (Apelido)</label>
+                  <input
+                    type="text"
+                    value={profileData.aka}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, aka: e.target.value }))}
+                    className={cn(
+                      "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    )}
+                    placeholder="Ex: Luck, The Boss..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold uppercase font-retro opacity-80">URL da Foto</label>
+                  <input
+                    type="url"
+                    value={profileData.avatar}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, avatar: e.target.value }))}
+                    className={cn(
+                      "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    )}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold uppercase font-retro opacity-80">Seu Level (Idade)</label>
+                  <input
+                    type="number"
+                    value={profileData.level}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, level: e.target.value }))}
+                    className={cn(
+                      "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold uppercase font-retro opacity-80">Sua Bio (Descrição Gamificada)</label>
+                <textarea
+                  value={profileData.bio}
+                  onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+                  rows="4"
+                  className={cn(
+                    "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium resize-none",
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                  )}
+                  placeholder="Escreva algo sobre você para aparecer no final dos seus posts..."
+                />
+              </div>
+
+              <button
+                onClick={() => handleUpdateProfile(profileData)}
+                className="w-full md:w-auto bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-purple-500 transition-all"
+              >
+                Salvar Alterações
+              </button>
+            </div>
+          </div>
+
+          {/* Preview do Author Box */}
+          <div className="lg:col-span-1">
+            <h4 className="font-retro text-sm font-bold uppercase mb-4 opacity-50">Preview no Post</h4>
+            <div className={cn("p-6 rounded-3xl border-2 relative overflow-hidden", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-gray-50 border-black/10")}>
+               <div className="flex flex-col items-center text-center gap-4">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-3">
+                      <img 
+                        src={profileData.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas"} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black p-1 px-2 rounded-lg border-2 border-black font-bold text-[10px] shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                       LVL {profileData.level}
+                    </div>
+                  </div>
+                  <div>
+                    <h5 className="font-retro text-xl font-bold uppercase">
+                      {profileData.name || "Seu Nome"}
+                      {profileData.aka && <span className="text-xs text-purple-500 ml-2">(aka {profileData.aka})</span>}
+                    </h5>
+                    <p className={cn("text-xs leading-relaxed mt-2 line-clamp-3", isDark ? "text-gray-400" : "text-gray-600")}>
+                      {profileData.bio || "Sua bio aparecerá aqui..."}
+                    </p>
+                  </div>
+               </div>
+            </div>
+            <p className="text-[10px] uppercase font-bold mt-4 opacity-40 text-center italic">
+              * O Author Box completo aparece no fim de cada post se ativado.
             </p>
           </div>
         </div>
