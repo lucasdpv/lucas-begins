@@ -16,11 +16,12 @@ import ArticleRenderer from "../components/ui/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
 import AuthGate from "../components/ui/AuthGate";
+import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
 
 export default function PostDetailPage({ previewPost }) {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast } = useAppContext();
+  const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast, isLoadingPosts } = useAppContext();
 
   const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
 
@@ -32,6 +33,15 @@ export default function PostDetailPage({ previewPost }) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
+
+  // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
+  if (isLoadingPosts && !post) {
+    return (
+      <div className="py-20">
+        <PostDetailSkeleton isDark={isDark} />
+      </div>
+    );
+  }
 
   if (!post) {
     return (
