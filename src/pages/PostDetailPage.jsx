@@ -255,21 +255,6 @@ export default function PostDetailPage({ previewPost }) {
             <AuthGate variant="banner" />
           )}
 
-          {/* Score / Veredito */}
-          {post.score && (
-            <div className={cn("p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card", isDark ? "bg-gray-800" : "bg-white")}>
-              <div>
-                <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
-                  Veredito da Redação
-                </h4>
-                <p className="text-lg font-bold uppercase tracking-widest">{post.verdict}</p>
-              </div>
-              <div className="flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                <span className="font-retro font-bold text-5xl leading-none -mt-2">{post.score}</span>
-              </div>
-            </div>
-          )}
-
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
             <ArticleRenderer
@@ -277,6 +262,21 @@ export default function PostDetailPage({ previewPost }) {
               isDark={isDark}
             />
           </div>
+
+          {/* Score / Veredito — Movido para o fim */}
+          {post.score && (
+            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-white")}>
+              <div>
+                <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
+                  Veredito da Redação
+                </h4>
+                <p className="text-lg font-bold uppercase tracking-widest leading-relaxed">{post.verdict}</p>
+              </div>
+              <div className="flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] shrink-0">
+                <span className="font-retro font-bold text-5xl leading-none -mt-2">{post.score}</span>
+              </div>
+            </div>
+          )}
 
           {/* Seção de Comentários */}
           <section className={cn("mt-24 pt-12 border-t-4", isDark ? "border-gray-800" : "border-gray-200")}>

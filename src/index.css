@@ -116,3 +116,29 @@
   50% { transform: translateX(0); }
   100% { transform: translateX(100%); }
 }
+
+/* Efeito Glitch Sutil */
+@keyframes glitch {
+  0% { transform: translate(0); text-shadow: none; }
+  2% { transform: translate(-2px, 2px); text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+  4% { transform: translate(2px, -2px); text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
+  6% { transform: translate(0); text-shadow: none; }
+  100% { transform: translate(0); }
+}
+
+.animate-glitch {
+  animation: glitch 5s infinite;
+}
+
+/* Utilitário Glassmorphism */
+.glass-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
