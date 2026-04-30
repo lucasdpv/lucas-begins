@@ -26,7 +26,7 @@ export default function PostCard({ post, onClick }) {
       <div
         className={cn(
           "h-56 md:h-64 w-full relative overflow-hidden border-b-4 flex items-center justify-center",
-          isDark ? "border-purple-600 bg-gray-900" : "border-black bg-gray-100",
+          isDark ? "border-purple-600 bg-gray-900" : "border-snes-dark bg-snes-mid",
           !post.imageUrl && !imgError && `bg-gradient-to-br ${post.gradient}`
         )}
         style={bgStyle}
@@ -70,7 +70,7 @@ export default function PostCard({ post, onClick }) {
         </p>
 
         {/* Footer do card */}
-        <div className={cn("flex items-center justify-between text-sm mt-auto pt-5 border-t-2", isDark ? "border-gray-700" : "border-gray-200")}>
+        <div className={cn("flex items-center justify-between text-sm mt-auto pt-5 border-t-2", isDark ? "border-gray-700" : "border-snes-mid")}>
           {/* Data e tempo de leitura */}
           <div className="flex flex-col gap-1">
             <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60">

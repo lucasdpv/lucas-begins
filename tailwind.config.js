@@ -8,12 +8,15 @@ export default {
     extend: {
       colors: {
         snes: {
-          light: "#F8F9FB", // Gelo perolado limpo
-          mid: "#F1F5F9",   // Cinza azulado suave
-          dark: "#000000",  // Preto para bordas e sombras (Troca do 8C8C8C)
-          accent: "#000000", // Texto e detalhes
-          "purple-light": "#C084FC", // Roxo vibrante suave
-          "purple-deep": "#7E22CE",   // Roxo elétrico
+          light:   "#EDE5F7", // fundo da página — lavanda quente (corpo do SNES)
+          surface: "#F5F0FC", // superfície de cards / painéis
+          input:   "#E4DCF2", // inputs e áreas inset
+          mid:     "#D5CCEB", // divisórias, hover, cabeçalho de tabela
+          dark:    "#2D1B69", // roxo profundo SNES (bordas, navbar, sombras)
+          accent:  "#1A0B2E", // texto principal (dark navy-purple)
+          muted:   "#6B5B8A", // texto secundário
+          "purple-light": "#C084FC",
+          "purple-deep":  "#7E22CE",
         }
       }
     },

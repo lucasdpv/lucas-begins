@@ -149,3 +149,10 @@
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(168, 85, 247, 0.2);
 }
+
+/* Light mode: usa a superfície SNES com toque lavanda */
+.light .glass-card,
+:not(.dark) .glass-card {
+  background: rgba(245, 240, 252, 0.5);
+  border: 1px solid rgba(45, 27, 105, 0.12);
+}

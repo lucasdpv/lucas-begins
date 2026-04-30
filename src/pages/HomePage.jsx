@@ -89,7 +89,7 @@ export default function HomePage() {
 
             {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
             <aside className="hidden lg:block lg:col-span-1">
-              <div className={cn("h-full md:h-[560px] p-6 rounded-3xl glass-card flex flex-col relative overflow-hidden", isDark ? "" : "bg-white/40")}>
+              <div className={cn("h-full md:h-[560px] p-6 rounded-3xl glass-card flex flex-col relative overflow-hidden", isDark ? "" : "bg-snes-surface/40")}>
                 {/* Efeito sutil de luz de fundo */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
                 
@@ -164,7 +164,7 @@ export default function HomePage() {
                 )}
               </div>
             ) : (
-              <div className={cn("p-12 text-center rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white border-2 border-black")}>
+              <div className={cn("p-12 text-center rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface border-2 border-snes-dark")}>
                 <Gamepad2 className="w-16 h-16 mx-auto mb-4 opacity-50 text-purple-500" />
                 <p className="font-retro text-xl mb-2 font-bold uppercase">Nenhum artigo encontrado.</p>
                 <p className="opacity-70 font-medium tracking-tight">Tente buscar por outro termo ou categoria.</p>

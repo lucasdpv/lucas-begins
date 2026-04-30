@@ -22,7 +22,7 @@ const PROVIDERS = [
     key: "google",
     label: "Entrar com Google",
     icon: GoogleIcon,
-    lightStyle: "bg-white text-gray-800 border-gray-300 hover:bg-gray-50",
+    lightStyle: "bg-snes-surface text-snes-accent border-snes-mid hover:bg-snes-input",
     darkStyle: "bg-white text-gray-900 border-gray-300 hover:bg-gray-100",
   },
 ];
@@ -55,7 +55,7 @@ export default function LoginModal() {
       <div
         className={cn(
           "w-full max-w-md rounded-3xl overflow-hidden retro-card relative",
-          isDark ? "bg-gray-900 border-purple-500" : "bg-white border-black"
+          isDark ? "bg-gray-900 border-purple-500" : "bg-snes-surface border-snes-dark"
         )}
       >
         {/* Header decorativo */}

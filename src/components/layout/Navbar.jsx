@@ -83,7 +83,7 @@ export default function Navbar() {
       ref={mobileMenuRef}
       className={cn(
         "sticky top-0 z-50 transition-all duration-300 border-b-4 backdrop-blur-md",
-        isDark ? "border-purple-600 bg-gray-900/95" : "border-black bg-white/95",
+        isDark ? "border-purple-600 bg-gray-900/95" : "border-snes-dark bg-snes-light/95",
         isVisible ? "translate-y-0" : "-translate-y-full"
       )}
     >
@@ -113,14 +113,14 @@ export default function Navbar() {
                 onMouseEnter={() => setIsCategoryMenuOpen(true)}
                 onMouseLeave={() => setIsCategoryMenuOpen(false)}
               >
-                <div className={cn("rounded-xl border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] overflow-hidden", isDark ? "bg-gray-800 border-purple-500" : "bg-white border-black")}>
+                <div className={cn("rounded-xl border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] overflow-hidden", isDark ? "bg-gray-800 border-purple-500" : "bg-snes-surface border-snes-dark")}>
                   {["Todos", ...categories].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategorySelect(cat)}
                       className={cn(
                         "w-full text-left px-4 py-3 font-retro font-bold text-xs uppercase transition-colors border-b last:border-0",
-                        isDark ? "border-gray-700 hover:bg-gray-700" : "border-gray-100 hover:bg-gray-50",
+                        isDark ? "border-gray-700 hover:bg-gray-700" : "border-snes-mid hover:bg-snes-input",
                         activeCategory === cat && "text-purple-500"
                       )}
                     >
@@ -155,7 +155,7 @@ export default function Navbar() {
                 "w-full pl-10 pr-4 py-2 rounded-xl border-2 font-bold outline-none transition-all text-sm",
                 isDark 
                   ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white placeholder:text-gray-400" 
-                  : "bg-gray-50 border-black/10 focus:border-black text-black placeholder:text-gray-500"
+                  : "bg-snes-input border-snes-dark/20 focus:border-snes-dark text-snes-accent placeholder:text-snes-muted"
               )}
             />
           </div>
@@ -164,7 +164,7 @@ export default function Navbar() {
             onClick={toggleTheme}
             className={cn(
               "p-2.5 rounded-xl border-2 transition-all retro-button",
-              isDark ? "bg-gray-800 border-purple-500 text-yellow-400" : "bg-white border-black text-black"
+              isDark ? "bg-gray-800 border-purple-500 text-yellow-400" : "bg-snes-surface border-snes-dark text-snes-accent"
             )}
           >
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -204,7 +204,7 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
               "p-2.5 rounded-xl border-2 lg:hidden retro-button",
-              isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black"
+              isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
             )}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -216,7 +216,7 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className={cn(
           "lg:hidden border-t-4 p-6 flex flex-col gap-6",
-          isDark ? "bg-gray-900 border-purple-600" : "bg-white border-black"
+          isDark ? "bg-gray-900 border-purple-600" : "bg-snes-surface border-snes-dark"
         )}>
           <input
             type="text"
@@ -226,7 +226,7 @@ export default function Navbar() {
             onChange={handleSearch}
             className={cn(
               "w-full p-4 rounded-xl border-2 outline-none font-bold",
-              isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-gray-50 border-black text-black"
+              isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
             )}
           />
           <div className="flex flex-col gap-4">
@@ -249,7 +249,7 @@ export default function Navbar() {
                     "p-3 rounded-xl border-2 font-retro font-bold text-xs uppercase text-left",
                     activeCategory === cat
                       ? "bg-purple-600 border-black text-white"
-                      : isDark ? "bg-gray-800 border-purple-900 text-gray-400" : "bg-gray-50 border-gray-200 text-gray-600"
+                      : isDark ? "bg-gray-800 border-purple-900 text-gray-400" : "bg-snes-input border-snes-mid text-snes-muted"
                   )}
                 >
                   {cat}

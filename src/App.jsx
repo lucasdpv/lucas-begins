@@ -37,13 +37,13 @@ export default function App() {
       root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
       root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0,0,0,1)');
     } else {
-      root.style.setProperty('--retro-border-color', '#000000');
-      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #000000');
-      root.style.setProperty('--retro-button-border', '#000000');
-      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #000000');
-      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #000000');
-      root.style.setProperty('--magazine-drop-cap-color', '#9333ea');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(147,51,234,0.3)');
+      root.style.setProperty('--retro-border-color', '#2D1B69');
+      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #2D1B69');
+      root.style.setProperty('--retro-button-border', '#2D1B69');
+      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #2D1B69');
+      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #2D1B69');
+      root.style.setProperty('--magazine-drop-cap-color', '#7C3AED');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(45,27,105,0.4)');
     }
   }, [isDark]);
 

@@ -50,7 +50,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
-            className={cn("p-3 rounded-lg retro-button", isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black")}
+            className={cn("p-3 rounded-lg retro-button", isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent")}
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -94,13 +94,13 @@ export default function AdminPage() {
       {/* Aba: Artigos */}
       {adminTab === "posts" && (
         <div className="space-y-6">
-          <div className={cn("rounded-2xl retro-card overflow-hidden", isDark ? "bg-gray-800" : "bg-white")}>
+          <div className={cn("rounded-2xl retro-card overflow-hidden", isDark ? "bg-gray-800" : "bg-snes-surface")}>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm font-medium">
                 <thead
                   className={cn(
                     "font-retro uppercase text-xs tracking-wider border-b-2",
-                    isDark ? "bg-gray-900 border-purple-500 text-purple-300" : "bg-gray-100 border-black text-black"
+                    isDark ? "bg-gray-900 border-purple-500 text-purple-300" : "bg-snes-mid border-snes-dark text-snes-accent"
                   )}
                 >
                   <tr>
@@ -114,7 +114,7 @@ export default function AdminPage() {
                   {posts.map((post) => (
                     <tr
                       key={post.id}
-                      className={cn(isDark ? "hover:bg-gray-700/50" : "hover:bg-gray-50", "transition-colors")}
+                      className={cn(isDark ? "hover:bg-gray-700/50" : "hover:bg-snes-mid", "transition-colors")}
                     >
                       <td className="px-6 py-4 font-bold max-w-[250px] truncate text-base" title={post.title}>
                         {post.title}
@@ -167,7 +167,7 @@ export default function AdminPage() {
       {adminTab === "categories" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Criar */}
-          <div className={cn("p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+          <div className={cn("p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
             <h3 className="font-retro text-2xl font-bold uppercase mb-6 flex items-center gap-2 border-b-2 border-purple-500 pb-2 inline-flex">
               <Tag className="w-6 h-6 text-purple-500" /> Criar Categoria
             </h3>
@@ -183,7 +183,7 @@ export default function AdminPage() {
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   className={cn(
                     "w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all",
-                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                   )}
                   placeholder="Ex: Curiosidades, Hardware..."
                 />
@@ -198,7 +198,7 @@ export default function AdminPage() {
           </div>
 
           {/* Listar e excluir */}
-          <div className={cn("p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+          <div className={cn("p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
             <h3 className="font-retro text-2xl font-bold uppercase mb-6 border-b-2 border-purple-500 pb-2 inline-flex">
               Categorias Atuais
             </h3>
@@ -208,7 +208,7 @@ export default function AdminPage() {
                   key={cat}
                   className={cn(
                     "flex items-center justify-between p-4 rounded-xl border-2 font-retro font-bold uppercase text-sm",
-                    isDark ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-black"
+                    isDark ? "bg-gray-900 border-gray-700" : "bg-snes-input border-snes-dark"
                   )}
                 >
                   <span>{cat}</span>
@@ -233,7 +233,7 @@ export default function AdminPage() {
       {adminTab === "profile" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Formulário */}
-          <div className={cn("lg:col-span-2 p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+          <div className={cn("lg:col-span-2 p-8 rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
             <h3 className="font-retro text-2xl font-bold uppercase mb-8 flex items-center gap-3 border-b-2 border-purple-500 pb-3">
               <User className="w-6 h-6 text-purple-500" /> Editar Perfil de Autor
             </h3>
@@ -248,7 +248,7 @@ export default function AdminPage() {
                     onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
                     className={cn(
                       "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
-                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                     )}
                   />
                 </div>
@@ -260,7 +260,7 @@ export default function AdminPage() {
                     onChange={(e) => setProfileData(prev => ({ ...prev, aka: e.target.value }))}
                     className={cn(
                       "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
-                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                     )}
                     placeholder="Ex: Luck, The Boss..."
                   />
@@ -273,7 +273,7 @@ export default function AdminPage() {
                     onChange={(e) => setProfileData(prev => ({ ...prev, avatar: e.target.value }))}
                     className={cn(
                       "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
-                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                     )}
                     placeholder="https://..."
                   />
@@ -286,7 +286,7 @@ export default function AdminPage() {
                     onChange={(e) => setProfileData(prev => ({ ...prev, level: e.target.value }))}
                     className={cn(
                       "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium",
-                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                     )}
                   />
                 </div>
@@ -300,7 +300,7 @@ export default function AdminPage() {
                   rows="4"
                   className={cn(
                     "w-full p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium resize-none",
-                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                   )}
                   placeholder="Escreva algo sobre você para aparecer no final dos seus posts..."
                 />
@@ -318,7 +318,7 @@ export default function AdminPage() {
           {/* Preview do Author Box */}
           <div className="lg:col-span-1">
             <h4 className="font-retro text-sm font-bold uppercase mb-4 opacity-50">Preview no Post</h4>
-            <div className={cn("p-6 rounded-3xl border-2 relative overflow-hidden", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-gray-50 border-black/10")}>
+            <div className={cn("p-6 rounded-3xl border-2 relative overflow-hidden", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
                <div className="flex flex-col items-center text-center gap-4">
                   <div className="relative">
                     <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-3">

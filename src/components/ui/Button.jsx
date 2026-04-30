@@ -23,7 +23,7 @@ export default function Button({
       : "bg-purple-600 text-white hover:bg-purple-500 border-black",
     secondary: isDark
       ? "bg-gray-800 text-white hover:border-purple-500 border-gray-600"
-      : "bg-white text-black hover:border-black border-gray-300",
+      : "bg-snes-surface text-snes-accent hover:border-snes-dark border-snes-mid",
     danger: "bg-red-500 text-white hover:bg-red-600 border-black",
     warning: "bg-yellow-400 text-black hover:bg-yellow-300 border-black",
   };

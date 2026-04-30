@@ -15,7 +15,7 @@ export default function NotFoundPage() {
         <meta name="description" content="Página não encontrada no Lucas Begins." />
       </Helmet>
 
-      <div className={cn("p-12 md:p-16 rounded-3xl retro-card border-4 relative overflow-hidden max-w-2xl w-full", isDark ? "bg-gray-900 border-red-500" : "bg-white border-red-600")}>
+      <div className={cn("p-12 md:p-16 rounded-3xl retro-card border-4 relative overflow-hidden max-w-2xl w-full", isDark ? "bg-gray-900 border-red-500" : "bg-snes-surface border-red-600")}>
         <div className="absolute inset-0 scanline-overlay opacity-50" />
         
         <Gamepad2 className="w-24 h-24 mx-auto mb-8 text-red-500 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] animate-bounce" />

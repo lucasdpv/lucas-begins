@@ -193,7 +193,7 @@ export default function PostDetailPage({ previewPost }) {
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   {post.author?.role && (
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-gray-100 border-gray-300 text-purple-600")}>
+                    <span className={cn("text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-snes-input border-snes-mid text-purple-600")}>
                       {post.author.role}
                     </span>
                   )}
@@ -214,7 +214,7 @@ export default function PostDetailPage({ previewPost }) {
                 onClick={handleShare}
                 className={cn(
                   "p-3 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105",
-                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-white border-black text-black"
+                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-snes-surface border-snes-dark text-snes-accent"
                 )}
                 title="Copiar link"
               >
@@ -229,7 +229,7 @@ export default function PostDetailPage({ previewPost }) {
                     "flex items-center gap-2 px-5 py-3 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
                     hasLiked
                       ? "bg-red-500 border-red-600 text-white"
-                      : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black"
+                      : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
                   )}
                 >
                   <Heart className={cn("w-5 h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current group-hover:scale-110")} />
@@ -262,7 +262,7 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Score / Veredito — Movido para o fim */}
           {post.score && (
-            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-white")}>
+            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-snes-surface")}>
               <div>
                 <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
                   Veredito da Redação
@@ -277,7 +277,7 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Seção: Sobre o Autor — Estilo Premium (Opcional) */}
           {post.showAuthorBox === true && (
-            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-gray-50 border-black/10")}>
+            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
               {/* Background Decorativo */}
               <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-600/5 rounded-full blur-3xl" />
               
@@ -326,7 +326,7 @@ export default function PostDetailPage({ previewPost }) {
 
             {/* Form de comentário ou AuthGate */}
             {currentUser ? (
-              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
                 <div className="flex items-center gap-4 mb-6 pb-5 border-b-2 border-dashed border-gray-500/20">
                   <img
                     src={currentUser.avatar}
@@ -340,7 +340,7 @@ export default function PostDetailPage({ previewPost }) {
                 <textarea
                   className={cn(
                     "w-full p-5 rounded-2xl mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg font-medium transition-all",
-                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                   )}
                   rows="4"
                   placeholder="Mande o papo reto sobre o artigo..."
@@ -373,7 +373,7 @@ export default function PostDetailPage({ previewPost }) {
                     key={comment.id}
                     className={cn(
                       "p-6 rounded-2xl flex justify-between gap-5 retro-card transition-all",
-                      isDark ? "bg-gray-800" : "bg-white"
+                      isDark ? "bg-gray-800" : "bg-snes-surface"
                     )}
                   >
                     <div className="flex-1 min-w-0">
@@ -446,7 +446,7 @@ export default function PostDetailPage({ previewPost }) {
         {/* Sidebar */}
         {trendingPosts.length > 0 && (
           <aside className="lg:col-span-1 space-y-8">
-            <div className={cn("p-6 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+            <div className={cn("p-6 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
               <h3 className={cn("font-retro font-bold text-xl uppercase mb-6 flex items-center gap-3 border-b-2 pb-3", isDark ? "border-purple-500" : "border-black")}>
                 <Star className={cn("w-6 h-6", isDark ? "text-yellow-400" : "text-yellow-500")} fill="currentColor" />
                 Veja Também
