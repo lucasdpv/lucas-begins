@@ -129,7 +129,7 @@ export function AppProvider({ children }) {
 
   const login = () => loginWithProvider(googleProvider, "Google");
 
-  const logout = async () => {
+  const handleLogout = async () => {
     try {
       await signOut(auth);
       showToast("Sessão encerrada. Até a próxima!");
@@ -140,7 +140,7 @@ export function AppProvider({ children }) {
 
   const value = {
     isDark, toggleTheme,
-    currentUser, login, logout, authLoading,
+    currentUser, login, handleLogout, authLoading,
     toast, showToast,
     posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
     loadMore, hasMore,

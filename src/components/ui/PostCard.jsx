@@ -6,11 +6,22 @@ import AuthGate from "./AuthGate";
 
 export default function PostCard({ post, onClick }) {
   const { isDark, handleLike, currentUser } = useAppContext();
+  const [imgError, setImgError] = React.useState(false);
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
 
-  const bgStyle = post.imageUrl
+  // Verifica se a imagem é válida
+  React.useEffect(() => {
+    if (post.imageUrl) {
+      const img = new Image();
+      img.src = post.imageUrl;
+      img.onerror = () => setImgError(true);
+      img.onload = () => setImgError(false);
+    }
+  }, [post.imageUrl]);
+
+  const bgStyle = post.imageUrl && !imgError
     ? { backgroundImage: `url(${post.imageUrl})`, backgroundSize: "cover", backgroundPosition: post.imagePosition || "center" }
     : {};
 
@@ -25,17 +36,36 @@ export default function PostCard({ post, onClick }) {
       {/* Thumb */}
       <div
         className={cn(
-          "h-56 md:h-64 w-full relative overflow-hidden border-b-4",
-          isDark ? "border-purple-600" : "border-black",
-          !post.imageUrl && `bg-gradient-to-br ${post.gradient}`
+          "h-56 md:h-64 w-full relative overflow-hidden border-b-4 flex items-center justify-center",
+          isDark ? "border-purple-600 bg-gray-900" : "border-black bg-gray-100",
+          !post.imageUrl && !imgError && `bg-gradient-to-br ${post.gradient}`
         )}
         style={bgStyle}
       >
+        {/* Mensagem Gamificada em caso de Erro de Imagem */}
+        {imgError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
+             <div className="text-red-500 font-retro text-[10px] sm:text-xs mb-2 animate-pulse bg-black/40 px-2 py-1 rounded border border-red-500/50">
+               ⚠️ GRAPHIC_ERROR_0x404
+             </div>
+             <p className={cn(
+               "text-[9px] sm:text-[10px] font-bold uppercase leading-tight max-w-[200px]",
+               isDark ? "text-gray-400" : "text-gray-600"
+             )}>
+               Textura não encontrada. Verificando integridade dos pixels no setor {Math.floor(Math.random() * 99)}...
+             </p>
+             <div className="mt-3 w-24 h-1 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+                <div className="h-full bg-red-500 animate-[loading_2s_infinite]" style={{ width: '30%' }} />
+             </div>
+          </div>
+        )}
+
         <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-70 transition-opacity duration-300" />
+        
         {/* Overlay de hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
-        <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
+        <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
           <span className="bg-purple-600 text-white font-retro font-bold text-xs px-4 py-1.5 rounded-lg uppercase tracking-widest border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]">
             {post.category}
           </span>

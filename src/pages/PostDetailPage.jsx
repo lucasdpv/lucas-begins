@@ -33,6 +33,17 @@ export default function PostDetailPage({ previewPost }) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
+  const [imgError, setImgError] = useState(false);
+
+  // Verifica se a imagem de capa é válida
+  React.useEffect(() => {
+    if (post?.imageUrl) {
+      const img = new Image();
+      img.src = post.imageUrl;
+      img.onerror = () => setImgError(true);
+      img.onload = () => setImgError(false);
+    }
+  }, [post?.imageUrl]);
 
   // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
   if (isLoadingPosts && !post) {
@@ -92,7 +103,7 @@ export default function PostDetailPage({ previewPost }) {
     }
   };
 
-  const heroStyle = post.imageUrl
+  const heroStyle = post.imageUrl && !imgError
     ? {
       backgroundImage: `url(${post.imageUrl})`,
       backgroundSize: "cover",
@@ -137,13 +148,27 @@ export default function PostDetailPage({ previewPost }) {
       {/* Hero */}
       <div
         className={cn(
-          "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden mb-12 retro-card",
-          !post.imageUrl && `bg-gradient-to-br ${post.gradient}`
+          "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden mb-12 retro-card flex items-center justify-center",
+          (!post.imageUrl || imgError) && `bg-gradient-to-br ${post.gradient || 'from-gray-900 to-purple-900'}`
         )}
         style={heroStyle}
       >
+        {imgError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 bg-black/60">
+             <div className="text-red-500 font-retro text-2xl md:text-4xl mb-4 animate-pulse border-2 border-red-500 px-6 py-2 rounded bg-black/80">
+               ⚠️ DATA_CORRUPTION_DETECTED
+             </div>
+             <p className="font-retro text-sm md:text-lg uppercase tracking-widest text-gray-300 max-w-2xl leading-relaxed">
+               A transmissão de alta fidelidade do setor {post.category} foi interrompida. 
+               Nossos técnicos estão recalibrando os lasers de projeção.
+             </p>
+             <div className="mt-8 w-64 h-3 bg-gray-800 rounded-full overflow-hidden border-2 border-white/20">
+                <div className="h-full bg-red-600 animate-[loading_5s_infinite]" style={{ width: '60%' }} />
+             </div>
+          </div>
+        )}
         <div className="absolute inset-0 scanline-overlay opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-[5]" />
         <div className="absolute bottom-0 p-8 md:p-16 text-white w-full max-w-5xl">
           <span className="bg-purple-600 font-retro text-xs md:text-sm px-4 py-2 rounded-lg uppercase tracking-wider mb-6 inline-block font-bold border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
             {post.category}
