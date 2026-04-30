@@ -8,7 +8,8 @@ import {
   ArrowDown, 
   PlusCircle,
   GripVertical,
-  Heading
+  Heading,
+  Play
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -44,7 +45,7 @@ export default function BlockEditor({ value, onChange, isDark }) {
       id: Date.now().toString() + Math.random(), 
       type, 
       content: '', 
-      url: type === 'image' ? '' : undefined 
+      url: (type === 'image' || type === 'video') ? '' : undefined 
     };
     setBlocks([...blocks, newBlock]);
   };
@@ -76,6 +77,7 @@ export default function BlockEditor({ value, onChange, isDark }) {
           <ToolbarButton onClick={() => addBlock('heading')} icon={<Heading />} label="Título" isDark={isDark} />
           <ToolbarButton onClick={() => addBlock('text')} icon={<Type />} label="Texto" isDark={isDark} />
           <ToolbarButton onClick={() => addBlock('image')} icon={<ImageIcon />} label="Imagem" isDark={isDark} />
+          <ToolbarButton onClick={() => addBlock('video')} icon={<Play />} label="Vídeo" isDark={isDark} />
           <ToolbarButton onClick={() => addBlock('divider')} icon={<Minus />} label="Divisor" isDark={isDark} />
         </div>
       </div>
@@ -162,6 +164,33 @@ export default function BlockEditor({ value, onChange, isDark }) {
                 </div>
               )}
 
+              {block.type === 'video' && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-black/10 dark:bg-black/40 border border-white/5">
+                    <Play size={20} className="text-purple-500" />
+                    <input 
+                      type="url"
+                      value={block.url}
+                      onChange={(e) => updateBlock(block.id, { url: e.target.value })}
+                      placeholder="URL do vídeo do YouTube..."
+                      className="flex-1 bg-transparent outline-none text-sm font-mono"
+                    />
+                  </div>
+                  {block.url && (
+                    <div className="relative rounded-xl overflow-hidden border-2 border-purple-500/20 aspect-video bg-black">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${block.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/)?.[1]}`}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {block.type === 'divider' && (
                 <div className="py-4 flex items-center gap-4">
                   <div className="flex-1 h-1 bg-purple-500/20 rounded-full" />
@@ -182,6 +211,7 @@ export default function BlockEditor({ value, onChange, isDark }) {
         <ToolbarButton onClick={() => addBlock('heading')} icon={<Heading size={18} />} label="Título" isDark={isDark} small />
         <ToolbarButton onClick={() => addBlock('text')} icon={<Type size={18} />} label="Texto" isDark={isDark} small />
         <ToolbarButton onClick={() => addBlock('image')} icon={<ImageIcon size={18} />} label="Imagem" isDark={isDark} small />
+        <ToolbarButton onClick={() => addBlock('video')} icon={<Play size={18} />} label="Vídeo" isDark={isDark} small />
         <ToolbarButton onClick={() => addBlock('divider')} icon={<Minus size={18} />} label="Divisor" isDark={isDark} small />
       </div>
     </div>
@@ -237,6 +267,11 @@ function parseMarkdownToBlocks(markdown) {
       if (match) {
         blocks.push({ id: Math.random().toString(), type: 'image', content: match[1], url: match[2] });
       }
+    } else if (line.startsWith('@[youtube]')) {
+      const match = line.match(/@\[youtube\]\((.*?)\)/);
+      if (match) {
+        blocks.push({ id: Math.random().toString(), type: 'video', url: match[1] });
+      }
     } else if (line.trim() === '---') {
       blocks.push({ id: Math.random().toString(), type: 'divider' });
     } else if (line.trim() !== '') {
@@ -257,6 +292,7 @@ function blocksToMarkdown(blocks) {
     switch (b.type) {
       case 'heading': return `## ${b.content}`;
       case 'image': return `![${b.content || ''}](${b.url})`;
+      case 'video': return `@[youtube](${b.url})`;
       case 'divider': return '---';
       case 'text': return b.content;
       default: return '';

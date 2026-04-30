@@ -158,36 +158,23 @@ export function usePosts(currentUser, showToast) {
   };
 
   const handleSavePost = async (postData) => {
+    // Verificação básica de segurança no cliente
+    if (currentUser?.role !== 'admin') {
+      showToast('Acesso negado. Apenas editores chefes podem lançar fases.', 'error');
+      return null;
+    }
+
     try {
       if (postData.id) {
-        // Atualizar post existente
         const { id, ...dataToUpdate } = postData;
-        await PostService.updatePost(id, { ...dataToUpdate, updatedAt: serverTimestamp() });
-
-        // Busca o post atualizado para ter os timestamps corretos
+        await PostService.updatePost(id, dataToUpdate);
+        
         const freshPost = await PostService.getPostById(id);
         if (freshPost) setPosts(prev => prev.map(p => p.id === id ? freshPost : p));
         showToast('Artigo atualizado com sucesso!');
         return freshPost;
       } else {
-        // Criar novo post com slug único (collision prevention)
-        const baseSlug = slugify(postData.title);
-        const uniqueHash = Math.random().toString(36).substring(2, 7);
-
-        const newPostData = {
-          ...postData,
-          likes: 0,
-          likedBy: [],
-          slug: `${baseSlug}-${uniqueHash}`,
-          comments: [],
-          author: { name: currentUser.name, role: 'Editor Chefe' },
-          gradient: postData.gradient || 'from-purple-600 to-blue-600',
-          createdAt: serverTimestamp(),
-        };
-        // Remove campo legado 'date'
-        delete newPostData.date;
-
-        const createdPost = await PostService.createPost(newPostData);
+        const createdPost = await PostService.createPost(postData, currentUser);
         if (createdPost) setPosts(prev => [createdPost, ...prev]);
         showToast('Novo artigo publicado na capa!');
         return createdPost;
@@ -200,8 +187,12 @@ export function usePosts(currentUser, showToast) {
   };
 
   const handleDeletePost = async (postId) => {
+    if (currentUser?.role !== 'admin') {
+      showToast('Apenas admins podem remover posts.', 'error');
+      return false;
+    }
+
     const originalPosts = [...posts];
-    // Optimistic delete
     setPosts(prev => prev.filter(p => p.id !== postId));
 
     try {

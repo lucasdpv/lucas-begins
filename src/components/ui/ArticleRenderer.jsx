@@ -80,6 +80,38 @@ export default function ArticleRenderer({ content, isDark }) {
           );
         }
 
+        // @[youtube](url) — Vídeo
+        const videoMatch = line.match(/^@\[youtube\]\((.*?)\)$/);
+        if (videoMatch) {
+          const videoId = videoMatch[1].match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/)?.[1];
+          firstElementRendered = true;
+          return (
+            <div key={index} className="my-14 w-full aspect-video rounded-2xl overflow-hidden border-4 border-black shadow-[8px_8px_0px_rgba(168,85,247,0.4)] bg-black flex items-center justify-center">
+              {videoId ? (
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <div className="text-purple-500 font-retro text-center p-4">
+                  <p className="text-xl mb-2">🎮 VÍDEO PRONTO PARA O PALCO</p>
+                  <p className="text-sm opacity-50 uppercase">Insira uma URL válida do YouTube no editor</p>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // Se a linha começa com @[youtube] mas não bateu no regex completo (ex: está incompleto), 
+        // evitamos que seja renderizado como parágrafo de texto comum com drop-cap
+        if (line.startsWith('@[youtube]')) {
+          return null;
+        }
+
         // Parágrafo
         const isFirst = !firstParagraphRendered && !firstElementRendered;
         firstParagraphRendered = true;

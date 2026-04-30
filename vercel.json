@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/post/(?<slug>[^/]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(whatsapp|facebookexternalhit|twitterbot|linkedinbot|slackbot|discordbot|telegrambot).*"
+        }
+      ],
+      "destination": "/api/og?slug=$slug"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

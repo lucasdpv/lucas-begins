@@ -25,7 +25,10 @@ export default function PostDetailPage({ previewPost }) {
   const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
 
   const trendingPosts = useMemo(() => {
-    return [...posts].sort((a, b) => b.likes - a.likes).slice(0, 4);
+    return [...posts]
+      .filter((p) => !p.isDraft)
+      .sort((a, b) => b.likes - a.likes)
+      .slice(0, 4);
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
@@ -51,6 +54,26 @@ export default function PostDetailPage({ previewPost }) {
 
   const handleShare = async () => {
     const url = window.location.href;
+    const shareData = {
+      title: post.title || "Lucas Begins",
+      text: post.excerpt ? `Confira: ${post.excerpt}` : "Dá uma olhada nessa matéria no Lucas Begins!",
+      url: url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          fallbackCopy(url);
+        }
+      }
+    } else {
+      fallbackCopy(url);
+    }
+  };
+
+  const fallbackCopy = async (url) => {
     try {
       await navigator.clipboard.writeText(url);
       showToast("Link copiado! Compartilhe com seus amigos 🎮");
@@ -63,7 +86,7 @@ export default function PostDetailPage({ previewPost }) {
     ? {
         backgroundImage: `url(${post.imageUrl})`,
         backgroundSize: "cover",
-        backgroundPosition: post.imagePosition || "center",
+        backgroundPosition: "center",
       }
     : {};
 
@@ -350,7 +373,7 @@ export default function PostDetailPage({ previewPost }) {
                           "h-28 w-full rounded-xl mb-3 bg-cover bg-center border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] group-hover:shadow-[5px_5px_0px_rgba(168,85,247,1)] transition-all",
                           !p.imageUrl && `bg-gradient-to-br ${p.gradient}`
                         )}
-                        style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundPosition: p.imagePosition || "center" } : {}}
+                        style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundPosition: "center" } : {}}
                       />
                       <span className="text-[10px] font-retro font-bold uppercase tracking-widest opacity-50 bg-purple-600/10 text-purple-500 px-2 py-0.5 rounded mb-1 inline-block">
                         {p.category}
