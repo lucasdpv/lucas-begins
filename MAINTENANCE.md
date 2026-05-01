@@ -39,9 +39,24 @@ O Firebase não faz backups automáticos no plano gratuito (Spark). Recomenda-se
 
 ---
 
+## 🚀 Deploy e Infraestrutura
+
+O blog está configurado para ser hospedado na **Vercel**, aproveitando as Edge Functions para performance.
+
+### 1. Vercel Hosting
+- O arquivo `vercel.json` configura os redirecionamentos e headers de segurança.
+- Ao fazer deploy, garanta que todas as variáveis de ambiente do `.env.local` estejam cadastradas no painel da Vercel.
+
+### 2. API de Imagens Sociais (Open Graph)
+Localizada em `api/og.js`, esta função gera automaticamente imagens de compartilhamento (Cards do Twitter/WhatsApp) dinâmicas para cada post.
+- **Como testar**: Acesse `https://seusite.com/api/og?title=Seu Titulo`.
+- **Manutenção**: Se mudar o design do blog, lembre-se de atualizar o layout React dentro de `api/og.js` para manter a consistência visual.
+
+---
+
 ## 🚀 Próximos Passos de Evolução
 - **Firebase Storage**: No futuro, podemos migrar o upload de imagens do `imageUrl` (links externos) para o Storage oficial do Firebase, garantindo que as imagens nunca "quebrem".
-- **Hospedagem**: Recomendo o **Vercel** ou **Firebase Hosting** para o deploy final. Ambos são gratuitos e extremamente rápidos.
+- **Hospedagem**: Atualmente utilizando **Vercel** para o frontend e funções de API.
 
 > [!TIP]
 > Em caso de erros críticos no banco, você pode resetar os dados básicos chamando a função `seedDatabase()` (que já roda automaticamente se o banco estiver vazio).

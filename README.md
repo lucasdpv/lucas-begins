@@ -11,6 +11,7 @@ O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming
 
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
+-   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Se você é novo no projeto, comece por aqui!
 -   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Como postar, gerir categorias e adicionar administradores.
 -   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre arquitetura, hooks, componentes e banco de dados.
 

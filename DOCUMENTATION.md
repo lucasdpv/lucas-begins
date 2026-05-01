@@ -31,6 +31,10 @@ Toda a interação com o Firestore foi abstraída em hooks para manter os compon
 - **Função**: Gerenciador de notificações UI.
 - **Estado**: Singleton que garante que apenas um aviso apareça por vez, com autolimpeza de timer.
 
+### 4. `useImageFallback.js`
+- **Função**: Garante que imagens de posts ou avatares quebrados sejam substituídas por placeholders elegantes ou ícones retro.
+- **Implementação**: Hook utilitário que monitora erros de carregamento (`onError`) no DOM.
+
 ---
 
 ## 🧩 Mapa de Componentes Principais
@@ -38,17 +42,22 @@ Toda a interação com o Firestore foi abstraída em hooks para manter os compon
 ### `Navbar.jsx`
 O centro de comando. Gerencia:
 - Busca em tempo real.
-- Troca de tema dinâmico.
+- Troca de tema dinâmico (Dark/Lavender).
 - Gatilho do `LoginModal`.
 
-### `PostEditorPage.jsx`
-O CMS customizado.
-- **Auto-Save**: Salva rascunhos no `localStorage` para evitar perda de dados.
-- **Markdown**: Utiliza o motor do `BlockEditor` para transformar texto em HTML retro.
+### `PostDetailPage.jsx`
+A experiência de leitura imersiva.
+- **ArticleRenderer**: Processa Markdown em HTML seguro com estilização retro.
+- **Comentários**: Sistema de feedback com cooldown (30s) para evitar spam.
+
+### `AdminPage.jsx` & `PostEditorPage.jsx`
+O CMS customizado para administradores.
+- **Dashboard**: Visão geral de posts e categorias.
+- **Editor**: Suporte a Markdown, upload de capas e salvamento automático (Drafts) no `localStorage`.
 
 ### `ProtectedRoute.jsx`
 A sentinela.
-- Envolve rotas sensíveis e verifica permissões antes de renderizar qualquer conteúdo.
+- Envolve rotas sensíveis (Admin/Editor) e verifica o `role` do usuário no Firebase antes de renderizar.
 
 ---
 
@@ -61,12 +70,24 @@ A sentinela.
   "slug": "String (ex: review-do-jogo-a7m9p)",
   "content": "String (Markdown)",
   "category": "String",
-  "createdAt": "Timestamp (Livre de strings hardcoded redundantes)",
+  "createdAt": "Timestamp",
+  "updatedAt": "Timestamp",
   "likes": "Number",
   "likedBy": "Array (UIDs)",
+  "author": {
+    "name": "String",
+    "role": "String (Editor Chefe/Colaborador)",
+    "avatar": "URL",
+    "bio": "String",
+    "aka": "String",
+    "level": "Number"
+  },
   "comments": [
     {
+      "id": "Number (Timestamp)",
+      "authorId": "String (UID)",
       "author": "String",
+      "authorAvatar": "URL",
       "text": "String",
       "createdAt": "String (ISO)"
     }
@@ -77,7 +98,7 @@ A sentinela.
 ---
 
 ## 🎨 Design System
-O projeto utiliza uma combinação de **Tailwind CSS** para utilitários e **CSS-in-JS (dinâmico)** no `App.jsx` para injetar variáveis que dependem do tema (como as cores do SNES e as sombras sólidas).
+O projeto utiliza **Tailwind CSS** para layout e utilitários, combinado com **CSS Variables** injetadas dinamicamente via `App.jsx`. Isso permite a troca de "skins" (Dark/Light) sem recarregar a página ou re-renderizar componentes pesados.
 
 ---
 **Desenvolvido com foco em escalabilidade e performance.**
