@@ -107,7 +107,8 @@ export default function LoginModal() {
 
           {/* Botões de login */}
           <div className="space-y-3">
-            {PROVIDERS.map(({ key, label, icon: Icon, lightStyle, darkStyle }) => (
+            {/* eslint-disable-next-line no-unused-vars */}
+            {PROVIDERS.map(({ key, label, icon: IconComponent, lightStyle, darkStyle }) => (
               <button
                 key={key}
                 onClick={() => handlers[key]?.()}
@@ -116,7 +117,7 @@ export default function LoginModal() {
                   isDark ? darkStyle : lightStyle
                 )}
               >
-                <Icon className="w-5 h-5 shrink-0" />
+                <IconComponent className="w-5 h-5 shrink-0" />
                 <span className="flex-1 text-left font-retro uppercase tracking-wide text-sm">
                   {label}
                 </span>

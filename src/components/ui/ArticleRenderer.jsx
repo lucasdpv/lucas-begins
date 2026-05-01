@@ -98,8 +98,21 @@ export default function ArticleRenderer({ content, isDark }) {
     return DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em'], ALLOWED_ATTR: ['class'] });
   };
 
-  let firstElementRendered = false;
-  let firstParagraphRendered = false;
+  // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo
+  let firstNonEmptyIndex = -1;
+  let firstParagraphIndex = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    if (line.startsWith('## ') || line.trim() === '---' || line.match(/^!\[/) || line.match(/^@\[youtube\]/) || !line.match(/^@\[youtube\]/)) {
+      if (firstNonEmptyIndex === -1) firstNonEmptyIndex = i;
+      if (!line.startsWith('## ') && line.trim() !== '---' && !line.match(/^!\[/) && !line.match(/^@\[youtube\]/) && firstParagraphIndex === -1) {
+        firstParagraphIndex = i;
+      }
+    }
+  }
 
   return (
     <>
@@ -108,7 +121,6 @@ export default function ArticleRenderer({ content, isDark }) {
 
         if (line.startsWith('## ')) {
           const headingText = line.slice(3).trim();
-          firstElementRendered = true;
           return (
             <h2 key={index} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
               {headingText}
@@ -117,7 +129,6 @@ export default function ArticleRenderer({ content, isDark }) {
         }
 
         if (line.trim() === '---') {
-          firstElementRendered = true;
           return (
             <div key={index} className="my-12 flex items-center gap-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
@@ -129,21 +140,18 @@ export default function ArticleRenderer({ content, isDark }) {
 
         const imgMatch = line.match(/^!\[([^\]]*)\]\((.+?)\)$/);
         if (imgMatch) {
-          firstElementRendered = true;
           return <ArticleImage key={index} src={imgMatch[2]} alt={imgMatch[1]} isDark={isDark} />;
         }
 
         const videoMatch = line.match(/^@\[youtube\]\((.*?)\)$/);
         if (videoMatch) {
-          firstElementRendered = true;
           return <ArticleVideo key={index} url={videoMatch[1]} isDark={isDark} />;
         }
 
         if (line.startsWith('@[youtube]')) return null;
 
-        const isFirst = !firstParagraphRendered && !firstElementRendered;
-        firstParagraphRendered = true;
-        firstElementRendered = true;
+        // Parágrafo
+        const isFirst = index === firstParagraphIndex;
 
         return (
           <p

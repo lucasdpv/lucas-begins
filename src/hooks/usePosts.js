@@ -58,7 +58,10 @@ export function usePosts(currentUser, showToast) {
 
   // Carregamento inicial (somente na montagem)
   useEffect(() => {
-    fetchPosts();
+    const loadInitial = async () => {
+      await fetchPosts();
+    };
+    loadInitial();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -7,7 +7,7 @@ import { CategoryBadge, ScoreBadge } from "./Badge";
  * Carrossel automático com autoplay, pausa no hover, navegação por teclado.
  * Respeita o campo imagePosition de cada post.
  */
-export default function Carousel({ posts, onPostClick, isDark }) {
+export default function Carousel({ posts, onPostClick }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 

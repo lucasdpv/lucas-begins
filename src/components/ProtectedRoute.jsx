@@ -12,7 +12,7 @@ import { useAppContext } from "../context/AppContext";
  * @param {"admin"|"user"} requiredRole - Role mínima para acessar a rota
  */
 export default function ProtectedRoute({ children, requiredRole = "admin" }) {
-  const { currentUser, authLoading, isDark } = useAppContext();
+  const { currentUser, authLoading } = useAppContext();
   const navigate = useNavigate();
 
   useEffect(() => {

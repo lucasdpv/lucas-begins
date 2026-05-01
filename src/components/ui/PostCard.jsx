@@ -10,6 +10,7 @@ export default function PostCard({ post, onClick }) {
   const { isDark, handleLike, currentUser } = useAppContext();
   const imgError = useImageFallback(post.imageUrl);
   const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
+  const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
@@ -41,7 +42,7 @@ export default function PostCard({ post, onClick }) {
                "text-[9px] sm:text-[10px] font-bold uppercase leading-tight max-w-[200px]",
                isDark ? "text-gray-400" : "text-gray-600"
              )}>
-               Textura não encontrada. Verificando integridade dos pixels no setor {Math.floor(Math.random() * 99)}...
+               Textura não encontrada. Verificando integridade dos pixels no setor {randomSector}...
              </p>
              <div className="mt-3 w-24 h-1 bg-gray-800 rounded-full overflow-hidden border border-white/10">
                 <div className="h-full bg-red-500 animate-[loading_2s_infinite]" style={{ width: '30%' }} />

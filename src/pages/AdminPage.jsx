@@ -13,26 +13,13 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const [adminTab, setAdminTab] = useState("posts");
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState(() => ({
     name: currentUser?.name || "",
     avatar: currentUser?.avatar || "",
     bio: currentUser?.bio || "",
     level: currentUser?.level || 1,
     aka: currentUser?.aka || ""
-  });
-
-  // Sincroniza o formulário quando o currentUser for carregado
-  React.useEffect(() => {
-    if (currentUser) {
-      setProfileData({
-        name: currentUser.name || "",
-        avatar: currentUser.avatar || "",
-        bio: currentUser.bio || "",
-        level: currentUser.level || 1,
-        aka: currentUser.aka || ""
-      });
-    }
-  }, [currentUser]);
+  }));
 
   const handleAddCat = (e) => {
     e.preventDefault();

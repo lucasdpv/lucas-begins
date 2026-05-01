@@ -23,12 +23,13 @@ export default function HomePage() {
       { threshold: 0.1 }
     );
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
     }
 
     return () => {
-      if (observerTarget.current) observer.disconnect();
+      if (currentTarget) observer.disconnect();
     };
   }, [hasMore, isLoadingPosts, searchQuery, activeCategory, loadMore]);
 
