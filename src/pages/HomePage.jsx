@@ -89,31 +89,43 @@ export default function HomePage() {
 
             {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
             <aside className="hidden lg:block lg:col-span-1">
-              <div className={cn("h-full md:h-[560px] p-6 rounded-3xl glass-card flex flex-col relative overflow-hidden", isDark ? "" : "bg-snes-surface/40")}>
-                {/* Efeito sutil de luz de fundo */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className={cn(
+                "h-full md:h-[560px] p-8 rounded-[2rem] flex flex-col relative overflow-hidden transition-all duration-500",
+                isDark 
+                  ? "bg-[#161b2c] border border-white/5 shadow-xl" 
+                  : "bg-snes-surface border-2 border-snes-dark shadow-[4px_4px_0px_0px_#2D1B69]"
+              )}>
+                {/* Efeito de luz de fundo sutil */}
+                {isDark && (
+                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none" />
+                )}
                 
-                <div className="flex flex-col justify-between h-full relative z-10">
+                <div className="flex flex-col justify-between h-full relative z-10 gap-1">
                   {trendingPosts.map((post, idx) => (
                     <div
                       key={post.id}
                       onClick={() => onPostClick(post)}
                       className={cn(
-                        "flex gap-4 cursor-pointer group pb-4 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1",
-                        isDark ? "border-purple-500/20" : "border-gray-100"
+                        "flex items-center gap-5 cursor-pointer group py-3 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-2",
+                        isDark ? "border-white/5" : "border-snes-mid/30"
                       )}
                     >
                       <div className={cn(
-                        "text-2xl md:text-3xl font-retro font-bold opacity-30 group-hover:opacity-100 group-hover:text-purple-500 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]",
-                        isDark ? "text-purple-400" : "text-purple-600"
+                        "text-4xl font-retro font-bold transition-all duration-300 min-w-[45px]",
+                        isDark 
+                          ? "text-[#4a4176] group-hover:text-purple-400 group-hover:drop-shadow-[0_0_12px_rgba(168,85,247,0.4)]" 
+                          : "text-purple-600/30 group-hover:text-purple-600"
                       )}>
                         {(idx + 1).toString().padStart(2, "0")}
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-sm leading-snug line-clamp-2 group-hover:text-purple-500 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <h4 className={cn(
+                          "font-bold text-[14px] leading-tight line-clamp-2 transition-colors",
+                          isDark ? "text-white group-hover:text-purple-200" : "text-snes-accent group-hover:text-purple-700"
+                        )}>
                           {post.title}
                         </h4>
-                        <div className="flex items-center gap-2 mt-1 opacity-40 text-[10px] font-bold uppercase">
+                        <div className="flex items-center gap-2 mt-1.5 opacity-40 text-[10px] font-bold uppercase tracking-wider">
                            <span>{post.likes || 0} curtidas</span>
                         </div>
                       </div>
