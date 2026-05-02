@@ -26,7 +26,7 @@ export default function AboutPage() {
       </div>
 
       {/* Conteúdo */}
-      <div className={`p-8 md:p-12 rounded-2xl retro-card prose sm:prose-lg max-w-none text-justify ${isDark ? "bg-gray-800 text-gray-300" : "bg-white text-gray-700"}`}>
+      <div className={`p-8 md:p-12 rounded-2xl retro-card prose sm:prose-lg max-w-none text-justify ${isDark ? "bg-gray-800 text-gray-300" : "bg-snes-surface text-snes-accent"}`}>
         <h2 className="font-retro text-3xl mb-6 text-purple-500 uppercase border-b-4 border-purple-500 inline-block pb-2">
           A Origem
         </h2>
@@ -46,7 +46,7 @@ export default function AboutPage() {
           Player 1
         </h2>
 
-        <div className={`p-6 md:p-10 rounded-2xl border-2 shadow-inner ${isDark ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}>
+        <div className={`p-6 md:p-10 rounded-2xl border-2 shadow-inner ${isDark ? "bg-gray-900 border-gray-700" : "bg-snes-input border-snes-mid"}`}>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             <div className="w-32 h-32 shrink-0 rounded-2xl bg-purple-600 flex items-center justify-center text-6xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
               👨‍💻

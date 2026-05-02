@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,11 +10,14 @@ import {
   Star,
   Clock,
   CheckCheck,
+  ChevronDown,
 } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, slugify } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
 import ArticleRenderer from "../components/ui/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
+import { useImageFallback } from "../hooks/useImageFallback";
+import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../components/ui/AuthGate";
 import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
 
@@ -33,17 +36,9 @@ export default function PostDetailPage({ previewPost }) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
-  const [imgError, setImgError] = useState(false);
-
-  // Verifica se a imagem de capa é válida
-  React.useEffect(() => {
-    if (post?.imageUrl) {
-      const img = new Image();
-      img.src = post.imageUrl;
-      img.onerror = () => setImgError(true);
-      img.onload = () => setImgError(false);
-    }
-  }, [post?.imageUrl]);
+  const imgError = useImageFallback(post?.imageUrl);
+  const COMMENTS_PER_PAGE = 5;
+  const [visibleComments, setVisibleComments] = useState(COMMENTS_PER_PAGE);
 
   // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
   if (isLoadingPosts && !post) {
@@ -103,13 +98,7 @@ export default function PostDetailPage({ previewPost }) {
     }
   };
 
-  const heroStyle = post.imageUrl && !imgError
-    ? {
-      backgroundImage: `url(${post.imageUrl})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }
-    : {};
+  const heroStyle = imgError ? {} : coverBgStyle(post.imageUrl);
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
 
@@ -170,9 +159,7 @@ export default function PostDetailPage({ previewPost }) {
         <div className="absolute inset-0 scanline-overlay opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-[5]" />
         <div className="absolute bottom-0 p-8 md:p-16 text-white w-full max-w-5xl">
-          <span className="bg-purple-600 font-retro text-xs md:text-sm px-4 py-2 rounded-lg uppercase tracking-wider mb-6 inline-block font-bold border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
-            {post.category}
-          </span>
+          <CategoryBadge size="md" className="mb-6 inline-block">{post.category}</CategoryBadge>
           <h1 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl leading-tight drop-shadow-[4px_4px_0px_rgba(0,0,0,0.8)]">
             {post.title || "Sem Título"}
           </h1>
@@ -191,6 +178,8 @@ export default function PostDetailPage({ previewPost }) {
                 <img 
                   src={post.author.avatar} 
                   alt={post.author.name} 
+                  loading="lazy"
+                  decoding="async"
                   className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
                 />
               ) : (
@@ -204,7 +193,7 @@ export default function PostDetailPage({ previewPost }) {
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   {post.author?.role && (
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-gray-100 border-gray-300 text-purple-600")}>
+                    <span className={cn("text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-snes-input border-snes-mid text-purple-600")}>
                       {post.author.role}
                     </span>
                   )}
@@ -225,7 +214,7 @@ export default function PostDetailPage({ previewPost }) {
                 onClick={handleShare}
                 className={cn(
                   "p-3 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105",
-                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-white border-black text-black"
+                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-snes-surface border-snes-dark text-snes-accent"
                 )}
                 title="Copiar link"
               >
@@ -240,7 +229,7 @@ export default function PostDetailPage({ previewPost }) {
                     "flex items-center gap-2 px-5 py-3 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
                     hasLiked
                       ? "bg-red-500 border-red-600 text-white"
-                      : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-black text-black"
+                      : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
                   )}
                 >
                   <Heart className={cn("w-5 h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current group-hover:scale-110")} />
@@ -273,7 +262,7 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Score / Veredito — Movido para o fim */}
           {post.score && (
-            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-white")}>
+            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-snes-surface")}>
               <div>
                 <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
                   Veredito da Redação
@@ -288,7 +277,7 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Seção: Sobre o Autor — Estilo Premium (Opcional) */}
           {post.showAuthorBox === true && (
-            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-gray-50 border-black/10")}>
+            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
               {/* Background Decorativo */}
               <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-600/5 rounded-full blur-3xl" />
               
@@ -298,6 +287,8 @@ export default function PostDetailPage({ previewPost }) {
                     <img 
                       src={post.author?.avatar} 
                       alt={post.author?.name} 
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -335,7 +326,7 @@ export default function PostDetailPage({ previewPost }) {
 
             {/* Form de comentário ou AuthGate */}
             {currentUser ? (
-              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
                 <div className="flex items-center gap-4 mb-6 pb-5 border-b-2 border-dashed border-gray-500/20">
                   <img
                     src={currentUser.avatar}
@@ -349,7 +340,7 @@ export default function PostDetailPage({ previewPost }) {
                 <textarea
                   className={cn(
                     "w-full p-5 rounded-2xl mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg font-medium transition-all",
-                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
                   )}
                   rows="4"
                   placeholder="Mande o papo reto sobre o artigo..."
@@ -373,7 +364,7 @@ export default function PostDetailPage({ previewPost }) {
 
             {/* Lista de comentários */}
             <div className="space-y-5">
-              {post.comments?.map((comment) => {
+              {post.comments?.slice(0, visibleComments).map((comment) => {
                 const canDelete =
                   currentUser &&
                   (currentUser.role === "admin" || currentUser.id === comment.authorId);
@@ -382,7 +373,7 @@ export default function PostDetailPage({ previewPost }) {
                     key={comment.id}
                     className={cn(
                       "p-6 rounded-2xl flex justify-between gap-5 retro-card transition-all",
-                      isDark ? "bg-gray-800" : "bg-white"
+                      isDark ? "bg-gray-800" : "bg-snes-surface"
                     )}
                   >
                     <div className="flex-1 min-w-0">
@@ -390,8 +381,8 @@ export default function PostDetailPage({ previewPost }) {
                         {comment.authorAvatar && (
                           <img
                             src={comment.authorAvatar}
-                            alt={comment.author}
-                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
+                            alt={comment.author}                            loading="lazy"
+                            decoding="async"                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
                           />
                         )}
                         <div className={cn("font-retro font-bold text-base uppercase tracking-wider", isDark ? "text-purple-400" : "text-purple-600")}>
@@ -433,6 +424,21 @@ export default function PostDetailPage({ previewPost }) {
                   </p>
                 </div>
               )}
+
+              {/* Botão "Ver mais comentários" */}
+              {post.comments && post.comments.length > visibleComments && (
+                <button
+                  onClick={() => setVisibleComments(v => v + COMMENTS_PER_PAGE)}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-retro font-bold text-sm uppercase tracking-wider transition-all retro-button",
+                    isDark ? "border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400" : "border-gray-200 text-gray-500 hover:border-black hover:text-black"
+                  )}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  Ver mais {Math.min(COMMENTS_PER_PAGE, post.comments.length - visibleComments)} comentários
+                  <span className="opacity-50">({post.comments.length - visibleComments} restantes)</span>
+                </button>
+              )}
             </div>
           </section>
         </div>
@@ -440,7 +446,7 @@ export default function PostDetailPage({ previewPost }) {
         {/* Sidebar */}
         {trendingPosts.length > 0 && (
           <aside className="lg:col-span-1 space-y-8">
-            <div className={cn("p-6 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-white")}>
+            <div className={cn("p-6 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
               <h3 className={cn("font-retro font-bold text-xl uppercase mb-6 flex items-center gap-3 border-b-2 pb-3", isDark ? "border-purple-500" : "border-black")}>
                 <Star className={cn("w-6 h-6", isDark ? "text-yellow-400" : "text-yellow-500")} fill="currentColor" />
                 Veja Também

@@ -1,9 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import { serverTimestamp } from 'firebase/firestore';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { PostService } from '../services/postService';
-import { slugify } from '../lib/utils';
+import { POSTS_PER_PAGE } from '../constants';
+import DOMPurify from 'dompurify';
 
-const POSTS_PER_PAGE = 6;
+function sanitizePostContent(content) {
+  if (!content) return '';
+  return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+}
 
 /**
  * Hook para gerenciar os artigos do blog.
@@ -16,6 +19,8 @@ export function usePosts(currentUser, showToast) {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastDoc, setLastDoc] = useState(null);
+  // Timestamp do último comentário para rate limiting (30s de cooldown)
+  const lastCommentTimeRef = useRef(0);
 
   // Busca inicial e paginação por cursor
   const fetchPosts = useCallback(async (isLoadMore = false) => {
@@ -53,7 +58,10 @@ export function usePosts(currentUser, showToast) {
 
   // Carregamento inicial (somente na montagem)
   useEffect(() => {
-    fetchPosts();
+    const loadInitial = async () => {
+      await fetchPosts();
+    };
+    loadInitial();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,47 +69,54 @@ export function usePosts(currentUser, showToast) {
     if (!isLoadingPosts && hasMore) fetchPosts(true);
   };
 
-  // -------------------------
-  // Handlers com Optimistic UI
-  // -------------------------
-
-  const handleLike = async (postId, e) => {
-    if (e) e.stopPropagation();
-    if (!currentUser) return;
-
-    const postIndex = posts.findIndex(p => p.id === postId);
-    if (postIndex === -1) return;
-    const post = posts[postIndex];
-
-    const likedBy = post.likedBy || [];
-    const hasLiked = likedBy.includes(currentUser.id);
-    const newLikedBy = hasLiked
-      ? likedBy.filter(id => id !== currentUser.id)
-      : [...likedBy, currentUser.id];
-
-    const originalPosts = [...posts];
+  // Aplica uma atualização otimista e faz rollback em caso de erro
+  const optimisticUpdate = useCallback(async (postId, getNextPost, serviceCall, errorTag, errorMsg) => {
+    const idx = posts.findIndex(p => p.id === postId);
+    if (idx === -1) return;
+    const originalPosts = posts;
     setPosts(prev => {
-      const updated = [...prev];
-      updated[postIndex] = { ...post, likedBy: newLikedBy, likes: newLikedBy.length };
-      return updated;
+      const next = [...prev];
+      next[idx] = getNextPost(prev[idx]);
+      return next;
     });
-
     try {
-      await PostService.updatePost(postId, { likedBy: newLikedBy, likes: newLikedBy.length });
-    } catch (error) {
-      console.error('[usePosts:handleLike]', error);
-      showToast('Erro ao curtir o post.', 'error');
+      return await serviceCall();
+    } catch (err) {
+      console.error(errorTag, err);
+      showToast(errorMsg, 'error');
       setPosts(originalPosts);
     }
-  };
+  }, [posts, showToast]);
 
-  const handleAddComment = async (postId, commentText) => {
+  const handleLike = useCallback(async (postId) => {
+    if (!currentUser) return;
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    const likedBy = post.likedBy || [];
+    const newLikedBy = likedBy.includes(currentUser.id)
+      ? likedBy.filter(id => id !== currentUser.id)
+      : [...likedBy, currentUser.id];
+    const update = { likedBy: newLikedBy, likes: newLikedBy.length };
+    await optimisticUpdate(
+      postId,
+      (p) => ({ ...p, ...update }),
+      () => PostService.updatePost(postId, update),
+      '[usePosts:handleLike]',
+      'Erro ao curtir o post.'
+    );
+  }, [currentUser, posts, optimisticUpdate]);
+
+  const handleAddComment = useCallback(async (postId, commentText) => {
     if (!commentText.trim() || !currentUser) return;
-
-    const postIndex = posts.findIndex(p => p.id === postId);
-    if (postIndex === -1) return;
-    const post = posts[postIndex];
-
+    const COMMENT_COOLDOWN_MS = 30_000;
+    const now = Date.now();
+    if (now - lastCommentTimeRef.current < COMMENT_COOLDOWN_MS) {
+      const remaining = Math.ceil((COMMENT_COOLDOWN_MS - (now - lastCommentTimeRef.current)) / 1000);
+      showToast(`Aguarde ${remaining}s antes de comentar novamente.`, 'error');
+      return;
+    }
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
     const newComment = {
       id: Date.now(),
       authorId: currentUser.id,
@@ -110,58 +125,41 @@ export function usePosts(currentUser, showToast) {
       text: commentText,
       createdAt: new Date().toISOString(),
     };
+    const newComments = [...(post.comments || []), newComment];
+    await optimisticUpdate(
+      postId,
+      (p) => ({ ...p, comments: newComments }),
+      async () => {
+        await PostService.updatePost(postId, { comments: newComments });
+        lastCommentTimeRef.current = Date.now();
+        showToast('Comentário publicado!');
+      },
+      '[usePosts:handleAddComment]',
+      'Erro ao comentar.'
+    );
+  }, [currentUser, posts, showToast, optimisticUpdate]);
 
-    const newCommentsList = [...(post.comments || []), newComment];
-    const originalPosts = [...posts];
-
-    setPosts(prev => {
-      const updated = [...prev];
-      updated[postIndex] = { ...post, comments: newCommentsList };
-      return updated;
-    });
-
-    try {
-      await PostService.updatePost(postId, { comments: newCommentsList });
-      showToast('Comentário publicado!');
-    } catch (error) {
-      console.error('[usePosts:handleAddComment]', error);
-      showToast('Erro ao comentar.', 'error');
-      setPosts(originalPosts);
-    }
-  };
-
-  const handleDeleteComment = async (postId, commentId) => {
-    const postIndex = posts.findIndex(p => p.id === postId);
-    if (postIndex === -1) return;
-    const post = posts[postIndex];
-
+  const handleDeleteComment = useCallback(async (postId, commentId) => {
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
     const comment = post.comments?.find(c => c.id === commentId);
-    const isOwner = comment && comment.authorId === currentUser?.id;
-    const isAdmin = currentUser?.role === 'admin';
-
-    if (!isOwner && !isAdmin) {
+    if (!comment) return;
+    if (comment.authorId !== currentUser?.id && currentUser?.role !== 'admin') {
       showToast('Você não tem permissão para excluir este comentário.', 'error');
       return;
     }
-
-    const newCommentsList = post.comments.filter(c => c.id !== commentId);
-    const originalPosts = [...posts];
-
-    setPosts(prev => {
-      const updated = [...prev];
-      updated[postIndex] = { ...post, comments: newCommentsList };
-      return updated;
-    });
-
-    try {
-      await PostService.updatePost(postId, { comments: newCommentsList });
-      showToast('Comentário removido.', 'success');
-    } catch (error) {
-      console.error('[usePosts:handleDeleteComment]', error);
-      showToast('Erro ao remover comentário.', 'error');
-      setPosts(originalPosts);
-    }
-  };
+    const newComments = post.comments.filter(c => c.id !== commentId);
+    await optimisticUpdate(
+      postId,
+      (p) => ({ ...p, comments: newComments }),
+      async () => {
+        await PostService.updatePost(postId, { comments: newComments });
+        showToast('Comentário removido.', 'success');
+      },
+      '[usePosts:handleDeleteComment]',
+      'Erro ao remover comentário.'
+    );
+  }, [currentUser, posts, showToast, optimisticUpdate]);
 
   const handleSavePost = async (postData) => {
     // Verificação básica de segurança no cliente
@@ -173,6 +171,7 @@ export function usePosts(currentUser, showToast) {
     try {
       if (postData.id) {
         const { id, ...dataToUpdate } = postData;
+        dataToUpdate.content = sanitizePostContent(dataToUpdate.content);
         await PostService.updatePost(id, dataToUpdate);
         
         const freshPost = await PostService.getPostById(id);
@@ -180,7 +179,10 @@ export function usePosts(currentUser, showToast) {
         showToast('Artigo atualizado com sucesso!');
         return freshPost;
       } else {
-        const createdPost = await PostService.createPost(postData, currentUser);
+        const createdPost = await PostService.createPost({
+          ...postData,
+          content: sanitizePostContent(postData.content),
+        }, currentUser);
         if (createdPost) setPosts(prev => [createdPost, ...prev]);
         showToast('Novo artigo publicado na capa!');
         return createdPost;

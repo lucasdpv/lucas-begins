@@ -68,17 +68,20 @@ export const PostService = {
     const uniqueHash = Math.random().toString(36).substring(2, 7);
 
     const newPostData = {
-      ...postData,
       likes: 0,
       likedBy: [],
-      slug: `${baseSlug}-${uniqueHash}`,
       comments: [],
-      author: { 
-        name: currentUser?.name || 'Anônimo', 
-        role: currentUser?.role === 'admin' ? 'Editor Chefe' : 'Colaborador' 
-      },
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      ...postData,
+      slug: `${baseSlug}-${uniqueHash}`,
+      // Garante que o author do editor (com avatar, bio, level, aka) seja preservado,
+      // adicionando apenas o role se não estiver definido
+      author: {
+        name: currentUser?.name || 'Anônimo',
+        role: currentUser?.role === 'admin' ? 'Editor Chefe' : 'Colaborador',
+        ...postData.author,
+      },
     };
 
     const docRef = await addDoc(collection(db, "posts"), newPostData);

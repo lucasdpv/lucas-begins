@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
-import { calculateReadingTime, cn } from "../../lib/utils";
+import { calculateReadingTime, cn, coverBgStyle } from "../../lib/utils";
+import { CategoryBadge, ScoreBadge } from "./Badge";
 
 /**
  * Carrossel automático com autoplay, pausa no hover, navegação por teclado.
  * Respeita o campo imagePosition de cada post.
  */
-export default function Carousel({ posts, onPostClick, isDark }) {
+export default function Carousel({ posts, onPostClick }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -38,13 +39,7 @@ export default function Carousel({ posts, onPostClick, isDark }) {
   const currentPost = posts[currentIndex];
   if (!currentPost) return null;
 
-  const bgStyle = currentPost.imageUrl
-    ? {
-        backgroundImage: `url(${currentPost.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: currentPost.imagePosition || "center",
-      }
-    : {};
+  const bgStyle = coverBgStyle(currentPost.imageUrl, currentPost.imagePosition);
 
   return (
     <div
@@ -69,14 +64,8 @@ export default function Carousel({ posts, onPostClick, isDark }) {
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-14 text-white max-w-5xl">
           <div className="flex gap-3 mb-4">
-            <span className="bg-purple-600 font-retro text-xs md:text-sm px-5 py-2 rounded-lg uppercase font-bold tracking-widest border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]">
-              {currentPost.category}
-            </span>
-            {currentPost.score && (
-              <span className="bg-yellow-400 text-black font-retro text-xs md:text-sm px-4 py-2 rounded-lg border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] font-bold flex items-center gap-1">
-                ★ {currentPost.score}
-              </span>
-            )}
+            <CategoryBadge size="md">{currentPost.category}</CategoryBadge>
+            {currentPost.score && <ScoreBadge score={currentPost.score} size="md" />}
           </div>
 
           <h2 className="font-retro font-bold text-3xl md:text-5xl lg:text-6xl mb-4 leading-tight drop-shadow-[3px_3px_0px_rgba(0,0,0,1)] hover:text-purple-300 transition-colors">
@@ -106,14 +95,16 @@ export default function Carousel({ posts, onPostClick, isDark }) {
         <>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            tabIndex={0}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 focus:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 focus:bg-purple-600 focus:border-purple-500 focus:outline-none retro-button"
             aria-label="Anterior"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 retro-button"
+            tabIndex={0}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 focus:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 focus:bg-purple-600 focus:border-purple-500 focus:outline-none retro-button"
             aria-label="Próximo"
           >
             <ChevronRight className="w-6 h-6" />

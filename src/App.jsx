@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 
 // Controle de estado
@@ -9,16 +9,17 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Toast from "./components/ui/Toast";
 import LoginModal from "./components/ui/LoginModal";
+import PostSkeleton from "./components/ui/PostSkeleton";
 
-// Páginas
-import HomePage from "./pages/HomePage";
-import PostDetailPage from "./pages/PostDetailPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import AdminPage from "./pages/AdminPage";
-import PostEditorPage from "./pages/PostEditorPage";
+// Páginas (lazy loaded para reduzir bundle inicial)
+const HomePage = lazy(() => import("./pages/HomePage"));
+const PostDetailPage = lazy(() => import("./pages/PostDetailPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const PostEditorPage = lazy(() => import("./pages/PostEditorPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -36,13 +37,13 @@ export default function App() {
       root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
       root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0,0,0,1)');
     } else {
-      root.style.setProperty('--retro-border-color', '#000000');
-      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #000000');
-      root.style.setProperty('--retro-button-border', '#000000');
-      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #000000');
-      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #000000');
-      root.style.setProperty('--magazine-drop-cap-color', '#9333ea');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(147,51,234,0.3)');
+      root.style.setProperty('--retro-border-color', '#2D1B69');
+      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #2D1B69');
+      root.style.setProperty('--retro-button-border', '#2D1B69');
+      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #2D1B69');
+      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #2D1B69');
+      root.style.setProperty('--magazine-drop-cap-color', '#7C3AED');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(45,27,105,0.4)');
     }
   }, [isDark]);
 
@@ -57,6 +58,11 @@ export default function App() {
         <Navbar />
 
         <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+              {[1,2,3].map(i => <PostSkeleton key={i} isDark={isDark} />)}
+            </div>
+          }>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/post/:slug" element={<PostDetailPage />} />
@@ -67,6 +73,7 @@ export default function App() {
             <Route path="/editor/:id" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
+          </Suspense>
         </main>
 
         <Footer />

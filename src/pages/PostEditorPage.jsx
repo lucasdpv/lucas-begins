@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Edit,
@@ -20,8 +20,9 @@ import PostDetailPage from "./PostDetailPage";
 import { useAppContext } from "../context/AppContext";
 import BlockEditor from "../components/editor/BlockEditor";
 import { Helmet } from "react-helmet-async";
+import { STORAGE_KEYS } from "../constants";
 
-const DRAFT_KEY = "retro_blog_draft";
+const DRAFT_KEY = STORAGE_KEYS.DRAFT;
 
 
 
@@ -35,6 +36,8 @@ export default function PostEditorPage() {
   const { posts, categories, isDark, currentUser, handleSavePost } = useAppContext();
 
   const [activeTab, setActiveTab] = useState("edit");
+  const [lastSaved, setLastSaved] = useState(null);
+  const autoSaveTimerRef = useRef(null);
 
   const post = id ? posts.find((p) => String(p.id) === String(id)) : null;
 
@@ -52,13 +55,15 @@ export default function PostEditorPage() {
     }
   });
 
-  // Auto-save do rascunho a cada 1 segundo (só para novos posts)
+  // Auto-save do rascunho com debounce de 1s (só para novos posts)
   useEffect(() => {
     if (!post) {
-      const timeoutId = setTimeout(() => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = setTimeout(() => {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+        setLastSaved(new Date());
       }, 1000);
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(autoSaveTimerRef.current);
     }
   }, [formData, post]);
 
@@ -92,7 +97,7 @@ export default function PostEditorPage() {
 
   const inputClass = cn(
     "w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all",
-    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
+    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
   );
 
   const previewPost = {
@@ -151,7 +156,7 @@ export default function PostEditorPage() {
             onClick={() => navigate("/admin")}
             className={cn(
               "px-5 py-3 rounded-xl text-sm font-retro uppercase font-bold transition-colors retro-button",
-              isDark ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700" : "bg-white text-black border-black hover:bg-gray-100"
+              isDark ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700" : "bg-snes-surface text-snes-accent border-snes-dark hover:bg-snes-mid"
             )}
           >
             Cancelar
@@ -163,10 +168,16 @@ export default function PostEditorPage() {
       {activeTab === "edit" ? (
         <form
           onSubmit={handleSubmit}
-          className={cn("p-8 md:p-10 rounded-2xl retro-card space-y-8", isDark ? "bg-gray-800" : "bg-white")}
+          className={cn("p-8 md:p-10 rounded-2xl retro-card space-y-8", isDark ? "bg-gray-800" : "bg-snes-surface")}
         >
           <div className="flex justify-between items-center opacity-60 text-xs uppercase font-retro font-bold">
-            <span>{post ? "Editando artigo existente" : "Salvo automaticamente no memory card 💾"}</span>
+            <span>
+              {post
+                ? "Editando artigo existente"
+                : lastSaved
+                  ? `Salvo às ${lastSaved.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} 💾`
+                  : "Auto-save ativo 💾"}
+            </span>
             {formData.content && <span>{calculateReadingTime(formData.content)}</span>}
           </div>
 
@@ -310,7 +321,7 @@ export default function PostEditorPage() {
         </form>
       ) : (
         /* Aba: Preview */
-        <div className={cn("border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8", isDark ? "border-purple-500/50 bg-gray-900/50" : "border-black/20 bg-gray-50")}>
+        <div className={cn("border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8", isDark ? "border-purple-500/50 bg-gray-900/50" : "border-snes-dark/20 bg-snes-input")}>
           <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase retro-card border-black">
             Modo de Pré-Visualização
           </div>

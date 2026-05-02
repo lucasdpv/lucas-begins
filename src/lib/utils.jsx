@@ -40,6 +40,17 @@ export const calculateReadingTime = (text) => {
 };
 
 /**
+ * Gera o style object para background cover a partir de uma URL de imagem.
+ * @param {string} imageUrl
+ * @param {string} [imagePosition="center"]
+ * @returns {React.CSSProperties}
+ */
+export function coverBgStyle(imageUrl, imagePosition = "center") {
+  if (!imageUrl) return {};
+  return { backgroundImage: `url(${imageUrl})`, backgroundSize: "cover", backgroundPosition: imagePosition };
+}
+
+/**
  * Converte um título em um slug (URL amigável).
  * Ex: "A Magia dos 16-bits" -> "a-magia-dos-16-bits"
  * @param {string} text 

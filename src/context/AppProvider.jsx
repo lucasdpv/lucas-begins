@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useToast } from "../hooks/useToast";
 import { usePosts } from "../hooks/usePosts";
 import { useCategories } from "../hooks/useCategories";
 import { db, auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
 import { AppContext } from "./AppContext";
+import { STORAGE_KEYS, MIGRATION_VERSION } from "../constants";
 
 export function AppProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('lucas_begins_theme');
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME);
     return saved !== null ? JSON.parse(saved) : true;
   });
 
@@ -75,16 +76,14 @@ export function AppProvider({ children }) {
 
   // 2. Roda o Seed de dados inicial e Limpeza de migração (apenas quando necessário)
   useEffect(() => {
-    // Incrementar MIGRATION_VERSION quando houver uma nova migração necessária
-    const MIGRATION_VERSION = "v1.2";
-    const lastMigration = localStorage.getItem("lucas_migration");
+    const lastMigration = localStorage.getItem(STORAGE_KEYS.MIGRATION_VERSION);
 
     const runInitialSetup = async () => {
       await seedDatabase();
       // Só roda o cleanup se ainda não rodou esta versão
       if (lastMigration !== MIGRATION_VERSION) {
         await cleanupDuplicates();
-        localStorage.setItem("lucas_migration", MIGRATION_VERSION);
+        localStorage.setItem(STORAGE_KEYS.MIGRATION_VERSION, MIGRATION_VERSION);
       }
     };
     runInitialSetup();
@@ -92,12 +91,9 @@ export function AppProvider({ children }) {
 
   // Efeitos para persistência do tema
   useEffect(() => {
-    localStorage.setItem('lucas_begins_theme', JSON.stringify(isDark));
+    localStorage.setItem(STORAGE_KEYS.THEME, JSON.stringify(isDark));
   }, [isDark]);
 
-  // Handlers Firebase
-  const toggleTheme = () => setIsDark(prev => !prev);
-  
   // Monitora o retorno do signInWithRedirect
   useEffect(() => {
     const handleRedirectResult = async () => {
@@ -113,20 +109,17 @@ export function AppProvider({ children }) {
       }
     };
     handleRedirectResult();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loginWithProvider = async (provider, providerName) => {
+  const loginWithProvider = useCallback(async (provider, providerName) => {
     try {
-      // Tenta popup primeiro (melhor para desktop e localhost)
       await signInWithPopup(auth, provider);
       showToast("Bem-vindo de volta, Player 1! 🎮");
       setIsLoginModalOpen(false);
     } catch (err) {
       console.error("Erro no popup:", err);
-      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-        return; // Usuário fechou a janela
-      }
-      // Se falhar por bloqueio de popup ou storage (comum em navegadores in-app no celular), tenta redirect
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
       if (err.code === 'auth/popup-blocked' || err.code === 'auth/web-storage-unsupported' || err.message.includes('localStorage')) {
         showToast("Redirecionando para login seguro...", "info");
         try {
@@ -139,20 +132,22 @@ export function AppProvider({ children }) {
         showToast(`Falha na autenticação com ${providerName}.`, "error");
       }
     }
-  };
+  }, [showToast]);
 
-  const login = () => loginWithProvider(googleProvider, "Google");
+  const toggleTheme = useCallback(() => setIsDark(prev => !prev), []);
 
-  const handleLogout = async () => {
+  const login = useCallback(() => loginWithProvider(googleProvider, "Google"), [loginWithProvider]);
+
+  const handleLogout = useCallback(async () => {
     try {
       await signOut(auth);
       showToast("Sessão encerrada. Até a próxima!");
     } catch {
       showToast("Erro ao sair.");
     }
-  };
+  }, [showToast]);
 
-  const handleUpdateProfile = async (data) => {
+  const handleUpdateProfile = useCallback(async (data) => {
     if (!currentUser) return;
     try {
       const userRef = doc(db, "users", currentUser.id);
@@ -163,9 +158,9 @@ export function AppProvider({ children }) {
       console.error(err);
       showToast("Erro ao atualizar perfil.");
     }
-  };
+  }, [currentUser, showToast]);
 
-  const value = {
+  const value = useMemo(() => ({
     isDark, toggleTheme,
     currentUser, login, handleLogout, authLoading,
     toast, showToast,
@@ -176,7 +171,15 @@ export function AppProvider({ children }) {
     searchQuery, setSearchQuery,
     isLoginModalOpen, setIsLoginModalOpen,
     handleUpdateProfile
-  };
+  }), [
+    isDark, toggleTheme,
+    currentUser, login, handleLogout, authLoading,
+    toast, showToast,
+    posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
+    loadMore, hasMore,
+    categories, handleAddCategory, handleDeleteCategory,
+    activeCategory, searchQuery, isLoginModalOpen, handleUpdateProfile
+  ]);
 
   return (
     <AppContext.Provider value={value}>

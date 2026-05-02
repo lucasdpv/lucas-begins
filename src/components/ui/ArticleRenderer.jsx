@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DOMPurify from "dompurify";
 import { cn } from "../../lib/utils";
 
 /**
@@ -13,12 +14,14 @@ function ArticleImage({ src, alt, isDark }) {
         "w-full rounded-2xl border-4 relative overflow-hidden flex items-center justify-center min-h-[300px]",
         isDark 
           ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)] bg-gray-900" 
-          : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-gray-100"
+          : "border-snes-dark shadow-[8px_8px_0px_rgba(45,27,105,1)] bg-snes-mid"
       )}>
         {!error ? (
           <img
             src={src}
             alt={alt}
+            loading="lazy"
+            decoding="async"
             onError={() => setError(true)}
             className="w-full h-auto object-cover max-h-[700px]"
           />
@@ -88,13 +91,28 @@ export default function ArticleRenderer({ content, isDark }) {
   if (!content) return null;
   const lines = content.split('\n');
 
-  const formatInline = (text) =>
-    text
+  const formatInline = (text) => {
+    const raw = text
       .replace(/\*\*(.*?)\*\*/g, `<strong class="font-bold text-purple-600 ${isDark ? 'dark:text-purple-400' : ''}">$1</strong>`)
       .replace(/\*(.*?)\*/g, `<em class="italic text-yellow-600 ${isDark ? 'dark:text-yellow-400' : ''}">$1</em>`);
+    return DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em'], ALLOWED_ATTR: ['class'] });
+  };
 
-  let firstElementRendered = false;
-  let firstParagraphRendered = false;
+  // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo
+  let firstNonEmptyIndex = -1;
+  let firstParagraphIndex = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    if (line.startsWith('## ') || line.trim() === '---' || line.match(/^!\[/) || line.match(/^@\[youtube\]/) || !line.match(/^@\[youtube\]/)) {
+      if (firstNonEmptyIndex === -1) firstNonEmptyIndex = i;
+      if (!line.startsWith('## ') && line.trim() !== '---' && !line.match(/^!\[/) && !line.match(/^@\[youtube\]/) && firstParagraphIndex === -1) {
+        firstParagraphIndex = i;
+      }
+    }
+  }
 
   return (
     <>
@@ -103,7 +121,6 @@ export default function ArticleRenderer({ content, isDark }) {
 
         if (line.startsWith('## ')) {
           const headingText = line.slice(3).trim();
-          firstElementRendered = true;
           return (
             <h2 key={index} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
               {headingText}
@@ -112,7 +129,6 @@ export default function ArticleRenderer({ content, isDark }) {
         }
 
         if (line.trim() === '---') {
-          firstElementRendered = true;
           return (
             <div key={index} className="my-12 flex items-center gap-4">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
@@ -124,21 +140,18 @@ export default function ArticleRenderer({ content, isDark }) {
 
         const imgMatch = line.match(/^!\[([^\]]*)\]\((.+?)\)$/);
         if (imgMatch) {
-          firstElementRendered = true;
           return <ArticleImage key={index} src={imgMatch[2]} alt={imgMatch[1]} isDark={isDark} />;
         }
 
         const videoMatch = line.match(/^@\[youtube\]\((.*?)\)$/);
         if (videoMatch) {
-          firstElementRendered = true;
           return <ArticleVideo key={index} url={videoMatch[1]} isDark={isDark} />;
         }
 
         if (line.startsWith('@[youtube]')) return null;
 
-        const isFirst = !firstParagraphRendered && !firstElementRendered;
-        firstParagraphRendered = true;
-        firstElementRendered = true;
+        // Parágrafo
+        const isFirst = index === firstParagraphIndex;
 
         return (
           <p
