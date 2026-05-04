@@ -163,14 +163,21 @@ export default function PostDetailPage({ previewPost }) {
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
 
-        {/* Content Container - Bottom Aligned with Hard Shadow */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 text-white w-full z-[10] pointer-events-none">
-          <div className="max-w-4xl">
-            <div className="mb-4 pointer-events-auto">
-              <CategoryBadge size="md">{post.category}</CategoryBadge>
+        {/* Content Container - Wide Layout */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white w-full z-[10] pointer-events-none">
+          <div className="max-w-6xl">
+            <div className="flex items-center gap-4 mb-6 pointer-events-auto">
+              <CategoryBadge size="md" className="shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black">
+                {post.category}
+              </CategoryBadge>
+              {post.score && (
+                <div className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl font-retro font-bold border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] text-sm md:text-base">
+                   ★ {post.score}
+                </div>
+              )}
             </div>
-            <h1 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow">
-              {post.title || "Sem Título"}
+            <h1 className="font-retro font-bold text-4xl md:text-5xl lg:text-7xl leading-[1.05] text-white drop-shadow-[5px_5px_0px_rgba(0,0,0,1)] text-glow tracking-tighter">
+              {post.title}
             </h1>
           </div>
         </div>
