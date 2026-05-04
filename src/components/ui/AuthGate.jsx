@@ -19,15 +19,15 @@ export default function AuthGate({ variant = "inline", className }) {
       <button
         onClick={() => setIsLoginModalOpen(true)}
         className={cn(
-          "flex items-center gap-1.5 text-xs font-retro font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all hover:scale-105 active:scale-95",
+          "flex items-center justify-center gap-2 h-12 px-5 text-sm font-retro font-bold uppercase tracking-wider rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
           isDark
-            ? "bg-gray-800 border-purple-500/50 text-purple-400 hover:bg-purple-900/40 hover:border-purple-400"
-            : "bg-purple-50 border-purple-300 text-purple-600 hover:bg-purple-100",
+            ? "bg-gray-800 border-purple-500 text-purple-400 hover:bg-purple-900/40 hover:border-purple-400 shadow-[3px_3px_0px_rgba(168,85,247,0.3)]"
+            : "bg-purple-50 border-purple-300 text-purple-600 hover:bg-purple-100 shadow-[3px_3px_0px_rgba(147,51,234,0.1)]",
           className
         )}
         title="Faça login para interagir"
       >
-        <Lock className="w-3 h-3 shrink-0" />
+        <Lock className="w-4 h-4 shrink-0" />
         Login
       </button>
     );
