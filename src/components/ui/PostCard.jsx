@@ -56,17 +56,23 @@ export default function PostCard({ post, onClick }) {
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
         <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
-          <CategoryBadge>{post.category}</CategoryBadge>
-          {post.score && <ScoreBadge score={post.score} />}
+          <div className="glass-card px-0.5 py-0.5 rounded-xl border-white/20 shadow-lg backdrop-blur-md">
+            <CategoryBadge>{post.category}</CategoryBadge>
+          </div>
+          {post.score && (
+            <div className="glass-card px-0.5 py-0.5 rounded-xl border-white/20 shadow-lg backdrop-blur-md">
+              <ScoreBadge score={post.score} />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Conteúdo */}
-      <div className="p-6 md:p-7 flex flex-col flex-grow">
-        <h3 className="font-retro font-bold text-xl md:text-2xl mb-3 line-clamp-3 leading-tight group-hover:text-purple-500 transition-colors duration-200">
+      <div className="p-7 md:p-8 flex flex-col flex-grow">
+        <h3 className="font-retro font-bold text-xl md:text-2xl mb-4 line-clamp-2 leading-tight group-hover:text-purple-500 transition-colors duration-300">
           {post.title}
         </h3>
-        <p className={cn("text-sm mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
+        <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
           {post.excerpt}
         </p>
 

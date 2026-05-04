@@ -70,13 +70,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-6">
             <div className="lg:col-span-3 flex items-center gap-3">
                <div className={cn("w-4 h-8 retro-card", isDark ? "bg-purple-500" : "bg-purple-600")} />
-               <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide">
+               <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide text-glow">
                  Em Destaque
                </h2>
             </div>
             <div className="hidden lg:flex items-center gap-3">
                <Star className="text-yellow-500 w-6 h-6" fill="currentColor" />
-               <h2 className="font-retro text-2xl font-bold uppercase tracking-wide">
+               <h2 className="font-retro text-2xl font-bold uppercase tracking-wide text-glow">
                  Em Alta
                </h2>
             </div>
@@ -145,7 +145,7 @@ export default function HomePage() {
           <section>
             <div className="flex items-center gap-3 mb-8">
               <div className={cn("w-4 h-8 retro-card", isDark ? "bg-blue-500" : "bg-blue-600")} />
-              <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide">
+              <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide text-glow-blue">
                 {isLoadingPosts 
                   ? "Carregando Fases..."
                   : searchQuery

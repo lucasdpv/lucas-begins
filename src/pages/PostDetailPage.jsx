@@ -157,12 +157,22 @@ export default function PostDetailPage({ previewPost }) {
           </div>
         )}
         <div className="absolute inset-0 scanline-overlay opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-[5]" />
-        <div className="absolute bottom-0 p-8 md:p-16 text-white w-full max-w-5xl">
-          <CategoryBadge size="md" className="mb-6 inline-block">{post.category}</CategoryBadge>
-          <h1 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl leading-tight drop-shadow-[4px_4px_0px_rgba(0,0,0,0.8)]">
-            {post.title || "Sem Título"}
-          </h1>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
+        
+        {/* Decorative elements for premium feel */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
+
+        {/* Content Container - Bottom Aligned with Hard Shadow */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 text-white w-full z-[10] pointer-events-none">
+          <div className="max-w-4xl">
+            <div className="mb-4 pointer-events-auto">
+              <CategoryBadge size="md">{post.category}</CategoryBadge>
+            </div>
+            <h1 className="font-retro font-bold text-4xl md:text-5xl lg:text-6xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow">
+              {post.title || "Sem Título"}
+            </h1>
+          </div>
         </div>
       </div>
 
@@ -187,7 +197,7 @@ export default function PostDetailPage({ previewPost }) {
                   ✍️
                 </div>
               )}
-              <div>
+              <div className="flex-1">
                 <p className="font-retro font-bold text-lg uppercase tracking-wide">
                   {post.author?.name || "Autor Desconhecido"}
                 </p>
@@ -208,12 +218,12 @@ export default function PostDetailPage({ previewPost }) {
             </div>
 
             {/* Ações */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-shrink-0">
               {/* Share */}
               <button
                 onClick={handleShare}
                 className={cn(
-                  "p-3 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105",
+                  "h-12 px-4 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105 flex items-center justify-center",
                   isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-snes-surface border-snes-dark text-snes-accent"
                 )}
                 title="Copiar link"
@@ -226,7 +236,7 @@ export default function PostDetailPage({ previewPost }) {
                 <button
                   onClick={() => handleLike(post.id)}
                   className={cn(
-                    "flex items-center gap-2 px-5 py-3 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
+                    "flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
                     hasLiked
                       ? "bg-red-500 border-red-600 text-white"
                       : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
@@ -236,8 +246,8 @@ export default function PostDetailPage({ previewPost }) {
                   {post.likes || 0}
                 </button>
               ) : (
-                <div className="flex items-center gap-2">
-                  <span className={cn("flex items-center gap-2 px-4 py-3 rounded-xl border-2 font-bold text-base opacity-40", isDark ? "border-gray-700 text-white" : "border-gray-300 text-black")}>
+                <div className="flex items-center gap-3">
+                  <span className={cn("flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base opacity-40", isDark ? "border-gray-700 text-white" : "border-gray-300 text-black")}>
                     <Heart className="w-5 h-5" />
                     {post.likes || 0}
                   </span>
@@ -247,10 +257,36 @@ export default function PostDetailPage({ previewPost }) {
             </div>
           </div>
 
-          {/* Auth Banner (não logado) */}
-          {!currentUser && (
-            <AuthGate variant="banner" />
+          {/* Resumo do Artigo — Estilo Tab Sobreposta */}
+          {post.excerpt && (
+            <div className={cn(
+              "relative mt-12 p-8 pt-12 rounded-3xl border-4 group", 
+              isDark 
+                ? "bg-gray-800/40 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]" 
+                : "bg-white border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.1)]"
+            )}>
+              {/* Scanlines effect sutil */}
+              <div className="absolute inset-0 scanline-overlay opacity-5 pointer-events-none rounded-[inherit]" />
+              
+              {/* Label retro — Posicionada sobre a borda (Estilo da segunda foto) */}
+              <div className="absolute -top-6 left-8">
+                <span className={cn(
+                  "font-retro text-sm md:text-base font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]", 
+                  isDark ? "bg-purple-600 border-purple-400 text-white" : "bg-purple-500 border-purple-700 text-white"
+                )}>
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  SYNOPSIS
+                </span>
+              </div>
+              
+              {/* Conteúdo */}
+              <p className={cn("text-lg md:text-xl leading-relaxed font-medium relative z-10 italic", isDark ? "text-gray-300" : "text-gray-700")}>
+                "{post.excerpt}"
+              </p>
+            </div>
           )}
+
+
 
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">

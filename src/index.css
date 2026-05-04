@@ -137,22 +137,34 @@
   animation: glitch 5s infinite;
 }
 
-/* Utilitário Glassmorphism */
+/* Utilitário Glassmorphism - Refinado */
 .glass-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 .dark .glass-card {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  background: rgba(13, 13, 20, 0.4);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
 }
 
 /* Light mode: usa a superfície SNES com toque lavanda */
 .light .glass-card,
 :not(.dark) .glass-card {
-  background: rgba(245, 240, 252, 0.5);
-  border: 1px solid rgba(45, 27, 105, 0.12);
+  background: rgba(245, 240, 252, 0.6);
+  border: 1px solid rgba(45, 27, 105, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.1);
 }
+
+/* Texto com Glow Moderno */
+.text-glow {
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.text-glow-blue {
+  text-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
