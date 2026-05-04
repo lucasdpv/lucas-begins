@@ -168,3 +168,44 @@
 .text-glow-blue {
   text-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
+
+/* ============================================================
+   Scrollbar Retro - Quadrada e estilizada
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.gray.950');
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #E2E2E2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4176;
+  border: 3px solid theme('colors.gray.950');
+  border-radius: 0;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #2D1B69;
+  border: 3px solid #E2E2E2;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c084fc;
+}
+
+/* Efeito de destaque para os números da sidebar */
+.trending-number {
+  transition: all 0.3s ease;
+}
+
+.group:hover .trending-number {
+  color: #c084fc;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+  transform: scale(1.1);
+}

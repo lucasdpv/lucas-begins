@@ -111,14 +111,12 @@ export default function HomePage() {
                         isDark ? "border-white/5" : "border-snes-mid/30"
                       )}
                     >
-                      <div className={cn(
-                        "text-4xl font-retro font-bold transition-all duration-300 min-w-[45px]",
-                        isDark 
-                          ? "text-[#4a4176] group-hover:text-purple-400 group-hover:drop-shadow-[0_0_12px_rgba(168,85,247,0.4)]" 
-                          : "text-purple-600/30 group-hover:text-purple-600"
+                      <span className={cn(
+                        "text-2xl font-retro font-bold trending-number transition-all duration-300 min-w-[40px]",
+                        isDark ? "text-purple-500/50" : "text-purple-600/30"
                       )}>
                         {(idx + 1).toString().padStart(2, "0")}
-                      </div>
+                      </span>
                       <div className="flex-1 min-w-0">
                         <h4 className={cn(
                           "font-bold text-[14px] leading-tight line-clamp-2 transition-colors",
