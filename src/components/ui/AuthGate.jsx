@@ -100,7 +100,7 @@ export default function AuthGate({ variant = "inline", className }) {
       </button>
 
       <p className={cn("text-xs font-medium opacity-50", isDark ? "text-gray-400" : "text-gray-500")}>
-        É grátis e rápido — escolha Google, Discord ou Apple
+        It's dangerous to go alone! Take this.
       </p>
     </div>
   );
