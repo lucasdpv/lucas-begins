@@ -67,26 +67,29 @@ export default function Carousel({ posts, onPostClick }) {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-600/10 blur-[120px] pointer-events-none" />
 
         {/* Content Container - Bottom Aligned */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 z-[2] pointer-events-none">
-          <div className="max-w-3xl">
-            <div className="mb-4 pointer-events-auto">
-              <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 text-white w-full z-[10] pointer-events-none">
+          <div className="max-w-4xl">
+            <div className="flex gap-3 mb-4 pointer-events-auto">
+              <CategoryBadge size="md">{currentPost.category}</CategoryBadge>
+              {currentPost.score && <ScoreBadge score={currentPost.score} size="md" />}
             </div>
             
-            <h2 className="font-retro font-bold text-2xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-6">
+            <h2 className="font-retro font-bold text-3xl md:text-5xl lg:text-6xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-4">
               {currentPost.title}
             </h2>
+
+            <p className="hidden md:block text-gray-200 text-lg font-medium mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
+              {currentPost.excerpt}
+            </p>
             
             <div className="flex flex-wrap items-center gap-3 pointer-events-auto">
-              {currentPost.score && <ScoreBadge score={currentPost.score} size="sm" />}
-              <span className="h-0.5 w-0.5 rounded-full bg-white/30 hidden md:block" />
-              <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wide text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                 <span className="flex items-center gap-1">
-                   <Heart className="w-3 h-3 text-red-400" fill="currentColor" />
+              <div className="flex items-center gap-5 text-sm font-bold uppercase tracking-wide text-white/80">
+                 <span className="flex items-center gap-1.5">
+                   <Heart className="w-4 h-4 text-red-400" fill="currentColor" />
                    {currentPost.likes || 0}
                  </span>
-                 <span className="flex items-center gap-1">
-                   <Clock className="w-3 h-3 text-purple-300" />
+                 <span className="flex items-center gap-1.5">
+                   <Clock className="w-4 h-4 text-purple-300" />
                    {calculateReadingTime(currentPost.content || "")}
                  </span>
               </div>

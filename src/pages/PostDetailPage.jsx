@@ -169,7 +169,7 @@ export default function PostDetailPage({ previewPost }) {
             <div className="mb-4 pointer-events-auto">
               <CategoryBadge size="md">{post.category}</CategoryBadge>
             </div>
-            <h1 className="font-retro font-bold text-4xl md:text-5xl lg:text-6xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow">
+            <h1 className="font-retro font-bold text-4xl md:text-6xl lg:text-7xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow">
               {post.title || "Sem Título"}
             </h1>
           </div>
@@ -271,7 +271,7 @@ export default function PostDetailPage({ previewPost }) {
               {/* Label retro — Posicionada sobre a borda (Estilo da segunda foto) */}
               <div className="absolute -top-6 left-8">
                 <span className={cn(
-                  "font-retro text-sm md:text-base font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]", 
+                  "font-retro text-sm md:text-base font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
                   isDark ? "bg-purple-600 border-purple-400 text-white" : "bg-purple-500 border-purple-700 text-white"
                 )}>
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -285,8 +285,6 @@ export default function PostDetailPage({ previewPost }) {
               </p>
             </div>
           )}
-
-
 
           {/* Conteúdo do artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
@@ -417,8 +415,10 @@ export default function PostDetailPage({ previewPost }) {
                         {comment.authorAvatar && (
                           <img
                             src={comment.authorAvatar}
-                            alt={comment.author}                            loading="lazy"
-                            decoding="async"                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
+                            alt={comment.author}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
                           />
                         )}
                         <div className={cn("font-retro font-bold text-base uppercase tracking-wider", isDark ? "text-purple-400" : "text-purple-600")}>
