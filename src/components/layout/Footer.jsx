@@ -17,7 +17,7 @@ export default function Footer() {
     >
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
         {/* Marca e Descrição */}
-        <div className="col-span-1 md:col-span-2 space-y-6">
+        <div className="col-span-1 md:col-span-2 space-y-8">
           <Link to="/" className="flex items-center gap-3 group cursor-pointer w-fit">
             <Gamepad2
               className={cn("w-8 h-8 shrink-0 hover:rotate-12 transition-transform", isDark ? "text-purple-400" : "text-purple-600")}

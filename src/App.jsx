@@ -1,5 +1,6 @@
 import React, { useEffect, lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Controle de estado
 import { useAppContext } from "./context/AppContext";
@@ -24,6 +25,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   const { isDark, toast, isLoginModalOpen } = useAppContext();
+  const location = useLocation();
 
   // Atualiza os CSS Custom Properties do tema (definidos em index.css)
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function App() {
       root.style.setProperty('--retro-button-shadow', '3px 3px 0px 0px #c084fc');
       root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #c084fc');
       root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0,0,0,1)');
+      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0, 0, 0, 1)');
     } else {
       root.style.setProperty('--retro-border-color', '#2D1B69');
       root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #2D1B69');
@@ -58,22 +60,32 @@ export default function App() {
         <Navbar />
 
         <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
-          <Suspense fallback={
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-              {[1,2,3].map(i => <PostSkeleton key={i} isDark={isDark} />)}
-            </div>
-          }>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/post/:slug" element={<PostDetailPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-            <Route path="/editor" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
-            <Route path="/editor/:id" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-          </Suspense>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Suspense fallback={
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                  {[1,2,3].map(i => <PostSkeleton key={i} isDark={isDark} />)}
+                </div>
+              }>
+                <Routes location={location} key={location.pathname}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/post/:slug" element={<PostDetailPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+                  <Route path="/editor" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
+                  <Route path="/editor/:id" element={<ProtectedRoute><PostEditorPage /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         <Footer />
