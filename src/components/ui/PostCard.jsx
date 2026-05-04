@@ -18,7 +18,7 @@ export default function PostCard({ post, onClick }) {
   return (
     <article
       className={cn(
-        "flex flex-col h-full rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-200",
+        "flex flex-col h-full rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,0.6)]",
         isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}
@@ -69,7 +69,7 @@ export default function PostCard({ post, onClick }) {
 
       {/* Conteúdo */}
       <div className="p-7 md:p-8 flex flex-col flex-grow">
-        <h3 className="font-retro font-bold text-xl md:text-2xl mb-4 line-clamp-2 leading-tight group-hover:text-purple-500 transition-colors duration-300">
+        <h3 className="font-retro font-bold text-xl md:text-2xl mb-4 line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
           {post.title}
         </h3>
         <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
@@ -90,7 +90,7 @@ export default function PostCard({ post, onClick }) {
           </div>
 
           {/* Ações */}
-          <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
             {/* Curtir */}
             {currentUser ? (
               <button
@@ -105,20 +105,20 @@ export default function PostCard({ post, onClick }) {
                 <span>{post.likes || 0}</span>
               </button>
             ) : (
-              <div className="flex items-center gap-2">
-                <span className={cn("text-xs font-bold flex items-center gap-1 opacity-40", isDark ? "text-gray-400" : "text-gray-500")}>
-                  <Heart className="w-4 h-4" />
-                  {post.likes || 0}
-                </span>
-                <AuthGate variant="inline" />
-              </div>
+              <span className={cn("text-sm font-bold flex items-center gap-1.5 opacity-40", isDark ? "text-gray-400" : "text-gray-500")}>
+                <Heart className="w-4 h-4" />
+                {post.likes || 0}
+              </span>
             )}
 
-            {/* Comentários — sempre visível, só leitura */}
+            {/* Comentários */}
             <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
               <MessageSquare className="w-4 h-4" />
               <span>{commentCount}</span>
             </div>
+
+            {/* Login Discreto */}
+            {!currentUser && <AuthGate variant="inline" className="ml-auto" />}
           </div>
         </div>
       </div>
