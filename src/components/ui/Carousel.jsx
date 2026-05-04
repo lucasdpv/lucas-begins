@@ -66,21 +66,21 @@ export default function Carousel({ posts, onPostClick }) {
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-600/10 blur-[120px] pointer-events-none" />
 
-        {/* Content Container - Bottom Aligned */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 z-[2] pointer-events-none">
-          <div className="max-w-3xl">
-            <div className="mb-4 pointer-events-auto">
+        {/* Content Container - Centered on Mobile to avoid arrows */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[2] pointer-events-none flex justify-center md:justify-start">
+          <div className="max-w-[75%] md:max-w-3xl pointer-events-auto text-center md:text-left flex flex-col items-center md:items-start">
+            <div className="mb-4">
               <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
             </div>
             
-            <h2 className="font-retro font-bold text-2xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-6">
+            <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-6">
               {currentPost.title}
             </h2>
             
-            <div className="flex flex-wrap items-center gap-3 pointer-events-auto">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {currentPost.score && <ScoreBadge score={currentPost.score} size="sm" />}
               <span className="h-0.5 w-0.5 rounded-full bg-white/30 hidden md:block" />
-              <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wide text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              <div className="flex items-center gap-3 text-[10px] md:text-xs font-bold uppercase tracking-wide text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                  <span className="flex items-center gap-1">
                    <Heart className="w-3 h-3 text-red-400" fill="currentColor" />
                    {currentPost.likes || 0}
@@ -95,37 +95,37 @@ export default function Carousel({ posts, onPostClick }) {
         </div>
       </div>
 
-      {/* Botões de navegação — aparecem no hover */}
+      {/* Botões de navegação — Prioridade Máxima */}
       {posts.length > 1 && (
         <>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
             tabIndex={0}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
             aria-label="Anterior"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
             tabIndex={0}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-black/50 text-white border-2 border-white/20 backdrop-blur-sm opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
             aria-label="Próximo"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </>
       )}
 
-      {/* Dots + barra de progresso */}
-      <div className="absolute bottom-6 right-6 flex items-center gap-3">
+      {/* Dots + barra de progresso — Centralizado no Mobile */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 flex items-center gap-3 z-30">
         {posts.map((_, idx) => (
           <button
             key={idx}
             onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
             className={cn(
-              "h-2.5 rounded-full border border-white/30 transition-all duration-500 shadow-sm",
-              idx === currentIndex ? "w-10 bg-purple-500" : "w-2.5 bg-white/60 hover:bg-white"
+              "h-2 md:h-2.5 rounded-full border border-white/30 transition-all duration-500 shadow-sm",
+              idx === currentIndex ? "w-8 md:w-10 bg-purple-500" : "w-2 md:w-2.5 bg-white/60 hover:bg-white"
             )}
             aria-label={`Slide ${idx + 1}`}
           />
