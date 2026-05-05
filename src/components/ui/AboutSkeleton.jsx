@@ -6,38 +6,43 @@ export default function AboutSkeleton({ isDark }) {
   const accentColor = isDark ? "bg-gray-700" : "bg-gray-300";
 
   return (
-    <div className="max-w-4xl mx-auto py-8 animate-pulse">
+    <div className="max-w-7xl mx-auto py-8 animate-pulse px-4 md:px-0">
       {/* Hero Skeleton */}
-      <div className={cn("w-full h-64 rounded-2xl mb-12 flex flex-col items-center justify-center gap-4", skeletonColor)}>
+      <div className={cn(
+        "w-full h-72 rounded-[2.5rem] border-4 mb-12 flex flex-col items-center justify-center gap-6", 
+        isDark ? "bg-gray-800/40 border-gray-700" : "bg-gray-100 border-gray-200"
+      )}>
         <div className={cn("w-20 h-20 rounded-2xl", accentColor)} />
-        <div className={cn("w-64 h-12 rounded-xl", accentColor)} />
+        <div className={cn("w-full max-w-md h-16 rounded-xl", accentColor)} />
       </div>
 
       {/* Main Content Box Skeleton */}
-      <div className={cn("p-8 md:p-12 rounded-2xl mb-16", isDark ? "bg-gray-800/40" : "bg-gray-50")}>
-        <div className={cn("w-40 h-8 mb-8 rounded", accentColor)} />
-        <div className="space-y-4">
+      <div className={cn(
+        "p-10 md:p-16 rounded-[2.5rem] border-4 mb-16", 
+        isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"
+      )}>
+        <div className={cn("w-40 h-10 mb-8 rounded", accentColor)} />
+        <div className="space-y-6 mb-16">
           <div className={cn("w-full h-4 rounded", accentColor)} />
           <div className={cn("w-full h-4 rounded", accentColor)} />
           <div className={cn("w-5/6 h-4 rounded", accentColor)} />
-          <div className={cn("w-full h-4 rounded", accentColor)} />
-          <div className={cn("w-4/6 h-4 rounded", accentColor)} />
         </div>
-      </div>
 
-      {/* Player 1 Section Skeleton */}
-      <div className={cn("w-48 h-8 mb-8 rounded", accentColor)} />
-      <div className={cn("p-6 md:p-10 rounded-2xl border-2", isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-100")}>
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-          <div className={cn("w-32 h-32 shrink-0 rounded-2xl", skeletonColor)} />
-          <div className="flex-1 w-full space-y-4">
-            <div className={cn("w-64 h-10 rounded-xl", accentColor)} />
-            <div className={cn("w-40 h-4 rounded", skeletonColor)} />
-            <div className="space-y-3 pt-4">
-              <div className={cn("w-full h-3 rounded", skeletonColor)} />
-              <div className={cn("w-full h-3 rounded", skeletonColor)} />
-              <div className={cn("w-full h-3 rounded", skeletonColor)} />
-              <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+        <div className={cn("w-40 h-10 mb-10 rounded", accentColor)} />
+        <div className={cn(
+          "p-8 md:p-14 rounded-[2.5rem] border-4", 
+          isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-100"
+        )}>
+          <div className="flex flex-col lg:row items-center lg:items-start gap-12">
+            <div className={cn("w-40 h-40 shrink-0 rounded-3xl border-4", skeletonColor)} />
+            <div className="flex-1 w-full space-y-6">
+              <div className={cn("w-full max-w-xs h-12 rounded-xl", accentColor)} />
+              <div className={cn("w-40 h-4 rounded", skeletonColor)} />
+              <div className="space-y-4 pt-6">
+                <div className={cn("w-full h-3 rounded", skeletonColor)} />
+                <div className={cn("w-full h-3 rounded", skeletonColor)} />
+                <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+              </div>
             </div>
           </div>
         </div>

@@ -41,9 +41,11 @@ export const PostService = {
    * Busca todos os posts (para busca global e filtros).
    */
   async getAllPosts() {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "posts"));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Ordena manualmente no JS caso falte o campo no Firestore
+    return posts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   },
 
   /**

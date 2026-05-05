@@ -30,13 +30,16 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
 
     try {
       if (forceAll) {
+        console.log('[usePosts] Forçando carregamento de TODOS os posts...');
         if (hasFetchedAllRef.current) {
+          console.log('[usePosts] Já carregou tudo anteriormente. Pulando...');
           isFetchingRef.current = false;
           setIsLoadingPosts(false);
           return;
         }
 
         const allPosts = await PostService.getAllPosts();
+        console.log(`[usePosts] Recebidos ${allPosts.length} posts do servidor.`);
         setPosts(allPosts);
         setHasMore(false);
         hasFetchedAllRef.current = true;
@@ -106,7 +109,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, activeCategory, fetchPosts, posts.length]);
+  }, [searchQuery, activeCategory, fetchPosts]);
 
   const loadMore = () => {
     if (!isLoadingPosts && !isFetchingMore && hasMore && !isFetchingRef.current) {
@@ -254,6 +257,10 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }
   };
 
+  const fetchAllPosts = useCallback(() => {
+    fetchPosts(false, true);
+  }, [fetchPosts]);
+
   return {
     posts,
     isLoadingPosts,
@@ -265,5 +272,6 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     handleDeletePost,
     loadMore,
     hasMore,
+    fetchAllPosts,
   };
 }

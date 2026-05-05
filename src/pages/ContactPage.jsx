@@ -1,104 +1,148 @@
 import React, { useState } from "react";
-import { Mail, Send } from "lucide-react";
+import { Send, Loader2, Gamepad2, User, Mail, MessageSquare } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { motion } from "framer-motion";
 import { useAppContext } from "../context/AppContext";
+import { contactService } from "../services/contactService";
+import { cn } from "../lib/utils";
 
-/**
- * Página de contato com formulário e card de e-mail.
- */
 export default function ContactPage() {
   const { isDark, showToast } = useAppContext();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    showToast("Mensagem recebida! Nossos pombos correios já estão trabalhando.", "success");
-    setFormData({ name: "", email: "", message: "" });
+    setIsSubmitting(true);
+    
+    try {
+      await contactService.sendMessage(formData);
+      showToast("MENSAGEM ENVIADA! PLAYER 1 LOGADO COM SUCESSO.", "success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      showToast("ERRO NO SISTEMA. TENTE NOVAMENTE.", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const inputClass = `w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all ${
-    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-gray-50 border-black text-black"
-  }`;
-
   return (
-    <div className="animate-in fade-in max-w-5xl mx-auto py-8">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 relative overflow-hidden">
       <Helmet>
-        <title>Fale Conosco | Lucas Begins</title>
-        <meta name="description" content="Entre em contato para parcerias, pautas ou reclamações." />
+        <title>Contato | Lucas Begins</title>
+        <meta name="description" content="Fale com o Player 1 do Lucas Begins." />
       </Helmet>
-      <div className="text-center mb-16">
-        <h1 className="font-retro font-bold text-5xl md:text-6xl uppercase tracking-widest mb-4 drop-shadow-[3px_3px_0px_rgba(168,85,247,0.5)]">
-          Fale <span className="text-purple-500">Conosco</span>
-        </h1>
-        <p className={`text-xl max-w-2xl mx-auto font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-          Tem uma pauta incrível? Quer fechar parceria? Ou reclamar da nota do seu jogo favorito?
-          Mande o papo reto!
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Card de E-mail */}
-        <div className="md:col-span-1 space-y-6">
-          <div className={`p-8 rounded-2xl retro-card ${isDark ? "bg-gray-800" : "bg-white"}`}>
-            <div className="w-14 h-14 bg-purple-600 text-white rounded-xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
-              <Mail className="w-8 h-8" />
-            </div>
-            <h3 className="font-retro font-bold text-xl uppercase mb-2">E-mail</h3>
-            <p className={`font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-              {import.meta.env.VITE_CONTACT_EMAIL || "contato@lucasbegins.com"}
-            </p>
+      {/* Efeito de Scanlines */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.04] z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
+
+      <div className="w-full max-w-4xl relative z-10">
+        {/* Título com Text Shadow Retro */}
+        <div className="text-center mb-12">
+          <div className="inline-block px-10 py-4 bg-purple-600 border-[6px] border-black shadow-[10px_10px_0px_rgba(0,0,0,1)] mb-8">
+             <h1 className="font-retro font-bold text-4xl md:text-6xl text-white uppercase tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                Fale <span className="text-yellow-400">Conosco</span>
+             </h1>
           </div>
+          <p className={cn(
+            "font-retro text-sm uppercase tracking-[0.3em] font-bold drop-shadow-sm",
+            isDark ? "text-purple-400" : "text-purple-900"
+          )}>
+            Insert Coin to Start Conversation
+          </p>
         </div>
 
-        {/* Formulário */}
-        <div className={`md:col-span-2 p-8 md:p-10 rounded-2xl retro-card ${isDark ? "bg-gray-800" : "bg-white"}`}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="contact-name" className="text-sm font-bold uppercase font-retro opacity-80">
-                  Player 1 (Seu Nome)
+        {/* Card do Formulário (Estilo Caixa de Diálogo SNES Expandida) */}
+        <div className={cn(
+          "p-10 md:p-16 border-[8px] shadow-[20px_20px_0px_rgba(0,0,0,1)] relative transition-all",
+          isDark 
+            ? "bg-gray-900/80 backdrop-blur-sm border-purple-600" 
+            : "bg-snes-surface border-snes-dark"
+        )}>
+          
+          <form onSubmit={handleSubmit} className="space-y-12 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* Nome */}
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 font-retro text-xs font-bold uppercase tracking-widest opacity-80">
+                  <User size={18} className="text-purple-500" /> Player 1 (Nome)
                 </label>
                 <input
-                  id="contact-name"
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={inputClass}
-                  placeholder="Ex: Mario Bros..."
+                  placeholder="DIGITE SEU NOME..."
+                  className={cn(
+                    "w-full px-6 py-5 border-[6px] font-retro text-sm uppercase outline-none transition-all shadow-[6px_6px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                    isDark 
+                      ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
+                      : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="contact-email" className="text-sm font-bold uppercase font-retro opacity-80">E-mail</label>
+
+              {/* Email */}
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 font-retro text-xs font-bold uppercase tracking-widest opacity-80">
+                  <Mail size={18} className="text-purple-500" /> E-mail
+                </label>
                 <input
-                  id="contact-email"
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={inputClass}
-                  placeholder="mario@nintendo.com"
+                  placeholder="SEU@EMAIL.COM"
+                  className={cn(
+                    "w-full px-6 py-5 border-[6px] font-retro text-sm uppercase outline-none transition-all shadow-[6px_6px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                    isDark 
+                      ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
+                      : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
+                  )}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label htmlFor="contact-message" className="text-sm font-bold uppercase font-retro opacity-80">Sua Mensagem</label>
+
+            {/* Mensagem */}
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 font-retro text-xs font-bold uppercase tracking-widest opacity-80">
+                <MessageSquare size={18} className="text-purple-500" /> Mensagem do Quest
+              </label>
               <textarea
-                id="contact-message"
                 required
                 rows="6"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className={`${inputClass} resize-none`}
-                placeholder="Escreva aqui o código secreto..."
+                placeholder="ESCREVA SUA MENSAGEM AQUI..."
+                className={cn(
+                  "w-full px-6 py-5 border-[6px] font-retro text-sm uppercase outline-none transition-all resize-none shadow-[6px_6px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                  isDark 
+                    ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
+                    : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
+                )}
               />
             </div>
-            <div className="flex justify-end pt-4">
+
+            {/* Botão de Envio (Estilo Retro Button Gigante) */}
+            <div className="pt-6">
               <button
                 type="submit"
-                className="flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button"
+                disabled={isSubmitting}
+                className={cn(
+                  "w-full flex items-center justify-center gap-4 py-6 border-[6px] font-retro text-2xl font-bold uppercase shadow-[10px_10px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[10px] active:translate-y-[10px] transition-all group",
+                  isDark 
+                    ? "bg-purple-600 text-white border-black hover:bg-purple-500" 
+                    : "bg-snes-accent text-white border-black hover:opacity-90"
+                )}
               >
-                <Send className="w-6 h-6" /> Enviar Mensagem
+                {isSubmitting ? (
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                ) : (
+                  <>
+                    <Gamepad2 className="w-8 h-8 group-hover:animate-bounce" /> 
+                    <span className="drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]">PRESS START (ENVIAR)</span>
+                  </>
+                )}
               </button>
             </div>
           </form>

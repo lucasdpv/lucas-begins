@@ -8,8 +8,10 @@ export default function PostSkeleton({ isDark }) {
       aria-busy="true"
       aria-label="Carregando artigo..."
       className={cn(
-        "flex flex-col h-full rounded-3xl overflow-hidden border-2 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-        isDark ? "bg-gray-800 border-gray-700" : "bg-snes-surface border-snes-mid"
+        "flex flex-col h-full rounded-[2.5rem] overflow-hidden border-4 transition-all",
+        isDark 
+          ? "bg-gray-800 border-gray-700 shadow-xl shadow-purple-900/5" 
+          : "bg-snes-surface border-snes-dark shadow-[8px_8px_0px_rgba(0,0,0,1)]"
       )}
     >
       {/* Thumb Skeleton */}
