@@ -262,7 +262,7 @@ export default function PostDetailPage({ previewPost }) {
           )}
 
           {/* Artigo */}
-          <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
+          <div className="prose sm:prose-lg md:prose-xl max-w-none text-left leading-loose text-lg md:text-xl font-medium">
             <ArticleRenderer
               content={post.content || "O seu artigo não tem texto ainda."}
               isDark={isDark}
@@ -271,13 +271,17 @@ export default function PostDetailPage({ previewPost }) {
 
           {/* Veredito */}
           {post.score && (
-            <div className={cn("p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
-              <div>
-                <h4 className="font-retro font-bold text-2xl uppercase mb-2 text-yellow-500">Veredito da Redação</h4>
-                <p className="text-lg font-bold uppercase tracking-widest">{post.verdict}</p>
+            <div className={cn(
+              "p-8 md:p-10 rounded-[2.5rem] border-4 border-yellow-400 flex flex-col md:flex-row items-center justify-between gap-8 retro-card relative overflow-hidden", 
+              isDark ? "bg-gray-800" : "bg-snes-surface"
+            )}>
+              <div className="text-center md:text-left">
+                <h4 className="font-retro font-bold text-2xl md:text-3xl uppercase mb-3 text-yellow-500 text-glow-retro">Veredito da Redação</h4>
+                <p className="text-lg md:text-xl font-bold uppercase tracking-widest leading-relaxed">{post.verdict}</p>
               </div>
-              <div className="flex flex-col items-center justify-center w-24 h-24 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <span className="font-retro font-bold text-4xl leading-none">{post.score}</span>
+              <div className="flex-shrink-0 flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-[-5deg] border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] group-hover:rotate-0 transition-transform duration-300">
+                <span className="text-[10px] font-retro font-bold uppercase mb-[-5px]">Score</span>
+                <span className="font-retro font-bold text-5xl leading-none">{post.score}</span>
               </div>
             </div>
           )}

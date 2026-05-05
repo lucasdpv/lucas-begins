@@ -33,7 +33,7 @@ export default function AboutPage() {
 
       {/* Conteúdo */}
       <div className={cn(
-        "p-10 md:p-16 rounded-[2.5rem] border-4 max-w-none text-justify transition-all",
+        "p-10 md:p-16 rounded-[2.5rem] border-4 max-w-none text-left transition-all",
         isDark 
           ? "bg-gray-900 border-gray-800 text-gray-300 shadow-xl shadow-purple-900/5" 
           : "bg-snes-surface border-snes-dark shadow-[16px_16px_0px_rgba(0,0,0,1)]"

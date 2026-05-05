@@ -122,7 +122,7 @@ export default function ArticleRenderer({ content, isDark }) {
         if (line.startsWith('## ')) {
           const headingText = line.slice(3).trim();
           return (
-            <h2 key={index} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
+            <h2 key={index} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
               {headingText}
             </h2>
           );

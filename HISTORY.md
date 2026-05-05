@@ -10,8 +10,12 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 ### ✨ UI/UX & Redesign
 - **Admin Inbox 2.0**: Implementação de linhas expansíveis no Inbox com visual de card detalhado e animações *slide-in*.
 - **Sistema Universal de Modais**: Substituição de alertas do sistema por modais customizados com estética retrô, sombras 3D e feedback tátil.
+### 🎨 Design & UX
 - **Páginas de Contato e Sobre**: Redesign completo com caixas de diálogo estilo SNES, sombras sólidas e alinhamento reto para maior harmonia.
 - **Sistema de Skeletons**: Atualização de todos os estados de carregamento (About, Admin, Contact) para espelhar perfeitamente os novos layouts 7xl.
+- **Legibilidade Aprimorada**: Remoção global de `text-justify` em artigos e na página Sobre para evitar "rios de branco" e melhorar a leitura no mobile.
+- **Visual Polish (Glow & DropCap)**: Implementação de efeito neon glow nos títulos e refinamento da letra capitular (Drop Cap) para um visual de revista de luxo.
+- **Veredito Responsivo**: Redesign da seção de nota para garantir que o selo de score permaneça circular e bem posicionado em todas as telas.
 
 ### ⚙️ Funcionalidades & Backend
 - **Integração Gmail Direct**: Botão "Responder Agora" que redireciona automaticamente para a aba de composição do Gmail Web.

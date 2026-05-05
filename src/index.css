@@ -56,13 +56,18 @@
    ============================================================ */
 .magazine-article::first-letter {
   font-family: var(--font-retro);
-  font-size: 4.5em;
+  font-size: 5rem;
   float: left;
-  line-height: 0.8;
-  margin-right: 0.1em;
-  margin-top: 0.1em;
+  line-height: 1;
+  margin-right: 0.15em;
+  margin-top: 0.05em;
   color: var(--magazine-drop-cap-color);
   text-shadow: var(--magazine-drop-cap-shadow);
+  font-weight: bold;
+}
+
+.text-glow-retro {
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.2);
 }
 
 /* ============================================================
