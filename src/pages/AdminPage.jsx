@@ -17,7 +17,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  MessageSquare
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
@@ -35,13 +36,16 @@ export default function AdminPage() {
   const navigate = useNavigate();
   const [adminTab, setAdminTab] = useState("posts");
 
-  // Força o carregamento de todos os posts ao entrar no admin
+  // Força o carregamento de posts e mensagens ao entrar no admin
   useEffect(() => {
     fetchAllPosts();
+    fetchMessages();
   }, [fetchAllPosts]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [expandedMessageId, setExpandedMessageId] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, type: null, title: "" });
   
   // Estados de Filtro e Paginação
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,21 +107,38 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteMsg = async (id) => {
-    if (!window.confirm("Deseja excluir esta mensagem permanentemente?")) return;
+  const handleDeleteMsg = (id) => {
+    setDeleteModal({ isOpen: true, id, type: 'message', title: 'Mensagem' });
+  };
+
+  const confirmDelete = async () => {
+    const { id, type } = deleteModal;
     try {
-      await contactService.deleteMessage(id);
-      setMessages(messages.filter(msg => msg.id !== id));
-      showToast("Mensagem excluída.");
+      if (type === 'message') {
+        await contactService.deleteMessage(id);
+        setMessages(messages.filter(msg => msg.id !== id));
+        showToast("Mensagem excluída.");
+      } else if (type === 'post') {
+        await handleDeletePost(id);
+        showToast("Artigo excluído com sucesso.");
+      } else if (type === 'category') {
+        await handleDeleteCategory(id);
+        showToast("Categoria removida.");
+      }
     } catch (error) {
-      showToast("Erro ao excluir mensagem.", "error");
+      showToast(`Erro ao excluir ${type}.`, "error");
+    } finally {
+      setDeleteModal({ isOpen: false, id: null, type: null, title: "" });
     }
   };
 
   const handleReply = (email, name) => {
     const subject = encodeURIComponent(`Re: Contato Lucas Begins - Olá ${name}`);
-    const body = encodeURIComponent(`Olá ${name},\n\nRecebemos sua mensagem através do portal Lucas Begins.\n\n---\nResposta:\n\n`);
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    const body = encodeURIComponent(`Olá ${name},\n\nRecebi sua mensagem através do portal Lucas Begins e gostaria de dar um retorno.\n\n---\nSua mensagem:\n[Conteúdo da mensagem]\n\nMinha resposta:\n\n`);
+    
+    // Abre o GMAIL diretamente no navegador em uma nova aba
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
+    window.open(gmailUrl, '_blank');
   };
 
   const handleAddCat = (e) => {
@@ -326,16 +347,12 @@ export default function AdminPage() {
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => {
-                                if (window.confirm("Tem certeza que deseja excluir definitivamente este artigo?")) {
-                                  handleDeletePost(post.id);
-                                }
-                              }}
-                              className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500 rounded-lg transition-colors retro-button"
-                              title="Excluir"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                                onClick={() => setDeleteModal({ isOpen: true, id: post.id, type: 'post', title: post.title })}
+                                className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500 rounded-lg transition-colors retro-button"
+                                title="Excluir"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                           </div>
                         </td>
                       </tr>
@@ -454,9 +471,9 @@ export default function AdminPage() {
                 >
                   <span>{cat}</span>
                   <button
-                    onClick={() => handleDeleteCategory(cat)}
-                    className="p-2 text-red-500 hover:bg-red-500 hover:text-white border border-transparent hover:border-red-500 rounded-lg transition-colors"
-                    title="Excluir Categoria"
+                    onClick={() => setDeleteModal({ isOpen: true, id: cat, type: 'category', title: cat })}
+                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                    title="Remover"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -639,86 +656,188 @@ export default function AdminPage() {
                     </tr>
                   ) : (
                     messages.map((msg) => (
-                      <tr 
-                        key={msg.id} 
-                        className={cn(
-                          "transition-colors group",
-                          msg.status === 'new' 
-                            ? isDark ? "bg-purple-500/5 hover:bg-purple-500/10" : "bg-purple-50 hover:bg-purple-100"
-                            : isDark ? "hover:bg-gray-700/50" : "hover:bg-snes-mid"
-                        )}
-                      >
-                        <td className="px-6 py-4">
-                          {msg.status === 'new' ? (
-                            <span className="flex items-center gap-2 text-red-500 font-bold uppercase text-[10px]">
-                              <Mail size={14} /> Nova
-                            </span>
-                          ) : msg.status === 'replied' ? (
-                            <span className="flex items-center gap-2 text-green-500 font-bold uppercase text-[10px]">
-                              <CheckCircle2 size={14} /> Respondida
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2 text-gray-500 font-bold uppercase text-[10px]">
-                              <MailOpen size={14} /> Lida
-                            </span>
+                      <React.Fragment key={msg.id}>
+                        <tr 
+                          className={cn(
+                            "transition-all group cursor-pointer border-l-4",
+                            expandedMessageId === msg.id ? "border-purple-500 shadow-inner" : "border-transparent",
+                            msg.status === 'new' 
+                              ? isDark ? "bg-purple-500/5 hover:bg-purple-500/10" : "bg-purple-50 hover:bg-purple-100"
+                              : isDark ? "hover:bg-gray-700/50" : "hover:bg-snes-mid"
                           )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-base">{msg.name}</span>
-                            <span className="text-xs opacity-60 truncate max-w-[150px]">{msg.email}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <p className="text-xs line-clamp-2 opacity-80 max-w-md">{msg.message}</p>
-                        </td>
-                        <td className="px-6 py-4 opacity-60 text-xs font-mono">
-                          {formatDate(msg.createdAt)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => handleReply(msg.email, msg.name)}
-                              className="p-2 bg-purple-600 text-white rounded-lg hover:scale-110 transition-all shadow-md"
-                              title="Responder via E-mail"
-                            >
-                              <Reply className="w-4 h-4" />
-                            </button>
-                            
-                            {msg.status === 'new' && (
-                              <button
-                                onClick={() => handleUpdateMessageStatus(msg.id, 'read')}
-                                className="p-2 bg-blue-500/10 text-blue-500 border border-blue-500/50 rounded-lg hover:bg-blue-500 hover:text-white transition-all"
-                                title="Marcar como lida"
-                              >
-                                <MailOpen className="w-4 h-4" />
-                              </button>
+                          onClick={() => setExpandedMessageId(expandedMessageId === msg.id ? null : msg.id)}
+                        >
+                          <td className="px-6 py-5">
+                            {msg.status === 'new' ? (
+                              <span className="flex items-center gap-2 text-red-500 font-bold uppercase text-[10px] tracking-widest">
+                                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" /> Nova
+                              </span>
+                            ) : msg.status === 'replied' ? (
+                              <span className="flex items-center gap-2 text-green-500 font-bold uppercase text-[10px] tracking-widest opacity-60">
+                                <CheckCircle2 size={14} /> Respondida
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-2 text-gray-500 font-bold uppercase text-[10px] tracking-widest opacity-60">
+                                <MailOpen size={14} /> Lida
+                              </span>
                             )}
-
-                            {msg.status !== 'replied' && (
+                          </td>
+                          <td className="px-6 py-5">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-base tracking-tight">{msg.name}</span>
+                              <span className="text-xs opacity-50 font-mono">{msg.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 hidden md:table-cell">
+                            <p className="text-xs line-clamp-1 opacity-70 italic max-w-xs font-mono">
+                              "{msg.message}"
+                            </p>
+                          </td>
+                          <td className="px-6 py-5 opacity-40 text-[10px] font-bold font-retro uppercase tracking-tighter whitespace-nowrap">
+                            {formatDate(msg.createdAt)}
+                          </td>
+                          <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-end gap-2">
                               <button
-                                onClick={() => handleUpdateMessageStatus(msg.id, 'replied')}
-                                className="p-2 bg-green-500/10 text-green-500 border border-green-500/50 rounded-lg hover:bg-green-500 hover:text-white transition-all"
-                                title="Marcar como respondida"
+                                onClick={() => handleReply(msg.email, msg.name)}
+                                className="p-2.5 bg-purple-600 text-white rounded-xl hover:scale-110 active:scale-95 transition-all shadow-lg shadow-purple-900/20"
+                                title="Responder via E-mail"
                               >
-                                <CheckCircle2 className="w-4 h-4" />
+                                <Reply className="w-4 h-4" />
                               </button>
-                            )}
+                              
+                              {msg.status === 'new' && (
+                                <button
+                                  onClick={() => handleUpdateMessageStatus(msg.id, 'read')}
+                                  className="p-2.5 bg-blue-500/10 text-blue-500 border-2 border-blue-500/30 rounded-xl hover:bg-blue-500 hover:text-white transition-all active:scale-95"
+                                  title="Marcar como lida"
+                                >
+                                  <MailOpen className="w-4 h-4" />
+                                </button>
+                              )}
 
-                            <button
-                              onClick={() => handleDeleteMsg(msg.id)}
-                              className="p-2 bg-red-500/10 text-red-500 border border-red-500/50 rounded-lg hover:bg-red-500 hover:text-white transition-all"
-                              title="Excluir"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+                              {msg.status !== 'replied' && (
+                                <button
+                                  onClick={() => handleUpdateMessageStatus(msg.id, 'replied')}
+                                  className="p-2.5 bg-green-500/10 text-green-500 border-2 border-green-500/30 rounded-xl hover:bg-green-500 hover:text-white transition-all active:scale-95"
+                                  title="Marcar como respondida"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                </button>
+                              )}
+
+                              <button
+                                onClick={() => handleDeleteMsg(msg.id)}
+                                className="p-2.5 bg-red-500/10 text-red-500 border-2 border-red-500/30 rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-95"
+                                title="Excluir"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Conteúdo Expandido da Mensagem */}
+                        {expandedMessageId === msg.id && (
+                          <tr className={cn(isDark ? "bg-gray-800/80" : "bg-purple-50/50")}>
+                            <td colSpan="5" className="px-10 py-10">
+                              <div className={cn(
+                                "p-8 rounded-3xl border-4 shadow-2xl relative overflow-hidden transition-all animate-in slide-in-from-top-4 duration-300",
+                                isDark ? "bg-gray-900 border-purple-600/30" : "bg-white border-purple-200"
+                              )}>
+                                <div className="relative z-10">
+                                  <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-dashed border-gray-700/30">
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-2xl shadow-lg border-2 border-black/20">
+                                        ✉️
+                                      </div>
+                                      <div>
+                                        <h4 className="font-retro text-lg font-bold text-purple-500 leading-none mb-1">
+                                          Mensagem de {msg.name}
+                                        </h4>
+                                        <p className="text-xs opacity-50 font-mono">{msg.email}</p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">Recebido em</p>
+                                      <p className="text-xs font-mono">{formatDate(msg.createdAt)}</p>
+                                    </div>
+                                  </div>
+
+                                  <div className={cn(
+                                    "p-8 rounded-2xl border-2 font-medium text-lg leading-relaxed whitespace-pre-wrap",
+                                    isDark ? "bg-gray-800/50 border-gray-700/50 text-gray-200" : "bg-gray-50 border-gray-100 text-gray-800"
+                                  )}>
+                                    {msg.message}
+                                  </div>
+                                  
+                                  <div className="mt-8 flex justify-end gap-4">
+                                    <button 
+                                      onClick={() => handleReply(msg.email, msg.name)}
+                                      className="px-6 py-3 bg-purple-600 text-white rounded-xl font-retro text-xs font-bold uppercase flex items-center gap-3 hover:scale-105 active:scale-95 transition-all"
+                                    >
+                                      <Reply size={16} /> Responder Agora
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal de Confirmação de Exclusão */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setDeleteModal({ isOpen: false, id: null })}
+          />
+          <div className={cn(
+            "relative w-full max-w-md p-8 rounded-[2.5rem] border-4 shadow-[12px_12px_0px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300",
+            isDark ? "bg-gray-900 border-red-500/50 shadow-red-900/20" : "bg-white border-red-500 shadow-red-200"
+          )}>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-20 h-20 bg-red-500/10 rounded-3xl border-4 border-red-500 flex items-center justify-center text-red-500 mb-6 animate-bounce">
+                <Trash2 size={40} />
+              </div>
+              <h3 className="font-retro text-2xl font-bold uppercase tracking-tighter mb-4">
+                Confirmar <span className="text-red-500">Exclusão</span>?
+              </h3>
+              <p className="text-sm opacity-60 mb-2 leading-relaxed">
+                Você está prestes a excluir permanentemente:
+              </p>
+              <p className="font-bold text-red-500 mb-6 truncate max-w-full italic px-4 py-2 bg-red-500/5 rounded-xl border border-red-500/20">
+                "{deleteModal.title}"
+              </p>
+              <p className="text-[10px] uppercase font-retro opacity-40 mb-8">
+                Esta ação não poderá ser desfeita.
+              </p>
+              
+              <div className="flex w-full gap-4">
+                <button
+                  onClick={() => setDeleteModal({ isOpen: false, id: null })}
+                  className={cn(
+                    "flex-1 py-4 rounded-2xl font-retro text-xs font-bold uppercase tracking-widest border-4 transition-all active:scale-95",
+                    isDark ? "bg-gray-800 border-gray-700 text-white hover:bg-gray-700" : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
+                  )}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 py-4 bg-red-500 border-4 border-black text-white rounded-2xl font-retro text-xs font-bold uppercase tracking-widest shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                >
+                  Sim, Deletar
+                </button>
+              </div>
             </div>
           </div>
         </div>

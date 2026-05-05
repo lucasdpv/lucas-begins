@@ -13,6 +13,9 @@ export function cn(...inputs) {
  * Formata datas provenientes do Firestore (Timestamp) ou string retrocompatível.
  */
 export const formatDate = (createdAt, oldDate) => {
+  if (createdAt instanceof Date) {
+    return createdAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
   if (createdAt && typeof createdAt.toDate === 'function') {
     return createdAt.toDate().toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
   }

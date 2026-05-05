@@ -41,12 +41,11 @@ export const contactService = {
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-        // Converte o timestamp do Firebase para objeto Date do JS
         createdAt: doc.data().createdAt?.toDate() || new Date(),
       }));
     } catch (error) {
-      console.error("[contactService:getAllMessages]", error);
-      throw error;
+      // Retorna vazio em caso de erro de permissão para não quebrar a UI
+      return [];
     }
   },
 
