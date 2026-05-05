@@ -103,7 +103,7 @@ export default function PostDetailPage({ previewPost }) {
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
 
   return (
-    <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+    <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full relative">
       <Helmet>
         <title>{post.title ? `${post.title} | Lucas Begins` : "Matéria | Lucas Begins"}</title>
         <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
@@ -134,69 +134,56 @@ export default function PostDetailPage({ previewPost }) {
         Voltar à Seleção
       </button>
 
-      {/* Hero */}
-      <div
-        className={cn(
-          "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden mb-12 retro-card flex items-center justify-center",
-          (!post.imageUrl || imgError) && `bg-gradient-to-br ${post.gradient || 'from-gray-900 to-purple-900'}`
-        )}
-        style={heroStyle}
-      >
-        {imgError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 bg-black/60">
-             <div className="text-red-500 font-retro text-2xl md:text-4xl mb-4 animate-pulse border-2 border-red-500 px-6 py-2 rounded bg-black/80">
-               ⚠️ DATA_CORRUPTION_DETECTED
-             </div>
-             <p className="font-retro text-sm md:text-lg uppercase tracking-widest text-gray-300 max-w-2xl leading-relaxed">
-               A transmissão de alta fidelidade do setor {post.category} foi interrompida. 
-               Nossos técnicos estão recalibrando os lasers de projeção.
-             </p>
-             <div className="mt-8 w-64 h-3 bg-gray-800 rounded-full overflow-hidden border-2 border-white/20">
-                <div className="h-full bg-red-600 animate-[loading_5s_infinite]" style={{ width: '60%' }} />
-             </div>
-          </div>
-        )}
-        <div className="absolute inset-0 scanline-overlay opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
-        
-        {/* Decorative elements for premium feel */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full pointer-events-none z-[4]" />
-
-        {/* Content Container - Wide Layout */}
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white w-full z-[10] pointer-events-none">
-          <div className="max-w-6xl">
-            <div className="flex items-center gap-4 mb-6 pointer-events-auto">
+      {/* Layout Expandido - Alinhado com a Navbar */}
+      <div className="w-full space-y-12">
+        {/* Hero */}
+        <div
+          className={cn(
+            "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden retro-card flex items-center justify-center",
+            (!post.imageUrl || imgError) && `bg-gradient-to-br ${post.gradient || 'from-gray-900 to-purple-900'}`
+          )}
+          style={heroStyle}
+        >
+          {imgError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 bg-black/60">
+              <div className="text-red-500 font-retro text-2xl md:text-4xl mb-4 animate-pulse border-2 border-red-500 px-6 py-2 rounded bg-black/80">
+                ⚠️ DATA_CORRUPTION_DETECTED
+              </div>
+              <p className="font-retro text-sm md:text-lg uppercase tracking-widest text-gray-300 max-w-2xl leading-relaxed">
+                A transmissão de alta fidelidade do setor {post.category} foi interrompida. 
+                Nossos técnicos estão recalibrando os lasers de projeção.
+              </p>
+            </div>
+          )}
+          <div className="absolute inset-0 scanline-overlay opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
+          
+          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 text-white w-full z-[10] pointer-events-none text-center md:text-left">
+            <div className="flex flex-col md:flex-row items-center gap-4 mb-6 pointer-events-auto">
               <CategoryBadge size="md" className="shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black">
                 {post.category}
               </CategoryBadge>
               {post.score && (
-                <div className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl font-retro font-bold border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] text-sm md:text-base">
+                <div className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl font-retro font-bold border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] text-sm">
                    ★ {post.score}
                 </div>
               )}
             </div>
-            <h1 className="font-retro font-bold text-4xl md:text-5xl lg:text-7xl leading-[1.05] text-white drop-shadow-[5px_5px_0px_rgba(0,0,0,1)] text-glow tracking-tighter">
+            <h1 className="font-retro font-bold text-3xl md:text-5xl lg:text-6xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tighter">
               {post.title}
             </h1>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-16">
-        {/* Coluna Principal */}
-        <div className="lg:col-span-3 space-y-10">
-
+        {/* Conteúdo Principal */}
+        <div id="article-content" className="space-y-12">
           {/* Barra de Autor e Ações */}
           <div className={cn("flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b-4", isDark ? "border-gray-800" : "border-gray-200")}>
-            {/* Autor */}
             <div className="flex items-center gap-4">
               {post.author?.avatar ? (
                 <img 
                   src={post.author.avatar} 
                   alt={post.author.name} 
-                  loading="lazy"
-                  decoding="async"
                   className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
                 />
               ) : (
@@ -209,11 +196,6 @@ export default function PostDetailPage({ previewPost }) {
                   {post.author?.name || "Autor Desconhecido"}
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
-                  {post.author?.role && (
-                    <span className={cn("text-[10px] uppercase font-bold tracking-widest px-2 py-1 rounded border", isDark ? "bg-gray-800 border-gray-700 text-purple-400" : "bg-snes-input border-snes-mid text-purple-600")}>
-                      {post.author.role}
-                    </span>
-                  )}
                   <span className="text-gray-500 font-bold text-xs uppercase">
                     {formatDate(post.createdAt, post.date)}
                   </span>
@@ -224,29 +206,23 @@ export default function PostDetailPage({ previewPost }) {
               </div>
             </div>
 
-            {/* Ações */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              {/* Share */}
+            <div className="flex items-center gap-3">
               <button
                 onClick={handleShare}
                 className={cn(
                   "h-12 px-4 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105 flex items-center justify-center",
                   isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-snes-surface border-snes-dark text-snes-accent"
                 )}
-                title="Copiar link"
               >
                 <Share2 className="w-5 h-5" />
               </button>
 
-              {/* Curtir */}
               {currentUser ? (
                 <button
                   onClick={() => handleLike(post.id)}
                   className={cn(
                     "flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
-                    hasLiked
-                      ? "bg-red-500 border-red-600 text-white"
-                      : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
+                    hasLiked ? "bg-red-500 border-red-600 text-white" : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
                   )}
                 >
                   <Heart className={cn("w-5 h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current group-hover:scale-110")} />
@@ -264,138 +240,116 @@ export default function PostDetailPage({ previewPost }) {
             </div>
           </div>
 
-          {/* Resumo do Artigo — Estilo Tab Sobreposta */}
+          {/* Synopsis */}
           {post.excerpt && (
             <div className={cn(
-              "relative mt-12 p-8 pt-12 rounded-3xl border-4 group", 
-              isDark 
-                ? "bg-gray-800/40 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]" 
-                : "bg-white border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.1)]"
+              "relative p-8 pt-12 rounded-3xl border-4 group", 
+              isDark ? "bg-gray-800/40 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]" : "bg-white border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.1)]"
             )}>
-              {/* Scanlines effect sutil */}
-              <div className="absolute inset-0 scanline-overlay opacity-5 pointer-events-none rounded-[inherit]" />
-              
-              {/* Label retro — Posicionada sobre a borda (Estilo da segunda foto) */}
               <div className="absolute -top-6 left-8">
                 <span className={cn(
-                  "font-retro text-sm md:text-base font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
+                  "font-retro text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
                   isDark ? "bg-purple-600 border-purple-400 text-white" : "bg-purple-500 border-purple-700 text-white"
                 )}>
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                   SYNOPSIS
                 </span>
               </div>
-              
-              {/* Conteúdo */}
-              <p className={cn("text-lg md:text-xl leading-relaxed font-medium relative z-10 italic", isDark ? "text-gray-300" : "text-gray-700")}>
+              <p className={cn("text-lg md:text-xl leading-relaxed font-medium italic", isDark ? "text-gray-300" : "text-gray-700")}>
                 "{post.excerpt}"
               </p>
             </div>
           )}
 
-          {/* Conteúdo do artigo */}
+          {/* Artigo */}
           <div className="prose sm:prose-lg md:prose-xl max-w-none text-justify leading-loose text-lg md:text-xl font-medium">
             <ArticleRenderer
-              content={post.content || "O seu artigo não tem texto ainda. Adicione algum conteúdo no editor!"}
+              content={post.content || "O seu artigo não tem texto ainda."}
               isDark={isDark}
             />
           </div>
 
-          {/* Score / Veredito — Movido para o fim */}
+          {/* Veredito */}
           {post.score && (
-            <div className={cn("mt-12 p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card animate-in fade-in slide-in-from-bottom-4 duration-700", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+            <div className={cn("p-8 md:p-10 rounded-3xl border-4 border-yellow-400 flex items-center justify-between retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
               <div>
-                <h4 className="font-retro font-bold text-3xl uppercase mb-2 text-yellow-500 drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
-                  Veredito da Redação
-                </h4>
-                <p className="text-lg font-bold uppercase tracking-widest leading-relaxed">{post.verdict}</p>
+                <h4 className="font-retro font-bold text-2xl uppercase mb-2 text-yellow-500">Veredito da Redação</h4>
+                <p className="text-lg font-bold uppercase tracking-widest">{post.verdict}</p>
               </div>
-              <div className="flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] shrink-0">
-                <span className="font-retro font-bold text-5xl leading-none -mt-2">{post.score}</span>
+              <div className="flex flex-col items-center justify-center w-24 h-24 bg-yellow-400 rounded-full text-black transform rotate-6 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <span className="font-retro font-bold text-4xl leading-none">{post.score}</span>
               </div>
             </div>
           )}
+        </div>
 
-          {/* Seção: Sobre o Autor — Estilo Premium (Opcional) */}
+        {/* Veja Também - Agora no final do artigo */}
+        {trendingPosts.length > 0 && (
+          <section className="pt-12 border-t-4 border-dashed border-gray-500/20">
+            <h3 className={cn("font-retro font-bold text-2xl uppercase mb-8 flex items-center gap-3", isDark ? "text-purple-400" : "text-purple-600")}>
+              <Star className="w-7 h-7 text-yellow-500" fill="currentColor" />
+              Próximas Fases (Recomendados)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {trendingPosts
+                .filter((p) => p.id !== post.id)
+                .slice(0, 3)
+                .map((p) => (
+                  <Link to={`/post/${p.slug || slugify(p.title)}`} key={p.id} className="block group">
+                    <div
+                      className={cn(
+                        "h-40 w-full rounded-2xl mb-4 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all overflow-hidden",
+                        !p.imageUrl && `bg-gradient-to-br ${p.gradient}`
+                      )}
+                      style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})` } : {}}
+                    >
+                      <div className="w-full h-full bg-black/20 group-hover:bg-transparent transition-colors" />
+                    </div>
+                    <h4 className="font-retro font-bold text-sm uppercase group-hover:text-purple-500 transition-colors line-clamp-2">
+                      {p.title}
+                    </h4>
+                  </Link>
+                ))}
+            </div>
+          </section>
+        )}
+
+        {/* Autor e Comentários */}
+        <div className="space-y-16">
           {post.showAuthorBox === true && (
-            <section className={cn("mt-16 p-8 md:p-12 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
-              {/* Background Decorativo */}
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-600/5 rounded-full blur-3xl" />
-              
+            <section className={cn("p-8 md:p-10 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
               <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
-                <div className="relative">
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden border-4 border-purple-600 shadow-[6px_6px_0px_rgba(0,0,0,1)] transform -rotate-3 group-hover:rotate-0 transition-transform duration-300">
-                    <img 
-                      src={post.author?.avatar} 
-                      alt={post.author?.name} 
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black p-2 rounded-xl border-2 border-black font-bold text-xs shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                    LVL {post.author?.level || 1}
-                  </div>
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden border-4 border-purple-600 shadow-[6px_6px_0px_rgba(0,0,0,1)] transform -rotate-3 group-hover:rotate-0 transition-transform">
+                  <img src={post.author?.avatar} alt={post.author?.name} className="w-full h-full object-cover" />
                 </div>
-
                 <div className="flex-1 text-center md:text-left">
-                  <span className="font-retro text-[10px] md:text-xs uppercase font-bold tracking-[0.2em] text-purple-500 mb-2 block">
-                    Escrito por
-                  </span>
-                  <h3 className="font-retro text-3xl md:text-4xl font-bold uppercase mb-4 tracking-tighter">
-                    {post.author?.name}
-                    {post.author?.aka && (
-                      <span className="text-sm md:text-lg text-purple-500 ml-3 normal-case opacity-80">
-                        (aka {post.author.aka})
-                      </span>
-                    )}
-                  </h3>
-                  <p className={cn("text-lg leading-relaxed font-medium max-w-2xl", isDark ? "text-gray-400" : "text-gray-600")}>
-                    {post.author?.bio}
-                  </p>
+                  <span className="font-retro text-xs uppercase font-bold text-purple-500 mb-1 block">Escrito por</span>
+                  <h3 className="font-retro text-3xl font-bold uppercase mb-4">{post.author?.name}</h3>
+                  <p className={cn("text-lg font-medium", isDark ? "text-gray-400" : "text-gray-600")}>{post.author?.bio}</p>
                 </div>
               </div>
             </section>
           )}
 
-          {/* Seção de Comentários */}
-          <section className={cn("mt-24 pt-12 border-t-4", isDark ? "border-gray-800" : "border-gray-200")}>
+          <section id="comments-section" className="pt-12 border-t-4 border-gray-800">
             <h3 className="font-retro text-3xl mb-10 flex items-center gap-3 uppercase font-bold">
-              <MessageSquare className={cn("w-8 h-8 shrink-0", isDark ? "text-purple-500" : "text-purple-600")} />
+              <MessageSquare className="w-8 h-8 text-purple-500" />
               Comunidade ({post.comments?.length || 0})
             </h3>
 
-            {/* Form de comentário ou AuthGate */}
             {currentUser ? (
               <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
-                <div className="flex items-center gap-4 mb-6 pb-5 border-b-2 border-dashed border-gray-500/20">
-                  <img
-                    src={currentUser.avatar}
-                    alt={currentUser.name}
-                    className="w-12 h-12 rounded-2xl border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] object-cover"
-                  />
-                  <span className="text-base font-bold uppercase font-retro tracking-wide">
-                    Comentando como <span className="text-purple-500">{currentUser.name}</span>
-                  </span>
-                </div>
                 <textarea
-                  className={cn(
-                    "w-full p-5 rounded-2xl mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg font-medium transition-all",
-                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
-                  )}
+                  className={cn("w-full p-5 rounded-2xl mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg", isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent")}
                   rows="4"
-                  placeholder="Mande o papo reto sobre o artigo..."
+                  placeholder="Mande o papo reto..."
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   required
                 />
                 <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={!commentText.trim()}
-                    className="flex items-center gap-2 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button border-2 border-black hover:bg-purple-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Send className="w-5 h-5" /> Enviar Comentário
+                  <button type="submit" disabled={!commentText.trim()} className="flex items-center gap-2 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button">
+                    <Send className="w-5 h-5" /> Enviar
                   </button>
                 </div>
               </form>
@@ -403,125 +357,21 @@ export default function PostDetailPage({ previewPost }) {
               <AuthGate variant="section" className="mb-12" />
             )}
 
-            {/* Lista de comentários */}
             <div className="space-y-5">
-              {post.comments?.slice(0, visibleComments).map((comment) => {
-                const canDelete =
-                  currentUser &&
-                  (currentUser.role === "admin" || currentUser.id === comment.authorId);
-                return (
-                  <div
-                    key={comment.id}
-                    className={cn(
-                      "p-6 rounded-2xl flex justify-between gap-5 retro-card transition-all",
-                      isDark ? "bg-gray-800" : "bg-snes-surface"
-                    )}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-3">
-                        {comment.authorAvatar && (
-                          <img
-                            src={comment.authorAvatar}
-                            alt={comment.author}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-9 h-9 rounded-full border-2 border-purple-500 object-cover shrink-0"
-                          />
-                        )}
-                        <div className={cn("font-retro font-bold text-base uppercase tracking-wider", isDark ? "text-purple-400" : "text-purple-600")}>
-                          {comment.author}
-                        </div>
-                        {comment.createdAt && (
-                          <span className="text-xs opacity-40 font-bold ml-auto shrink-0">
-                            {formatDate(comment.createdAt)}
-                          </span>
-                        )}
-                      </div>
-                      <p className={cn("text-base font-medium leading-relaxed", isDark ? "text-gray-300" : "text-gray-700")}>
-                        {comment.text}
-                      </p>
+              {post.comments?.slice(0, visibleComments).map((comment) => (
+                <div key={comment.id} className={cn("p-6 rounded-2xl flex justify-between gap-5 retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="font-retro font-bold text-base uppercase text-purple-400">{comment.author}</div>
+                      <span className="text-xs opacity-40 ml-auto">{formatDate(comment.createdAt)}</span>
                     </div>
-                    {canDelete && (
-                      <button
-                        onClick={() => {
-                          if (window.confirm("Deseja apagar este comentário?")) {
-                            handleDeleteComment(post.id, comment.id);
-                          }
-                        }}
-                        className="text-white h-fit p-2.5 bg-red-500 border-2 border-black rounded-xl font-bold retro-button hover:bg-red-600 shrink-0 transition-colors"
-                        title="Excluir"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
+                    <p className="text-base font-medium">{comment.text}</p>
                   </div>
-                );
-              })}
-
-              {/* Empty state */}
-              {(!post.comments || post.comments.length === 0) && (
-                <div className={cn("py-12 text-center rounded-2xl border-2 border-dashed", isDark ? "border-gray-700 text-gray-500" : "border-gray-300 text-gray-400")}>
-                  <CheckCheck className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="font-retro font-bold text-sm uppercase tracking-wide opacity-50">
-                    Nenhum comentário ainda. Seja o primeiro!
-                  </p>
                 </div>
-              )}
-
-              {/* Botão "Ver mais comentários" */}
-              {post.comments && post.comments.length > visibleComments && (
-                <button
-                  onClick={() => setVisibleComments(v => v + COMMENTS_PER_PAGE)}
-                  className={cn(
-                    "w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-retro font-bold text-sm uppercase tracking-wider transition-all retro-button",
-                    isDark ? "border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400" : "border-gray-200 text-gray-500 hover:border-black hover:text-black"
-                  )}
-                >
-                  <ChevronDown className="w-4 h-4" />
-                  Ver mais {Math.min(COMMENTS_PER_PAGE, post.comments.length - visibleComments)} comentários
-                  <span className="opacity-50">({post.comments.length - visibleComments} restantes)</span>
-                </button>
-              )}
+              ))}
             </div>
           </section>
         </div>
-
-        {/* Sidebar */}
-        {trendingPosts.length > 0 && (
-          <aside className="lg:col-span-1 space-y-8">
-            <div className={cn("p-6 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
-              <h3 className={cn("font-retro font-bold text-xl uppercase mb-6 flex items-center gap-3 border-b-2 pb-3", isDark ? "border-purple-500" : "border-black")}>
-                <Star className={cn("w-6 h-6", isDark ? "text-yellow-400" : "text-yellow-500")} fill="currentColor" />
-                Veja Também
-              </h3>
-              <div className="space-y-6">
-                {trendingPosts
-                  .filter((p) => p.id !== post.id)
-                  .slice(0, 3)
-                  .map((p) => (
-                    <Link to={`/post/${p.slug || slugify(p.title)}`} key={p.id} className="block cursor-pointer group">
-                      <div
-                        className={cn(
-                          "h-28 w-full rounded-xl mb-3 bg-cover bg-center border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] group-hover:shadow-[5px_5px_0px_rgba(168,85,247,1)] transition-all",
-                          !p.imageUrl && `bg-gradient-to-br ${p.gradient}`
-                        )}
-                        style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})`, backgroundPosition: "center" } : {}}
-                      />
-                      <span className="text-[10px] font-retro font-bold uppercase tracking-widest opacity-50 bg-purple-600/10 text-purple-500 px-2 py-0.5 rounded mb-1 inline-block">
-                        {p.category}
-                      </span>
-                      <h4 className="font-bold text-sm group-hover:text-purple-500 transition-colors line-clamp-2 leading-snug">
-                        {p.title}
-                      </h4>
-                      <p className="text-xs opacity-40 mt-1 font-bold flex items-center gap-1">
-                        <Heart className="w-3 h-3" /> {p.likes || 0} curtidas
-                      </p>
-                    </Link>
-                  ))}
-              </div>
-            </div>
-          </aside>
-        )}
       </div>
     </article>
   );

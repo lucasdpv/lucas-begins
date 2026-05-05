@@ -141,8 +141,8 @@ export default function Navbar() {
         </div>
 
         {/* Direita: Busca e Ações */}
-        <div className="flex items-center gap-3">
-          {/* Busca - Visibilidade Melhorada */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Busca - Visibilidade Melhorada (Apenas Desktop) */}
           <div className="hidden md:flex relative w-48 xl:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
             <input
@@ -163,47 +163,50 @@ export default function Navbar() {
           <button
             onClick={toggleTheme}
             className={cn(
-              "p-2.5 rounded-xl border-2 transition-all retro-button",
+              "p-2 md:p-2.5 rounded-xl border-2 transition-all retro-button",
               isDark ? "bg-gray-800 border-purple-500 text-yellow-400" : "bg-snes-surface border-snes-dark text-snes-accent"
             )}
           >
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
           
-          {/* Botão Admin: Painel de Moderação */}
-          {currentUser?.role === 'admin' && (
-            <Link
-              to="/admin"
-              className={cn(
-                "hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl font-retro font-bold text-[10px] md:text-xs bg-purple-600 text-white border-2 border-black retro-button shadow-[3px_3px_0px_rgba(0,0,0,1)]",
-                "hover:bg-purple-500 transition-all"
-              )}
-            >
-              <Settings className="w-4 h-4" />
-              <span className="hidden xl:inline">PAINEL ADMIN</span>
-            </Link>
-          )}
+          {/* Botões que só aparecem no Desktop para não poluir */}
+          <div className="hidden md:flex items-center gap-3">
+            {currentUser?.role === 'admin' && (
+              <Link
+                to="/admin"
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-xl font-retro font-bold text-xs bg-purple-600 text-white border-2 border-black retro-button shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                  "hover:bg-purple-500 transition-all"
+                )}
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden xl:inline">PAINEL ADMIN</span>
+              </Link>
+            )}
 
-          {currentUser ? (
-            <div className="flex items-center gap-3">
-              <img src={currentUser.avatar} alt={currentUser.name} className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover" />
-              <button onClick={handleLogout} className="p-2.5 rounded-xl border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all retro-button">
-                <LogOut className="w-5 h-5" />
+            {currentUser ? (
+              <div className="flex items-center gap-3">
+                <img src={currentUser.avatar} alt={currentUser.name} className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover" />
+                <button onClick={handleLogout} className="p-2.5 rounded-xl border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all retro-button">
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-retro font-bold text-xs bg-purple-600 text-white border-2 border-black retro-button"
+              >
+                LOGIN
               </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-xl font-retro font-bold text-xs bg-purple-600 text-white border-2 border-black retro-button"
-            >
-              LOGIN
-            </button>
-          )}
+            )}
+          </div>
 
+          {/* Botão Menu (Apenas Mobile) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
-              "p-2.5 rounded-xl border-2 lg:hidden retro-button",
+              "p-2 md:p-2.5 rounded-xl border-2 lg:hidden retro-button",
               isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
             )}
           >
@@ -212,16 +215,38 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Refatorado com mais opções */}
       {isMobileMenuOpen && (
         <div className={cn(
-          "lg:hidden border-t-4 p-6 flex flex-col gap-6",
+          "lg:hidden border-t-4 p-6 flex flex-col gap-6 animate-in slide-in-from-top duration-300",
           isDark ? "bg-gray-900 border-purple-600" : "bg-snes-surface border-snes-dark"
         )}>
+          {/* Sessão do Usuário no Mobile Menu */}
+          {currentUser && (
+            <div className={cn("flex items-center gap-4 p-4 rounded-2xl border-2 mb-2", isDark ? "bg-gray-800 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
+              <img src={currentUser.avatar} alt={currentUser.name} className="w-12 h-12 rounded-full border-2 border-purple-500 object-cover" />
+              <div className="flex-1">
+                <p className="font-retro font-bold text-sm uppercase tracking-tight">{currentUser.name}</p>
+                <p className="text-[10px] opacity-50 uppercase font-bold">{currentUser.role}</p>
+              </div>
+              <button onClick={handleLogout} className="p-3 rounded-xl border-2 border-red-500/50 text-red-500 retro-button">
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+
+          {!currentUser && (
+            <button
+              onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-retro font-bold text-sm bg-purple-600 text-white border-2 border-black retro-button"
+            >
+              LOGIN / ENTRAR
+            </button>
+          )}
+
           <input
             type="text"
-            aria-label="Pesquisar artigos"
-            placeholder="Pesquisar..."
+            placeholder="Pesquisar artigos..."
             value={searchQuery}
             onChange={handleSearch}
             className={cn(
@@ -229,17 +254,20 @@ export default function Navbar() {
               isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
             )}
           />
+          
           <div className="flex flex-col gap-4">
-             <Link to="/about" className="font-retro font-bold uppercase tracking-widest text-sm">Sobre Nós</Link>
-             <Link to="/contact" className="font-retro font-bold uppercase tracking-widest text-sm">Contatos</Link>
+             <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-sm py-2">Sobre Nós</Link>
+             <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-sm py-2">Contatos</Link>
+             
              {currentUser?.role === 'admin' && (
-               <Link to="/admin" className="font-retro font-bold uppercase tracking-widest text-sm text-purple-500 flex items-center gap-2">
+               <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-sm text-purple-500 flex items-center gap-2 py-2 border-t border-gray-500/10 pt-4">
                  <Settings className="w-4 h-4" /> Painel Admin
                </Link>
              )}
           </div>
+
           <div className="border-t border-gray-500/20 pt-4">
-            <p className="text-[10px] opacity-50 uppercase font-bold mb-3">Categorias</p>
+            <p className="text-[10px] opacity-50 uppercase font-bold mb-3">Filtrar por Categoria</p>
             <div className="grid grid-cols-2 gap-3">
               {["Todos", ...categories].map((cat) => (
                 <button
