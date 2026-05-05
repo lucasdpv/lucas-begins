@@ -4,7 +4,18 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
-## 🚀 [v1.5.0] - Refinamento de UX & PWA (Atual)
+## 🎨 [v1.5.1] - Modernização Visual & UX de Busca
+*Data: 05 de Maio de 2026*
+
+### ✨ UI/UX
+- **Mega Menu de Categorias**: Redesign do dropdown de categorias para um formato de grade (2 colunas) com ícones e ponteiro indicador.
+- **Busca com Memória (Cancelar)**: Implementação da funcionalidade de "Cancelar Busca" que retorna o usuário para a página anterior ao clicar no botão 'X'.
+- **Refinamento de Alinhamento**: Ajuste fino no posicionamento dos elementos da Navbar e botões de ação.
+- **Botão de Limpar Busca no Desktop**: Adicionado botão de cancelamento dinâmico na barra de pesquisa desktop.
+
+---
+
+## 🚀 [v1.5.0] - Refinamento de UX & PWA
 *Data: 05 de Maio de 2026*
 
 ### ✨ UI/UX Mobile
