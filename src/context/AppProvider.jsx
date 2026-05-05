@@ -24,7 +24,7 @@ export function AppProvider({ children }) {
 
   // Inicializa os hooks
   const { toast, showToast } = useToast();
-  const { posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, loadMore, hasMore } = usePosts(currentUser, showToast);
+  const { posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, loadMore, hasMore } = usePosts(currentUser, showToast, searchQuery, activeCategory);
   const { categories, handleAddCategory, handleDeleteCategory } = useCategories(posts, showToast);
 
   // 1. Monitora o estado de autenticação e busca papel de Admin no Modo Pro

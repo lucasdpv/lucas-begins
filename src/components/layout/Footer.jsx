@@ -5,6 +5,8 @@ import { XIcon, ThreadsIcon, InstagramIcon, YoutubeIcon, TwitchIcon } from "../i
 import { useAppContext } from "../../context/AppContext";
 import { cn } from "../../lib/utils";
 
+import { version } from "../../../package.json";
+
 export default function Footer() {
   const { isDark } = useAppContext();
 
@@ -102,11 +104,15 @@ export default function Footer() {
       {/* Linha de Copyright */}
       <div
         className={cn(
-          "max-w-7xl mx-auto px-4 pt-8 border-t-2 flex flex-col md:flex-row items-center justify-between gap-6 text-xs sm:text-sm font-retro font-bold uppercase tracking-widest",
+          "max-w-7xl mx-auto px-4 pt-8 border-t-2 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] sm:text-xs font-retro font-bold uppercase tracking-widest",
           isDark ? "border-gray-800 text-gray-500" : "border-gray-300 text-gray-500"
         )}
       >
-        <p>© {new Date().getFullYear()} Lucas Begins. Insert Coin to Continue.</p>
+        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+          <p>© {new Date().getFullYear()} Lucas Begins. Insert Coin to Continue.</p>
+          <span className="hidden md:inline opacity-30">|</span>
+          <span className="opacity-50">Version {version}</span>
+        </div>
         <p className="flex items-center gap-2">
           Feito com <Heart className="w-4 h-4 text-red-500 fill-red-500 shrink-0" /> e nostalgia
         </p>
