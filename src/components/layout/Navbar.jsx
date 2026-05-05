@@ -1,85 +1,99 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Gamepad2,
-  Search,
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { 
+  Gamepad2, 
+  Menu, 
+  X, 
+  Search, 
+  Moon, 
+  Sun, 
+  ChevronDown, 
+  LogOut, 
   Settings,
-  Sun,
-  Moon,
-  LogOut,
   User,
-  Menu,
-  X,
-  ChevronDown,
+  LayoutGrid,
+  Hash,
+  Star,
+  Zap,
+  Clock,
   PlusCircle
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAppContext } from "../../context/AppContext";
 import { cn } from "../../lib/utils";
 
 export default function Navbar() {
-  const {
-    isDark,
-    toggleTheme,
-    currentUser,
-    handleLogout,
-    categories,
-    activeCategory,
-    setActiveCategory,
+  const { 
+    isDark, 
+    toggleTheme, 
+    currentUser, 
+    handleLogout, 
+    setIsLoginModalOpen,
     searchQuery,
     setSearchQuery,
-    setIsLoginModalOpen,
+    activeCategory,
+    setActiveCategory,
+    categories
   } = useAppContext();
 
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const lastScrollYRef = useRef(0);
-  const mobileMenuRef = useRef(null);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchInputRef = useRef(null);
 
-  // Fecha menu mobile ao clicar fora dele
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    if (isMobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [isMobileMenuOpen]);
-
-  // Esconde a Navbar ao rolar para baixo
+  // Controle de scroll para esconder/mostrar a navbar
   useEffect(() => {
     const controlNavbar = () => {
-      const current = window.scrollY;
-      setIsVisible(current < lastScrollYRef.current || current <= 120);
-      lastScrollYRef.current = current;
+      if (typeof window !== "undefined") {
+        if (window.scrollY > lastScrollY && window.scrollY > 100) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
     };
-    window.addEventListener('scroll', controlNavbar, { passive: true });
-    return () => window.removeEventListener('scroll', controlNavbar);
-  }, []);
+
+    window.addEventListener("scroll", controlNavbar);
+    return () => window.removeEventListener("scroll", controlNavbar);
+  }, [lastScrollY]);
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    if (window.location.pathname !== "/") navigate("/");
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    // Se não estiver na home e começar a pesquisar, anota onde estava e redireciona
+    if (location.pathname !== "/" && query.trim() !== "") {
+      if (!sessionStorage.getItem('preSearchPath')) {
+        sessionStorage.setItem('preSearchPath', location.pathname);
+      }
+      navigate("/");
+    }
+  };
+
+  const handleCancelSearch = () => {
+    setSearchQuery("");
+    setIsSearchExpanded(false);
+    
+    const prePath = sessionStorage.getItem('preSearchPath');
+    if (prePath && prePath !== "/") {
+      sessionStorage.removeItem('preSearchPath');
+      navigate(prePath);
+    }
   };
 
   const handleCategorySelect = (cat) => {
     setActiveCategory(cat);
-    setSearchQuery("");
     setIsCategoryMenuOpen(false);
     setIsMobileMenuOpen(false);
     navigate("/");
   };
-
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   // Bloqueia o scroll do corpo quando o menu mobile está aberto
   useEffect(() => {
@@ -93,6 +107,11 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  const navLinks = [
+    { name: "Sobre Nós", path: "/about" },
+    { name: "Contatos", path: "/contact" }
+  ];
+
   return (
     <>
       <header
@@ -103,7 +122,7 @@ export default function Navbar() {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4 relative">
-          {/* Esquerda: Logo (Oculta se busca expandida no mobile) */}
+          {/* Esquerda: Logo */}
           <AnimatePresence mode="wait">
             {!isSearchExpanded && (
               <motion.div
@@ -123,37 +142,63 @@ export default function Navbar() {
           </AnimatePresence>
 
           {/* Centro: Links de Navegação (Desktop) */}
-          <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
-            <div className="relative group">
+          <div className="hidden lg:flex items-center gap-4 flex-1 justify-center px-4">
+            {/* Dropdown de Categorias (O Estilo que você gostou) */}
+            <div className="relative">
               <button
-                className="flex items-center gap-1 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors py-2 text-sm"
+                className={cn(
+                  "px-5 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
+                  isCategoryMenuOpen ? "text-purple-500 bg-purple-500/10" : "hover:text-purple-500"
+                )}
                 onMouseEnter={() => setIsCategoryMenuOpen(true)}
                 onMouseLeave={() => setIsCategoryMenuOpen(false)}
               >
                 Categorias <ChevronDown className={cn("w-4 h-4 transition-transform", isCategoryMenuOpen && "rotate-180")} />
               </button>
+              
               <AnimatePresence>
                 {isCategoryMenuOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-0 pt-2 w-52 z-50"
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                    className="absolute top-full left-0 mt-0 pt-4 w-[420px] z-50"
                     onMouseEnter={() => setIsCategoryMenuOpen(true)}
                     onMouseLeave={() => setIsCategoryMenuOpen(false)}
                   >
-                    <div className={cn("rounded-2xl border-2 shadow-2xl overflow-hidden p-2", isDark ? "bg-gray-800 border-purple-500" : "bg-white border-purple-200")}>
-                      {["Todos", ...categories].map((cat) => (
+                    {/* Ponteiro (Triângulo) */}
+                    <div className={cn(
+                      "absolute top-2 left-8 w-4 h-4 rotate-45 border-l-4 border-t-4 z-10",
+                      isDark ? "bg-gray-800 border-purple-500" : "bg-white border-purple-200"
+                    )} />
+
+                    <div className={cn(
+                      "rounded-[2rem] border-4 shadow-2xl overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
+                      isDark ? "bg-gray-800 border-purple-500 shadow-purple-900/40" : "bg-white border-purple-200 shadow-black/10"
+                    )}>
+                      {["Todos", ...categories].map((cat, idx) => (
                         <button
                           key={cat}
                           onClick={() => handleCategorySelect(cat)}
                           className={cn(
-                            "w-full text-left px-4 py-3 font-retro font-bold text-[11px] uppercase transition-all rounded-xl mb-1 last:mb-0",
-                            isDark ? "hover:bg-purple-500/20 text-gray-300 hover:text-purple-400" : "hover:bg-purple-100 text-gray-700 hover:text-purple-700",
-                            activeCategory === cat && "bg-purple-600 text-white"
+                            "group flex items-center gap-4 p-4 rounded-2xl transition-all text-left",
+                            activeCategory === cat 
+                              ? "bg-purple-600 text-white shadow-lg" 
+                              : isDark 
+                                ? "hover:bg-purple-500/10 text-gray-300" 
+                                : "hover:bg-purple-50 text-gray-700"
                           )}
                         >
-                          {cat}
+                          <div className={cn(
+                            "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                            activeCategory === cat ? "bg-white/20" : isDark ? "bg-gray-700" : "bg-gray-100"
+                          )}>
+                            {idx === 0 ? <LayoutGrid size={20} /> : <Hash size={20} />}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-retro font-bold text-xs uppercase tracking-wider">{cat}</span>
+                            <span className="text-[10px] opacity-50 font-bold uppercase">Ver artigos</span>
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -162,57 +207,95 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Link to="/about" className="font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Sobre Nós</Link>
-            <Link to="/contact" className="font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Contatos</Link>
+            <Link to="/about" className="px-5 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Sobre Nós</Link>
+            <Link to="/contact" className="px-5 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Contatos</Link>
           </div>
 
-          {/* Direita: Ações + Busca Expansível */}
+          {/* Direita: Ações */}
           <div className={cn("flex items-center gap-2 md:gap-3", isSearchExpanded && "flex-1 ml-4")}>
-            {/* Campo de Busca (Desktop fixo, Mobile expansível) */}
             <div className={cn(
               "relative transition-all duration-300",
-              isSearchExpanded ? "w-full" : "hidden md:block md:w-48 xl:w-64"
+              isSearchExpanded ? "w-full" : "hidden md:block md:w-10 lg:w-48 xl:w-64"
             )}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
-              <input
-                type="text"
-                placeholder="Pesquisar..."
-                value={searchQuery}
-                onChange={handleSearch}
-                onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
-                autoFocus={isSearchExpanded}
-                className={cn(
-                  "w-full pl-10 pr-12 py-2.5 rounded-xl border-2 font-bold outline-none transition-all text-sm",
-                  isDark ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" : "bg-snes-input border-snes-dark/20 focus:border-snes-dark text-snes-accent"
+              <AnimatePresence mode="wait">
+                {isSearchExpanded ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="relative w-full"
+                  >
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
+                    <input
+                      type="text"
+                      placeholder="Pesquisar..."
+                      value={searchQuery}
+                      onChange={handleSearch}
+                      onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
+                      autoFocus
+                      className={cn(
+                        "w-full pl-10 pr-12 py-2.5 rounded-xl border-2 font-bold outline-none text-sm",
+                        isDark ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" : "bg-gray-50 border-purple-200 focus:border-purple-500 text-gray-900"
+                      )}
+                    />
+                    <button 
+                      onClick={handleCancelSearch}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-purple-600 text-white rounded-lg"
+                    >
+                      <PlusCircle className="w-4 h-4 rotate-45" />
+                    </button>
+                  </motion.div>
+                ) : (
+                  <div className="hidden lg:block relative w-full group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
+                    <input
+                      type="text"
+                      placeholder="Pesquisar..."
+                      value={searchQuery}
+                      onChange={handleSearch}
+                      className={cn(
+                        "w-full pl-10 pr-10 py-2 rounded-xl border-2 font-bold outline-none text-sm transition-all",
+                        isDark ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" : "bg-snes-input border-snes-dark/20 focus:border-snes-dark text-snes-accent"
+                      )}
+                    />
+                    <AnimatePresence>
+                      {searchQuery && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          className="absolute inset-y-0 right-2 flex items-center"
+                        >
+                          <button
+                            onClick={handleCancelSearch}
+                            className="p-1.5 hover:bg-purple-600/20 text-purple-500 rounded-lg transition-colors"
+                          >
+                            <PlusCircle className="w-4 h-4 rotate-45" />
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 )}
-              />
-              {isSearchExpanded && (
-                <button 
-                  onClick={() => setIsSearchExpanded(false)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-500"
-                >
-                  <PlusCircle className="w-4 h-4 rotate-45" />
-                </button>
-              )}
+              </AnimatePresence>
             </div>
 
-            {/* Ícone de Lupa para Expandir (Mobile) */}
             {!isSearchExpanded && (
               <button 
                 onClick={() => setIsSearchExpanded(true)}
-                className="p-2 md:hidden rounded-xl border-2 transition-all retro-button"
+                className="p-2.5 md:hidden lg:hidden rounded-xl border-2 transition-all retro-button"
               >
-                <Search className="w-6 h-6 text-purple-500" />
+                <Search className="w-5 h-5 text-purple-500" />
               </button>
             )}
 
             {!isSearchExpanded && (
               <>
-                <button onClick={toggleTheme} className="p-2 md:p-2.5 rounded-xl border-2 transition-all retro-button">
+                <button onClick={toggleTheme} className="p-2.5 rounded-xl border-2 transition-all retro-button">
                   {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-snes-accent" />}
                 </button>
                 
-                <div className="hidden md:flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-3">
                   {currentUser?.role === 'admin' && (
                     <Link to="/admin" className="p-2.5 rounded-xl bg-purple-600 text-white border-2 border-black retro-button shadow-[3px_3px_0px_rgba(0,0,0,1)]"><Settings className="w-5 h-5" /></Link>
                   )}
@@ -226,7 +309,7 @@ export default function Navbar() {
                   )}
                 </div>
 
-                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 md:p-2.5 rounded-xl border-2 lg:hidden retro-button">
+                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2.5 rounded-xl border-2 lg:hidden retro-button">
                   <Menu className="w-6 h-6" />
                 </button>
               </>
@@ -235,78 +318,81 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-[100] lg:hidden">
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
-            {/* Drawer */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className={cn(
-                "absolute top-0 right-0 h-[100dvh] w-[85%] max-w-sm shadow-2xl p-8 flex flex-col gap-8 overflow-y-auto border-l-4",
-                isDark ? "bg-gray-900 border-purple-600 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
+                "absolute top-0 right-0 h-full w-[85%] max-w-sm shadow-2xl p-8 flex flex-col gap-8 overflow-y-auto",
+                isDark ? "bg-gray-950 text-white border-l-4 border-purple-600" : "bg-white text-gray-900 border-l-4 border-snes-dark"
               )}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Gamepad2 className="w-6 h-6 text-purple-500" />
-                  <h2 className="font-retro text-xl font-bold uppercase tracking-tighter">Menu</h2>
+                  <Gamepad2 className="text-purple-500" />
+                  <span className="font-retro font-bold text-xl uppercase">Menu</span>
                 </div>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-xl border-2 border-red-500/30 text-red-500">
-                  <X className="w-6 h-6" />
+                <button 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 bg-red-500/10 text-red-500 rounded-xl"
+                >
+                  <X size={24} />
                 </button>
               </div>
 
               {currentUser && (
-                <div className={cn("flex items-center gap-4 p-5 rounded-2xl border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]", isDark ? "bg-gray-800 border-purple-500/50" : "bg-white border-snes-dark/20")}>
-                  <img src={currentUser.avatar} alt="" className="w-14 h-14 rounded-full border-2 border-purple-500 object-cover" />
-                  <div className="flex-1">
-                    <p className="font-retro font-bold text-base uppercase tracking-tight">{currentUser.name}</p>
-                    <button onClick={handleLogout} className="text-red-500 font-bold text-xs uppercase flex items-center gap-1 mt-1"><LogOut className="w-3 h-3" /> Sair</button>
+                <div className={cn("flex items-center gap-4 p-4 rounded-3xl border-4", isDark ? "bg-gray-900 border-purple-500/50" : "bg-gray-50 border-purple-200")}>
+                  <img src={currentUser.avatar} alt="" className="w-16 h-16 rounded-full border-2 border-purple-500" />
+                  <div>
+                    <h4 className="font-retro font-bold uppercase text-sm">{currentUser.name}</h4>
+                    <button onClick={handleLogout} className="text-xs text-red-500 font-bold uppercase mt-1">Sair</button>
                   </div>
                 </div>
               )}
 
               {!currentUser && (
-                <button onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }} className="w-full py-4 rounded-xl font-retro font-bold text-sm bg-purple-600 text-white border-2 border-black retro-button shadow-[4px_4px_0px_rgba(0,0,0,1)]">LOGIN / ENTRAR</button>
+                <button 
+                  onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }}
+                  className="w-full py-4 bg-purple-600 text-white rounded-3xl font-retro font-bold uppercase text-sm"
+                >
+                  Login / Entrar
+                </button>
               )}
 
               <nav className="flex flex-col gap-2">
-                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-lg py-3 px-4 rounded-xl hover:bg-purple-500/10 transition-colors border-b-2 border-transparent">Sobre Nós</Link>
-                 <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-lg py-3 px-4 rounded-xl hover:bg-purple-500/10 transition-colors border-b-2 border-transparent">Contatos</Link>
-                 {currentUser?.role === 'admin' && (
-                   <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="font-retro font-bold uppercase tracking-widest text-lg text-purple-500 flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-purple-500/10 transition-colors">
-                     <Settings className="w-5 h-5" /> Painel Admin
-                   </Link>
-                 )}
+                <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl font-retro font-bold uppercase text-lg hover:bg-purple-600 hover:text-white transition-all">
+                  <Zap size={20} /> Sobre Nós
+                </Link>
+                <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl font-retro font-bold uppercase text-lg hover:bg-purple-600 hover:text-white transition-all">
+                  <Star size={20} /> Contatos
+                </Link>
               </nav>
 
-              <div className="mt-auto pt-8 border-t-2 border-dashed border-gray-500/20">
-                <p className="text-[10px] opacity-50 uppercase font-bold mb-4 tracking-[0.2em] ml-4">Categorias</p>
+              <div className="flex flex-col gap-4">
+                <h5 className="font-retro font-bold uppercase text-xs opacity-50 ml-4">Categorias</h5>
                 <div className="grid grid-cols-1 gap-2">
                   {["Todos", ...categories].map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => {
-                        handleCategorySelect(cat);
-                        setIsMobileMenuOpen(false);
-                      }}
+                      onClick={() => handleCategorySelect(cat)}
                       className={cn(
-                        "p-4 rounded-xl border-2 font-retro font-bold text-xs uppercase text-left transition-all",
-                        activeCategory === cat ? "bg-purple-600 border-black text-white shadow-[4px_4px_0px_rgba(0,0,0,1)]" : isDark ? "bg-gray-800 border-purple-900/50 text-gray-400" : "bg-white border-snes-mid text-snes-muted"
+                        "flex items-center gap-4 p-4 rounded-2xl font-retro font-bold uppercase text-sm transition-all",
+                        activeCategory === cat ? "bg-purple-600 text-white" : isDark ? "bg-gray-900 hover:bg-gray-800" : "bg-gray-50 hover:bg-gray-100"
                       )}
                     >
+                      <div className="w-6 h-6 flex items-center justify-center opacity-50"><Hash size={16} /></div>
                       {cat}
                     </button>
                   ))}

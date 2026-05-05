@@ -124,9 +124,6 @@ export default function LoginModal() {
             ))}
           </div>
 
-          <p className="text-[10px] text-center opacity-40 uppercase font-bold tracking-tighter pt-2">
-            Ao entrar, você concorda com nossos termos de conduta e privacidade.
-          </p>
         </div>
       </div>
     </div>

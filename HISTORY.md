@@ -4,7 +4,38 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
-## 🚀 [v1.5.0] - Refinamento de UX & PWA (Atual)
+## 🎨 [v1.6.0] - Premium Retro Overhaul & Admin UX
+*Data: 05 de Maio de 2026*
+
+### ✨ UI/UX & Redesign
+- **Admin Inbox 2.0**: Implementação de linhas expansíveis no Inbox com visual de card detalhado e animações *slide-in*.
+- **Sistema Universal de Modais**: Substituição de alertas do sistema por modais customizados com estética retrô, sombras 3D e feedback tátil.
+- **Páginas de Contato e Sobre**: Redesign completo com caixas de diálogo estilo SNES, sombras sólidas e alinhamento reto para maior harmonia.
+- **Sistema de Skeletons**: Atualização de todos os estados de carregamento (About, Admin, Contact) para espelhar perfeitamente os novos layouts 7xl.
+
+### ⚙️ Funcionalidades & Backend
+- **Integração Gmail Direct**: Botão "Responder Agora" que redireciona automaticamente para a aba de composição do Gmail Web.
+- **Stats Sincronizadas**: Mensagens agora carregam no mount do Admin, mantendo os contadores de estatísticas sempre atualizados.
+- **Correção de Data/Hora**: Ajuste no utilitário de formatação de data para suportar objetos nativos do JS e evitar "Data Desconhecida".
+
+### 🐛 Estabilização
+- **Limpeza de Debug Logs**: Remoção de mensagens excessivas no console para uma performance mais limpa.
+- **Permissões Firebase**: Atualização das regras de segurança para permitir envio público de mensagens e leitura administrativa protegida.
+
+---
+
+## 🎨 [v1.5.1] - Modernização Visual & UX de Busca
+*Data: 05 de Maio de 2026*
+
+### ✨ UI/UX
+- **Mega Menu de Categorias**: Redesign do dropdown de categorias para um formato de grade (2 colunas) com ícones e ponteiro indicador.
+- **Busca com Memória (Cancelar)**: Implementação da funcionalidade de "Cancelar Busca" que retorna o usuário para a página anterior ao clicar no botão 'X'.
+- **Refinamento de Alinhamento**: Ajuste fino no posicionamento dos elementos da Navbar e botões de ação.
+- **Botão de Limpar Busca no Desktop**: Adicionado botão de cancelamento dinâmico na barra de pesquisa desktop.
+
+---
+
+## 🚀 [v1.5.0] - Refinamento de UX & PWA
 *Data: 05 de Maio de 2026*
 
 ### ✨ UI/UX Mobile

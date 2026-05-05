@@ -106,7 +106,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, activeCategory, fetchPosts, posts.length]);
+  }, [searchQuery, activeCategory, fetchPosts]);
 
   const loadMore = () => {
     if (!isLoadingPosts && !isFetchingMore && hasMore && !isFetchingRef.current) {
@@ -254,6 +254,10 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }
   };
 
+  const fetchAllPosts = useCallback(() => {
+    fetchPosts(false, true);
+  }, [fetchPosts]);
+
   return {
     posts,
     isLoadingPosts,
@@ -265,5 +269,6 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     handleDeletePost,
     loadMore,
     hasMore,
+    fetchAllPosts,
   };
 }
