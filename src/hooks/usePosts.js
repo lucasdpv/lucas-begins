@@ -8,68 +8,112 @@ function sanitizePostContent(content) {
   return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
 }
 
-/**
- * Hook para gerenciar os artigos do blog.
- * Utiliza PostService como camada de acesso a dados (separação de responsabilidades).
- * Mantém Optimistic UI para todas as mutações.
- */
-export function usePosts(currentUser, showToast) {
+export function usePosts(currentUser, showToast, searchQuery = "", activeCategory = "Todos") {
   const [posts, setPosts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastDoc, setLastDoc] = useState(null);
-  // Timestamp do último comentário para rate limiting (30s de cooldown)
   const lastCommentTimeRef = useRef(0);
+  const hasFetchedAllRef = useRef(false);
+  const isFetchingRef = useRef(false);
 
-  // Busca inicial e paginação por cursor
-  const fetchPosts = useCallback(async (isLoadMore = false) => {
+  const fetchPosts = useCallback(async (isLoadMore = false, forceAll = false) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
     if (isLoadMore) {
       setIsFetchingMore(true);
-    } else if (posts.length === 0) {
+    } else {
       setIsLoadingPosts(true);
     }
+
     try {
-      // Busca N+1 para detectar se há próxima página sem custo extra
-      const fetchLimit = POSTS_PER_PAGE + 1;
-      const snapshot = await PostService.getPaginatedPosts(
-        fetchLimit,
-        isLoadMore ? lastDoc : null
-      );
+      if (forceAll) {
+        if (hasFetchedAllRef.current) {
+          isFetchingRef.current = false;
+          setIsLoadingPosts(false);
+          return;
+        }
 
-      const hasNextPage = snapshot.docs.length > POSTS_PER_PAGE;
-      const pageDocs = hasNextPage
-        ? snapshot.docs.slice(0, POSTS_PER_PAGE)
-        : snapshot.docs;
+        const allPosts = await PostService.getAllPosts();
+        setPosts(allPosts);
+        setHasMore(false);
+        hasFetchedAllRef.current = true;
+      } else {
+        const fetchLimit = POSTS_PER_PAGE + 1;
+        const snapshot = await PostService.getPaginatedPosts(
+          fetchLimit,
+          isLoadMore ? lastDoc : null
+        );
 
-      const postsData = pageDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const hasNextPage = snapshot.docs.length > POSTS_PER_PAGE;
+        const pageDocs = hasNextPage
+          ? snapshot.docs.slice(0, POSTS_PER_PAGE)
+          : snapshot.docs;
 
-      setPosts(prev => (isLoadMore ? [...prev, ...postsData] : postsData));
-      if (pageDocs.length > 0) setLastDoc(pageDocs[pageDocs.length - 1]);
-      setHasMore(hasNextPage);
+        const postsData = pageDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        setPosts(prev => {
+          if (!isLoadMore) return postsData;
+          const existingIds = new Set(prev.map(p => p.id));
+          const uniqueNewPosts = postsData.filter(p => !existingIds.has(p.id));
+          return [...prev, ...uniqueNewPosts];
+        });
+
+        if (pageDocs.length > 0) {
+          setLastDoc(pageDocs[pageDocs.length - 1]);
+        }
+        setHasMore(hasNextPage);
+        hasFetchedAllRef.current = false;
+      }
     } catch (error) {
       console.error('[usePosts:fetchPosts]', error);
       showToast('Erro ao carregar posts.', 'error');
     } finally {
       setIsLoadingPosts(false);
       setIsFetchingMore(false);
+      isFetchingRef.current = false;
     }
-  }, [lastDoc, showToast, posts.length]);
+  }, [lastDoc, showToast]);
 
-  // Carregamento inicial (somente na montagem)
+  const lastSearchRef = useRef({ query: searchQuery, cat: activeCategory });
+
   useEffect(() => {
-    const loadInitial = async () => {
-      await fetchPosts();
-    };
-    loadInitial();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const isGlobal = searchQuery !== "" || activeCategory !== "Todos";
+    
+    if (lastSearchRef.current.query === searchQuery && lastSearchRef.current.cat === activeCategory && posts.length > 0) {
+      return;
+    }
+    
+    lastSearchRef.current = { query: searchQuery, cat: activeCategory };
+
+    if (!isGlobal) {
+      setLastDoc(null);
+      hasFetchedAllRef.current = false;
+      fetchPosts(false, false);
+      return;
+    }
+
+    // Se mudou para global, ativamos o loading IMEDIATAMENTE para evitar "Nenhum artigo encontrado"
+    if (!hasFetchedAllRef.current) {
+      setIsLoadingPosts(true);
+    }
+
+    const timer = setTimeout(() => {
+      setLastDoc(null);
+      fetchPosts(false, true);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeCategory, fetchPosts, posts.length]);
 
   const loadMore = () => {
-    if (!isLoadingPosts && hasMore) fetchPosts(true);
+    if (!isLoadingPosts && !isFetchingMore && hasMore && !isFetchingRef.current) {
+      fetchPosts(true, false);
+    }
   };
 
-  // Aplica uma atualização otimista e faz rollback em caso de erro
   const optimisticUpdate = useCallback(async (postId, getNextPost, serviceCall, errorTag, errorMsg) => {
     const idx = posts.findIndex(p => p.id === postId);
     if (idx === -1) return;
@@ -162,18 +206,15 @@ export function usePosts(currentUser, showToast) {
   }, [currentUser, posts, showToast, optimisticUpdate]);
 
   const handleSavePost = async (postData) => {
-    // Verificação básica de segurança no cliente
     if (currentUser?.role !== 'admin') {
       showToast('Acesso negado. Apenas editores chefes podem lançar fases.', 'error');
       return null;
     }
-
     try {
       if (postData.id) {
         const { id, ...dataToUpdate } = postData;
         dataToUpdate.content = sanitizePostContent(dataToUpdate.content);
         await PostService.updatePost(id, dataToUpdate);
-        
         const freshPost = await PostService.getPostById(id);
         if (freshPost) setPosts(prev => prev.map(p => p.id === id ? freshPost : p));
         showToast('Artigo atualizado com sucesso!');
@@ -199,10 +240,8 @@ export function usePosts(currentUser, showToast) {
       showToast('Apenas admins podem remover posts.', 'error');
       return false;
     }
-
     const originalPosts = [...posts];
     setPosts(prev => prev.filter(p => p.id !== postId));
-
     try {
       await PostService.deletePost(postId);
       showToast('Artigo removido permanentemente.', 'success');
@@ -228,4 +267,3 @@ export function usePosts(currentUser, showToast) {
     hasMore,
   };
 }
-

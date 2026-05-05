@@ -38,6 +38,15 @@ export const PostService = {
   },
 
   /**
+   * Busca todos os posts (para busca global e filtros).
+   */
+  async getAllPosts() {
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  /**
    * Busca um post específico.
    */
   async getPostById(postId) {
