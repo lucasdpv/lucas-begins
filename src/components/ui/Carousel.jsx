@@ -43,7 +43,7 @@ export default function Carousel({ posts, onPostClick }) {
 
   return (
     <div
-      className="relative rounded-3xl overflow-hidden retro-card group/carousel"
+      className="relative rounded-none border-2 border-black overflow-hidden retro-card group/carousel"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

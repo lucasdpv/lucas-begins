@@ -1,5 +1,5 @@
 import React from "react";
-import { Heart, MessageSquare, Clock } from "lucide-react";
+import { Heart, MessageSquare, Clock, Eye } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../lib/utils";
 import { useAppContext } from "../../context/AppContext";
 import { useImageFallback } from "../../hooks/useImageFallback";
@@ -18,7 +18,7 @@ export default function PostCard({ post, onClick }) {
   return (
     <article
       className={cn(
-        "flex flex-col h-full rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,0.6)]",
+        "flex flex-col h-full rounded-none border-2 border-black cursor-pointer group transition-all duration-300 hover:-translate-y-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
         isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}
@@ -26,8 +26,8 @@ export default function PostCard({ post, onClick }) {
       {/* Thumb */}
       <div
         className={cn(
-          "h-56 md:h-64 w-full relative overflow-hidden border-b-4 flex items-center justify-center",
-          isDark ? "border-purple-600 bg-gray-900" : "border-snes-dark bg-snes-mid",
+          "h-56 md:h-64 w-full relative overflow-hidden border-b-2 border-black flex items-center justify-center",
+          isDark ? "bg-gray-900" : "bg-snes-mid",
           !post.imageUrl && !imgError && `bg-gradient-to-br ${post.gradient}`
         )}
         style={bgStyle}
@@ -68,8 +68,8 @@ export default function PostCard({ post, onClick }) {
       </div>
 
       {/* Conteúdo */}
-      <div className="p-7 md:p-8 flex flex-col flex-grow">
-        <h3 className="font-retro font-bold text-xl md:text-2xl mb-4 line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
+      <div className="p-7 flex flex-col flex-grow">
+        <h3 className="font-retro font-bold text-lg md:text-xl mb-3 uppercase line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
           {post.title}
         </h3>
         <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
@@ -77,20 +77,20 @@ export default function PostCard({ post, onClick }) {
         </p>
 
         {/* Footer do card */}
-        <div className={cn("flex items-center justify-between text-sm mt-auto pt-5 border-t-2", isDark ? "border-gray-700" : "border-snes-mid")}>
+        <div className={cn("flex items-center justify-between text-sm mt-auto pt-4 border-t-2", isDark ? "border-gray-800" : "border-snes-mid")}>
           {/* Data e tempo de leitura */}
-          <div className="flex flex-col gap-1">
-            <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60">
+          <div className="flex flex-col gap-1 shrink-0">
+            <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60 whitespace-nowrap">
               {formatDate(post.createdAt, post.date)}
             </span>
-            <span className="text-xs flex items-center gap-1 font-bold uppercase opacity-40">
-              <Clock className="w-3 h-3" />
+            <span className="text-[10px] md:text-xs flex items-center gap-1 font-bold uppercase opacity-40 whitespace-nowrap">
+              <Clock className="w-3 h-3 shrink-0" />
               {calculateReadingTime(post.content || "")}
             </span>
           </div>
 
           {/* Ações */}
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-end gap-2.5 md:gap-4 ml-2" onClick={(e) => e.stopPropagation()}>
             {/* Curtir */}
             {currentUser ? (
               <button
@@ -115,6 +115,12 @@ export default function PostCard({ post, onClick }) {
             <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
               <MessageSquare className="w-4 h-4" />
               <span>{commentCount}</span>
+            </div>
+
+            {/* Visualizações */}
+            <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+              <Eye className="w-4 h-4" />
+              <span>{post.views || 0}</span>
             </div>
 
             {/* Login Discreto */}

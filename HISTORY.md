@@ -4,6 +4,22 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🕹️ [v1.7.0] - Neo-Brutalist & Stability Overhaul
+*Data: 06 de Maio de 2026*
+
+### 🎨 Design & Estética Neo-Brutalista
+- **"Hard Edge" UI**: Transição para uma estética de console retro com cantos 100% retos (`rounded-none`) em cards de posts e containers principais.
+- **Solid Shadows**: Implementação de sombras pretas sólidas e espessas (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`) para criar profundidade tátil.
+- **Refinamento de Sidebar**: Redesign da barra lateral "Mais Acessados" com foco em legibilidade e harmonia visual.
+- **Botões "Moda Antiga"**: Retorno das bordas arredondadas (`rounded-xl`) exclusivamente para elementos de controle (Navbar e botões de ação), garantindo conforto visual e tátil.
+
+### ⚙️ Estabilidade & Core
+- **Contador de Acessos Universal**: Otimização do sistema de views para contabilizar acessos de usuários anônimos e logados de forma transparente.
+- **Login Padronizado**: Re-estilização do acesso via AuthGate para seguir o padrão visual de botões premium do sistema.
+- **Hierarquia de Ações**: Reorganização da barra de ferramentas do artigo para priorizar a experiência de leitura e interação social.
+
+---
+
 ## 📱 [v1.6.1] - Mobile & Tablet UX Masterclass
 *Data: 06 de Maio de 2026*
 

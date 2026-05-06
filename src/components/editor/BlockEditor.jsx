@@ -150,7 +150,7 @@ export default function BlockEditor({ value, onChange, isDark }) {
                     />
                   </div>
                   {block.url && (
-                    <div className="relative rounded-xl overflow-hidden border-2 border-purple-500/20">
+                    <div className="relative rounded-none overflow-hidden border-2 border-purple-500/20">
                       <img src={block.url} alt="Preview" className="w-full h-auto max-h-80 object-contain bg-black/20" />
                     </div>
                   )}
@@ -177,7 +177,7 @@ export default function BlockEditor({ value, onChange, isDark }) {
                     />
                   </div>
                   {block.url && (
-                    <div className="relative rounded-xl overflow-hidden border-2 border-purple-500/20 aspect-video bg-black">
+                    <div className="relative rounded-none overflow-hidden border-2 border-purple-500/20 aspect-video bg-black">
                       <iframe
                         className="w-full h-full"
                         src={`https://www.youtube.com/embed/${block.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/)?.[1]}`}

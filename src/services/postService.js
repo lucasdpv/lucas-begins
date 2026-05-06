@@ -11,7 +11,8 @@ import {
   limit,
   startAfter,
   serverTimestamp,
-  getDoc
+  getDoc,
+  increment
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
 
@@ -68,6 +69,17 @@ export const PostService = {
       updatedAt: serverTimestamp()
     };
     await updateDoc(postRef, updateData);
+    return true;
+  },
+
+  /**
+   * Incrementa o número de visualizações de um post.
+   */
+  async incrementPostViews(postId) {
+    const postRef = doc(db, "posts", postId);
+    await updateDoc(postRef, {
+      views: increment(1)
+    });
     return true;
   },
 
