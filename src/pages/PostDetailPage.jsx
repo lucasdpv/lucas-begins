@@ -272,29 +272,101 @@ export default function PostDetailPage({ previewPost }) {
           {/* Veredito */}
           {post.score && (
             <div className={cn(
-              "p-8 md:p-10 rounded-[2.5rem] border-4 border-yellow-400 flex flex-col md:flex-row items-center justify-between gap-8 retro-card relative overflow-hidden", 
-              isDark ? "bg-gray-800" : "bg-snes-surface"
+              "border-4 border-yellow-400 shadow-[6px_6px_0px_rgba(0,0,0,1)] overflow-hidden",
+              isDark ? "bg-gray-900" : "bg-snes-surface"
             )}>
-              <div className="text-center md:text-left">
-                <h4 className="font-retro font-bold text-2xl md:text-3xl uppercase mb-3 text-yellow-500 text-glow-retro">Veredito da Redação</h4>
-                <p className="text-lg md:text-xl font-bold uppercase tracking-widest leading-relaxed">{post.verdict}</p>
+              {/* Header da seção */}
+              <div className="bg-yellow-400 px-5 py-2 flex items-center gap-3">
+                <Star className="w-4 h-4 text-black" fill="currentColor" />
+                <span className="font-retro font-bold text-xs md:text-sm uppercase tracking-widest text-black">
+                  Veredito da Redação
+                </span>
               </div>
-              <div className="flex-shrink-0 flex flex-col items-center justify-center w-28 h-28 bg-yellow-400 rounded-full text-black transform rotate-[-5deg] border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] group-hover:rotate-0 transition-transform duration-300">
-                <span className="text-[10px] font-retro font-bold uppercase mb-[-5px]">Score</span>
-                <span className="font-retro font-bold text-5xl leading-none">{post.score}</span>
+
+              {/* Corpo: nota + texto */}
+              <div className="flex items-stretch">
+                {/* Nota */}
+                <div className="flex flex-col items-center justify-center px-6 md:px-10 py-5 bg-yellow-400 border-r-4 border-black shrink-0 gap-0.5">
+                  <span className="font-retro font-bold text-[10px] md:text-xs uppercase text-black/70 tracking-widest leading-none">Score</span>
+                  <span className="font-retro font-bold text-5xl md:text-7xl leading-none text-black">{post.score}</span>
+                  <span className="font-retro text-[9px] text-black/50 uppercase tracking-wider leading-none">/10</span>
+                </div>
+
+                {/* Texto do veredito */}
+                <div className="flex items-center px-6 md:px-10 py-5 flex-1">
+                  <p className={cn(
+                    "font-retro font-bold text-sm md:text-lg uppercase tracking-wide leading-relaxed",
+                    isDark ? "text-gray-100" : "text-gray-800"
+                  )}>
+                    {post.verdict}
+                  </p>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Veja Também - Agora no final do artigo */}
-        {trendingPosts.length > 0 && (
-          <section className="pt-12 border-t-4 border-dashed border-gray-500/20">
-            <h3 className={cn("font-retro font-bold text-2xl uppercase mb-8 flex items-center gap-3", isDark ? "text-purple-400" : "text-purple-600")}>
-              <Star className="w-7 h-7 text-yellow-500" fill="currentColor" />
-              Próximas Fases (Recomendados)
+        {/* Escrito Por — logo após o conteúdo/veredito */}
+        {post.showAuthorBox === true && (
+          <section className={cn(
+            "border-2 overflow-hidden group",
+            isDark ? "bg-gray-800/40 border-purple-500/20" : "bg-snes-input border-snes-dark/10"
+          )}>
+            {/* Label topo */}
+            <div className={cn(
+              "px-5 py-2 border-b-2 flex items-center gap-2",
+              isDark ? "border-purple-500/20 bg-purple-500/5" : "border-snes-dark/10 bg-purple-50"
+            )}>
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              <span className="font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest text-purple-500">
+                Escrito por
+              </span>
+            </div>
+            {/* Conteúdo */}
+            <div className="flex items-center gap-5 md:gap-8 p-5 md:p-7">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] shrink-0 -rotate-2 group-hover:rotate-0 transition-transform">
+                <img src={post.author?.avatar} alt={post.author?.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-retro font-bold text-base md:text-2xl uppercase tracking-wide truncate">
+                  {post.author?.name}
+                </h3>
+                <p className={cn(
+                  "text-sm md:text-base font-medium mt-1 leading-snug line-clamp-2",
+                  isDark ? "text-gray-400" : "text-gray-600"
+                )}>
+                  {post.author?.bio}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Separador retro antes das Próximas Fases */}
+        {trendingPosts.filter((p) => p.id !== post.id).length > 0 && (
+          <div className="flex items-center gap-4 py-2">
+            <span className={cn("flex-1 border-t-4 border-dashed", isDark ? "border-gray-700" : "border-gray-300")} />
+            <span className={cn(
+              "font-retro text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] px-3 py-1 border-2 shrink-0",
+              isDark ? "border-gray-700 text-gray-600 bg-gray-900" : "border-gray-300 text-gray-400 bg-white"
+            )}>
+              ● ● ●
+            </span>
+            <span className={cn("flex-1 border-t-4 border-dashed", isDark ? "border-gray-700" : "border-gray-300")} />
+          </div>
+        )}
+
+        {/* Próximas Fases — sempre por último (antes dos comentários) */}
+        {trendingPosts.filter((p) => p.id !== post.id).length > 0 && (
+          <section>
+            <h3 className={cn("font-retro font-bold text-xl md:text-2xl uppercase mb-6 md:mb-8 flex items-center gap-3", isDark ? "text-purple-400" : "text-purple-600")}>
+              <Star className="w-5 h-5 md:w-7 md:h-7 text-yellow-500" fill="currentColor" />
+              Próximas Fases
+              <span className={cn("font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest ml-1 px-2 py-0.5 border", isDark ? "border-purple-700 text-purple-600" : "border-purple-300 text-purple-400")}>
+                Recomendados
+              </span>
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
               {trendingPosts
                 .filter((p) => p.id !== post.id)
                 .slice(0, 3)
@@ -302,14 +374,14 @@ export default function PostDetailPage({ previewPost }) {
                   <Link to={`/post/${p.slug || slugify(p.title)}`} key={p.id} className="block group">
                     <div
                       className={cn(
-                        "h-40 w-full rounded-2xl mb-4 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all overflow-hidden",
+                        "h-36 md:h-40 w-full mb-3 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all overflow-hidden",
                         !p.imageUrl && `bg-gradient-to-br ${p.gradient}`
                       )}
                       style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})` } : {}}
                     >
                       <div className="w-full h-full bg-black/20 group-hover:bg-transparent transition-colors" />
                     </div>
-                    <h4 className="font-retro font-bold text-sm uppercase group-hover:text-purple-500 transition-colors line-clamp-2">
+                    <h4 className="font-retro font-bold text-xs md:text-sm uppercase group-hover:text-purple-500 transition-colors line-clamp-2 leading-snug">
                       {p.title}
                     </h4>
                   </Link>
@@ -318,23 +390,8 @@ export default function PostDetailPage({ previewPost }) {
           </section>
         )}
 
-        {/* Autor e Comentários */}
+        {/* Comentários — sempre ao final */}
         <div className="space-y-16">
-          {post.showAuthorBox === true && (
-            <section className={cn("p-8 md:p-10 rounded-3xl border-2 relative overflow-hidden group", isDark ? "bg-gray-800/40 border-purple-500/30" : "bg-snes-input border-snes-dark/10")}>
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden border-4 border-purple-600 shadow-[6px_6px_0px_rgba(0,0,0,1)] transform -rotate-3 group-hover:rotate-0 transition-transform">
-                  <img src={post.author?.avatar} alt={post.author?.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <span className="font-retro text-xs uppercase font-bold text-purple-500 mb-1 block">Escrito por</span>
-                  <h3 className="font-retro text-3xl font-bold uppercase mb-4">{post.author?.name}</h3>
-                  <p className={cn("text-lg font-medium", isDark ? "text-gray-400" : "text-gray-600")}>{post.author?.bio}</p>
-                </div>
-              </div>
-            </section>
-          )}
-
           <section id="comments-section" className="pt-12 border-t-4 border-gray-800">
             <h3 className="font-retro text-3xl mb-10 flex items-center gap-3 uppercase font-bold">
               <MessageSquare className="w-8 h-8 text-purple-500" />
