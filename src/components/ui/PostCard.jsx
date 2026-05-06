@@ -56,13 +56,9 @@ export default function PostCard({ post, onClick }) {
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
         <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
-          <div className="glass-card px-0.5 py-0.5 rounded-xl border-white/20 shadow-lg backdrop-blur-md">
-            <CategoryBadge>{post.category}</CategoryBadge>
-          </div>
+          <CategoryBadge>{post.category}</CategoryBadge>
           {post.score && (
-            <div className="glass-card px-0.5 py-0.5 rounded-xl border-white/20 shadow-lg backdrop-blur-md">
-              <ScoreBadge score={post.score} />
-            </div>
+            <ScoreBadge score={post.score} />
           )}
         </div>
       </div>

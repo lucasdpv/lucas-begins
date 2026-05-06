@@ -133,7 +133,9 @@ export default function Navbar() {
               <button
                 className={cn(
                   "px-5 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
-                  isCategoryMenuOpen ? "text-purple-500 bg-purple-500/10" : "hover:text-purple-500"
+                  isCategoryMenuOpen 
+                    ? (isDark ? "text-purple-500 bg-purple-500/10" : "text-snes-dark bg-snes-input") 
+                    : (isDark ? "hover:text-purple-500" : "hover:text-snes-dark hover:bg-snes-surface")
                 )}
                 onMouseEnter={() => setIsCategoryMenuOpen(true)}
                 onMouseLeave={() => setIsCategoryMenuOpen(false)}
@@ -168,10 +170,10 @@ export default function Navbar() {
                           className={cn(
                             "group flex items-center gap-4 p-4 rounded-2xl border-2 border-transparent transition-all text-left",
                             activeCategory === cat 
-                              ? "bg-purple-600 text-white shadow-lg" 
+                              ? (isDark ? "bg-purple-600 text-white shadow-lg" : "bg-snes-dark text-white shadow-lg")
                               : isDark 
                                 ? "hover:bg-purple-500/10 text-gray-300" 
-                                : "hover:bg-purple-50 text-gray-700"
+                                : "hover:bg-snes-input text-snes-accent"
                           )}
                         >
                           <div className={cn(

@@ -238,7 +238,7 @@ export default function PostDetailPage({ previewPost }) {
                 </button>
               ) : (
                 <span className={cn(
-                  "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base retro-button opacity-60 cursor-default",
+                  "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base opacity-60 cursor-default",
                   isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
                 )}>
                   <Heart className="w-5 h-5" />
@@ -247,7 +247,7 @@ export default function PostDetailPage({ previewPost }) {
               )}
 
               <span className={cn(
-                "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base cursor-default retro-button",
+                "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base cursor-default",
                 isDark ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-snes-surface border-gray-400 text-gray-700"
               )}>
                 <Eye className="w-5 h-5" />
