@@ -1,5 +1,5 @@
 import React from "react";
-import { Heart, MessageSquare, Clock } from "lucide-react";
+import { Heart, MessageSquare, Clock, Eye } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../lib/utils";
 import { useAppContext } from "../../context/AppContext";
 import { useImageFallback } from "../../hooks/useImageFallback";
@@ -79,18 +79,18 @@ export default function PostCard({ post, onClick }) {
         {/* Footer do card */}
         <div className={cn("flex items-center justify-between text-sm mt-auto pt-5 border-t-2", isDark ? "border-gray-700" : "border-snes-mid")}>
           {/* Data e tempo de leitura */}
-          <div className="flex flex-col gap-1">
-            <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60">
+          <div className="flex flex-col gap-1 shrink-0">
+            <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60 whitespace-nowrap">
               {formatDate(post.createdAt, post.date)}
             </span>
-            <span className="text-xs flex items-center gap-1 font-bold uppercase opacity-40">
-              <Clock className="w-3 h-3" />
+            <span className="text-[10px] md:text-xs flex items-center gap-1 font-bold uppercase opacity-40 whitespace-nowrap">
+              <Clock className="w-3 h-3 shrink-0" />
               {calculateReadingTime(post.content || "")}
             </span>
           </div>
 
           {/* Ações */}
-          <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-end gap-2.5 md:gap-4 ml-2" onClick={(e) => e.stopPropagation()}>
             {/* Curtir */}
             {currentUser ? (
               <button
@@ -115,6 +115,12 @@ export default function PostCard({ post, onClick }) {
             <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
               <MessageSquare className="w-4 h-4" />
               <span>{commentCount}</span>
+            </div>
+
+            {/* Visualizações */}
+            <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+              <Eye className="w-4 h-4" />
+              <span>{post.views || 0}</span>
             </div>
 
             {/* Login Discreto */}

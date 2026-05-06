@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   Clock,
   CheckCheck,
   ChevronDown,
+  Eye,
 } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
 import ArticleRenderer from "../components/ui/ArticleRenderer";
@@ -24,7 +25,7 @@ import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
 export default function PostDetailPage({ previewPost }) {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast, isLoadingPosts } = useAppContext();
+  const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast, isLoadingPosts, handleView } = useAppContext();
 
   const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
 
@@ -39,6 +40,12 @@ export default function PostDetailPage({ previewPost }) {
   const imgError = useImageFallback(post?.imageUrl);
   const COMMENTS_PER_PAGE = 5;
   const [visibleComments, setVisibleComments] = useState(COMMENTS_PER_PAGE);
+
+  useEffect(() => {
+    if (post && post.id && !previewPost) {
+      handleView(post.id);
+    }
+  }, [post?.id, previewPost, handleView]);
 
   // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
   if (isLoadingPosts && !post) {
@@ -230,13 +237,24 @@ export default function PostDetailPage({ previewPost }) {
                 </button>
               ) : (
                 <div className="flex items-center gap-3">
-                  <span className={cn("flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base opacity-40", isDark ? "border-gray-700 text-white" : "border-gray-300 text-black")}>
+                  <span className={cn(
+                    "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base retro-button opacity-60 cursor-default",
+                    isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
+                  )}>
                     <Heart className="w-5 h-5" />
                     {post.likes || 0}
                   </span>
                   <AuthGate variant="inline" />
                 </div>
               )}
+
+              <span className={cn(
+                "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base cursor-default retro-button",
+                isDark ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-snes-surface border-gray-400 text-gray-700"
+              )}>
+                <Eye className="w-5 h-5" />
+                {post.views || 0}
+              </span>
             </div>
           </div>
 

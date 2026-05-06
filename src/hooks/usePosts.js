@@ -254,6 +254,27 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }
   }, [currentUser, posts, showToast]);
 
+  const handleView = useCallback(async (postId) => {
+    const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
+    if (viewedPosts.includes(postId)) return;
+
+    viewedPosts.push(postId);
+    sessionStorage.setItem('viewedPosts', JSON.stringify(viewedPosts));
+
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return { ...p, views: (p.views || 0) + 1 };
+      }
+      return p;
+    }));
+
+    try {
+      await PostService.incrementPostViews(postId);
+    } catch (err) {
+      console.error('[usePosts:handleView]', err);
+    }
+  }, []);
+
   const fetchAllPosts = useCallback(() => {
     fetchPosts(false, true);
   }, [fetchPosts]);
@@ -270,5 +291,6 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     loadMore,
     hasMore,
     fetchAllPosts,
+    handleView,
   };
 }

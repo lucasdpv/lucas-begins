@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect, useRef } from "react";
-import { Gamepad2, Star } from "lucide-react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
+import { Gamepad2, Star, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Carousel from "../components/ui/Carousel";
@@ -12,6 +12,7 @@ export default function HomePage() {
   const { isDark, posts, isLoadingPosts, isFetchingMore, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();
   const navigate = useNavigate();
   const observerTarget = useRef(null);
+  const [activeSidebarTab, setActiveSidebarTab] = useState("acessados");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -44,10 +45,17 @@ export default function HomePage() {
     });
   }, [posts, activeCategory, searchQuery]);
 
-  const trendingPosts = useMemo(() => {
+  const featuredPosts = useMemo(() => {
     return [...posts]
       .filter((p) => !p.isDraft)
       .sort((a, b) => b.likes - a.likes)
+      .slice(0, 5);
+  }, [posts]);
+
+  const mostViewedPosts = useMemo(() => {
+    return [...posts]
+      .filter((p) => !p.isDraft)
+      .sort((a, b) => (b.views || 0) - (a.views || 0))
       .slice(0, 5);
   }, [posts]);
 
@@ -69,23 +77,43 @@ export default function HomePage() {
           {/* Linha de Títulos Unificada para Simetria Total */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-6">
             <div className="lg:col-span-3 flex items-center gap-3">
-               <div className={cn("w-4 h-8 retro-card", isDark ? "bg-purple-500" : "bg-purple-600")} />
+               <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]" : "bg-purple-600")} />
                <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide text-glow">
                  Em Destaque
                </h2>
             </div>
-            <div className="hidden lg:flex items-center gap-3">
-               <Star className="text-yellow-500 w-6 h-6" fill="currentColor" />
-               <h2 className="font-retro text-2xl font-bold uppercase tracking-wide text-glow">
-                 Em Alta
-               </h2>
+            <div className="hidden lg:flex items-center w-full">
+               <div className={cn("flex w-full rounded-xl p-1", isDark ? "bg-black/30 shadow-inner" : "bg-snes-mid shadow-inner")}>
+                 <button 
+                   onClick={() => setActiveSidebarTab('acessados')}
+                   className={cn(
+                     "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-retro text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
+                     activeSidebarTab === 'acessados' 
+                       ? (isDark ? "bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-purple-600 text-white border-2 border-snes-dark shadow-[2px_2px_0px_#2D1B69]") 
+                       : "text-gray-500 hover:text-gray-400 opacity-60 hover:opacity-100"
+                   )}
+                 >
+                   <Eye className="w-3.5 h-3.5 shrink-0" /> Acessados
+                 </button>
+                 <button 
+                   onClick={() => setActiveSidebarTab('curtidos')}
+                   className={cn(
+                     "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-retro text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
+                     activeSidebarTab === 'curtidos' 
+                       ? (isDark ? "bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-purple-600 text-white border-2 border-snes-dark shadow-[2px_2px_0px_#2D1B69]") 
+                       : "text-gray-500 hover:text-gray-400 opacity-60 hover:opacity-100"
+                   )}
+                 >
+                   <Star className="w-3.5 h-3.5 shrink-0" /> Em Alta
+                 </button>
+               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Carrossel Principal */}
             <div className="lg:col-span-3">
-              <Carousel posts={trendingPosts.slice(0, 5)} onPostClick={onPostClick} isDark={isDark} />
+              <Carousel posts={featuredPosts} onPostClick={onPostClick} isDark={isDark} />
             </div>
 
             {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
@@ -102,7 +130,7 @@ export default function HomePage() {
                 )}
                 
                 <div className="flex flex-col justify-between h-full relative z-10 gap-1">
-                  {trendingPosts.map((post, idx) => (
+                  {(activeSidebarTab === 'acessados' ? mostViewedPosts : featuredPosts).map((post, idx) => (
                     <div
                       key={post.id}
                       onClick={() => onPostClick(post)}
@@ -125,7 +153,11 @@ export default function HomePage() {
                           {post.title}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 opacity-40 text-[10px] font-bold uppercase tracking-wider">
-                           <span>{post.likes || 0} curtidas</span>
+                           <span>
+                             {activeSidebarTab === 'acessados' 
+                               ? `${post.views || 0} visualizações` 
+                               : `${post.likes || 0} curtidas`}
+                           </span>
                         </div>
                       </div>
                     </div>
@@ -142,7 +174,7 @@ export default function HomePage() {
         <div className="lg:col-span-4">
           <section>
             <div className="flex items-center gap-3 mb-8">
-              <div className={cn("w-4 h-8 retro-card", isDark ? "bg-blue-500" : "bg-blue-600")} />
+              <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" : "bg-blue-600")} />
               <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide text-glow-blue">
                 {isLoadingPosts 
                   ? "Carregando Fases..."

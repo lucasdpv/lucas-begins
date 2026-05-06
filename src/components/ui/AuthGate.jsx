@@ -19,7 +19,7 @@ export default function AuthGate({ variant = "inline", className }) {
       <button
         onClick={() => setIsLoginModalOpen(true)}
         className={cn(
-          "flex items-center justify-center gap-2 h-9 px-3 text-[10px] font-retro font-bold uppercase tracking-wider rounded-lg border-2 transition-all hover:scale-105 active:scale-95",
+          "flex items-center justify-center gap-1.5 h-8 px-2 md:px-3 md:h-9 text-[9px] md:text-[10px] font-retro font-bold uppercase tracking-wider rounded-lg border-2 transition-all hover:scale-105 active:scale-95 shrink-0",
           isDark
             ? "bg-gray-800/40 border-purple-500/50 text-purple-400/80 hover:bg-purple-600 hover:text-white hover:border-black shadow-[2px_2px_0px_rgba(168,85,247,0.2)]"
             : "bg-purple-50/50 border-purple-300/50 text-purple-600/80 hover:bg-purple-600 hover:text-white hover:border-black shadow-[2px_2px_0px_rgba(147,51,234,0.1)]",
