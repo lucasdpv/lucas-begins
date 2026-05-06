@@ -4,6 +4,18 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 📱 [v1.6.1] - Mobile & Tablet UX Masterclass
+*Data: 06 de Maio de 2026*
+
+### ✨ UI/UX Responsivo
+- **Redesign do Mobile Menu**: Substituição de cards pesados por um layout flat e minimalista para perfil de usuário e painel admin.
+- **Accordion de Categorias**: Implementação de menu colapsável para categorias no mobile, economizando espaço vertical.
+- **Busca Overlay (Fluída)**: Nova transição de pesquisa que sobrepõe a Navbar sem causar "pulos" de layout, garantindo 100% de fluidez.
+- **Otimização iPad Pro**: Ajuste dos breakpoints para `xl` (1280px), garantindo que tablets de alta resolução recebam a interface mobile otimizada.
+- **Acessibilidade Tátil**: Aumento dos alvos de toque e refinamento dos botões de Admin e Sair no menu.
+
+---
+
 ## 🎨 [v1.6.0] - Premium Retro Overhaul & Admin UX
 *Data: 05 de Maio de 2026*
 
