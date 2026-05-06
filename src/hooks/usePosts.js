@@ -205,7 +205,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     );
   }, [currentUser, posts, showToast, optimisticUpdate]);
 
-  const handleSavePost = async (postData) => {
+  const handleSavePost = useCallback(async (postData) => {
     if (currentUser?.role !== 'admin') {
       showToast('Acesso negado. Apenas editores chefes podem lançar fases.', 'error');
       return null;
@@ -233,9 +233,9 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
       showToast('Erro ao salvar o artigo.', 'error');
       return null;
     }
-  };
+  }, [currentUser, showToast]);
 
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = useCallback(async (postId) => {
     if (currentUser?.role !== 'admin') {
       showToast('Apenas admins podem remover posts.', 'error');
       return false;
@@ -252,7 +252,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
       setPosts(originalPosts);
       return false;
     }
-  };
+  }, [currentUser, posts, showToast]);
 
   const fetchAllPosts = useCallback(() => {
     fetchPosts(false, true);

@@ -31,28 +31,20 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Busca se o usuário está na lista VIP de admins no Firestore
         let role = "user";
-        try {
-          if (user.email) {
-            const adminDoc = await getDoc(doc(db, "admins", user.email));
-            if (adminDoc.exists()) {
-              role = "admin";
-            }
-          }
-        } catch (error) {
-          console.error("Erro ao verificar permissões:", error);
-        }
-
-        // Busca dados extras do perfil (Bio, AKA, Level, Avatar Custom)
         let profileData = {};
+
         try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            profileData = userDoc.data();
-          }
+          // Paraleliza as duas leituras do Firestore para reduzir latência
+          const [adminDoc, userDoc] = await Promise.all([
+            user.email ? getDoc(doc(db, "admins", user.email)) : Promise.resolve({ exists: () => false }),
+            getDoc(doc(db, "users", user.uid))
+          ]);
+
+          if (adminDoc.exists()) role = "admin";
+          if (userDoc.exists()) profileData = userDoc.data();
         } catch (error) {
-          console.error("Erro ao buscar perfil:", error);
+          console.error("Erro ao verificar permissões do usuário:", error);
         }
 
         setCurrentUser({
@@ -63,7 +55,7 @@ export function AppProvider({ children }) {
           bio: profileData.bio || "",
           aka: profileData.aka || "",
           level: profileData.level || 1,
-          role: role
+          role
         });
       } else {
         setCurrentUser(null);

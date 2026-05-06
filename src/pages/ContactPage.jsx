@@ -11,8 +11,30 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validate = () => {
+    if (formData.name.trim().length < 2) {
+      showToast("Nome muito curto. Use pelo menos 2 caracteres.", "error");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      showToast("E-mail inválido.", "error");
+      return false;
+    }
+    if (formData.message.trim().length < 10) {
+      showToast("Mensagem muito curta. Escreva pelo menos 10 caracteres.", "error");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
     setIsSubmitting(true);
     
     try {
@@ -69,9 +91,10 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={handleChange}
                   placeholder="DIGITE SEU NOME..."
                   className={cn(
                     "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
@@ -89,9 +112,10 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={handleChange}
                   placeholder="SEU@EMAIL.COM"
                   className={cn(
                     "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
@@ -110,9 +134,10 @@ export default function ContactPage() {
               </label>
               <textarea
                 required
+                name="message"
                 rows="5"
                 value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                onChange={handleChange}
                 placeholder="ESCREVA SUA MENSAGEM AQUI..."
                 className={cn(
                   "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all resize-none shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
