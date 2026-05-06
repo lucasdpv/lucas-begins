@@ -119,7 +119,7 @@ export default function HomePage() {
             {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
             <aside className="hidden lg:block lg:col-span-1">
               <div className={cn(
-                "h-full md:h-[560px] p-8 rounded-[2rem] flex flex-col relative overflow-hidden transition-all duration-500",
+                "h-full md:h-[560px] p-8 rounded-none flex flex-col relative overflow-hidden transition-all duration-500",
                 isDark 
                   ? "bg-[#161b2c] border border-white/5 shadow-xl" 
                   : "bg-snes-surface border-2 border-snes-dark shadow-[4px_4px_0px_0px_#2D1B69]"

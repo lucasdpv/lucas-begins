@@ -18,7 +18,7 @@ export default function PostCard({ post, onClick }) {
   return (
     <article
       className={cn(
-        "flex flex-col h-full rounded-3xl overflow-hidden retro-card cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,0.6)]",
+        "flex flex-col h-full rounded-none border-2 border-black cursor-pointer group transition-all duration-300 hover:-translate-y-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
         isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}
@@ -26,8 +26,8 @@ export default function PostCard({ post, onClick }) {
       {/* Thumb */}
       <div
         className={cn(
-          "h-56 md:h-64 w-full relative overflow-hidden border-b-4 flex items-center justify-center",
-          isDark ? "border-purple-600 bg-gray-900" : "border-snes-dark bg-snes-mid",
+          "h-56 md:h-64 w-full relative overflow-hidden border-b-2 border-black flex items-center justify-center",
+          isDark ? "bg-gray-900" : "bg-snes-mid",
           !post.imageUrl && !imgError && `bg-gradient-to-br ${post.gradient}`
         )}
         style={bgStyle}
@@ -68,8 +68,8 @@ export default function PostCard({ post, onClick }) {
       </div>
 
       {/* Conteúdo */}
-      <div className="p-7 md:p-8 flex flex-col flex-grow">
-        <h3 className="font-retro font-bold text-xl md:text-2xl mb-4 line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
+      <div className="p-7 flex flex-col flex-grow">
+        <h3 className="font-retro font-bold text-lg md:text-xl mb-3 uppercase line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
           {post.title}
         </h3>
         <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
@@ -77,7 +77,7 @@ export default function PostCard({ post, onClick }) {
         </p>
 
         {/* Footer do card */}
-        <div className={cn("flex items-center justify-between text-sm mt-auto pt-5 border-t-2", isDark ? "border-gray-700" : "border-snes-mid")}>
+        <div className={cn("flex items-center justify-between text-sm mt-auto pt-4 border-t-2", isDark ? "border-gray-800" : "border-snes-mid")}>
           {/* Data e tempo de leitura */}
           <div className="flex flex-col gap-1 shrink-0">
             <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60 whitespace-nowrap">

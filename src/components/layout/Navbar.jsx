@@ -158,15 +158,15 @@ export default function Navbar() {
                     )} />
 
                     <div className={cn(
-                      "rounded-[2rem] border-4 shadow-2xl overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
-                      isDark ? "bg-gray-800 border-purple-500 shadow-purple-900/40" : "bg-white border-purple-200 shadow-black/10"
+                      "rounded-3xl border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
+                      isDark ? "bg-gray-800" : "bg-white"
                     )}>
                       {["Todos", ...categories].map((cat, idx) => (
                         <button
                           key={cat}
                           onClick={() => handleCategorySelect(cat)}
                           className={cn(
-                            "group flex items-center gap-4 p-4 rounded-2xl transition-all text-left",
+                            "group flex items-center gap-4 p-4 rounded-2xl border-2 border-transparent transition-all text-left",
                             activeCategory === cat 
                               ? "bg-purple-600 text-white shadow-lg" 
                               : isDark 
@@ -175,7 +175,7 @@ export default function Navbar() {
                           )}
                         >
                           <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                            "w-10 h-10 rounded-xl border-2 border-black flex items-center justify-center transition-colors",
                             activeCategory === cat ? "bg-white/20" : isDark ? "bg-gray-700" : "bg-gray-100"
                           )}>
                             {idx === 0 ? <LayoutGrid size={20} /> : <Hash size={20} />}
@@ -221,7 +221,7 @@ export default function Navbar() {
                   >
                     <button
                       onClick={handleCancelSearch}
-                      className="p-1.5 hover:bg-purple-600/20 text-purple-500 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-purple-600/20 text-purple-500 rounded-xl transition-colors"
                     >
                       <PlusCircle className="w-4 h-4 rotate-45" />
                     </button>

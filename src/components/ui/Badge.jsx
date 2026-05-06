@@ -8,7 +8,7 @@ const retroSizes = {
 
 export function CategoryBadge({ children, size = "sm", className }) {
   return (
-    <span className={cn("bg-purple-600 text-white font-retro font-bold uppercase tracking-widest rounded-lg border-2 border-black transition-all hover:scale-105 active:scale-95", retroSizes[size], className)}>
+    <span className={cn("bg-purple-600 text-white font-retro font-bold uppercase tracking-widest rounded-none border-2 border-black transition-all hover:scale-105 active:scale-95", retroSizes[size], className)}>
       {children}
     </span>
   );
@@ -16,14 +16,14 @@ export function CategoryBadge({ children, size = "sm", className }) {
 
 export function ScoreBadge({ score, size = "sm", className }) {
   return (
-    <span className={cn("bg-yellow-400 text-black font-retro font-bold rounded-lg border-2 border-black flex items-center gap-1 transition-all hover:scale-105 active:scale-95", retroSizes[size], className)}>
+    <span className={cn("bg-yellow-400 text-black font-retro font-bold rounded-none border-2 border-black flex items-center gap-1 transition-all hover:scale-105 active:scale-95", retroSizes[size], className)}>
       ★ {score}
     </span>
   );
 }
 
 export default function Badge({ children, variant = "default", isDark, className, ...props }) {
-  const baseStyle = "px-4 py-1.5 rounded-full font-retro text-xs font-bold uppercase tracking-wider border-2 transition-all";
+  const baseStyle = "px-4 py-1.5 rounded-none font-retro text-xs font-bold uppercase tracking-wider border-2 transition-all";
 
   const variants = {
     default: isDark

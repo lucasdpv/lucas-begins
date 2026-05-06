@@ -12,6 +12,7 @@ import {
   CheckCheck,
   ChevronDown,
   Eye,
+  Lock,
 } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
 import ArticleRenderer from "../components/ui/ArticleRenderer";
@@ -146,7 +147,7 @@ export default function PostDetailPage({ previewPost }) {
         {/* Hero */}
         <div
           className={cn(
-            "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden retro-card flex items-center justify-center",
+            "w-full h-[350px] md:h-[550px] rounded-none border-2 border-black relative overflow-hidden retro-card flex items-center justify-center",
             (!post.imageUrl || imgError) && `bg-gradient-to-br ${post.gradient || 'from-gray-900 to-purple-900'}`
           )}
           style={heroStyle}
@@ -236,16 +237,13 @@ export default function PostDetailPage({ previewPost }) {
                   {post.likes || 0}
                 </button>
               ) : (
-                <div className="flex items-center gap-3">
-                  <span className={cn(
-                    "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base retro-button opacity-60 cursor-default",
-                    isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
-                  )}>
-                    <Heart className="w-5 h-5" />
-                    {post.likes || 0}
-                  </span>
-                  <AuthGate variant="inline" />
-                </div>
+                <span className={cn(
+                  "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base retro-button opacity-60 cursor-default",
+                  isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
+                )}>
+                  <Heart className="w-5 h-5" />
+                  {post.likes || 0}
+                </span>
               )}
 
               <span className={cn(
@@ -255,19 +253,32 @@ export default function PostDetailPage({ previewPost }) {
                 <Eye className="w-5 h-5" />
                 {post.views || 0}
               </span>
+
+              {!currentUser && (
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className={cn(
+                    "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-retro font-bold text-xs uppercase tracking-wider retro-button transition-all hover:scale-105 active:scale-95",
+                    isDark ? "bg-gray-800/40 border-purple-500/50 text-purple-400 hover:bg-purple-600 hover:text-white hover:border-black" : "bg-purple-50/50 border-purple-300/50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-black"
+                  )}
+                >
+                  <Lock className="w-4 h-4" />
+                  LOGIN
+                </button>
+              )}
             </div>
           </div>
 
           {/* Synopsis */}
           {post.excerpt && (
             <div className={cn(
-              "relative p-8 pt-12 rounded-3xl border-4 group", 
-              isDark ? "bg-gray-800/40 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]" : "bg-white border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.1)]"
+              "relative p-8 pt-12 rounded-none border-4 group", 
+              isDark ? "bg-gray-800/40 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]" : "bg-white border-purple-400 shadow-[4px_4px_0_rgba(168,85,247,0.4)]"
             )}>
               <div className="absolute -top-6 left-8">
                 <span className={cn(
-                  "font-retro text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-xl border-4 flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
-                  isDark ? "bg-purple-600 border-purple-400 text-white" : "bg-purple-500 border-purple-700 text-white"
+                  "font-retro text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-none border-4 border-black flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
+                  isDark ? "bg-purple-600 text-white" : "bg-purple-500 text-white"
                 )}>
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                   SYNOPSIS
@@ -417,9 +428,9 @@ export default function PostDetailPage({ previewPost }) {
             </h3>
 
             {currentUser ? (
-              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-3xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+              <form onSubmit={submitComment} className={cn("mb-12 p-8 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
                 <textarea
-                  className={cn("w-full p-5 rounded-2xl mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg", isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent")}
+                  className={cn("w-full p-5 rounded-none mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg", isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent")}
                   rows="4"
                   placeholder="Mande o papo reto..."
                   value={commentText}
@@ -427,7 +438,7 @@ export default function PostDetailPage({ previewPost }) {
                   required
                 />
                 <div className="flex justify-end">
-                  <button type="submit" disabled={!commentText.trim()} className="flex items-center gap-2 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button">
+                  <button type="submit" disabled={!commentText.trim()} className="flex items-center gap-2 px-8 py-4 rounded-none font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button">
                     <Send className="w-5 h-5" /> Enviar
                   </button>
                 </div>
@@ -438,7 +449,7 @@ export default function PostDetailPage({ previewPost }) {
 
             <div className="space-y-5">
               {post.comments?.slice(0, visibleComments).map((comment) => (
-                <div key={comment.id} className={cn("p-6 rounded-2xl flex justify-between gap-5 retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+                <div key={comment.id} className={cn("p-6 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] flex justify-between gap-5 retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="font-retro font-bold text-base uppercase text-purple-400">{comment.author}</div>
