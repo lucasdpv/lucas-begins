@@ -4,8 +4,8 @@
   "description": "Sua revista digital retro de games e tecnologia.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#9333ea",
+  "background_color": "#cec9cc",
+  "theme_color": "#4f43ae",
   "orientation": "portrait",
   "icons": [
     {
