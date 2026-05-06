@@ -10,12 +10,10 @@ import {
   ChevronDown, 
   LogOut, 
   Settings,
-  User,
   LayoutGrid,
   Hash,
   Star,
   Zap,
-  Clock,
   PlusCircle,
   ChevronRight
 } from "lucide-react";
@@ -40,10 +38,9 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(null);
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
+  const lastScrollY = useRef(0);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,19 +49,18 @@ export default function Navbar() {
   // Controle de scroll para esconder/mostrar a navbar
   useEffect(() => {
     const controlNavbar = () => {
-      if (typeof window !== "undefined") {
-        if (window.scrollY > lastScrollY && window.scrollY > 100) {
-          setIsVisible(false);
-        } else {
-          setIsVisible(true);
-        }
-        setLastScrollY(window.scrollY);
+      const currentY = window.scrollY;
+      if (currentY > lastScrollY.current && currentY > 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
       }
+      lastScrollY.current = currentY;
     };
 
-    window.addEventListener("scroll", controlNavbar);
+    window.addEventListener("scroll", controlNavbar, { passive: true });
     return () => window.removeEventListener("scroll", controlNavbar);
-  }, [lastScrollY]);
+  }, []);
 
   const handleSearch = (e) => {
     const query = e.target.value;
@@ -109,10 +105,6 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
-  const navLinks = [
-    { name: "Sobre Nós", path: "/about" },
-    { name: "Contatos", path: "/contact" }
-  ];
 
   return (
     <>
