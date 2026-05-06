@@ -22,6 +22,7 @@ Toda a interação com o Firestore foi abstraída em hooks para manter os compon
 - **Destaque (Performance)**: Implementa paginação infinita através de **Cursores Nativos do Firestore** (`getDocs` + `startAfter`), reduzindo brutalmente o custo por leitura da base de dados.
 - **Optimistic UI**: Curtidas, criação e exclusão de comentários refletem na tela instantaneamente, atualizando o *cache local* do React antes mesmo do servidor responder.
 - **Segurança Anticolisão**: O algoritmo de geração de Slugs (`slugify`) inclui um hash alfanumérico garantindo que títulos idênticos gerem rotas Web (`URL`) absolutamente únicas.
+- **Contador de Acessos**: Implementa um sistema de visualizações (`views`) universal que contabiliza acessos de usuários anônimos e logados, utilizando `sessionStorage` para evitar contagem duplicada na mesma sessão.
 
 ### 2. `useCategories.js`
 - **Função**: Gerencia a coleção `categories`.
@@ -98,7 +99,12 @@ A sentinela.
 ---
 
 ## 🎨 Design System
-O projeto utiliza **Tailwind CSS** para layout e utilitários, combinado com **CSS Variables** injetadas dinamicamente via `App.jsx`. Isso permite a troca de "skins" (Dark/Light) sem recarregar a página ou re-renderizar componentes pesados.
+O projeto utiliza **Tailwind CSS** para layout e utilitários, combinado com **CSS Variables** injetadas dinamicamente via `App.jsx`. Isso permite a troca de "skins" (Dark/Light) sem recarregar a página ou re-renderizar componentes pesados. 
+
+A partir da versão **v1.7.0**, o sistema adota uma estética **Neo-Brutalista**, caracterizada por:
+- **Bordas Retas**: Containers principais e cards usam `rounded-none`.
+- **Sombras Sólidas**: Uso extensivo de sombras 2D pretas espessas.
+- **Controles Ergonômicos**: Botões de navegação mantêm `rounded-xl` para melhor usabilidade.
 
 ---
 **Desenvolvido com foco em escalabilidade e performance.**
