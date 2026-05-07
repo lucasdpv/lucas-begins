@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { 
-  Gamepad2, 
-  Menu, 
-  X, 
-  Search, 
-  Moon, 
-  Sun, 
-  ChevronDown, 
-  LogOut, 
+import {
+  Gamepad2,
+  Menu,
+  X,
+  Search,
+  Moon,
+  Sun,
+  ChevronDown,
+  LogOut,
   Settings,
   LayoutGrid,
   Hash,
@@ -19,14 +19,15 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppContext } from "../../context/AppContext";
+import { BRUTAL_DESIGN } from "../../constants";
 import { cn } from "../../lib/utils";
 
 export default function Navbar() {
-  const { 
-    isDark, 
-    toggleTheme, 
-    currentUser, 
-    handleLogout, 
+  const {
+    isDark,
+    toggleTheme,
+    currentUser,
+    handleLogout,
     setIsLoginModalOpen,
     searchQuery,
     setSearchQuery,
@@ -41,7 +42,7 @@ export default function Navbar() {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
   const lastScrollY = useRef(0);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const searchInputRef = useRef(null);
@@ -65,7 +66,7 @@ export default function Navbar() {
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     // Se não estiver na home e começar a pesquisar, anota onde estava e redireciona
     if (location.pathname !== "/" && query.trim() !== "") {
       if (!sessionStorage.getItem('preSearchPath')) {
@@ -78,7 +79,7 @@ export default function Navbar() {
   const handleCancelSearch = () => {
     setSearchQuery("");
     setIsSearchExpanded(false);
-    
+
     const prePath = sessionStorage.getItem('preSearchPath');
     if (prePath && prePath !== "/") {
       sessionStorage.removeItem('preSearchPath');
@@ -133,8 +134,8 @@ export default function Navbar() {
               <button
                 className={cn(
                   "px-3 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
-                  isCategoryMenuOpen 
-                    ? (isDark ? "text-purple-500 bg-purple-500/10" : "text-snes-dark bg-snes-input") 
+                  isCategoryMenuOpen
+                    ? (isDark ? "text-purple-500 bg-purple-500/10" : "text-snes-dark bg-snes-input")
                     : (isDark ? "hover:text-purple-500" : "hover:text-snes-dark hover:bg-snes-surface")
                 )}
                 onMouseEnter={() => setIsCategoryMenuOpen(true)}
@@ -142,7 +143,7 @@ export default function Navbar() {
               >
                 Categorias <ChevronDown className={cn("w-4 h-4 transition-transform", isCategoryMenuOpen && "rotate-180")} />
               </button>
-              
+
               <AnimatePresence>
                 {isCategoryMenuOpen && (
                   <motion.div
@@ -160,7 +161,8 @@ export default function Navbar() {
                     )} />
 
                     <div className={cn(
-                      "rounded-3xl border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
+                      "overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
+                      BRUTAL_DESIGN.ROUNDED, BRUTAL_DESIGN.BORDER_THICK, BRUTAL_DESIGN.SHADOW,
                       isDark ? "bg-gray-800" : "bg-white"
                     )}>
                       {["Todos", ...categories].map((cat, idx) => (
@@ -169,15 +171,16 @@ export default function Navbar() {
                           onClick={() => handleCategorySelect(cat)}
                           className={cn(
                             "group flex items-center gap-4 p-4 rounded-2xl border-2 border-transparent transition-all text-left",
-                            activeCategory === cat 
+                            activeCategory === cat
                               ? (isDark ? "bg-purple-600 text-white shadow-lg" : "bg-snes-dark text-white shadow-lg")
-                              : isDark 
-                                ? "hover:bg-purple-500/10 text-gray-300" 
+                              : isDark
+                                ? "hover:bg-purple-500/10 text-gray-300"
                                 : "hover:bg-snes-input text-snes-accent"
                           )}
                         >
                           <div className={cn(
-                            "w-10 h-10 rounded-xl border-2 border-black flex items-center justify-center transition-colors",
+                            "w-10 h-10 flex items-center justify-center transition-colors",
+                            BRUTAL_DESIGN.ROUNDED_MODERN, BRUTAL_DESIGN.BORDER,
                             activeCategory === cat ? "bg-white/20" : isDark ? "bg-gray-700" : "bg-gray-100"
                           )}>
                             {idx === 0 ? <LayoutGrid size={20} /> : <Hash size={20} />}
@@ -209,7 +212,8 @@ export default function Navbar() {
                 value={searchQuery}
                 onChange={handleSearch}
                 className={cn(
-                  "w-full pl-10 pr-10 py-2 rounded-xl border-2 font-bold outline-none text-sm transition-all",
+                  "w-full pl-10 pr-10 py-2 font-bold outline-none text-sm transition-all",
+                  BRUTAL_DESIGN.ROUNDED_MODERN, BRUTAL_DESIGN.BORDER,
                   isDark ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" : "bg-snes-input border-snes-dark/20 focus:border-snes-dark text-snes-accent"
                 )}
               />
@@ -235,7 +239,7 @@ export default function Navbar() {
             {/* Mobile/Tablet Search Overlay (Fluído) */}
             <AnimatePresence>
               {isSearchExpanded && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -258,7 +262,7 @@ export default function Navbar() {
                         isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-purple-600 text-gray-900"
                       )}
                     />
-                    <button 
+                    <button
                       onClick={handleCancelSearch}
                       className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white rounded-xl shadow-lg active:scale-90 transition-transform"
                     >
@@ -270,7 +274,7 @@ export default function Navbar() {
             </AnimatePresence>
 
             {!isSearchExpanded && (
-              <button 
+              <button
                 onClick={() => setIsSearchExpanded(true)}
                 className="p-2.5 xl:hidden rounded-xl border-2 transition-all retro-button"
               >
@@ -283,25 +287,25 @@ export default function Navbar() {
                 <button onClick={toggleTheme} className="hidden xl:flex p-2.5 rounded-xl border-2 transition-all retro-button">
                   {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-snes-accent" />}
                 </button>
-                
+
                 <div className="hidden xl:flex items-center gap-3">
                   {currentUser?.role === 'admin' && (
                     <Link to="/admin" className="p-2.5 rounded-xl border-2 border-purple-500 bg-purple-500 text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95">
                       <Settings size={20} className="animate-spin-slow" />
                     </Link>
                   )}
-                  
+
                   {currentUser ? (
                     <div className="flex items-center gap-3">
                       <div className="relative group">
-                        <img 
-                          src={currentUser.avatar} 
-                          alt="" 
-                          className="w-10 h-10 rounded-full border-2 border-purple-500 cursor-pointer shadow-lg" 
+                        <img
+                          src={currentUser.avatar}
+                          alt=""
+                          className="w-10 h-10 rounded-full border-2 border-purple-500 cursor-pointer shadow-lg"
                         />
                         <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse" />
                       </div>
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className="p-2.5 rounded-xl border-2 border-red-500/30 text-red-500 transition-all hover:bg-red-500 hover:text-white"
                       >
@@ -352,7 +356,7 @@ export default function Navbar() {
                   <span className="font-retro font-bold text-xl uppercase">Menu</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button 
+                  <button
                     onClick={() => { toggleTheme(); setIsMobileMenuOpen(false); }}
                     className={cn(
                       "p-2.5 rounded-xl border-2 transition-all",
@@ -361,7 +365,7 @@ export default function Navbar() {
                   >
                     {isDark ? <Sun size={20} /> : <Moon size={20} />}
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="p-2.5 bg-red-500/10 text-red-500 rounded-xl"
                   >
@@ -381,8 +385,8 @@ export default function Navbar() {
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     {currentUser?.role === 'admin' && (
-                      <Link 
-                        to="/admin" 
+                      <Link
+                        to="/admin"
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
                           "flex items-center gap-2 px-3 py-1.5 rounded-lg font-retro font-bold uppercase text-[10px] transition-all",
@@ -392,8 +396,8 @@ export default function Navbar() {
                         <Settings size={14} className="animate-spin-slow" /> Painel Admin
                       </Link>
                     )}
-                    <button 
-                      onClick={handleLogout} 
+                    <button
+                      onClick={handleLogout}
                       className={cn(
                         "px-3 py-1.5 rounded-lg font-retro font-bold uppercase text-[10px] transition-all",
                         isDark ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" : "bg-red-50 text-red-600 hover:bg-red-100"
@@ -406,7 +410,7 @@ export default function Navbar() {
               )}
 
               {!currentUser && (
-                <button 
+                <button
                   onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }}
                   className="w-full py-4 border-2 border-purple-600 text-purple-500 rounded-xl font-retro font-bold uppercase text-sm hover:bg-purple-600 hover:text-white transition-all"
                 >
@@ -416,19 +420,19 @@ export default function Navbar() {
 
 
               <nav className="flex flex-col gap-3">
-                <Link 
-                  to="/about" 
-                  onClick={() => setIsMobileMenuOpen(false)} 
+                <Link
+                  to="/about"
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
                     isDark ? "text-gray-300" : "text-gray-700"
                   )}
                 >
-                  <Zap size={24} className="text-purple-500" /> Sobre o Blog
+                  <Zap size={24} className="text-purple-500" /> Sobre Nós
                 </Link>
-                <Link 
-                  to="/contact" 
-                  onClick={() => setIsMobileMenuOpen(false)} 
+                <Link
+                  to="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
                     isDark ? "text-gray-300" : "text-gray-700"
@@ -439,7 +443,7 @@ export default function Navbar() {
               </nav>
 
               <div className="flex flex-col">
-                <button 
+                <button
                   onClick={() => setIsMobileCategoriesOpen(!isMobileCategoriesOpen)}
                   className={cn(
                     "flex items-center justify-between p-4 rounded-xl font-retro font-bold uppercase text-sm transition-all",
@@ -452,10 +456,10 @@ export default function Navbar() {
                   </div>
                   <span className="text-[10px] opacity-50 bg-purple-500/20 px-2 py-0.5 rounded-full">{categories.length + 1}</span>
                 </button>
-                
+
                 <AnimatePresence>
                   {isMobileCategoriesOpen && (
-                    <motion.div 
+                    <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
@@ -467,8 +471,8 @@ export default function Navbar() {
                           onClick={() => { handleCategorySelect(cat); setIsMobileMenuOpen(false); }}
                           className={cn(
                             "flex items-center gap-4 p-4 rounded-xl font-retro font-bold uppercase text-xs transition-all",
-                            activeCategory === cat 
-                              ? "bg-purple-600 text-white" 
+                            activeCategory === cat
+                              ? "bg-purple-600 text-white"
                               : isDark ? "hover:bg-gray-900 text-gray-400" : "hover:bg-gray-50 text-gray-600"
                           )}
                         >

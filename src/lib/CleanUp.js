@@ -48,9 +48,7 @@ export async function cleanupDuplicates() {
     }
 
     if (deleteCount > 0 || migrateCount > 0) {
-      console.log(`[CleanUp] Sucesso: ${deleteCount} duplicatas removidas, ${migrateCount} posts migrados para Slugs.`);
     }
   } catch (error) {
-    console.error("[CleanUp] Erro ao limpar/migrar posts:", error);
   }
 }

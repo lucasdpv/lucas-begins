@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import DOMPurify from "dompurify";
 
 
 /**
@@ -74,4 +75,11 @@ export const slugify = (text) => {
     .replace(/-+$/, ''); // Remove hífen do fim
 };
 
-
+/**
+ * Limpa conteúdo HTML para evitar ataques XSS e remover tags indesejadas.
+ * @param {string} content 
+ */
+export function sanitizeContent(content) {
+  if (!content) return "";
+  return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+}

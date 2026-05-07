@@ -7,6 +7,7 @@ import PostCard from "../components/ui/PostCard";
 import PostSkeleton from "../components/ui/PostSkeleton";
 import CarouselSkeleton from "../components/ui/CarouselSkeleton";
 import { useAppContext } from "../context/AppContext";
+import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify } from "../lib/utils";
 
 export default function HomePage() {
@@ -35,30 +36,7 @@ export default function HomePage() {
     };
   }, [hasMore, isLoadingPosts, searchQuery, activeCategory, loadMore]);
 
-  const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      if (post.isDraft) return false;
-      const matchesCat = activeCategory === "Todos" || post.category === activeCategory;
-      const matchesSearch =
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCat && matchesSearch;
-    });
-  }, [posts, activeCategory, searchQuery]);
-
-  const featuredPosts = useMemo(() => {
-    return [...posts]
-      .filter((p) => !p.isDraft)
-      .sort((a, b) => b.likes - a.likes)
-      .slice(0, 5);
-  }, [posts]);
-
-  const mostViewedPosts = useMemo(() => {
-    return [...posts]
-      .filter((p) => !p.isDraft)
-      .sort((a, b) => (b.views || 0) - (a.views || 0))
-      .slice(0, 5);
-  }, [posts]);
+  const { filteredPosts, featuredPosts, mostViewedPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
   const onPostClick = (post) => {
     const targetSlug = post.slug || slugify(post.title);

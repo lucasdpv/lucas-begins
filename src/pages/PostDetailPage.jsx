@@ -23,6 +23,8 @@ import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../components/ui/AuthGate";
 import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
 import { PostService } from "../services/postService";
+import { contactService } from "../services/contactService";
+import { errorService } from "../services/errorService";
 
 export default function PostDetailPage({ previewPost }) {
   const { slug } = useParams();
@@ -54,7 +56,8 @@ export default function PostDetailPage({ previewPost }) {
           setLocalPost(fetched);
         }
       } catch (error) {
-        console.error("Erro ao buscar post por slug:", error);
+        errorService.handle(error, "ao buscar post por slug");
+        setLocalPost(null);
       } finally {
         setIsFetchingLocal(false);
         // Não reseta isFetchingRef: uma vez buscado, não busca de novo para este slug

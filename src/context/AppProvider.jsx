@@ -7,6 +7,8 @@ import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuth
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { seedDatabase } from "../lib/SeedData";
 import { cleanupDuplicates } from "../lib/CleanUp";
+import { userService } from "../services/userService";
+import { errorService } from "../services/errorService";
 import { AppContext } from "./AppContext";
 import { STORAGE_KEYS, MIGRATION_VERSION } from "../constants";
 
@@ -31,32 +33,8 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        let role = "user";
-        let profileData = {};
-
-        try {
-          // Paraleliza as duas leituras do Firestore para reduzir latência
-          const [adminDoc, userDoc] = await Promise.all([
-            user.email ? getDoc(doc(db, "admins", user.email)) : Promise.resolve({ exists: () => false }),
-            getDoc(doc(db, "users", user.uid))
-          ]);
-
-          if (adminDoc.exists()) role = "admin";
-          if (userDoc.exists()) profileData = userDoc.data();
-        } catch (error) {
-          console.error("Erro ao verificar permissões do usuário:", error);
-        }
-
-        setCurrentUser({
-          id: user.uid,
-          name: profileData.name || user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
-          email: user.email || "",
-          avatar: profileData.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || "P"}`,
-          bio: profileData.bio || "",
-          aka: profileData.aka || "",
-          level: profileData.level || 1,
-          role
-        });
+        const profile = await userService.getUserProfile(user);
+        setCurrentUser(profile);
       } else {
         setCurrentUser(null);
       }
@@ -73,9 +51,8 @@ export function AppProvider({ children }) {
     const runInitialSetup = async () => {
       // Só roda o setup inicial (seed e cleanup) se a versão da migração mudou
       if (lastMigration !== MIGRATION_VERSION) {
-        console.log(`[Setup] Executando migração ${MIGRATION_VERSION}...`);
-        await seedDatabase();
         await cleanupDuplicates();
+        await seedDatabase();
         localStorage.setItem(STORAGE_KEYS.MIGRATION_VERSION, MIGRATION_VERSION);
       }
     };
@@ -97,7 +74,7 @@ export function AppProvider({ children }) {
           setIsLoginModalOpen(false);
         }
       } catch (err) {
-        console.error("Erro no redirecionamento:", err);
+        errorService.handle(err, "no retorno do login");
         showToast("Falha na autenticação.", "error");
       }
     };
@@ -111,14 +88,14 @@ export function AppProvider({ children }) {
       showToast("Bem-vindo de volta, Player 1! 🎮");
       setIsLoginModalOpen(false);
     } catch (err) {
-      console.error("Erro no popup:", err);
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+      errorService.handle(err, "no login via popup");
       if (err.code === 'auth/popup-blocked' || err.code === 'auth/web-storage-unsupported' || err.message.includes('localStorage')) {
         showToast("Redirecionando para login seguro...", "info");
         try {
           await signInWithRedirect(auth, provider);
         } catch (redirectErr) {
-          console.error("Erro no redirect fallback:", redirectErr);
+          errorService.handle(redirectErr, "no login via redirect");
           showToast(`Falha total ao autenticar com ${providerName}.`, "error");
         }
       } else {
@@ -143,12 +120,10 @@ export function AppProvider({ children }) {
   const handleUpdateProfile = useCallback(async (data) => {
     if (!currentUser) return;
     try {
-      const userRef = doc(db, "users", currentUser.id);
-      await setDoc(userRef, data, { merge: true });
+      await userService.updateProfile(currentUser.id, data);
       setCurrentUser(prev => ({ ...prev, ...data }));
       showToast("Perfil atualizado com sucesso! 🎮");
     } catch (err) {
-      console.error(err);
       showToast("Erro ao atualizar perfil.");
     }
   }, [currentUser, showToast]);

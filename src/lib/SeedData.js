@@ -14,7 +14,6 @@ export async function seedDatabase() {
     const snapshot = await getDocs(postsCol);
 
     if (snapshot.empty) {
-      console.log("Iniciando migração dos posts mockados p/ o Firestore...");
       // Sobe os posts iniciais
       for (const post of initialPosts) {
         // eslint-disable-next-line no-unused-vars
@@ -25,7 +24,6 @@ export async function seedDatabase() {
           createdAt: serverTimestamp()
         });
       }
-      console.log("Migração concluída com sucesso!");
     }
 
     // 2. Verifica categorias
@@ -33,13 +31,11 @@ export async function seedDatabase() {
     const catSnapshot = await getDocs(catCol);
     
     if (catSnapshot.empty) {
-      console.log("Iniciando migração de categorias...");
       for (const cat of INITIAL_CATEGORIES) {
         await addDoc(catCol, { name: cat });
       }
     }
 
   } catch (error) {
-    console.error("Erro ao migrar dados:", error);
   }
 }
