@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { errorService } from '../services/errorService';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -40,8 +41,7 @@ export function useCategories(posts, showToast) {
       await addDoc(collection(db, "categories"), { name: newCat.trim() });
       showToast(`Categoria "${newCat}" adicionada!`);
     } catch (error) {
-      console.error("[useCategories:handleAddCategory]", error);
-      showToast("Erro ao adicionar categoria.");
+      errorService.handle(error, "[useCategories:handleAddCategory]", showToast);
     }
   };
 
@@ -63,8 +63,7 @@ export function useCategories(posts, showToast) {
       showToast(`Categoria "${catToDelete}" excluída.`);
       return true;
     } catch (error) {
-      console.error("[useCategories:handleDeleteCategory]", error);
-      showToast("Erro ao excluir categoria.");
+      errorService.handle(error, "[useCategories:handleDeleteCategory]", showToast);
       return false;
     }
   };

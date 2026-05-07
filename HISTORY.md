@@ -4,6 +4,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🛠️ [v1.9.0] - Refactoring & Code Stability
+*Data: 07 de Maio de 2026*
+
+### ⚙️ Arquitetura & Estabilidade
+- **Centralização de Erros**: Criação do `errorService.js` para padronizar o tratamento de exceções e traduzir erros do Firebase para mensagens amigáveis ao usuário.
+- **Remoção de Logs**: Limpeza global de `console.log`, `console.error` e `console.warn` em todo o projeto, garantindo um console 100% limpo em produção.
+- **Refatoração de Skeletons**: Correção de erros de referência (`ReferenceError`) e otimização da sintaxe nos componentes de carregamento.
+
+### ✨ UI/UX & Refinamento
+- **RetroSeparator Universal**: Implementação de um componente de separador padronizado com estética Neo-Brutalista para garantir visibilidade em todos os temas.
+- **Consistência Mobile**: Revisão e padronização dos textos no menu mobile (Drawer) para alinhamento com a versão Desktop.
+- **Correção de Fontes (CORS)**: Ajuste nas políticas de carregamento do Google Fonts via `index.html` e Service Worker (`sw.js`).
+
+---
+
 ## 🦴 [v1.8.0] - Universal Skeleton Overhaul
 *Data: 07 de Maio de 2026*
 

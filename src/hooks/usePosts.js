@@ -1,12 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { PostService } from '../services/postService';
+import { errorService } from '../services/errorService';
 import { POSTS_PER_PAGE } from '../constants';
-import DOMPurify from 'dompurify';
-
-function sanitizePostContent(content) {
-  if (!content) return '';
-  return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-}
+import { sanitizeContent } from '../lib/utils';
 
 export function usePosts(currentUser, showToast, searchQuery = "", activeCategory = "Todos") {
   const [posts, setPosts] = useState([]);
@@ -68,8 +64,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
         hasFetchedAllRef.current = false;
       }
     } catch (error) {
-      console.error('[usePosts:fetchPosts]', error);
-      showToast('Erro ao carregar posts.', 'error');
+      errorService.handle(error, "ao carregar posts", showToast);
     } finally {
       setIsLoadingPosts(false);
       setIsFetchingMore(false);
@@ -126,8 +121,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     try {
       return await serviceCall();
     } catch (err) {
-      console.error(errorTag, err);
-      showToast(errorMsg, 'error');
+      errorService.handle(err, errorTag, showToast);
       setPosts(originalPosts);
     }
   }, [posts, showToast]);
@@ -213,7 +207,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     try {
       if (postData.id) {
         const { id, ...dataToUpdate } = postData;
-        dataToUpdate.content = sanitizePostContent(dataToUpdate.content);
+        dataToUpdate.content = sanitizeContent(dataToUpdate.content);
         await PostService.updatePost(id, dataToUpdate);
         const freshPost = await PostService.getPostById(id);
         if (freshPost) setPosts(prev => prev.map(p => p.id === id ? freshPost : p));
@@ -222,15 +216,14 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
       } else {
         const createdPost = await PostService.createPost({
           ...postData,
-          content: sanitizePostContent(postData.content),
+          content: sanitizeContent(postData.content),
         }, currentUser);
         if (createdPost) setPosts(prev => [createdPost, ...prev]);
         showToast('Novo artigo publicado na capa!');
         return createdPost;
       }
     } catch (error) {
-      console.error('[usePosts:handleSavePost]', error);
-      showToast('Erro ao salvar o artigo.', 'error');
+      errorService.handle(error, "ao salvar o artigo", showToast);
       return null;
     }
   }, [currentUser, showToast]);
@@ -247,8 +240,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
       showToast('Artigo removido permanentemente.', 'success');
       return true;
     } catch (error) {
-      console.error('[usePosts:handleDeletePost]', error);
-      showToast('Erro ao excluir artigo.', 'error');
+      errorService.handle(error, "ao excluir artigo", showToast);
       setPosts(originalPosts);
       return false;
     }
@@ -271,7 +263,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     try {
       await PostService.incrementPostViews(postId);
     } catch (err) {
-      console.error('[usePosts:handleView]', err);
+      errorService.handle(err, "ao registrar visualização");
     }
   }, []);
 

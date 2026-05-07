@@ -28,3 +28,25 @@ export const COLLECTIONS = {
 
 // Paginação padrão
 export const POSTS_PER_PAGE = 6;
+
+// Design System: Neo-Brutalist
+export const BRUTAL_DESIGN = {
+  // Sombras sólidas (Brutalist style)
+  SHADOW: "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
+  SHADOW_LG: "shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]",
+  SHADOW_XL: "shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]",
+  SHADOW_XXL: "shadow-[20px_20px_0px_0px_rgba(0,0,0,1)]",
+  SHADOW_PURPLE: "shadow-[4px_4px_0px_rgba(168,85,247,0.4)]",
+  
+  // Bordas e Arredondamento
+  BORDER: "border-2 border-black",
+  BORDER_THICK: "border-4 border-black",
+  BORDER_HEAVY: "border-4 md:border-[8px] border-black",
+  ROUNDED: "rounded-none",
+  ROUNDED_MODERN: "rounded-xl",
+  
+  // Efeitos e Estados
+  TRANSITION: "transition-all duration-300",
+  HOVER_LIFT: "hover:-translate-y-1 active:translate-y-0",
+  HOVER_GLOW: "hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]",
+};

@@ -10,6 +10,7 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { errorService } from "./errorService";
 
 const COLLECTION_NAME = "messages";
 
@@ -26,7 +27,7 @@ export const contactService = {
       });
       return { success: true, id: docRef.id };
     } catch (error) {
-      console.error("[contactService:sendMessage]", error);
+      errorService.handle(error, "ao enviar mensagem");
       throw error;
     }
   },
@@ -44,7 +45,7 @@ export const contactService = {
         createdAt: doc.data().createdAt?.toDate() || new Date(),
       }));
     } catch (error) {
-      // Retorna vazio em caso de erro de permissão para não quebrar a UI
+      errorService.handle(error, "ao buscar mensagens");
       return [];
     }
   },
@@ -58,7 +59,7 @@ export const contactService = {
       await updateDoc(docRef, { status });
       return { success: true };
     } catch (error) {
-      console.error("[contactService:updateMessageStatus]", error);
+      errorService.handle(error, "ao atualizar status da mensagem");
       throw error;
     }
   },
@@ -72,7 +73,7 @@ export const contactService = {
       await deleteDoc(docRef);
       return { success: true };
     } catch (error) {
-      console.error("[contactService:deleteMessage]", error);
+      errorService.handle(error, "ao excluir mensagem");
       throw error;
     }
   }

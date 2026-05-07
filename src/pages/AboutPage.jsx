@@ -2,6 +2,7 @@ import React from "react";
 import { Gamepad2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useAppContext } from "../context/AppContext";
+import RetroSeparator from "../components/ui/RetroSeparator";
 import { cn } from "../lib/utils";
 
 /**
@@ -65,11 +66,7 @@ export default function AboutPage() {
           </div>
 
           {/* Separador estilo retro */}
-          <div className="flex items-center gap-4 mb-10 md:mb-14">
-            <span className="flex-1 h-1 bg-purple-500/20" />
-            <h2 className="font-retro text-xl md:text-3xl text-purple-500 uppercase">Player 1</h2>
-            <span className="flex-1 h-1 bg-purple-500/20" />
-          </div>
+          <RetroSeparator isDark={isDark} className="mb-10 md:mb-14" />
 
           {/* Card do perfil — mesmo estilo de borda/sombra do card principal */}
           <div className={cn(

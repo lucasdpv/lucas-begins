@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import DOMPurify from "dompurify";
 import { cn } from "../../lib/utils";
+import RetroSeparator from "./RetroSeparator";
 
 /**
  * Sub-componente para renderizar imagens com tratamento de erro gamificado.
@@ -129,13 +130,7 @@ export default function ArticleRenderer({ content, isDark }) {
         }
 
         if (line.trim() === '---') {
-          return (
-            <div key={index} className="my-12 flex items-center gap-4">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
-              <span className={cn("font-retro text-lg opacity-50", isDark ? 'text-purple-400' : 'text-purple-500')}>✦</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-30" />
-            </div>
-          );
+          return <RetroSeparator key={index} isDark={isDark} />;
         }
 
         const imgMatch = line.match(/^!\[([^\]]*)\]\((.+?)\)$/);

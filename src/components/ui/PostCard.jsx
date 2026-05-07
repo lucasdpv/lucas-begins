@@ -1,6 +1,7 @@
 import React from "react";
 import { Heart, MessageSquare, Clock, Eye } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../lib/utils";
+import { BRUTAL_DESIGN } from "../../constants";
 import { useAppContext } from "../../context/AppContext";
 import { useImageFallback } from "../../hooks/useImageFallback";
 import { CategoryBadge, ScoreBadge } from "./Badge";
@@ -12,13 +13,17 @@ export default function PostCard({ post, onClick }) {
   const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
 
+  const { BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT } = BRUTAL_DESIGN;
+
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
 
   return (
     <article
       className={cn(
-        "flex flex-col h-full rounded-none border-2 border-black cursor-pointer group transition-all duration-300 hover:-translate-y-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
+        "flex flex-col h-full cursor-pointer group",
+        BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT,
+        "hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
         isDark ? "bg-gray-800" : "bg-snes-light"
       )}
       onClick={onClick}
@@ -51,8 +56,6 @@ export default function PostCard({ post, onClick }) {
         )}
 
         <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-70 transition-opacity duration-300" />
-        
-        {/* Overlay de hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
         <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
@@ -87,39 +90,29 @@ export default function PostCard({ post, onClick }) {
 
           {/* Ações */}
           <div className="flex items-center justify-end gap-2.5 md:gap-4 ml-2" onClick={(e) => e.stopPropagation()}>
-            {/* Curtir */}
-            {currentUser ? (
-              <button
-                className={cn(
-                  "flex items-center gap-1.5 font-bold text-sm transition-all hover:scale-110 active:scale-95",
-                  hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-500 hover:text-red-500"
-                )}
-                onClick={() => handleLike(post.id)}
-                title="Curtir"
-              >
-                <Heart className={cn("w-4 h-4", hasLiked && "fill-current")} />
-                <span>{post.likes || 0}</span>
-              </button>
-            ) : (
-              <span className={cn("text-sm font-bold flex items-center gap-1.5 opacity-40", isDark ? "text-gray-400" : "text-gray-500")}>
-                <Heart className="w-4 h-4" />
-                {post.likes || 0}
-              </span>
-            )}
+            <button
+              className={cn(
+                "flex items-center gap-1.5 font-bold text-sm transition-all hover:scale-110 active:scale-95",
+                hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-500 hover:text-red-500"
+              )}
+              onClick={() => currentUser ? handleLike(post.id) : null}
+              title={currentUser ? "Curtir" : "Faça login para curtir"}
+              disabled={!currentUser}
+            >
+              <Heart className={cn("w-4 h-4", hasLiked && "fill-current")} />
+              <span>{post.likes || 0}</span>
+            </button>
 
-            {/* Comentários */}
             <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
               <MessageSquare className="w-4 h-4" />
               <span>{commentCount}</span>
             </div>
 
-            {/* Visualizações */}
             <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
               <Eye className="w-4 h-4" />
               <span>{post.views || 0}</span>
             </div>
 
-            {/* Login Discreto */}
             {!currentUser && <AuthGate variant="inline" className="ml-auto" />}
           </div>
         </div>
