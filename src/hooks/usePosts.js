@@ -246,6 +246,37 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     }
   }, [currentUser, posts, showToast]);
 
+  const handleToggleFeatured = useCallback(async (postId) => {
+    if (currentUser?.role !== 'admin') {
+      showToast('Acesso negado. Apenas administradores podem destacar artigos.', 'error');
+      return;
+    }
+
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+
+    // Conta quantos já estão em destaque (excluindo o atual se ele já estiver)
+    const featuredCount = posts.filter(p => p.isFeatured && p.id !== postId).length;
+
+    if (!post.isFeatured && featuredCount >= 5) {
+      showToast('O limite é de 5 artigos no carrossel. Remova um para adicionar este.', 'warning');
+      return;
+    }
+
+    const nextFeaturedState = !post.isFeatured;
+    
+    await optimisticUpdate(
+      postId,
+      (p) => ({ ...p, isFeatured: nextFeaturedState }),
+      async () => {
+        await PostService.updatePost(postId, { isFeatured: nextFeaturedState });
+        showToast(nextFeaturedState ? 'Artigo adicionado ao carrossel! 🎡' : 'Artigo removido do carrossel.');
+      },
+      '[usePosts:handleToggleFeatured]',
+      'Erro ao atualizar destaque.'
+    );
+  }, [currentUser, posts, showToast, optimisticUpdate]);
+
   const handleView = useCallback(async (postId) => {
     const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
     if (viewedPosts.includes(postId)) return;
@@ -280,6 +311,7 @@ export function usePosts(currentUser, showToast, searchQuery = "", activeCategor
     handleDeleteComment,
     handleSavePost,
     handleDeletePost,
+    handleToggleFeatured,
     loadMore,
     hasMore,
     fetchAllPosts,

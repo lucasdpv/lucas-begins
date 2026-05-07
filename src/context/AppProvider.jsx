@@ -26,7 +26,7 @@ export function AppProvider({ children }) {
 
   // Inicializa os hooks
   const { toast, showToast } = useToast();
-  const { posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, loadMore, hasMore, fetchAllPosts, handleView } = usePosts(currentUser, showToast, searchQuery, activeCategory);
+  const { posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, handleToggleFeatured, loadMore, hasMore, fetchAllPosts, handleView } = usePosts(currentUser, showToast, searchQuery, activeCategory);
   const { categories, handleAddCategory, handleDeleteCategory } = useCategories(posts, showToast);
 
   // 1. Monitora o estado de autenticação e busca papel de Admin no Modo Pro
@@ -132,7 +132,7 @@ export function AppProvider({ children }) {
     isDark, toggleTheme,
     currentUser, login, handleLogout, authLoading,
     toast, showToast,
-    posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
+    posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, handleToggleFeatured,
     loadMore, hasMore, fetchAllPosts, handleView,
     categories, handleAddCategory, handleDeleteCategory,
     activeCategory, setActiveCategory,
@@ -143,7 +143,7 @@ export function AppProvider({ children }) {
     isDark, toggleTheme,
     currentUser, login, handleLogout, authLoading,
     toast, showToast,
-    posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost,
+    posts, isLoadingPosts, isFetchingMore, handleLike, handleAddComment, handleDeleteComment, handleSavePost, handleDeletePost, handleToggleFeatured,
     loadMore, hasMore, fetchAllPosts, handleView,
     categories, handleAddCategory, handleDeleteCategory,
     activeCategory, searchQuery, isLoginModalOpen, handleUpdateProfile

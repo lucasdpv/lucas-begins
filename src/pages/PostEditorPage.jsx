@@ -279,6 +279,38 @@ export default function PostEditorPage() {
               </div>
             </div>
             
+            {/* Toggle Destaque (Carrossel) */}
+            <div className={cn(
+              "md:col-span-2 flex items-center gap-4 p-6 rounded-2xl border-2 border-dashed transition-all group relative",
+              formData.isFeatured 
+                ? (isDark ? "bg-yellow-900/10 border-yellow-500/50" : "bg-yellow-50 border-yellow-500/30")
+                : (isDark ? "bg-gray-800/50 border-gray-700/50" : "bg-gray-50 border-gray-200")
+            )}>
+              <input
+                type="checkbox"
+                id="isFeatured"
+                name="isFeatured"
+                checked={formData.isFeatured || false}
+                disabled={!formData.isFeatured && posts.filter(p => p.isFeatured && String(p.id) !== String(id)).length >= 5}
+                onChange={(e) => setFormData(prev => ({ ...prev, isFeatured: e.target.checked }))}
+                className="w-6 h-6 accent-yellow-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+              />
+              <label htmlFor="isFeatured" className={cn(
+                "font-retro font-bold uppercase text-sm cursor-pointer select-none flex-1",
+                !formData.isFeatured && posts.filter(p => p.isFeatured && String(p.id) !== String(id)).length >= 5 && "opacity-40 cursor-not-allowed"
+              )}>
+                <div className="flex items-center gap-2">
+                  <Star className={cn("w-4 h-4", formData.isFeatured && "fill-yellow-500 text-yellow-500")} />
+                  Destacar no Carrossel da Home
+                </div>
+                <span className="block text-[10px] opacity-60 font-medium normal-case mt-1 tracking-normal">
+                  {posts.filter(p => p.isFeatured && String(p.id) !== String(id)).length >= 5 && !formData.isFeatured
+                    ? "Limite de 5 artigos atingido. Remova um destaque no Painel Admin para liberar esta vaga."
+                    : "Este artigo será exibido com destaque no carrossel da página inicial."}
+                </span>
+              </label>
+            </div>
+
             {/* Toggle Author Box */}
             <div className={cn(
               "md:col-span-2 flex items-center gap-4 p-6 rounded-2xl border-2 border-dashed transition-all",

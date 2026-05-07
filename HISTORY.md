@@ -4,6 +4,25 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎡 [v1.10.0] - Curation System & Manual Featured
+*Data: 07 de Maio de 2026*
+
+### ⚙️ Funcionalidades & Curadoria
+- **Destaques Manuais**: Implementação de sistema de curadoria que permite aos administradores selecionar manualmente até 5 artigos para o carrossel da home.
+- **Regra dos 5**: Lógica de validação em tempo real que impede a seleção de mais de 5 itens, com feedback visual (toasts) e bloqueio de interface.
+- **Persistência isFeatured**: Adição do campo `isFeatured` ao modelo de posts no Firestore para persistência do estado de destaque.
+
+### ✨ UI/UX & Painel Admin
+- **Ações Centralizadas**: Agrupamento do botão de alternância de destaque (estrela) dentro da coluna de ações na tabela administrativa para melhor fluxo de trabalho.
+- **Feedback Visual**: Implementação de ícones de estrela com preenchimento dourado e brilho neon para identificar artigos destacados no painel.
+- **Editor Integrado**: Adição de checkbox de destaque na página de edição de artigos, respeitando as mesmas regras de limite.
+
+### 🐛 Estabilidade & Performance
+- **Correção de Cache (HMR)**: Resolução de conflitos de estado global que causavam erros de referência após atualizações de código.
+- **Otimização de Contexto**: Refatoração do `AppProvider` para garantir que o estado dos posts e ações de curadoria sejam propagados corretamente para toda a aplicação.
+
+---
+
 ## 🛠️ [v1.9.0] - Refactoring & Code Stability
 *Data: 07 de Maio de 2026*
 

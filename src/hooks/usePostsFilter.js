@@ -21,11 +21,11 @@ export function usePostsFilter(posts, category = "Todos", search = "") {
     });
   }, [posts, category, search]);
 
-  // 2. Posts em Destaque (Mais Curtidos)
+  // 2. Posts em Destaque (Marcados manualmente)
   const featuredPosts = useMemo(() => {
-    return [...posts]
-      .filter((p) => !p.isDraft)
-      .sort((a, b) => (b.likes || 0) - (a.likes || 0))
+    return posts
+      .filter((p) => !p.isDraft && p.isFeatured)
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
       .slice(0, 5);
   }, [posts]);
 

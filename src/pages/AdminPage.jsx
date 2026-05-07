@@ -18,7 +18,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  MessageSquare
+  MessageSquare,
+  Star
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
@@ -32,7 +33,7 @@ const POSTS_PER_PAGE = 8;
  * Painel administrativo com abas: Artigos, Categorias, Perfil e Inbox.
  */
 export default function AdminPage() {
-  const { posts, categories, isDark, currentUser, handleDeletePost, handleAddCategory, handleDeleteCategory, handleUpdateProfile, showToast, fetchAllPosts } = useAppContext();
+  const { posts, categories, isDark, currentUser, handleDeletePost, handleToggleFeatured, handleAddCategory, handleDeleteCategory, handleUpdateProfile, showToast, fetchAllPosts } = useAppContext();
   const navigate = useNavigate();
   const [adminTab, setAdminTab] = useState("posts");
 
@@ -293,8 +294,18 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="text-right text-xs font-bold uppercase opacity-50 font-retro">
-              {filteredPosts.length} Artigo{filteredPosts.length !== 1 ? 's' : ''} encontrado{filteredPosts.length !== 1 ? 's' : ''}
+            <div className="flex flex-col items-end gap-1">
+              <div className="text-right text-xs font-bold uppercase opacity-50 font-retro">
+                {filteredPosts.length} Artigo{filteredPosts.length !== 1 ? 's' : ''} encontrado{filteredPosts.length !== 1 ? 's' : ''}
+              </div>
+              <div className={cn(
+                "text-[10px] font-retro font-bold uppercase px-3 py-1 rounded-full border-2",
+                posts.filter(p => p.isFeatured).length >= 5 
+                  ? "bg-yellow-500/10 border-yellow-500 text-yellow-500" 
+                  : "bg-purple-500/10 border-purple-500 text-purple-500"
+              )}>
+                Carrossel: {posts.filter(p => p.isFeatured).length} / 5
+              </div>
             </div>
           </div>
 
@@ -339,6 +350,18 @@ export default function AdminPage() {
                         <td className="px-6 py-4 hidden sm:table-cell opacity-70 font-mono">{formatDate(post.createdAt, post.date)}</td>
                         <td className="px-4 md:px-6 py-3 md:py-4 text-right">
                           <div className="flex items-center justify-end gap-2 md:gap-3">
+                            <button
+                              onClick={() => handleToggleFeatured(post.id)}
+                              className={cn(
+                                "p-1.5 md:p-2 rounded-lg transition-all active:scale-90",
+                                post.isFeatured 
+                                  ? "bg-yellow-400/20 text-yellow-500 border border-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.3)]" 
+                                  : "bg-gray-500/10 text-gray-400 border border-gray-500/30 hover:border-yellow-500/50"
+                              )}
+                              title={post.isFeatured ? "Remover do carrossel" : "Adicionar ao carrossel"}
+                            >
+                              <Star className={cn("w-3.5 h-3.5 md:w-4 md:h-4", post.isFeatured && "fill-yellow-500")} />
+                            </button>
                             <button
                               onClick={() => navigate(`/editor/${post.id}`)}
                               className="p-1.5 md:p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-500 rounded-lg transition-colors retro-button"
