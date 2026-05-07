@@ -17,7 +17,11 @@ import {
 } from "lucide-react";
 import { calculateReadingTime, cn } from "../lib/utils";
 import PostDetailPage from "./PostDetailPage";
-import { useAppContext } from "../context/AppContext";
+import { useAuth } from "../context/AuthProvider";
+import { useThemeStore } from "../store/useThemeStore";
+import { useUIStore } from "../store/useUIStore";
+import { useCreatePostMutation, useUpdatePostMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
+import { useCategories } from "../features/posts/hooks/useCategoriesQuery";
 import BlockEditor from "../components/editor/BlockEditor";
 import { Helmet } from "react-helmet-async";
 import { STORAGE_KEYS } from "../constants";
@@ -33,7 +37,14 @@ const DRAFT_KEY = STORAGE_KEYS.DRAFT;
 export default function PostEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { posts, categories, isDark, currentUser, handleSavePost } = useAppContext();
+  const { showToast } = useUIStore();
+  const { posts = [] } = useAllPosts(); // Precisa de posts para o rascunho/edição
+  const { data: categories = [] } = useCategories();
+  const { currentUser } = useAuth();
+  const { isDark } = useThemeStore();
+
+  const createPostMutation = useCreatePostMutation();
+  const updatePostMutation = useUpdatePostMutation();
 
   const [activeTab, setActiveTab] = useState("edit");
   const [lastSaved, setLastSaved] = useState(null);
@@ -91,8 +102,19 @@ export default function PostEditorPage() {
         aka: currentUser?.aka || ""
       }
     };
-    const saved = await handleSavePost(postToSave);
-    if (saved) navigate("/admin");
+
+    try {
+      if (id) {
+        await updatePostMutation.mutateAsync({ id, data: postToSave });
+        showToast('Artigo atualizado com sucesso!');
+      } else {
+        await createPostMutation.mutateAsync({ postData: postToSave, currentUser });
+        showToast('Novo artigo publicado!');
+      }
+      navigate("/admin");
+    } catch (error) {
+      showToast('Erro ao salvar o artigo.', 'error');
+    }
   };
 
   const inputClass = cn(

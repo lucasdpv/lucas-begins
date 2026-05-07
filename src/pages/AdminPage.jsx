@@ -22,7 +22,11 @@ import {
   Star
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAuth } from "../context/AuthProvider";
+import { useThemeStore } from "../store/useThemeStore";
+import { useUIStore } from "../store/useUIStore";
+import { useAllPosts, useDeletePostMutation, useUpdatePostMutation } from "../features/posts/hooks/usePostsQuery";
+import { useCategories, useAddCategoryMutation, useDeleteCategoryMutation } from "../features/posts/hooks/useCategoriesQuery";
 import { Helmet } from "react-helmet-async";
 import { cn, formatDate } from "../lib/utils";
 import { contactService } from "../services/contactService";
@@ -33,15 +37,24 @@ const POSTS_PER_PAGE = 8;
  * Painel administrativo com abas: Artigos, Categorias, Perfil e Inbox.
  */
 export default function AdminPage() {
-  const { posts, categories, isDark, currentUser, handleDeletePost, handleToggleFeatured, handleAddCategory, handleDeleteCategory, handleUpdateProfile, showToast, fetchAllPosts } = useAppContext();
+  const { showToast } = useUIStore();
+  const { currentUser, handleUpdateProfile } = useAuth();
+  const { isDark } = useThemeStore();
   const navigate = useNavigate();
+
+  const { data: posts = [], isLoading: isLoadingPosts } = useAllPosts();
+  const { data: categories = [] } = useCategories();
+  
+  const deletePostMutation = useDeletePostMutation();
+  const updatePostMutation = useUpdatePostMutation();
+  const addCategoryMutation = useAddCategoryMutation();
+  const deleteCategoryMutation = useDeleteCategoryMutation();
   const [adminTab, setAdminTab] = useState("posts");
 
-  // Força o carregamento de posts e mensagens ao entrar no admin
+  // Força o carregamento de mensagens ao entrar no admin
   useEffect(() => {
-    fetchAllPosts();
     fetchMessages();
-  }, [fetchAllPosts]);
+  }, []);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -71,13 +84,26 @@ export default function AdminPage() {
     setCurrentPage(1);
   }, [searchTerm, filterCategory]);
   
-  const [profileData, setProfileData] = useState(() => ({
+  const [profileData, setProfileData] = useState({
     name: currentUser?.name || "",
     avatar: currentUser?.avatar || "",
     bio: currentUser?.bio || "",
     level: currentUser?.level || 1,
     aka: currentUser?.aka || ""
-  }));
+  });
+
+  // Atualiza o estado local quando o currentUser mudar (ex: carregamento inicial)
+  useEffect(() => {
+    if (currentUser) {
+      setProfileData({
+        name: currentUser.name || "",
+        avatar: currentUser.avatar || "",
+        bio: currentUser.bio || "",
+        level: currentUser.level || 1,
+        aka: currentUser.aka || ""
+      });
+    }
+  }, [currentUser]);
 
   // Busca mensagens quando entra na aba inbox
   useEffect(() => {
@@ -120,11 +146,16 @@ export default function AdminPage() {
         setMessages(messages.filter(msg => msg.id !== id));
         showToast("Mensagem excluída.");
       } else if (type === 'post') {
-        await handleDeletePost(id);
+        await deletePostMutation.mutateAsync(id);
         showToast("Artigo excluído com sucesso.");
       } else if (type === 'category') {
-        await handleDeleteCategory(id);
-        showToast("Categoria removida.");
+        const isUsed = posts.some((p) => p.category === id);
+        if (isUsed) {
+          showToast("Não é possível excluir: existem artigos usando esta categoria.", "error");
+        } else {
+          await deleteCategoryMutation.mutateAsync(id);
+          showToast("Categoria removida.");
+        }
       }
     } catch (error) {
       showToast(`Erro ao excluir ${type}.`, "error");
@@ -142,10 +173,19 @@ export default function AdminPage() {
     window.open(gmailUrl, '_blank');
   };
 
-  const handleAddCat = (e) => {
+  const handleAddCat = async (e) => {
     e.preventDefault();
-    handleAddCategory(newCategoryName);
-    setNewCategoryName("");
+    if (!newCategoryName.trim() || categories.includes(newCategoryName.trim())) {
+      showToast("Categoria inválida ou já existe.", "error");
+      return;
+    }
+    try {
+      await addCategoryMutation.mutateAsync(newCategoryName);
+      showToast(`Categoria "${newCategoryName}" adicionada!`);
+      setNewCategoryName("");
+    } catch (error) {
+      showToast("Erro ao adicionar categoria.", "error");
+    }
   };
 
   return (
@@ -351,17 +391,26 @@ export default function AdminPage() {
                         <td className="px-4 md:px-6 py-3 md:py-4 text-right">
                           <div className="flex items-center justify-end gap-2 md:gap-3">
                             <button
-                              onClick={() => handleToggleFeatured(post.id)}
-                              className={cn(
-                                "p-1.5 md:p-2 rounded-lg transition-all active:scale-90",
-                                post.isFeatured 
-                                  ? "bg-yellow-400/20 text-yellow-500 border border-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.3)]" 
-                                  : "bg-gray-500/10 text-gray-400 border border-gray-500/30 hover:border-yellow-500/50"
-                              )}
-                              title={post.isFeatured ? "Remover do carrossel" : "Adicionar ao carrossel"}
-                            >
-                              <Star className={cn("w-3.5 h-3.5 md:w-4 md:h-4", post.isFeatured && "fill-yellow-500")} />
-                            </button>
+                                onClick={() => {
+                                  if (!post.isFeatured && posts.filter(p => p.isFeatured).length >= 5) {
+                                    showToast('Limite de 5 destaques atingido.', 'warning');
+                                    return;
+                                  }
+                                  updatePostMutation.mutate({ id: post.id, data: { isFeatured: !post.isFeatured } });
+                                }}
+                                className={cn(
+                                  "p-1.5 md:p-2 rounded-lg transition-all active:scale-90",
+                                  post.isFeatured 
+                                    ? "bg-yellow-400/20 text-yellow-500 border border-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.3)]" 
+                                    : "bg-gray-500/10 text-gray-400 border border-gray-500/30 hover:border-yellow-500/50"
+                                )}
+                                title={post.isFeatured ? "Remover do carrossel" : "Adicionar ao carrossel"}
+                              >
+                                <Star className={cn("w-3.5 h-3.5 md:w-4 md:h-4", post.isFeatured && "fill-yellow-500")} />
+                                {updatePostMutation.isPending && updatePostMutation.variables?.id === post.id && (
+                                  <Loader2 className="absolute w-full h-full animate-spin opacity-50" />
+                                )}
+                              </button>
                             <button
                               onClick={() => navigate(`/editor/${post.id}`)}
                               className="p-1.5 md:p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-500 rounded-lg transition-colors retro-button"

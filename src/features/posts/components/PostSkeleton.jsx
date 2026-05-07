@@ -1,7 +1,7 @@
 import React from "react";
-import { cn } from "../../lib/utils";
-import { BRUTAL_DESIGN } from "../../constants";
-import SkeletonItem from "./SkeletonItem";
+import { cn } from "../../../lib/utils";
+import { BRUTAL_DESIGN } from "../../../constants";
+import SkeletonItem from "../../../components/ui/SkeletonItem";
 
 /**
  * Skeleton do PostCard refatorado para usar SkeletonItem e BRUTAL_DESIGN.

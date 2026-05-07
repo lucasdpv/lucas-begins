@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DOMPurify from "dompurify";
-import { cn } from "../../lib/utils";
-import RetroSeparator from "./RetroSeparator";
+import { cn } from "../../../lib/utils";
+import RetroSeparator from "../../../components/ui/RetroSeparator";
 
 /**
  * Sub-componente para renderizar imagens com tratamento de erro gamificado.

@@ -15,13 +15,16 @@ import {
   Lock,
 } from "lucide-react";
 import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
-import ArticleRenderer from "../components/ui/ArticleRenderer";
+import ArticleRenderer from "../features/posts/components/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
-import { useAppContext } from "../context/AppContext";
+import { useAuth } from "../context/AuthProvider";
+import { useThemeStore } from "../store/useThemeStore";
+import { useUIStore } from "../store/useUIStore";
+import { usePost, useLikeMutation, useCommentMutation, useDeleteCommentMutation, useIncrementViewMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
 import { useImageFallback } from "../hooks/useImageFallback";
 import { CategoryBadge } from "../components/ui/Badge";
-import AuthGate from "../components/ui/AuthGate";
-import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
+import AuthGate from "../features/auth/components/AuthGate";
+import PostDetailSkeleton from "../features/posts/components/PostDetailSkeleton";
 import { PostService } from "../services/postService";
 import { contactService } from "../services/contactService";
 import { errorService } from "../services/errorService";
@@ -29,43 +32,20 @@ import { errorService } from "../services/errorService";
 export default function PostDetailPage({ previewPost }) {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { 
-    posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, 
-    showToast, isLoadingPosts, handleView, setIsLoginModalOpen 
-  } = useAppContext();
+  const { showToast, setIsLoginModalOpen } = useUIStore();
+  const { currentUser } = useAuth();
+  const { isDark } = useThemeStore();
+  
+  const { data: posts = [], isLoading: isLoadingPosts } = useAllPosts();
 
-  const [localPost, setLocalPost] = useState(null);
-  const [isFetchingLocal, setIsFetchingLocal] = useState(false);
+  const likeMutation = useLikeMutation();
+  const commentMutation = useCommentMutation();
+  const deleteCommentMutation = useDeleteCommentMutation();
+  const incrementViewMutation = useIncrementViewMutation();
 
-  // 1. Tenta achar na lista global primeiro
+  // Busca o post usando React Query se não for um preview e não estiver na lista global
+  const { data: localPost, isLoading: isFetchingLocal } = usePost(slug, true);
   const post = previewPost || posts.find((p) => String(p.slug) === String(slug)) || localPost;
-
-  // Ref para evitar chamadas duplicadas ao Firestore (não causa re-renders)
-  const isFetchingRef = useRef(false);
-
-  // 2. Se não achou na lista global e não estamos mais carregando a lista inicial, busca direto no Firestore
-  useEffect(() => {
-    if (post || !slug || previewPost || isLoadingPosts || isFetchingRef.current) return;
-
-    const fetchPost = async () => {
-      isFetchingRef.current = true;
-      setIsFetchingLocal(true);
-      try {
-        const fetched = await PostService.getPostBySlug(slug);
-        if (fetched) {
-          setLocalPost(fetched);
-        }
-      } catch (error) {
-        errorService.handle(error, "ao buscar post por slug");
-        setLocalPost(null);
-      } finally {
-        setIsFetchingLocal(false);
-        // Não reseta isFetchingRef: uma vez buscado, não busca de novo para este slug
-      }
-    };
-
-    fetchPost();
-  }, [slug, post, isLoadingPosts, previewPost]);
 
   const trendingPosts = useMemo(() => {
     return [...posts]
@@ -81,9 +61,9 @@ export default function PostDetailPage({ previewPost }) {
 
   useEffect(() => {
     if (post && post.id && !previewPost) {
-      handleView(post.id);
+      incrementViewMutation.mutate(post.id);
     }
-  }, [post?.id, previewPost, handleView]);
+  }, [post?.id, previewPost]);
 
   // Enquanto estiver carregando os posts do Firebase ou buscando o post localmente, mostramos o Skeleton
   if ((isLoadingPosts || isFetchingLocal) && !post) {
@@ -109,7 +89,16 @@ export default function PostDetailPage({ previewPost }) {
   const submitComment = (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
-    handleAddComment(post.id, commentText);
+
+    const comment = {
+      text: commentText,
+      userName: currentUser.name,
+      userAvatar: currentUser.avatar,
+      userId: currentUser.id,
+      createdAt: new Date().toISOString()
+    };
+
+    commentMutation.mutate({ postId: post.id, comment });
     setCommentText("");
   };
 
@@ -264,7 +253,7 @@ export default function PostDetailPage({ previewPost }) {
 
               {currentUser ? (
                 <button
-                  onClick={() => handleLike(post.id)}
+                  onClick={() => likeMutation.mutate({ postId: post.id, userId: currentUser.id })}
                   className={cn(
                     "flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
                     hasLiked ? "bg-red-500 border-red-600 text-white" : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"

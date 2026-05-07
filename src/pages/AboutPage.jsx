@@ -1,7 +1,7 @@
 import React from "react";
 import { Gamepad2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { useAppContext } from "../context/AppContext";
+import { useThemeStore } from "../store/useThemeStore";
 import RetroSeparator from "../components/ui/RetroSeparator";
 import { cn } from "../lib/utils";
 
@@ -10,7 +10,7 @@ import { cn } from "../lib/utils";
  * Visual alinhado ao padrão da ContactPage.
  */
 export default function AboutPage() {
-  const { isDark } = useAppContext();
+  const { isDark } = useThemeStore();
 
   return (
     <div className="min-h-[85vh] flex items-start justify-center py-12 md:py-20 px-4 relative overflow-hidden">

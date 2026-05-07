@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { X, Gamepad2 } from "lucide-react";
-import { useAppContext } from "../../context/AppContext";
-import { cn } from "../../lib/utils";
+import { useAuth } from "../../../context/AuthProvider";
+import { useThemeStore } from "../../../store/useThemeStore";
+import { useUIStore } from "../../../store/useUIStore";
+import { cn } from "../../../lib/utils";
 
 function GoogleIcon({ className }) {
   return (
@@ -27,7 +29,9 @@ const PROVIDERS = [
 ];
 
 export default function LoginModal() {
-  const { isDark, setIsLoginModalOpen, login } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { setIsLoginModalOpen } = useUIStore();
+  const { login } = useAuth();
   const overlayRef = useRef(null);
 
   const handlers = { google: login };

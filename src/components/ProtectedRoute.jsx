@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Gamepad2 } from "lucide-react";
-import { useAppContext } from "../context/AppContext";
+import { useAuth } from "../context/AuthProvider";
 
 /**
  * Componente que protege rotas que exigem autenticação e permissão.
@@ -12,7 +12,7 @@ import { useAppContext } from "../context/AppContext";
  * @param {"admin"|"user"} requiredRole - Role mínima para acessar a rota
  */
 export default function ProtectedRoute({ children, requiredRole = "admin" }) {
-  const { currentUser, authLoading } = useAppContext();
+  const { currentUser, authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

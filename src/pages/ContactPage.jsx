@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Send, Loader2, Gamepad2, User, Mail, MessageSquare } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { useAppContext } from "../context/AppContext";
+import { useThemeStore } from "../store/useThemeStore";
+import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
 import { cn } from "../lib/utils";
 
 export default function ContactPage() {
-  const { isDark, showToast } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { showToast } = useUIStore();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 

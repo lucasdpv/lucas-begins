@@ -2,16 +2,26 @@ import React, { useMemo, useEffect, useRef, useState } from "react";
 import { Gamepad2, Star, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import Carousel from "../components/ui/Carousel";
-import PostCard from "../components/ui/PostCard";
-import PostSkeleton from "../components/ui/PostSkeleton";
-import CarouselSkeleton from "../components/ui/CarouselSkeleton";
-import { useAppContext } from "../context/AppContext";
+import Carousel from "../features/posts/components/Carousel";
+import PostCard from "../features/posts/components/PostCard";
+import PostSkeleton from "../features/posts/components/PostSkeleton";
+import CarouselSkeleton from "../features/posts/components/CarouselSkeleton";
+import { useThemeStore } from "../store/useThemeStore";
+import { useUIStore } from "../store/useUIStore";
+import { usePosts } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify } from "../lib/utils";
 
 export default function HomePage() {
-  const { isDark, posts, isLoadingPosts, isFetchingMore, activeCategory, searchQuery, loadMore, hasMore } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { activeCategory, searchQuery } = useUIStore();
+  const { 
+    posts, 
+    isLoading: isLoadingPosts, 
+    isFetchingNextPage: isFetchingMore, 
+    hasNextPage, 
+    fetchNextPage: loadMore 
+  } = usePosts({ search: searchQuery, category: activeCategory });
   const navigate = useNavigate();
   const observerTarget = useRef(null);
   const [activeSidebarTab, setActiveSidebarTab] = useState("acessados");
@@ -19,7 +29,7 @@ export default function HomePage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos") {
+        if (entries[0].isIntersecting && hasNextPage && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos") {
           loadMore();
         }
       },
@@ -34,7 +44,7 @@ export default function HomePage() {
     return () => {
       if (currentTarget) observer.disconnect();
     };
-  }, [hasMore, isLoadingPosts, searchQuery, activeCategory, loadMore]);
+  }, [hasNextPage, isLoadingPosts, searchQuery, activeCategory, loadMore]);
 
   const { filteredPosts, featuredPosts, mostViewedPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
@@ -196,7 +206,7 @@ export default function HomePage() {
             )}
 
             {/* Trigger para Scroll Infinito */}
-            {hasMore && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos" && (
+            {hasNextPage && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos" && (
               <div ref={observerTarget} className="mt-16 flex justify-center py-10">
                 <div className="flex items-center gap-3 opacity-50">
                   <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" />

@@ -2,11 +2,11 @@ import React from "react";
 import { Gamepad2, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useAppContext } from "../context/AppContext";
+import { useThemeStore } from "../store/useThemeStore";
 import { cn } from "../lib/utils";
 
 export default function NotFoundPage() {
-  const { isDark } = useAppContext();
+  const { isDark } = useThemeStore();
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 animate-in fade-in zoom-in duration-500">

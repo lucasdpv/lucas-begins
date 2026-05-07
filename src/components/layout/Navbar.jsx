@@ -18,23 +18,25 @@ import {
   ChevronRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppContext } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthProvider";
+import { useThemeStore } from "../../store/useThemeStore";
+import { useUIStore } from "../../store/useUIStore";
+import { useCategories } from "../../features/posts/hooks/useCategoriesQuery";
 import { BRUTAL_DESIGN } from "../../constants";
 import { cn } from "../../lib/utils";
 
 export default function Navbar() {
   const {
-    isDark,
-    toggleTheme,
-    currentUser,
-    handleLogout,
     setIsLoginModalOpen,
     searchQuery,
     setSearchQuery,
     activeCategory,
     setActiveCategory,
-    categories
-  } = useAppContext();
+  } = useUIStore();
+
+  const { isDark, toggleTheme } = useThemeStore();
+  const { currentUser, handleLogout } = useAuth();
+  const { data: categories = [] } = useCategories();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);

@@ -1,7 +1,8 @@
 import React from "react";
 import { Lock, Gamepad2 } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { useAppContext } from "../../context/AppContext";
+import { cn } from "../../../lib/utils";
+import { useThemeStore } from "../../../store/useThemeStore";
+import { useUIStore } from "../../../store/useUIStore";
 
 /**
  * AuthGate — exibido em ações que exigem autenticação.
@@ -12,7 +13,8 @@ import { useAppContext } from "../../context/AppContext";
  *  - "section" : bloco grande centralizado para seções de comentários
  */
 export default function AuthGate({ variant = "inline", className }) {
-  const { isDark, setIsLoginModalOpen } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { setIsLoginModalOpen } = useUIStore();
 
   if (variant === "inline") {
     return (

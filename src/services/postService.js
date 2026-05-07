@@ -124,6 +124,63 @@ export const PostService = {
   },
 
   /**
+   * Alterna o like de um usuário no post.
+   */
+  async toggleLike(postId, userId) {
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return;
+
+    const data = postSnap.data();
+    const likedBy = data.likedBy || [];
+    const hasLiked = likedBy.includes(userId);
+
+    if (hasLiked) {
+      await updateDoc(postRef, {
+        likedBy: likedBy.filter(id => id !== userId),
+        likes: increment(-1)
+      });
+    } else {
+      await updateDoc(postRef, {
+        likedBy: [...likedBy, userId],
+        likes: increment(1)
+      });
+    }
+  },
+
+  /**
+   * Adiciona um comentário ao post.
+   */
+  async addComment(postId, comment) {
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return;
+
+    const data = postSnap.data();
+    const comments = data.comments || [];
+    
+    await updateDoc(postRef, {
+      comments: [...comments, { ...comment, id: Date.now() }]
+    });
+  },
+
+  /**
+   * Remove um comentário do post.
+   */
+  async deleteComment(postId, commentId) {
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return;
+
+    const data = postSnap.data();
+    const comments = data.comments || [];
+
+    await updateDoc(postRef, {
+      comments: comments.filter(c => c.id !== commentId)
+    });
+  },
+
+  /**
    * Remove um post permanentemente.
    */
   async deletePost(postId) {

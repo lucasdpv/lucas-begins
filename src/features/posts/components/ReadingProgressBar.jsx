@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { cn } from "../../lib/utils";
+import { cn } from "../../../lib/utils";
 
 export default function ReadingProgressBar({ isDark, targetSelector = "article" }) {
   const [progress, setProgress] = useState(0);

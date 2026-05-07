@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../../lib/utils";
+import { cn } from "../../../lib/utils";
 
 export default function PostDetailSkeleton({ isDark }) {
   const skeletonColor = isDark ? "bg-gray-800" : "bg-gray-200";

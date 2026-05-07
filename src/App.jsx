@@ -2,16 +2,18 @@ import React, { useEffect, lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Controle de estado
-import { useAppContext } from "./context/AppContext";
+import { useAuth } from "./context/AuthProvider";
+import { useThemeStore } from "./store/useThemeStore";
+import { useUIStore } from "./store/useUIStore";
 
 // Layout & UI
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Toast from "./components/ui/Toast";
-import LoginModal from "./components/ui/LoginModal";
-import PostSkeleton from "./components/ui/PostSkeleton";
-import PostDetailSkeleton from "./components/ui/PostDetailSkeleton";
+import LoginModal from "./features/auth/components/LoginModal";
+import SystemInitializer from "./components/SystemInitializer";
+import PostSkeleton from "./features/posts/components/PostSkeleton";
+import PostDetailSkeleton from "./features/posts/components/PostDetailSkeleton";
 import FormSkeleton from "./components/ui/FormSkeleton";
 import AboutSkeleton from "./components/ui/AboutSkeleton";
 import ContactSkeleton from "./components/ui/ContactSkeleton";
@@ -28,7 +30,8 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
-  const { isDark, toast, isLoginModalOpen } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { toast, isLoginModalOpen } = useUIStore();
   const location = useLocation();
 
   // Atualiza os CSS Custom Properties do tema (definidos em index.css)
@@ -58,6 +61,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>
+      <SystemInitializer />
       <Toast toast={toast} isDark={isDark} />
 
       <div className="flex flex-col min-h-screen">

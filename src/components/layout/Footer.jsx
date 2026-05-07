@@ -2,13 +2,13 @@ import React from "react";
 import { Gamepad2, ChevronRight, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { XIcon, ThreadsIcon, InstagramIcon, YoutubeIcon, TwitchIcon } from "../icons/SocialIcons";
-import { useAppContext } from "../../context/AppContext";
+import { useThemeStore } from "../../store/useThemeStore";
 import { cn } from "../../lib/utils";
 
 import { version } from "../../../package.json";
 
 export default function Footer() {
-  const { isDark } = useAppContext();
+  const { isDark } = useThemeStore();
 
   return (
     <footer

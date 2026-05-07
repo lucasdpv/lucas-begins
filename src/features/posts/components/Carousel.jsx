@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
-import { calculateReadingTime, cn, coverBgStyle } from "../../lib/utils";
-import { CategoryBadge, ScoreBadge } from "./Badge";
+import { calculateReadingTime, cn, coverBgStyle } from "../../../lib/utils";
+import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 
 /**
  * Carrossel automático com autoplay, pausa no hover, navegação por teclado.

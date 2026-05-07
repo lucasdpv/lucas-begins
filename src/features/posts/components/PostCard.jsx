@@ -1,14 +1,18 @@
 import React from "react";
 import { Heart, MessageSquare, Clock, Eye } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../lib/utils";
-import { BRUTAL_DESIGN } from "../../constants";
-import { useAppContext } from "../../context/AppContext";
-import { useImageFallback } from "../../hooks/useImageFallback";
-import { CategoryBadge, ScoreBadge } from "./Badge";
-import AuthGate from "./AuthGate";
+import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../../lib/utils";
+import { BRUTAL_DESIGN } from "../../../constants";
+import { useAuth } from "../../../context/AuthProvider";
+import { useThemeStore } from "../../../store/useThemeStore";
+import { useLikeMutation } from "../hooks/usePostsQuery";
+import { useImageFallback } from "../../../hooks/useImageFallback";
+import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
+import AuthGate from "../../auth/components/AuthGate";
 
 export default function PostCard({ post, onClick }) {
-  const { isDark, handleLike, currentUser } = useAppContext();
+  const { isDark } = useThemeStore();
+  const { currentUser } = useAuth();
+  const likeMutation = useLikeMutation();
   const imgError = useImageFallback(post.imageUrl);
   const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
@@ -95,7 +99,7 @@ export default function PostCard({ post, onClick }) {
                 "flex items-center gap-1.5 font-bold text-sm transition-all hover:scale-110 active:scale-95",
                 hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-500 hover:text-red-500"
               )}
-              onClick={() => currentUser ? handleLike(post.id) : null}
+              onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
               title={currentUser ? "Curtir" : "Faça login para curtir"}
               disabled={!currentUser}
             >
