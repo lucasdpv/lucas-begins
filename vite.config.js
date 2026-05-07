@@ -7,13 +7,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Firebase em um chunk separado — raramente muda, fica no cache do browser
-          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          // Framer Motion em chunk separado pela mesma razão
-          'vendor-motion': ['framer-motion'],
-          // React core em chunk separado
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('firebase')) return 'vendor-firebase';
+            if (id.includes('framer-motion')) return 'vendor-motion';
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) return 'vendor-react';
+            return 'vendor';
+          }
         }
       }
     }
