@@ -71,9 +71,10 @@ export function AppProvider({ children }) {
     const lastMigration = localStorage.getItem(STORAGE_KEYS.MIGRATION_VERSION);
 
     const runInitialSetup = async () => {
-      await seedDatabase();
-      // Só roda o cleanup se ainda não rodou esta versão
+      // Só roda o setup inicial (seed e cleanup) se a versão da migração mudou
       if (lastMigration !== MIGRATION_VERSION) {
+        console.log(`[Setup] Executando migração ${MIGRATION_VERSION}...`);
+        await seedDatabase();
         await cleanupDuplicates();
         localStorage.setItem(STORAGE_KEYS.MIGRATION_VERSION, MIGRATION_VERSION);
       }

@@ -12,7 +12,8 @@ import {
   startAfter,
   serverTimestamp,
   getDoc,
-  increment
+  increment,
+  where
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
 
@@ -57,6 +58,17 @@ export const PostService = {
     const snap = await getDoc(postRef);
     if (!snap.exists()) return null;
     return { id: snap.id, ...snap.data() };
+  },
+
+  /**
+   * Busca um post específico pelo Slug (URL amigável).
+   */
+  async getPostBySlug(slug) {
+    const q = query(collection(db, "posts"), where("slug", "==", slug), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const postDoc = snapshot.docs[0];
+    return { id: postDoc.id, ...postDoc.data() };
   },
 
   /**

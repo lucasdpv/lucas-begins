@@ -4,6 +4,17 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🦴 [v1.8.0] - Universal Skeleton Overhaul
+*Data: 07 de Maio de 2026*
+
+### ✨ UI/UX & Carregamento
+- **Skeletons de Próxima Geração**: Redesign completo de todos os estados de carregamento (Home, Sobre, Artigos) para espelhar perfeitamente o design Neo-Brutalista.
+- **Layout Mirroring**: Skeletons agora utilizam bordas rígidas, sombras sólidas (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`) e labels flutuantes para consistência visual absoluta.
+- **Zero Layout Shift**: Introdução do `CarouselSkeleton` na página inicial, simulando o carrossel e a sidebar em tempo real durante o fetch de dados.
+- **Otimização de Percepção**: Placeholders de texto e blocos de conteúdo agora respeitam milimetricamente as dimensões dos componentes renderizados.
+
+---
+
 ## 🕹️ [v1.7.0] - Neo-Brutalist & Stability Overhaul
 *Data: 06 de Maio de 2026*
 

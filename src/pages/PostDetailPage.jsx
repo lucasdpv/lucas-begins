@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -22,13 +22,47 @@ import { useImageFallback } from "../hooks/useImageFallback";
 import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../components/ui/AuthGate";
 import PostDetailSkeleton from "../components/ui/PostDetailSkeleton";
+import { PostService } from "../services/postService";
 
 export default function PostDetailPage({ previewPost }) {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, showToast, isLoadingPosts, handleView } = useAppContext();
+  const { 
+    posts, isDark, currentUser, handleLike, handleAddComment, handleDeleteComment, 
+    showToast, isLoadingPosts, handleView, setIsLoginModalOpen 
+  } = useAppContext();
 
-  const post = previewPost || posts.find((p) => String(p.slug) === String(slug));
+  const [localPost, setLocalPost] = useState(null);
+  const [isFetchingLocal, setIsFetchingLocal] = useState(false);
+
+  // 1. Tenta achar na lista global primeiro
+  const post = previewPost || posts.find((p) => String(p.slug) === String(slug)) || localPost;
+
+  // Ref para evitar chamadas duplicadas ao Firestore (não causa re-renders)
+  const isFetchingRef = useRef(false);
+
+  // 2. Se não achou na lista global e não estamos mais carregando a lista inicial, busca direto no Firestore
+  useEffect(() => {
+    if (post || !slug || previewPost || isLoadingPosts || isFetchingRef.current) return;
+
+    const fetchPost = async () => {
+      isFetchingRef.current = true;
+      setIsFetchingLocal(true);
+      try {
+        const fetched = await PostService.getPostBySlug(slug);
+        if (fetched) {
+          setLocalPost(fetched);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar post por slug:", error);
+      } finally {
+        setIsFetchingLocal(false);
+        // Não reseta isFetchingRef: uma vez buscado, não busca de novo para este slug
+      }
+    };
+
+    fetchPost();
+  }, [slug, post, isLoadingPosts, previewPost]);
 
   const trendingPosts = useMemo(() => {
     return [...posts]
@@ -48,8 +82,8 @@ export default function PostDetailPage({ previewPost }) {
     }
   }, [post?.id, previewPost, handleView]);
 
-  // Enquanto estiver carregando os posts do Firebase, mostramos o Skeleton
-  if (isLoadingPosts && !post) {
+  // Enquanto estiver carregando os posts do Firebase ou buscando o post localmente, mostramos o Skeleton
+  if ((isLoadingPosts || isFetchingLocal) && !post) {
     return (
       <div className="py-20">
         <PostDetailSkeleton isDark={isDark} />

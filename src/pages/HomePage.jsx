@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import Carousel from "../components/ui/Carousel";
 import PostCard from "../components/ui/PostCard";
 import PostSkeleton from "../components/ui/PostSkeleton";
+import CarouselSkeleton from "../components/ui/CarouselSkeleton";
 import { useAppContext } from "../context/AppContext";
 import { cn, slugify } from "../lib/utils";
 
@@ -72,9 +73,11 @@ export default function HomePage() {
       </Helmet>
 
       {/* Seção Superior: Destaque + Em Alta (Lado a Lado) */}
-      {!isLoadingPosts && activeCategory === "Todos" && searchQuery === "" && posts.length > 0 && (
+      {isLoadingPosts && activeCategory === "Todos" && searchQuery === "" ? (
+        <CarouselSkeleton isDark={isDark} />
+      ) : !isLoadingPosts && activeCategory === "Todos" && searchQuery === "" && posts.length > 0 && (
         <section>
-          {/* Linha de Títulos Unificada para Simetria Total */}
+          {/* ... existing section code ... */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-6">
             <div className="lg:col-span-3 flex items-center gap-3">
                <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]" : "bg-purple-600")} />
