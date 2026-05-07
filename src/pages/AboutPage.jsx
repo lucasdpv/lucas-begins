@@ -12,7 +12,7 @@ export default function AboutPage() {
   const { isDark } = useAppContext();
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-6 md:py-12 px-4 relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-start justify-center py-12 md:py-20 px-4 relative overflow-hidden">
       <Helmet>
         <title>A História | Lucas Begins</title>
         <meta name="description" content="Conheça a história de Player 1 por trás do Lucas Begins e porque amamos games retro." />
@@ -26,7 +26,7 @@ export default function AboutPage() {
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-block px-6 md:px-10 py-3 md:py-4 bg-purple-600 border-4 md:border-[6px] border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] md:shadow-[10px_10px_0px_rgba(0,0,0,1)] mb-6 md:mb-8">
             <h1 className="font-retro font-bold text-2xl md:text-6xl text-white uppercase tracking-tighter drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-              Sobre o <span className="text-yellow-400">Blog</span>
+              Sobre <span className="text-yellow-400">Nós</span>
             </h1>
           </div>
           <p className={cn(

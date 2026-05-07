@@ -127,12 +127,12 @@ export default function Navbar() {
           </div>
 
           {/* Centro: Links de Navegação (Desktop) */}
-          <div className="hidden xl:flex items-center gap-4 flex-1 justify-center px-4">
+          <div className="hidden xl:flex items-center gap-1 flex-1 justify-center px-4 whitespace-nowrap">
             {/* Dropdown de Categorias (O Estilo que você gostou) */}
             <div className="relative">
               <button
                 className={cn(
-                  "px-5 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
+                  "px-3 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
                   isCategoryMenuOpen 
                     ? (isDark ? "text-purple-500 bg-purple-500/10" : "text-snes-dark bg-snes-input") 
                     : (isDark ? "hover:text-purple-500" : "hover:text-snes-dark hover:bg-snes-surface")
@@ -194,8 +194,8 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Link to="/about" className="px-5 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Sobre Nós</Link>
-            <Link to="/contact" className="px-5 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm">Contatos</Link>
+            <Link to="/about" className="px-3 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm whitespace-nowrap">Sobre Nós</Link>
+            <Link to="/contact" className="px-3 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm whitespace-nowrap">Contatos</Link>
           </div>
 
           {/* Direita: Ações */}
