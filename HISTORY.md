@@ -4,6 +4,31 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🏆 [v2.0.0] - The Community & Maintenance Update
+*Data: 08 de Maio de 2026*
+
+### 🎮 Sistema de Gamificação (XP & Level)
+- **Progressão em Tempo Real**: Implementação de sistema de XP e Níveis para todos os usuários logados.
+- **Recompensas por Ação**: Ganhos de XP automatizados e persistentes: Ler Artigo (+10 XP), Curtir (+5 XP), Comentar (+20 XP), Favoritar (+15 XP).
+- **Sincronização Persistente**: Correção de bug crítico de sobrescrita; agora o progresso de Nível e XP é protegido contra perdas durante atualizações de perfil.
+
+### 🏠 QG do Usuário (Dashboard 2.0)
+- **Acesso Universal**: Liberação da rota `/dashboard` para todos os usuários autenticados, transformando-a no centro de comando do leitor.
+- **Customização de Perfil**: Nova funcionalidade de edição de perfil (Nome, AKA, Bio, Avatar) disponível para todos os jogadores diretamente no Dashboard.
+- **Interface Viva**: Dashboard agora exibe estatísticas em tempo real e barra de progresso de XP sincronizada instantaneamente com o Firestore.
+
+### 🛠️ Ferramentas de Manutenção (Admin)
+- **Aba de Ferramentas**: Nova seção administrativa dedicada à integridade e saúde do banco de dados.
+- **Normalização de Dados**: Implementação de ferramenta para resetar contadores de visualizações inflados, ajustando-os para valores realistas baseados no engajamento real.
+
+### 🛡️ Estabilidade & Segurança
+- **Migração TypeScript**: Refatoração completa da arquitetura do projeto de JavaScript para TypeScript, garantindo tipagem estática e maior robustez contra bugs de tempo de execução.
+- **Anti-Loop de Visualizações**: Implementação de trava técnica via `useRef` para impedir o consumo excessivo de cota do Firebase por múltiplos incrementos de views.
+- **Refatoração de Permissões**: Novo `ProtectedRoute` com lógica de hierarquia inteligente, permitindo que Admins acessem áreas de usuários sem restrições.
+- **Correções de Código**: Resolução de erros de referência e importação no `AdminPage` e `PostDetailPage`.
+
+---
+
 ## 🎡 [v1.10.0] - Curation System & Manual Featured
 *Data: 07 de Maio de 2026*
 
