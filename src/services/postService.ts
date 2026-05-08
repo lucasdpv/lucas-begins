@@ -148,11 +148,12 @@ export const PostService = {
 
   /**
    * Alterna o like de um usuário no post.
+   * Retorna 'liked' ou 'unliked' para controle de XP.
    */
-  async toggleLike(postId: string, userId: string): Promise<void> {
+  async toggleLike(postId: string, userId: string): Promise<'liked' | 'unliked' | null> {
     const postRef = doc(db, "posts", postId);
     const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return;
+    if (!postSnap.exists()) return null;
 
     const data = postSnap.data() as Post;
     const likedBy = data.likedBy || [];
@@ -163,11 +164,13 @@ export const PostService = {
         likedBy: likedBy.filter(id => id !== userId),
         likes: increment(-1)
       });
+      return 'unliked';
     } else {
       await updateDoc(postRef, {
         likedBy: [...likedBy, userId],
         likes: increment(1)
       });
+      return 'liked';
     }
   },
 

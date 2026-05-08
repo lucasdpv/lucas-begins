@@ -48,8 +48,17 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const incrementViewMutation = useIncrementViewMutation();
 
   // Busca o post usando React Query se não for um preview e não estiver na lista global
-  const { data: localPost, isLoading: isFetchingLocal } = usePost(slug!, true);
-  const post = previewPost || (posts as Post[]).find((p) => String(p.slug) === String(slug)) || localPost;
+  // Busca o post usando React Query: tenta por slug primeiro, se falhar ou não existir, o próprio hook pode ser usado com ID
+  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug!, true);
+  const { data: postById, isLoading: isLoadingId } = usePost(slug!, false);
+  
+  // A ordem de prioridade: Preview > Lista Global > Busca por Slug > Busca por ID
+  const post = previewPost || 
+               (posts as Post[]).find((p) => String(p.slug) === String(slug) || String(p.id) === String(slug)) || 
+               postBySlug || 
+               postById;
+
+  const isFetchingLocal = isLoadingSlug && isLoadingId;
 
   const trendingPosts = useMemo(() => {
     return [...(posts as Post[])]
@@ -66,11 +75,15 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const hasIncremented = useRef(false);
 
   useEffect(() => {
+    // Só dispara se o post existir, não for preview e ainda não incrementamos nesta sessão
     if (post && post.id && !previewPost && !hasIncremented.current) {
-      incrementViewMutation.mutate({ postId: post.id, userId: currentUser?.id });
-      hasIncremented.current = true;
+      // Se estivermos logados, esperamos o currentUser estar disponível para garantir o XP
+      if (!authLoading) {
+        incrementViewMutation.mutate({ postId: post.id, userId: currentUser?.id });
+        hasIncremented.current = true;
+      }
     }
-  }, [post?.id, previewPost, incrementViewMutation, currentUser?.id]);
+  }, [post?.id, previewPost, incrementViewMutation, currentUser?.id, authLoading]);
 
   // Enquanto estiver carregando os posts do Firebase ou buscando o post localmente, mostramos o Skeleton
   if ((isLoadingPosts || isFetchingLocal) && !post) {

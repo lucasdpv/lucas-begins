@@ -150,7 +150,9 @@ export function useLikeMutation() {
       // Update Profile XP
       queryClient.setQueryData(['userProfile', userId], (old: any) => {
         if (!old) return old;
-        return { ...old, xp: old.xp + 5 };
+        const postData = queryClient.getQueryData(postKeys.detail(postId)) as any;
+        const alreadyLiked = postData?.likedBy?.includes(userId);
+        return { ...old, xp: alreadyLiked ? old.xp : old.xp + 5 };
       });
 
       return { prevPost, prevProfile };
@@ -178,12 +180,12 @@ export function useCommentMutation() {
       await PostService.addComment(postId, comment);
       // Ganha 10 XP por comentar
       if (comment.authorId) {
-        await userService.addXP(comment.authorId, 10);
+        await userService.addXP(comment.authorId, 20);
       }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
     },
   });
 }
@@ -216,7 +218,7 @@ export function useFavoriteMutation() {
         return {
           ...old,
           favorites: newFavorites,
-          xp: old.xp + 15 // XP também sobe visualmente
+          xp: isFavorited ? old.xp : old.xp + 15 // XP só sobe se estiver adicionando
         };
       });
 

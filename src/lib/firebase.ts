@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
@@ -17,11 +17,7 @@ const app = initializeApp(firebaseConfig);
 
 // Exporta serviços para uso no App
 export const auth = getAuth(app);
-
-// Inicializa Firestore com Persistência Local (Melhora muito o tempo de resposta inicial)
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-});
+export const db = getFirestore(app);
 
 // Google
 export const googleProvider = new GoogleAuthProvider();

@@ -9,6 +9,6 @@ export function useUserProfile(userId: string | undefined) {
     queryKey: ['userProfile', userId],
     queryFn: () => userId ? userService.getUserProfileById(userId) : null,
     enabled: !!userId,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 0, // Força a busca do servidor para garantir sincronização entre aparelhos
   });
 }

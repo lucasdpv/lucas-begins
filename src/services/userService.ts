@@ -101,8 +101,9 @@ export const userService = {
 
   /**
    * Alterna um post nos favoritos do usuário.
+   * Retorna 'added' ou 'removed' para controle de XP.
    */
-  toggleFavorite: async (userId: string, postId: string): Promise<boolean> => {
+  toggleFavorite: async (userId: string, postId: string): Promise<'added' | 'removed' | null> => {
     try {
       const userRef = doc(db, COLLECTIONS.USERS, userId);
       const userSnap = await getDoc(userRef);
@@ -114,18 +115,28 @@ export const userService = {
       }
 
       const isFavorited = favorites.includes(postId);
-      const newFavorites = isFavorited 
-        ? favorites.filter((id: string) => id !== postId)
-        : [...favorites, postId];
+      let action: 'added' | 'removed';
+      let newFavorites: string[];
+
+      if (isFavorited) {
+        newFavorites = favorites.filter((id: string) => id !== postId);
+        action = 'removed';
+      } else {
+        newFavorites = [...favorites, postId];
+        action = 'added';
+      }
 
       await setDoc(userRef, { favorites: newFavorites }, { merge: true });
-      return true;
+      return action;
     } catch (error) {
       errorService.handle(error, "ao alternar favorito");
-      return false;
+      return null;
     }
   },
 
+  /**
+   * Adiciona XP ao usuário e verifica Level Up.
+   */
   /**
    * Adiciona XP ao usuário e verifica Level Up.
    */
@@ -133,24 +144,38 @@ export const userService = {
     try {
       const userRef = doc(db, COLLECTIONS.USERS, userId);
       const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return;
-
-      const data = userSnap.data();
-      const currentXP = data.xp || 0;
-      const currentLevel = data.level || 1;
       
-      const newXP = currentXP + amount;
-      // Lógica de Level Up: cada level exige 100 XP * level atual
-      const nextLevelThreshold = currentLevel * 100;
+      let currentXP = 0;
+      let currentLevel = 1;
+      let email = "";
+      let name = "Player";
 
-      if (newXP >= nextLevelThreshold) {
-        await setDoc(userRef, { 
-          xp: newXP - nextLevelThreshold, 
-          level: currentLevel + 1 
-        }, { merge: true });
-      } else {
-        await setDoc(userRef, { xp: newXP }, { merge: true });
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        currentXP = data.xp || 0;
+        currentLevel = data.level || 1;
+        email = data.email || "";
+        name = data.name || "Player";
       }
+
+      let newXP = currentXP + amount;
+      let newLevel = currentLevel;
+
+      // Lógica de Level Up acumulativa
+      while (newXP >= newLevel * 100) {
+        newXP -= newLevel * 100;
+        newLevel++;
+      }
+
+      await setDoc(userRef, { 
+        xp: newXP, 
+        level: newLevel,
+        // Garante campos básicos se for criação
+        id: userId,
+        email,
+        name,
+        updatedAt: new Date()
+      }, { merge: true });
     } catch (error) {
       errorService.handle(error, "ao adicionar XP");
     }
