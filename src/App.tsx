@@ -11,6 +11,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Toast from "./components/ui/Toast";
 import LoginModal from "./features/auth/components/LoginModal";
+import BackToTop from "./components/ui/BackToTop";
 import SystemInitializer from "./components/SystemInitializer";
 import PostSkeleton from "./features/posts/components/PostSkeleton";
 import PostDetailSkeleton from "./features/posts/components/PostDetailSkeleton";
@@ -133,6 +134,7 @@ export default function App() {
         </main>
 
         <Footer />
+        <BackToTop />
         {isLoginModalOpen && <LoginModal />}
       </div>
     </div>

@@ -123,7 +123,14 @@ export default function LoginModal() {
             {PROVIDERS.map(({ key, label, icon: IconComponent, lightStyle, darkStyle }) => (
               <button
                 key={key}
-                onClick={() => handlers[key]?.()}
+                onClick={async () => {
+                  try {
+                    await handlers[key]?.();
+                    setIsLoginModalOpen(false);
+                  } catch (err) {
+                    // Erro já tratado no Provider
+                  }
+                }}
                 className={cn(
                   "w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-base transition-all duration-150 border-2 retro-button",
                   isDark ? darkStyle : lightStyle
