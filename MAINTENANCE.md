@@ -1,62 +1,61 @@
-# 🔧 Guia de Manutenção — Lucas Begins
+# 🔧 Guia de Manutenção — Lucas Begins (v2.0)
 
-Este documento servirá como seu manual de operações para manter o blog seguro, atualizado e organizado.
-
----
-
-## 🔐 Gestão de Administradores
-
-A segurança do blog baseia-se em uma lista VIP de emails autorizados. Atualmente, o sistema verifica se o seu email está na coleção `admins` do Firestore.
-
-### Como adicionar um novo Administrador:
-1. Acesse o **[Console do Firebase](https://console.firebase.google.com/)**.
-2. Vá em **Firestore Database**.
-3. Localize a coleção `admins`.
-4. Clique em **Adicionar Documento**.
-5. Em **ID do Documento**, coloque o **e-mail exato** da pessoa (ex: `exemplo@gmail.com`).
-6. Não é necessário adicionar campos extras dentro do documento, apenas o ID sendo o e-mail já basta para o sistema reconhecê-la como Admin.
+Este documento é o seu manual de operações para manter a economia de jogo e a integridade do banco de dados do portal.
 
 ---
 
-## 🧹 Limpeza e Integridade de Dados
+## 🔐 Gestão de Administradores & Roles
 
-O blog possui scripts automáticos para evitar duplicatas e garantir que todos os posts tenham URLs amigáveis (Slugs).
+Diferente da versão anterior, a segurança agora é baseada em **Roles** (Papéis) dentro do documento do usuário na coleção `users`.
 
-### Versionamento de Migração:
-Se você notar algum problema com posts antigos ou duplicatas que não estão sendo removidas:
-1. Abra o arquivo `src/context/AppProvider.jsx`.
-2. Localize a constante `MIGRATION_VERSION` (atualmente `v1.2`).
-3. Altere para uma nova versão (ex: `v1.3`).
-4. Isso forçará o script `cleanupDuplicates()` a rodar novamente para todos os usuários na próxima vez que acessarem o site.
-
----
-
-## 💾 Backups
-
-O Firebase não faz backups automáticos no plano gratuito (Spark). Recomenda-se:
-- Antes de grandes exclusões, use a função de **Exportar Dados** no console do Firebase (requer configuração de Storage).
-- Alternativamente, mantenha uma cópia dos seus artigos em arquivos locais (Markdown) antes de publicá-los.
+### Como promover um usuário a Admin:
+1. Acesse o **Firestore Database**.
+2. Localize o usuário na coleção `users` (pelo UID ou e-mail).
+3. Altere o campo `role` de `"user"` para `"admin"`.
+4. Isso desbloqueia automaticamente o acesso ao Painel Admin e todas as ferramentas de edição.
 
 ---
 
-## 🚀 Deploy e Infraestrutura
+## 🛠️ Ferramentas Administrativas (Painel de Controle)
 
-O blog está configurado para ser hospedado na **Vercel**, aproveitando as Edge Functions para performance.
+A Versão 2.0 introduziu a aba **"Ferramentas"** no Painel Admin, eliminando a necessidade de scripts manuais.
 
-### 1. Vercel Hosting
-- O arquivo `vercel.json` configura os redirecionamentos e headers de segurança.
-- Ao fazer deploy, garanta que todas as variáveis de ambiente do `.env.local` estejam cadastradas no painel da Vercel.
-
-### 2. API de Imagens Sociais (Open Graph)
-Localizada em `api/og.js`, esta função gera automaticamente imagens de compartilhamento (Cards do Twitter/WhatsApp) dinâmicas para cada post.
-- **Como testar**: Acesse `https://seusite.com/api/og?title=Seu Titulo`.
-- **Manutenção**: Se mudar o design do blog, lembre-se de atualizar o layout React dentro de `api/og.js` para manter a consistência visual.
+### 📊 Normalização de Visualizações
+Se as visualizações de um post parecerem irreais (ex: 10.000 views para 2 likes), use esta ferramenta:
+1. Vá em **Admin > Ferramentas**.
+2. Clique em **"Executar Reset"**.
+3. O sistema recalculará as views de todos os posts usando uma fórmula baseada em engajamento real + fator aleatório retro.
+4. **Performance**: O processo é executado em paralelo e leva poucos segundos.
 
 ---
 
-## 🚀 Próximos Passos de Evolução
-- **Firebase Storage**: No futuro, podemos migrar o upload de imagens do `imageUrl` (links externos) para o Storage oficial do Firebase, garantindo que as imagens nunca "quebrem".
-- **Hospedagem**: Atualmente utilizando **Vercel** para o frontend e funções de API.
+## 🎮 Gestão de Gamificação (XP & Level)
+
+O progresso dos usuários é armazenado nos campos `xp` e `level` da coleção `users`.
+
+### Recuperação de XP:
+Se um usuário relatar perda de nível ou XP:
+1. Verifique o histórico de edições de perfil no Firestore.
+2. O sistema de proteção (v2.0) impede sobrescritas, mas em caso de falha, você pode editar manualmente os campos `xp` e `level` para restaurar o progresso do jogador.
+
+---
+
+## 🧹 Versionamento de Migração
+A constante que controla a limpeza de cache e scripts de inicialização agora reside em:
+`src/constants.ts` -> `MIGRATION_VERSION`.
+
+Ao subir uma versão que mude drasticamente a estrutura do banco:
+1. Altere o valor de `MIGRATION_VERSION` (ex: de `v2.0` para `v2.1`).
+2. Isso forçará a limpeza de `localStorage` e re-sincronização para todos os usuários.
+
+---
+
+## 💾 Backups & Segurança
+O Firebase não possui backups automáticos no plano Spark.
+- **Exportação**: Utilize o Google Cloud Console para exportações programadas se o banco crescer muito.
+- **Zod Schemas**: Todos os dados salvos passam pela validação do `src/features/posts/schemas.ts`. Se adicionar um campo novo no Firestore, atualize o Schema ou o dado será ignorado pela interface.
+
+---
 
 > [!TIP]
-> Em caso de erros críticos no banco, você pode resetar os dados básicos chamando a função `seedDatabase()` (que já roda automaticamente se o banco estiver vazio).
+> O sistema possui um `SystemInitializer.tsx` que garante que as coleções básicas existam. Se deletar o banco por engano, basta abrir o site logado como admin que a estrutura básica será recriada.

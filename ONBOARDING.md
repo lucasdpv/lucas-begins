@@ -12,59 +12,58 @@ O **Lucas Begins** não é apenas um blog; é uma experiência visual. Nossa est
 
 ---
 
-## 🛠️ 2. Stack Tecnológica
-*   **Core**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/) (para um build ultra-rápido).
-*   **Roteamento**: [React Router 7](https://reactrouter.com/en/main).
+## 🛠️ 2. Stack Tecnológica (The "Modern Powerhouse")
+*   **Core**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/) + **TypeScript** (6.0+).
+*   **Data Fetching & Cache**: [@tanstack/react-query](https://tanstack.com/query/latest) (Nossa fonte da verdade para dados do Firebase).
+*   **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (Gerencia UI Store e Theme Store de forma ultra-veloz).
 *   **Backend**: [Firebase](https://firebase.google.com/) (Firestore para dados, Auth para login).
-*   **Estilo**: [Tailwind CSS](https://tailwindcss.com/) + **CSS Variables** (para o sistema de temas).
-*   **Ícones**: [Lucide React](https://lucide.dev/).
-*   **Segurança**: Sanitização de HTML com `dompurify`.
+*   **Estilo**: [Tailwind CSS](https://tailwindcss.com/) + **CSS Variables** (Sistema de temas Modern Brutalist).
+*   **Validation**: [Zod](https://zod.dev/) (Garante que os dados do Firestore respeitem nossos Schemas).
 
 ---
 
-## 📂 3. Estrutura de Pastas
-Para manter a escalabilidade, seguimos esta organização:
+## 📂 3. Estrutura de Pastas (v2.0)
+Seguimos uma organização modular para facilitar a manutenção:
 
 ```text
 src/
-├── api/            # Funções serverless (ex: geração de imagens Open Graph)
+├── features/       # Módulos de domínio (ex: posts)
+│   └── posts/      # Components, hooks (React Query) e Schemas (Zod) do domínio
+├── services/       # Camada de Dados (Funções puras que chamam o Firestore)
+├── hooks/          # Hooks globais e utilitários (ex: useUserQuery)
 ├── components/
-│   ├── ui/         # Componentes base (Botões, Cards, Modais) - "O nosso UI Kit"
-│   ├── layout/     # Navbar, Footer, Containers
-│   └── editor/     # Componentes complexos do CMS/Editor
-├── services/       # Camada de Dados (Funções puras que chamam o Firebase)
-├── hooks/          # A ponte entre UI e Services (ex: usePosts, useAuth)
-├── context/        # Estado Global (AppProvider gerencia Tema e Usuário)
-├── pages/          # Páginas completas da aplicação
-└── index.css       # Design System (Definição de variáveis retro e animações)
+│   ├── ui/         # Componentes base (Botões, Cards, Skeletons)
+│   └── layout/     # Navbar, Footer, ProtectedRoute
+├── store/          # Zustand Stores (useUIStore, useThemeStore)
+├── context/        # AuthProvider (Gerenciamento de sessão Firebase)
+├── pages/          # Páginas completas (agora em .tsx)
+└── lib/            # Utilitários, configurações do Firebase e Zod schemas
 ```
 
 ---
 
-## 🎨 4. O Sistema de Design (Como Estilizar)
-**Não use cores fixas do Tailwind (ex: `bg-purple-500`) para elementos de marca.**
+## 🎨 4. O Sistema de Design (Modern Brutalist)
+**Identidade Visual**: Bordas sólidas de 4px, sombras pretas puras e paleta SNES (Roxo, Amarelo, Cinza).
 
-Sempre prefira as nossas **CSS Variables** definidas em `index.css`. Isso garante que o componente mude de cor automaticamente ao trocar o tema.
-
-*   **Cards**: Use a classe `.retro-card`.
-*   **Botões**: Use a classe `.retro-button`.
-*   **Cores**: Use variáveis como `var(--retro-border-color)`.
+*   **Classes Utilitárias**: Use `BRUTAL_DESIGN` (em `src/constants.ts`) para sombras e bordas padronizadas.
+*   **Responsividade**: O projeto é mobile-first. Teste sempre em resoluções de 375px.
 
 ---
 
-## 🧠 5. Fluxo de Trabalho (O "Jeito Lucas Begins")
+## 🧠 5. Fluxo de Trabalho (O "Novo Jeito Lucas Begins")
 
-### A. Adicionando uma nova funcionalidade de dados:
-1.  Crie a lógica de busca/escrita em `src/services/`.
-2.  Exponha isso através de um Hook em `src/hooks/`.
-3.  Consuma no componente de UI.
+### A. Adicionando dados:
+1.  Defina o Schema Zod em `src/features/[feature]/schemas.ts`.
+2.  Crie a função de chamada em `src/services/`.
+3.  Crie o Hook do React Query em `src/features/[feature]/hooks/`.
+4.  Consuma usando `{ data, isLoading } = useMyHook()`.
 
-### B. Autenticação e Admin:
-O sistema de Admin é baseado em uma coleção `admins` no Firestore. Se o e-mail do usuário logado estiver lá, ele ganha acesso ao editor.
-*   Use o componente `<ProtectedRoute>` para envolver rotas privadas.
+### B. Autenticação & Roles:
+O acesso é gerido pelo `AuthProvider`. O `ProtectedRoute` verifica se o usuário tem o `role === 'admin'` para áreas sensíveis.
+*   **Dashboard**: Acessível para todos os usuários logados (`role: user`).
 
-### C. SEO:
-Cada página usa `react-helmet-async` para definir títulos e metas dinâmicos. Não esqueça de atualizar o `Helmet` ao criar uma nova página!
+### C. SEO & Helmet:
+Continuamos usando `react-helmet-async`. Cada página deve definir seu SEO logo no início do componente.
 
 ---
 

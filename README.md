@@ -1,9 +1,8 @@
-# 🕹️ Lucas Begins - Retro Gaming Journal
+# 🕹️ Lucas Begins - Retro Gaming Journal (v2.0)
 
+> **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-> **"A essência dos 16-bits em uma experiência web de alta fidelidade."**
-
-O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Inspirado na estética nítida dos consoles clássicos e na sofisticação das interfaces modernas, o projeto oferece uma jornada imersiva através de análises, notícias e memórias da era dourada dos videogames.
+O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 2.0, o projeto evoluiu de um simples blog para uma plataforma de comunidade gamificada, onde cada leitura e interação aproxima o usuário da era dourada dos videogames através de níveis e conquistas.
 
 ---
 
@@ -11,34 +10,36 @@ O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming
 
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
--   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Se você é novo no projeto, comece por aqui!
--   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Como postar, gerir categorias e adicionar administradores.
--   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre arquitetura, hooks, componentes e banco de dados.
+-   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Configuração do ambiente e arquitetura TypeScript.
+-   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação e ferramentas admin.
+-   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre esquemas Zod, queries e stores.
 
 ---
 
-## ✨ Destaques do Projeto
+## ✨ Destaques da Versão 2.0
 
-### 🎨 Design "Modern Arcade"
-Uma evolução da estética do SNES Americano. Fundo perolado limpo, roxos elétricos e **sombras pretas sólidas** que dão profundidade e peso visual à interface.
+### 🎮 Gamificação (XP System)
+Sistema de progressão real. Usuários ganham XP ao ler, curtir e comentar, subindo de nível e desbloqueando emblemas de "Veterano". Tudo persistido em tempo real no Firestore.
 
-### 📝 CMS Imersivo
-Editor de Markdown integrado com sistema de rascunhos automático (`LocalStorage`) para garantir que nenhum conteúdo seja perdido durante a criação.
+### 🏠 QG de Comunidade (Dashboard)
+Um painel exclusivo para cada usuário gerenciar seu inventário de favoritos, acompanhar seu nível de experiência e personalizar sua identidade (Bio/AKA) com estética Modern Brutalist.
 
-### ⚡ Arquitetura "Enterprise-Ready"
-O coração do blog foi reescrito com foco em **Performance Extrema e Custos Zero** no Firebase. Utilizamos **Optimistic UI** para interações em tempo real (Sem lag), **Cursor Pagination** (`startAfter`) para economia de requisições e **Memoização Profunda** (`useMemo`) global para prevenir renderizações em cascata ("Render Hell").
+### ⚡ Arquitetura "Turbo-Type"
+O projeto foi totalmente migrado para **TypeScript**, utilizando **React Query** para gerenciamento de cache inteligente e **Zustand** para estados globais ultra-leves. Performance extrema com tipagem estática.
 
-### 🔐 Segurança Pro
-Sistema de autenticação via Google e proteção de rotas administrativas com verificação de papéis (Admin/User) direto no Firestore.
+### 🔐 Segurança & Manutenção
+Painel Administrativo com ferramentas integradas para normalização de dados e gestão de categorias, protegido por rotas inteligentes que respeitam a hierarquia de acesso.
 
 ---
 
-## 🛠️ Tecnologias de Ponta
+## 🛠️ Tecnologias de Elite
 
--   **React 19** + **Vite**
+-   **React 19** + **Vite** + **TypeScript**
 -   **Firebase** (Auth & Firestore Database)
--   **Tailwind CSS** + **Neo-Retro Design System**
--   **React Router 7**
+-   **TanStack React Query v5** (Data Fetching & Cache)
+-   **Zustand** (State Management: UI & Theme)
+-   **Tailwind CSS** + **Modern Brutalist Design**
+-   **Zod** (Validation & Type Safety)
 -   **Lucide Icons**
 
 ---
