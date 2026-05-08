@@ -62,44 +62,50 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
 
   /**
    * Tenta compartilhar para o Instagram Stories.
-   * No mobile, tenta usar o deep link. No desktop, explica como fazer.
+   * No mobile, prioriza o compartilhamento de arquivo via API nativa.
    */
   const shareInstagramStories = async () => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // No mobile, o ideal é compartilhar a imagem via navigator.share se suportado, 
-      // ou usar o deep link se tivermos o app ID do Facebook.
-      // Aqui vamos tentar a abordagem mais compatível: compartilhar o arquivo de imagem.
-      
       try {
-        const response = await fetch(post.imageUrl || '');
-        const blob = await response.blob();
-        const file = new File([blob], 'share-card.jpg', { type: blob.type });
+        // 1. Tentar compartilhar a imagem (Melhor experiência para Stories)
+        if (post.imageUrl) {
+          const response = await fetch(post.imageUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'share-card.jpg', { type: blob.type });
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: post.title,
+              text: `Confira: ${postUrl}`,
+            });
+            onClose();
+            return;
+          }
+        }
+
+        // 2. Fallback: Compartilhamento de texto nativo (Mais confiável que deep link)
+        if (navigator.share) {
           await navigator.share({
-            files: [file],
             title: post.title,
-            text: `Leia agora: ${postUrl}`,
+            text: `Leia agora no Lucas Begins: ${post.title}`,
+            url: postUrl,
           });
           onClose();
           return;
         }
       } catch (err) {
-        console.error("Erro ao preparar imagem para share:", err);
+        console.error("Erro no compartilhamento nativo:", err);
       }
       
-      // Fallback para deep link (protocolo customizado do Instagram)
-      // Nota: Este protocolo funciona melhor se você tiver um Facebook App ID registrado.
-      const instagramUrl = `instagram-stories://share?contentURL=${encodeURIComponent(postUrl)}`;
-      window.location.href = instagramUrl;
-      
-      showToast("Abrindo Instagram... Adicione o link sticker!");
+      // 3. Se tudo falhar (ex: navegador antigo), copia o link
+      copyToClipboard();
+      showToast("Link copiado! Abra o Instagram e cole no sticker de Link.", "info");
       onClose();
     } else {
-      // No desktop, mostramos um aviso de como fazer
-      showToast("No PC: Salve a imagem e envie pelo browser ou celular! 📱", "info");
+      showToast("No PC: Salve a imagem e envie pelo celular! 📱", "info");
     }
   };
 
