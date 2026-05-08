@@ -26,6 +26,7 @@ import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../features/auth/components/AuthGate";
 import PostDetailSkeleton from "../features/posts/components/PostDetailSkeleton";
 import { Post } from "../features/posts/schemas";
+import ShareModal from "../components/ui/ShareModal";
 
 interface PostDetailPageProps {
   previewPost?: Post;
@@ -67,6 +68,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const imgError = useImageFallback(post?.imageUrl ?? undefined);
   const COMMENTS_PER_PAGE = 5;
   const [visibleComments] = useState(COMMENTS_PER_PAGE);
@@ -134,25 +136,8 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     setCommentText("");
   };
 
-  const handleShare = async () => {
-    const url = window.location.href;
-    const shareData = {
-      title: post.title || "Lucas Begins",
-      text: post.excerpt ? `Confira: ${post.excerpt}` : "Dá uma olhada nessa matéria no Lucas Begins!",
-      url: url,
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          fallbackCopy(url);
-        }
-      }
-    } else {
-      fallbackCopy(url);
-    }
+  const handleShare = () => {
+    setIsShareModalOpen(true);
   };
 
   const fallbackCopy = async (url: string) => {
@@ -601,6 +586,12 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           </section>
         </div>
       </div>
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        post={post} 
+        isDark={isDark} 
+      />
     </article>
   );
 }
