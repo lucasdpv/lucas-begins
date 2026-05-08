@@ -209,16 +209,18 @@ export const PostService = {
   async normalizeAllPostViews(): Promise<void> {
     const posts = await this.getAllPosts();
     
-    for (const post of posts) {
-      if (!post.id) continue;
+    // Criamos uma lista de promessas para atualizar tudo em paralelo
+    const updatePromises = posts.map(post => {
+      if (!post.id) return Promise.resolve();
       
       const likes = post.likes || 0;
-      // Define views como curtidas + um número aleatório entre 5 e 15, com mínimo de 5
       const normalizedViews = Math.max(likes + (Math.floor(Math.random() * 10) + 5), 5);
       
       const postRef = doc(db, "posts", post.id);
-      await updateDoc(postRef, { views: normalizedViews });
-    }
+      return updateDoc(postRef, { views: normalizedViews });
+    });
+
+    await Promise.all(updatePromises);
   },
 
   /**
