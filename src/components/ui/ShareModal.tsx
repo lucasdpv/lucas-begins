@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Instagram, MessageCircle, Copy, Share2, Download, ExternalLink } from 'lucide-react';
+import { X, MessageCircle, Copy, Share2, Download } from 'lucide-react';
 import { Post } from '../../features/posts/schemas';
 import { useUIStore } from '../../store/useUIStore';
 import { cn } from '../../lib/utils';
@@ -160,7 +160,19 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                     "bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white"
                   )}
                 >
-                  <Instagram className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="w-8 h-8 group-hover:scale-110 transition-transform"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
                   <span className="font-retro text-[10px] font-bold uppercase">Stories</span>
                 </button>
 
