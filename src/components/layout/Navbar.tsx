@@ -11,19 +11,31 @@ import {
   LogOut,
   Settings,
   LayoutGrid,
-  Hash,
+  User,
+  FileText,
+  Sword,
+  Newspaper,
+  CheckCircle,
+  History,
+  Cpu,
+  Gamepad,
+  Music,
   Star,
   Zap,
   PlusCircle,
-  ChevronRight
+  ChevronRight,
+  BookOpen,
+  Clock,
+  FileSearch
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthProvider";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useUIStore } from "../../store/useUIStore";
 import { useCategories } from "../../features/posts/hooks/useCategoriesQuery";
+import { useUserProfile } from "../../hooks/useUserQuery";
 import { BRUTAL_DESIGN } from "../../constants";
-import { cn } from "../../lib/utils";
+import { cn, getPixelAvatar } from "../../lib/utils";
 
 export default function Navbar() {
   const {
@@ -36,6 +48,7 @@ export default function Navbar() {
 
   const { isDark, toggleTheme } = useThemeStore();
   const { currentUser, handleLogout } = useAuth();
+  const { data: profile } = useUserProfile(currentUser?.id);
   const { data: categories = [] } = useCategories();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,6 +120,28 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  // Mapeamento de Ícones por Categoria
+  const getCategoryIcon = (cat: string, size?: number) => {
+    const iconSize = size || 20;
+    const lowerCat = cat.toLowerCase();
+    
+    if (lowerCat === "todos") return <LayoutGrid size={iconSize} />;
+    if (lowerCat.includes("dossiê")) return <BookOpen size={iconSize} />;
+    if (lowerCat.includes("tempo")) return <Clock size={iconSize} />;
+    if (lowerCat.includes("análise")) return <FileSearch size={iconSize} />;
+    if (lowerCat.includes("artigo")) return <FileText size={iconSize} />;
+    if (lowerCat.includes("especial")) return <Star size={iconSize} />;
+    if (lowerCat.includes("rpg") || lowerCat.includes("mmo")) return <Sword size={iconSize} />;
+    if (lowerCat.includes("notícia")) return <Newspaper size={iconSize} />;
+    if (lowerCat.includes("review")) return <CheckCircle size={iconSize} />;
+    if (lowerCat.includes("nostalgia")) return <History size={iconSize} />;
+    if (lowerCat.includes("tech") || lowerCat.includes("futuro")) return <Cpu size={iconSize} />;
+    if (lowerCat.includes("retro") || lowerCat.includes("clássico")) return <Gamepad2 size={iconSize} />;
+    if (lowerCat.includes("cultura") || lowerCat.includes("pop")) return <Music size={iconSize} />;
+    
+    return <Zap size={iconSize} />;
+  };
+
 
   return (
     <>
@@ -151,7 +186,7 @@ export default function Navbar() {
                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                    className="absolute top-full left-0 mt-0 pt-4 w-[420px] z-50"
+                    className="absolute top-full left-0 mt-0 pt-4 w-[480px] z-50"
                     onMouseEnter={() => setIsCategoryMenuOpen(true)}
                     onMouseLeave={() => setIsCategoryMenuOpen(false)}
                   >
@@ -162,16 +197,16 @@ export default function Navbar() {
                     )} />
 
                     <div className={cn(
-                      "overflow-hidden p-6 grid grid-cols-2 gap-3 relative",
+                      "overflow-hidden p-5 grid grid-cols-2 gap-4 relative",
                       BRUTAL_DESIGN.ROUNDED, BRUTAL_DESIGN.BORDER_THICK, BRUTAL_DESIGN.SHADOW,
                       isDark ? "bg-gray-800" : "bg-white"
                     )}>
-                      {["Todos", ...categories].map((cat, idx) => (
+                      {["Todos", ...categories].map((cat) => (
                         <button
                           key={cat}
                           onClick={() => handleCategorySelect(cat)}
                           className={cn(
-                            "group flex items-center gap-4 p-4 rounded-2xl border-2 border-transparent transition-all text-left",
+                            "group flex items-center gap-3.5 p-3 rounded-2xl border-2 border-transparent transition-all text-left w-full",
                             activeCategory === cat
                               ? (isDark ? "bg-purple-600 text-white shadow-lg" : "bg-snes-dark text-white shadow-lg")
                               : isDark
@@ -180,15 +215,22 @@ export default function Navbar() {
                           )}
                         >
                           <div className={cn(
-                            "w-10 h-10 flex items-center justify-center transition-colors",
+                            "w-10 h-10 shrink-0 flex items-center justify-center transition-all duration-300",
                             BRUTAL_DESIGN.ROUNDED_MODERN, BRUTAL_DESIGN.BORDER,
-                            activeCategory === cat ? "bg-white/20" : isDark ? "bg-gray-700" : "bg-gray-100"
+                            activeCategory === cat ? "bg-white/20 border-white/40" : isDark ? "bg-gray-700 border-white/5" : "bg-gray-100 border-black/5",
+                            "group-hover:scale-110"
                           )}>
-                            {idx === 0 ? <LayoutGrid size={20} /> : <Hash size={20} />}
+                            <div className="opacity-80 group-hover:opacity-100">
+                              {getCategoryIcon(cat, 18)}
+                            </div>
                           </div>
-                          <div className="flex flex-col">
-                            <span className="font-retro font-bold text-xs uppercase tracking-wider">{cat}</span>
-                            <span className="text-[10px] opacity-50 font-bold uppercase">Ver artigos</span>
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="font-retro font-bold text-[11px] uppercase tracking-wider truncate">
+                              {cat}
+                            </span>
+                            <span className="text-[9px] opacity-50 font-bold uppercase tracking-tight">
+                              Explorar
+                            </span>
                           </div>
                         </button>
                       ))}
@@ -277,16 +319,26 @@ export default function Navbar() {
             {!isSearchExpanded && (
               <button
                 onClick={() => setIsSearchExpanded(true)}
-                className="p-2.5 xl:hidden rounded-xl border-2 transition-all retro-button"
+                className={cn(
+                  "p-2.5 xl:hidden rounded-xl border-2 transition-all active:scale-95",
+                  isDark ? "bg-gray-900 border-purple-500 text-purple-400" : "bg-purple-50 border-purple-500 text-purple-600"
+                )}
               >
-                <Search className="w-5 h-5 text-purple-500" />
+                <Search size={22} />
               </button>
             )}
 
             {!isSearchExpanded && (
               <>
-                <button onClick={toggleTheme} className="hidden xl:flex p-2.5 rounded-xl border-2 transition-all retro-button">
-                  {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-snes-accent" />}
+                <button 
+                  onClick={toggleTheme} 
+                  className={cn(
+                    "hidden xl:flex p-2.5 rounded-xl border-2 transition-all group",
+                    isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-yellow-400" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-purple-600"
+                  )}
+                  title={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
+                >
+                  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
 
                 <div className="hidden xl:flex items-center gap-3">
@@ -297,32 +349,66 @@ export default function Navbar() {
                   )}
 
                   {currentUser ? (
-                    <div className="flex items-center gap-3">
-                      <div className="relative group">
-                        <img
-                          src={currentUser.avatar}
-                          alt=""
-                          className="w-10 h-10 rounded-full border-2 border-purple-500 cursor-pointer shadow-lg"
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse" />
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Link 
+                        to="/dashboard" 
+                        className={cn(
+                          "flex items-center gap-2 p-1.5 pr-3 rounded-xl border-2 transition-all group",
+                          isDark ? "border-purple-500/30 hover:bg-purple-500/20" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100"
+                        )}
+                        title="Meu QG"
+                      >
+                        <div className="relative shrink-0">
+                          <img
+                            src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))}
+                            alt=""
+                            className="w-8 h-8 rounded-lg border border-purple-500/50 object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = getPixelAvatar(currentUser.id);
+                            }}
+                          />
+                          <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
+                        </div>
+                        <span className="font-retro text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Meu QG</span>
+                      </Link>
+                      
                       <button
                         onClick={handleLogout}
-                        className="p-2.5 rounded-xl border-2 border-red-500/30 text-red-500 transition-all hover:bg-red-500 hover:text-white"
+                        className={cn(
+                          "p-2 rounded-xl border-2 transition-all",
+                          isDark 
+                            ? "border-red-500/30 text-red-400 hover:bg-red-500/20" 
+                            : "border-red-500/20 text-red-500 hover:bg-red-50"
+                        )}
+                        title="Sair"
                       >
-                        <LogOut size={20} />
+                        <LogOut size={18} />
                       </button>
                     </div>
                   ) : (
-                    <button onClick={() => setIsLoginModalOpen(true)} className="px-6 py-2.5 rounded-xl font-retro font-bold text-xs bg-purple-600 text-white border-2 border-black retro-button">LOGIN</button>
+                    <button 
+                      onClick={() => setIsLoginModalOpen(true)} 
+                      className={cn(
+                        "px-6 py-2.5 rounded-2xl font-retro font-bold text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 border-2 shadow-lg",
+                        isDark 
+                          ? "bg-purple-600 border-purple-400 text-white shadow-purple-500/20" 
+                          : "bg-purple-600 border-purple-700 text-white shadow-purple-600/20"
+                      )}
+                    >
+                      LOGIN
+                    </button>
                   )}
                 </div>
 
                 <button
                   onClick={() => setIsMobileMenuOpen(true)}
-                  className="p-2.5 xl:hidden rounded-xl border-2 border-purple-500 bg-purple-500/10 text-purple-500 transition-all hover:bg-purple-600 hover:text-white active:scale-95"
+                  className={cn(
+                    "p-2.5 xl:hidden rounded-xl border-2 transition-all active:scale-95",
+                    isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-purple-50 border-purple-500 text-purple-600"
+                  )}
                 >
-                  <Menu size={24} />
+                  <Menu size={22} />
                 </button>
               </>
             )}
@@ -361,7 +447,9 @@ export default function Navbar() {
                     onClick={() => { toggleTheme(); setIsMobileMenuOpen(false); }}
                     className={cn(
                       "p-2.5 rounded-xl border-2 transition-all",
-                      isDark ? "bg-gray-800 border-gray-700 text-yellow-400" : "bg-gray-100 border-gray-200 text-snes-accent"
+                      isDark 
+                        ? "border-purple-500/30 bg-gray-800 text-yellow-400" 
+                        : "border-purple-500/20 bg-purple-50 text-purple-600"
                     )}
                   >
                     {isDark ? <Sun size={20} /> : <Moon size={20} />}
@@ -378,13 +466,32 @@ export default function Navbar() {
               {currentUser && (
                 <div className="flex flex-col gap-1 py-2 px-1 border-b border-white/10">
                   <div className="flex items-center gap-4 mb-2">
-                    <img src={currentUser.avatar} alt="" className="w-12 h-12 rounded-full border border-purple-500/50 object-cover" />
+                    <img 
+                      src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))} 
+                      alt="" 
+                      className="w-12 h-12 rounded-full border border-purple-500/50 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = getPixelAvatar(currentUser.id);
+                      }}
+                    />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-retro font-bold uppercase text-sm text-purple-400 truncate">{currentUser.name}</h4>
-                      <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Autor Nível {currentUser.level || 1}</p>
+                      <h4 className="font-retro font-bold uppercase text-sm text-purple-400 truncate">{profile?.name || currentUser.name}</h4>
+                      <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Autor Nível {profile?.level || 1}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-1.5 rounded-lg font-retro font-bold uppercase text-[10px] transition-all",
+                        isDark ? "bg-blue-600/20 text-blue-400 hover:bg-blue-600/30" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      )}
+                    >
+                      <User size={14} /> Meu QG
+                    </Link>
+
                     {currentUser?.role === 'admin' && (
                       <Link
                         to="/admin"
@@ -394,9 +501,10 @@ export default function Navbar() {
                           isDark ? "bg-purple-600/20 text-purple-400 hover:bg-purple-600/30" : "bg-purple-50 text-purple-600 hover:bg-purple-100"
                         )}
                       >
-                        <Settings size={14} className="animate-spin-slow" /> Painel Admin
+                        <Settings size={14} /> Admin
                       </Link>
                     )}
+
                     <button
                       onClick={handleLogout}
                       className={cn(
@@ -413,7 +521,12 @@ export default function Navbar() {
               {!currentUser && (
                 <button
                   onClick={() => { setIsLoginModalOpen(true); setIsMobileMenuOpen(false); }}
-                  className="w-full py-4 border-2 border-purple-600 text-purple-500 rounded-xl font-retro font-bold uppercase text-sm hover:bg-purple-600 hover:text-white transition-all"
+                  className={cn(
+                    "w-full py-4 border-2 rounded-2xl font-retro font-bold uppercase text-sm transition-all active:scale-95 shadow-lg",
+                    isDark 
+                      ? "bg-purple-600 border-purple-400 text-white shadow-purple-500/20" 
+                      : "bg-purple-600 border-purple-700 text-white shadow-purple-600/20"
+                  )}
                 >
                   Login / Entrar
                 </button>
@@ -477,7 +590,9 @@ export default function Navbar() {
                               : isDark ? "hover:bg-gray-900 text-gray-400" : "hover:bg-gray-50 text-gray-600"
                           )}
                         >
-                          <Hash size={14} className="opacity-50" />
+                          <div className="opacity-70 scale-75 origin-left">
+                            {getCategoryIcon(cat)}
+                          </div>
                           {cat}
                         </button>
                       ))}

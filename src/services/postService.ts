@@ -204,6 +204,24 @@ export const PostService = {
   },
 
   /**
+   * Normaliza as visualizações de todos os posts (limpeza de dados inflados).
+   */
+  async normalizeAllPostViews(): Promise<void> {
+    const posts = await this.getAllPosts();
+    
+    for (const post of posts) {
+      if (!post.id) continue;
+      
+      const likes = post.likes || 0;
+      // Define views como curtidas + um número aleatório entre 5 e 15, com mínimo de 5
+      const normalizedViews = Math.max(likes + (Math.floor(Math.random() * 10) + 5), 5);
+      
+      const postRef = doc(db, "posts", post.id);
+      await updateDoc(postRef, { views: normalizedViews });
+    }
+  },
+
+  /**
    * Remove um post permanentemente.
    */
   async deletePost(postId: string): Promise<boolean> {

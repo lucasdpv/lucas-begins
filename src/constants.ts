@@ -11,7 +11,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // Versão atual das migrações de dados
-export const MIGRATION_VERSION = "v1.2" as const;
+export const MIGRATION_VERSION = "v2.0" as const;
 
 // Roles de usuário
 export const USER_ROLES = {

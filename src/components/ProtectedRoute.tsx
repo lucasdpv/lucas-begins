@@ -13,15 +13,19 @@ interface ProtectedRouteProps {
  * Enquanto carrega, exibe um loading. Se o usuário não tiver acesso,
  * redireciona para a home silenciosamente.
  */
-export default function ProtectedRoute({ children, requiredRole = "admin" }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requiredRole = "user" }: ProtectedRouteProps) {
   const { currentUser, authLoading } = useAuth();
   const navigate = useNavigate();
 
+  const hasAccess = currentUser && (
+    requiredRole === "user" || currentUser.role === "admin"
+  );
+
   useEffect(() => {
-    if (!authLoading && (!currentUser || currentUser.role !== requiredRole)) {
+    if (!authLoading && !hasAccess) {
       navigate("/", { replace: true });
     }
-  }, [currentUser, authLoading, requiredRole, navigate]);
+  }, [hasAccess, authLoading, navigate]);
 
   // Enquanto o Firebase verifica a sessão, exibe um loading neutro
   if (authLoading) {
@@ -34,7 +38,7 @@ export default function ProtectedRoute({ children, requiredRole = "admin" }: Pro
   }
 
   // Se não autorizado, não renderiza nada (o useEffect já redireciona)
-  if (!currentUser || currentUser.role !== requiredRole) {
+  if (!hasAccess) {
     return null;
   }
 

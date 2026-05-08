@@ -13,6 +13,8 @@ export interface User {
   bio: string;
   aka: string;
   level: number;
+  xp: number;
+  favorites: string[];
   role: 'admin' | 'user';
 }
 

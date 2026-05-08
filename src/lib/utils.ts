@@ -86,3 +86,19 @@ export function formatNumber(num: number): string {
   }
   return num.toString();
 }
+
+/**
+ * Retorna a URL de um avatar em Pixel Art gerado via DiceBear.
+ */
+export function getPixelAvatar(seed: string): string {
+  // Usamos o estilo pixel-art do DiceBear (versão 9.x) para manter o clima retro
+  // Adicionamos parâmetros para garantir que pareçam "rostos" mais definidos
+  const baseUrl = "https://api.dicebear.com/9.x/pixel-art/svg";
+  const params = new URLSearchParams({
+    seed: seed,
+    backgroundColor: "transparent",
+    size: "128"
+  });
+  
+  return `${baseUrl}?${params.toString()}`;
+}

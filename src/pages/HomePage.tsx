@@ -73,31 +73,11 @@ export default function HomePage() {
                  Em Destaque
                </h2>
             </div>
-            <div className="hidden lg:flex items-center w-full">
-               <div className={cn("flex w-full rounded-xl p-1", isDark ? "bg-black/30 shadow-inner" : "bg-snes-mid shadow-inner")}>
-                 <button 
-                   onClick={() => setActiveSidebarTab('acessados')}
-                   className={cn(
-                     "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-retro text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
-                     activeSidebarTab === 'acessados' 
-                       ? (isDark ? "bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-purple-600 text-white border-2 border-snes-dark shadow-[2px_2px_0px_#2D1B69]") 
-                       : "text-gray-500 hover:text-gray-400 opacity-60 hover:opacity-100"
-                   )}
-                 >
-                   <Eye className="w-3.5 h-3.5 shrink-0" /> Acessados
-                 </button>
-                 <button 
-                   onClick={() => setActiveSidebarTab('curtidos')}
-                   className={cn(
-                     "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-retro text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
-                     activeSidebarTab === 'curtidos' 
-                       ? (isDark ? "bg-purple-600 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-purple-600 text-white border-2 border-snes-dark shadow-[2px_2px_0px_#2D1B69]") 
-                       : "text-gray-500 hover:text-gray-400 opacity-60 hover:opacity-100"
-                   )}
-                 >
-                   <Star className="w-3.5 h-3.5 shrink-0" /> Em Alta
-                 </button>
-               </div>
+            <div className="hidden lg:flex items-center gap-3">
+               <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" : "bg-amber-500")} />
+               <h2 className="font-retro text-2xl md:text-3xl font-bold uppercase tracking-wide text-glow-amber">
+                 Mais Acessados
+               </h2>
             </div>
           </div>
 
@@ -107,7 +87,7 @@ export default function HomePage() {
               <Carousel posts={featuredPosts} onPostClick={onPostClick} isDark={isDark} />
             </div>
 
-            {/* Sidebar Em Alta - Altura Casada com o Carrossel */}
+            {/* Sidebar Mais Acessados - Altura Casada com o Carrossel */}
             <aside className="hidden lg:block lg:col-span-1">
               <div className={cn(
                 "h-full md:h-[560px] p-8 rounded-none flex flex-col relative overflow-hidden transition-all duration-500",
@@ -121,7 +101,7 @@ export default function HomePage() {
                 )}
                 
                 <div className="flex flex-col justify-between h-full relative z-10 gap-1">
-                  {(activeSidebarTab === 'acessados' ? mostViewedPosts : featuredPosts).map((post, idx) => (
+                  {mostViewedPosts.map((post, idx) => (
                     <div
                       key={post.id}
                       onClick={() => onPostClick(post)}
@@ -144,11 +124,7 @@ export default function HomePage() {
                           {post.title}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 opacity-40 text-[10px] font-bold uppercase tracking-wider">
-                           <span>
-                             {activeSidebarTab === 'acessados' 
-                               ? `${formatNumber(post.views || 0)} visualizações` 
-                               : `${formatNumber(post.likes || 0)} curtidas`}
-                           </span>
+                           <span>{formatNumber(post.views || 0)} visualizações</span>
                         </div>
                       </div>
                     </div>

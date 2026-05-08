@@ -26,6 +26,7 @@ const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const PostEditorPage = lazy(() => import("./pages/PostEditorPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -102,22 +103,29 @@ export default function App() {
                     <ContactPage />
                   </Suspense>
                 } />
-                <Route path="/admin" element={
+                <Route path="/dashboard" element={
                   <ProtectedRoute>
+                    <Suspense fallback={<FormSkeleton isDark={isDark} />}>
+                      <DashboardPage />
+                    </Suspense>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute requiredRole="admin">
                     <Suspense fallback={<FormSkeleton isDark={isDark} />}>
                       <AdminPage />
                     </Suspense>
                   </ProtectedRoute>
                 } />
                 <Route path="/editor" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRole="admin">
                     <Suspense fallback={<FormSkeleton isDark={isDark} />}>
                       <PostEditorPage />
                     </Suspense>
                   </ProtectedRoute>
                 } />
                 <Route path="/editor/:id" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRole="admin">
                     <Suspense fallback={<FormSkeleton isDark={isDark} />}>
                       <PostEditorPage />
                     </Suspense>

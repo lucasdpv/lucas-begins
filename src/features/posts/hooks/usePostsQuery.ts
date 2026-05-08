@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '../../../services/postService';
+import { userService } from '../../../services/userService';
 import { POSTS_PER_PAGE } from '../../../constants';
 import { Post, Comment, PostSchema } from '../schemas';
 
@@ -121,10 +122,51 @@ export function useUpdatePostMutation() {
 export function useLikeMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, userId }: { postId: string, userId: string }) => PostService.toggleLike(postId, userId),
-    onSuccess: (_, variables) => {
+    mutationFn: async ({ postId, userId }: { postId: string, userId: string }) => {
+      await PostService.toggleLike(postId, userId);
+      // Ganha 5 XP por curtir
+      await userService.addXP(userId, 5);
+    },
+    onMutate: async ({ postId, userId }) => {
+      // Cancela queries
+      await queryClient.cancelQueries({ queryKey: postKeys.all });
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+      await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
+
+      // Snapshots
+      const prevPost = queryClient.getQueryData(postKeys.detail(postId));
+      const prevProfile = queryClient.getQueryData(['userProfile', userId]);
+
+      // Update Post Detail
+      queryClient.setQueryData(postKeys.detail(postId), (old: any) => {
+        if (!old) return old;
+        const likedBy = old.likedBy || [];
+        const hasLiked = likedBy.includes(userId);
+        const newLikes = hasLiked ? (old.likes || 1) - 1 : (old.likes || 0) + 1;
+        const newLikedBy = hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId];
+        return { ...old, likes: newLikes, likedBy: newLikedBy };
+      });
+
+      // Update Profile XP
+      queryClient.setQueryData(['userProfile', userId], (old: any) => {
+        if (!old) return old;
+        return { ...old, xp: old.xp + 5 };
+      });
+
+      return { prevPost, prevProfile };
+    },
+    onError: (err, variables, context: any) => {
+      if (context?.prevPost) {
+        queryClient.setQueryData(postKeys.detail(variables.postId), context.prevPost);
+      }
+      if (context?.prevProfile) {
+        queryClient.setQueryData(['userProfile', variables.userId], context.prevProfile);
+      }
+    },
+    onSettled: (data, error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     },
   });
 }
@@ -132,9 +174,63 @@ export function useLikeMutation() {
 export function useCommentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, comment }: { postId: string, comment: Partial<Comment> }) => PostService.addComment(postId, comment),
+    mutationFn: async ({ postId, comment }: { postId: string, comment: Partial<Comment> }) => {
+      await PostService.addComment(postId, comment);
+      // Ganha 10 XP por comentar
+      if (comment.authorId) {
+        await userService.addXP(comment.authorId, 10);
+      }
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+  });
+}
+
+export function useFavoriteMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, postId }: { userId: string, postId: string }) => {
+      await userService.toggleFavorite(userId, postId);
+      // Ganha 15 XP por favoritar (incentiva a leitura futura)
+      await userService.addXP(userId, 15);
+    },
+    // Otimistic Update: Atualiza a UI antes mesmo da resposta do banco
+    onMutate: async ({ userId, postId }) => {
+      // Cancela refetches em andamento para não sobrescrever o estado otimista
+      await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
+
+      // Salva o estado anterior para rollback em caso de erro
+      const previousProfile = queryClient.getQueryData(['userProfile', userId]);
+
+      // Atualiza o cache localmente
+      queryClient.setQueryData(['userProfile', userId], (old: any) => {
+        if (!old) return old;
+        const favorites = old.favorites || [];
+        const isFavorited = favorites.includes(postId);
+        const newFavorites = isFavorited 
+          ? favorites.filter((id: string) => id !== postId)
+          : [...favorites, postId];
+        
+        return {
+          ...old,
+          favorites: newFavorites,
+          xp: old.xp + 15 // XP também sobe visualmente
+        };
+      });
+
+      return { previousProfile };
+    },
+    // Se falhar, volta ao estado anterior
+    onError: (err, variables, context) => {
+      if (context?.previousProfile) {
+        queryClient.setQueryData(['userProfile', variables.userId], context.previousProfile);
+      }
+    },
+    // Sempre invalida ao final para sincronizar com a verdade do servidor
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     },
   });
 }
@@ -151,6 +247,11 @@ export function useDeleteCommentMutation() {
 
 export function useIncrementViewMutation() {
   return useMutation({
-    mutationFn: (postId: string) => PostService.incrementPostViews(postId),
+    mutationFn: async ({ postId, userId }: { postId: string, userId?: string }) => {
+      await PostService.incrementPostViews(postId);
+      if (userId) {
+        await userService.addXP(userId, 10);
+      }
+    },
   });
 }

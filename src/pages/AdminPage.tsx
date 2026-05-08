@@ -17,7 +17,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  Star
+  Star,
+  Wrench,
+  Database,
+  RefreshCcw
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
@@ -29,6 +32,8 @@ import { Helmet } from "react-helmet-async";
 import { cn, formatDate } from "../lib/utils";
 import { contactService } from "../services/contactService";
 import { Post } from "../features/posts/schemas";
+import { PostService } from "../services/postService";
+import { useUserProfile } from "../hooks/useUserQuery";
 
 const POSTS_PER_PAGE = 8;
 
@@ -41,7 +46,7 @@ interface Message {
   createdAt: any;
 }
 
-type AdminTab = "posts" | "categories" | "messages" | "profile";
+type AdminTab = "posts" | "categories" | "messages" | "profile" | "tools";
 
 /**
  * Painel administrativo com abas: Artigos, Categorias, Perfil e Inbox.
@@ -49,6 +54,7 @@ type AdminTab = "posts" | "categories" | "messages" | "profile";
 export default function AdminPage() {
   const { showToast } = useUIStore();
   const { currentUser, handleUpdateProfile } = useAuth();
+  const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
   const navigate = useNavigate();
 
@@ -76,6 +82,7 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isResettingViews, setIsResettingViews] = useState(false);
 
   // Lógica de Filtragem
   const filteredPosts = (posts as Post[]).filter(post => {
@@ -96,25 +103,25 @@ export default function AdminPage() {
   }, [searchTerm, filterCategory]);
   
   const [profileData, setProfileData] = useState({
-    name: currentUser?.name || "",
-    avatar: currentUser?.avatar || "",
-    bio: currentUser?.bio || "",
-    level: currentUser?.level || 1,
-    aka: currentUser?.aka || ""
+    name: "",
+    avatar: "",
+    bio: "",
+    level: 1,
+    aka: ""
   });
 
-  // Atualiza o estado local quando o currentUser mudar (ex: carregamento inicial)
+  // Atualiza o estado local quando o profile real mudar (reativo)
   useEffect(() => {
-    if (currentUser) {
+    if (profile) {
       setProfileData({
-        name: currentUser.name || "",
-        avatar: currentUser.avatar || "",
-        bio: currentUser.bio || "",
-        level: currentUser.level || 1,
-        aka: currentUser.aka || ""
+        name: profile.name || "",
+        avatar: profile.avatar || "",
+        bio: profile.bio || "",
+        level: profile.level || 1,
+        aka: profile.aka || ""
       });
     }
-  }, [currentUser]);
+  }, [profile]);
 
   const fetchMessages = async () => {
     setIsLoadingMessages(true);
@@ -128,16 +135,12 @@ export default function AdminPage() {
     }
   };
 
-  // Busca mensagens quando entra na aba inbox ou ao iniciar
+  // Busca mensagens quando entra na aba inbox
   useEffect(() => {
     if (adminTab === "messages") {
       fetchMessages();
     }
   }, [adminTab]);
-
-  useEffect(() => {
-    fetchMessages();
-  }, []);
 
   const handleUpdateMessageStatus = async (id: string, status: Message['status']) => {
     try {
@@ -202,6 +205,24 @@ export default function AdminPage() {
       setNewCategoryName("");
     } catch (error) {
       showToast("Erro ao adicionar categoria.", "error");
+    }
+  };
+
+  const handleResetViews = async () => {
+    if (!window.confirm("Isso vai resetar as visualizações de TODOS os posts para valores realistas. Confirmar?")) return;
+    
+    setIsResettingViews(true);
+    try {
+      await PostService.normalizeAllPostViews();
+      showToast("Visualizações normalizadas com sucesso!");
+    } catch (error: any) {
+      if (error?.code === 'resource-exhausted') {
+        showToast("Cota do Firebase excedida. Tente novamente mais tarde.", "error");
+      } else {
+        showToast("Erro ao normalizar visualizações.", "error");
+      }
+    } finally {
+      setIsResettingViews(false);
     }
   };
 
@@ -287,6 +308,7 @@ export default function AdminPage() {
             { id: "categories" as AdminTab, label: "Categorias", icon: Tag },
             { id: "messages" as AdminTab, label: "Inbox", icon: Inbox, badge: messages.some(m => m.status === 'new') },
             { id: "profile" as AdminTab, label: "Perfil", icon: User },
+            { id: "tools" as AdminTab, label: "Ferramentas", icon: Wrench },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -878,6 +900,75 @@ export default function AdminPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Aba: Ferramentas (Manutenção) */}
+      {adminTab === "tools" && (
+        <div className="max-w-2xl animate-in slide-in-from-bottom-4 duration-500">
+          <div className={cn(
+            "p-6 md:p-10 rounded-[2rem] border-4 relative overflow-hidden",
+            isDark ? "bg-gray-800 border-purple-500/30" : "bg-white border-snes-dark shadow-[8px_8px_0px_rgba(0,0,0,1)]"
+          )}>
+            <div className="relative z-10">
+              <h3 className="font-retro text-xl md:text-3xl font-bold uppercase mb-4 flex items-center gap-3">
+                <Wrench className="text-purple-500" /> Manutenção do Sistema
+              </h3>
+              <p className={cn("text-sm md:text-base mb-8 opacity-70 leading-relaxed", isDark ? "text-gray-300" : "text-gray-600")}>
+                Utilize estas ferramentas para corrigir dados inflados ou realizar limpezas periódicas no banco de dados. 
+                <strong className="block mt-2 text-red-500 uppercase text-xs font-retro">Atenção: Estas ações são permanentes.</strong>
+              </p>
+
+              <div className="space-y-6">
+                <div className={cn(
+                  "p-6 rounded-2xl border-2 flex flex-col md:flex-row items-center justify-between gap-6",
+                  isDark ? "bg-gray-900/50 border-gray-700" : "bg-gray-50 border-gray-200"
+                )}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl">
+                      <RefreshCcw size={24} className={cn(isResettingViews && "animate-spin")} />
+                    </div>
+                    <div>
+                      <h4 className="font-retro text-sm font-bold uppercase">Resetar Visualizações</h4>
+                      <p className="text-xs opacity-60">Recalcula visitas baseado nas curtidas reais.</p>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={handleResetViews}
+                    disabled={isResettingViews}
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-3 rounded-xl font-retro text-xs font-bold uppercase transition-all active:scale-95 disabled:opacity-50",
+                      isDark 
+                        ? "bg-purple-600 text-white hover:bg-purple-500 shadow-lg shadow-purple-900/20" 
+                        : "bg-black text-white hover:bg-gray-800 shadow-[4px_4px_0px_rgba(168,85,247,0.5)]"
+                    )}
+                  >
+                    {isResettingViews ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} /> Processando...
+                      </>
+                    ) : (
+                      "Executar Reset"
+                    )}
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-xl bg-yellow-500/10 border-2 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 text-[10px] uppercase font-bold flex items-start gap-3">
+                  <Database size={14} className="mt-0.5 shrink-0" />
+                  <p>
+                    Dica: Rode este comando sempre que notar anomalias nos contadores. 
+                    Isso ajuda a manter o ranking da comunidade justo e realista.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Decoração de fundo */}
+            <div className="absolute -bottom-10 -right-10 opacity-5">
+              <Database size={200} />
             </div>
           </div>
         </div>

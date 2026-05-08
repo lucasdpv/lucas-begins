@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,15 +10,18 @@ import {
   Clock,
   Eye,
   Lock,
+  Bookmark,
+  Trash2
 } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle, formatNumber } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle, formatNumber, getPixelAvatar } from "../lib/utils";
 import ArticleRenderer from "../features/posts/components/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../context/AuthProvider";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { usePost, useLikeMutation, useCommentMutation, useIncrementViewMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
+import { usePost, useLikeMutation, useCommentMutation, useIncrementViewMutation, useAllPosts, useFavoriteMutation, useDeleteCommentMutation } from "../features/posts/hooks/usePostsQuery";
 import { useImageFallback } from "../hooks/useImageFallback";
+import { useUserProfile } from "../hooks/useUserQuery";
 import { CategoryBadge } from "../components/ui/Badge";
 import AuthGate from "../features/auth/components/AuthGate";
 import PostDetailSkeleton from "../features/posts/components/PostDetailSkeleton";
@@ -32,13 +35,16 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { showToast, setIsLoginModalOpen } = useUIStore();
-  const { currentUser } = useAuth();
+  const { currentUser, authLoading } = useAuth();
+  const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
   
   const { data: posts = [], isLoading: isLoadingPosts } = useAllPosts();
 
   const likeMutation = useLikeMutation();
   const commentMutation = useCommentMutation();
+  const favoriteMutation = useFavoriteMutation();
+  const deleteCommentMutation = useDeleteCommentMutation();
   const incrementViewMutation = useIncrementViewMutation();
 
   // Busca o post usando React Query se não for um preview e não estiver na lista global
@@ -57,11 +63,14 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const COMMENTS_PER_PAGE = 5;
   const [visibleComments] = useState(COMMENTS_PER_PAGE);
 
+  const hasIncremented = useRef(false);
+
   useEffect(() => {
-    if (post && post.id && !previewPost) {
-      incrementViewMutation.mutate(post.id);
+    if (post && post.id && !previewPost && !hasIncremented.current) {
+      incrementViewMutation.mutate({ postId: post.id, userId: currentUser?.id });
+      hasIncremented.current = true;
     }
-  }, [post?.id, previewPost, incrementViewMutation]);
+  }, [post?.id, previewPost, incrementViewMutation, currentUser?.id]);
 
   // Enquanto estiver carregando os posts do Firebase ou buscando o post localmente, mostramos o Skeleton
   if ((isLoadingPosts || isFetchingLocal) && !post) {
@@ -90,9 +99,9 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
     const comment = {
       text: commentText,
-      userName: currentUser.name,
-      userAvatar: currentUser.avatar,
-      userId: currentUser.id,
+      author: currentUser.name,
+      authorAvatar: currentUser.avatar,
+      authorId: currentUser.id,
       createdAt: new Date().toISOString()
     };
 
@@ -238,57 +247,93 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleShare}
                 className={cn(
-                  "h-12 px-4 rounded-xl border-2 font-bold retro-button transition-all hover:scale-105 flex items-center justify-center",
-                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-snes-surface border-snes-dark text-snes-accent"
+                  "h-11 w-11 md:h-12 md:w-12 rounded-2xl border-2 transition-all hover:scale-105 flex items-center justify-center shrink-0",
+                  isDark 
+                    ? "bg-gray-800 border-purple-500/50 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]" 
+                    : "bg-white border-snes-dark/20 text-snes-accent shadow-sm"
                 )}
+                title="Compartilhar"
               >
-                <Share2 className="w-5 h-5" />
+                <Share2 className="w-4 h-4 md:w-5 md:h-5" />
               </button>
 
-              {currentUser ? (
-                <button
-                  onClick={() => likeMutation.mutate({ postId: post.id, userId: currentUser.id })}
-                  className={cn(
-                    "flex items-center justify-center gap-2 h-12 px-6 rounded-xl font-retro font-bold text-base uppercase retro-button border-2 group transition-all hover:scale-105 active:scale-95",
-                    hasLiked ? "bg-red-500 border-red-600 text-white" : isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-snes-surface border-snes-dark text-snes-accent"
-                  )}
-                >
-                  <Heart className={cn("w-5 h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current group-hover:scale-110")} />
-                  {formatNumber(post.likes || 0)}
-                </button>
-              ) : (
-                <span className={cn(
-                  "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base opacity-60 cursor-default",
-                  isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
-                )}>
-                  <Heart className="w-5 h-5" />
-                  {formatNumber(post.likes || 0)}
-                </span>
-              )}
-
-              <span className={cn(
-                "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-bold text-base cursor-default",
-                isDark ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-snes-surface border-gray-400 text-gray-700"
+              <div className={cn(
+                "flex items-center justify-center gap-1.5 md:gap-2 h-11 px-3 md:h-12 md:px-5 rounded-2xl border-2 font-bold text-xs md:text-base cursor-default shrink-0",
+                isDark 
+                  ? "bg-gray-800/40 border-gray-700 text-gray-400 shadow-inner" 
+                  : "bg-gray-50 border-gray-200 text-gray-500 shadow-inner"
               )}>
-                <Eye className="w-5 h-5" />
-                {formatNumber(post.views || 0)}
-              </span>
+                <Eye className="w-4 h-4 md:w-5 md:h-5 opacity-60" />
+                <span className="font-retro">{formatNumber(post.views || 0)}</span>
+              </div>
 
-              {!currentUser && (
-                <button
-                  onClick={() => setIsLoginModalOpen(true)}
-                  className={cn(
-                    "flex items-center justify-center gap-2 h-12 px-5 rounded-xl border-2 font-retro font-bold text-xs uppercase tracking-wider retro-button transition-all hover:scale-105 active:scale-95",
-                    isDark ? "bg-gray-800/40 border-purple-500/50 text-purple-400 hover:bg-purple-600 hover:text-white hover:border-black" : "bg-purple-50/50 border-purple-300/50 text-purple-600 hover:bg-purple-600 hover:text-white hover:border-black"
+              {/* Se estiver carregando o auth, mostramos um placeholder ou nada para evitar pulos de UI */}
+              {authLoading ? (
+                <div className="h-12 w-24 bg-gray-500/10 animate-pulse rounded-2xl border-2 border-dashed border-gray-500/20" />
+              ) : (
+                <>
+                  {currentUser ? (
+                    <button
+                      onClick={() => likeMutation.mutate({ postId: post.id, userId: currentUser.id })}
+                      className={cn(
+                        "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
+                        hasLiked 
+                          ? "bg-red-500 border-red-400 text-white shadow-red-500/20" 
+                          : isDark 
+                            ? "bg-gray-800 border-purple-500/50 text-white shadow-purple-500/10" 
+                            : "bg-white border-snes-dark/20 text-snes-accent shadow-sm"
+                      )}
+                    >
+                      <Heart className={cn("w-4 h-4 md:w-5 md:h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current")} />
+                      <span>{formatNumber(post.likes || 0)}</span>
+                    </button>
+                  ) : (
+                    <div className={cn(
+                      "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl border-2 font-bold text-xs md:text-base opacity-60 cursor-not-allowed shrink-0",
+                      isDark ? "bg-gray-800 border-gray-700 text-gray-500" : "bg-gray-100 border-gray-200 text-gray-400"
+                    )}>
+                      <Heart className="w-4 h-4 md:w-5 md:h-5" />
+                      <span>{formatNumber(post.likes || 0)}</span>
+                    </div>
                   )}
-                >
-                  <Lock className="w-4 h-4" />
-                  LOGIN
-                </button>
+
+                  {currentUser && (
+                    <button
+                      onClick={() => favoriteMutation.mutate({ userId: currentUser.id, postId: post.id })}
+                      title={profile?.favorites?.includes(post.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                      className={cn(
+                        "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
+                        profile?.favorites?.includes(post.id) 
+                          ? "bg-yellow-400 border-yellow-500 text-black shadow-yellow-400/20" 
+                          : isDark 
+                            ? "bg-gray-800 border-purple-500/50 text-white shadow-purple-500/10" 
+                            : "bg-white border-snes-dark/20 text-snes-accent shadow-sm"
+                      )}
+                    >
+                      <Bookmark className={cn("w-4 h-4 md:w-5 md:h-5 transition-transform", profile?.favorites?.includes(post.id) ? "fill-current scale-110" : "group-hover:fill-current")} />
+                      <span className="hidden md:inline">{profile?.favorites?.includes(post.id) ? "Salvo" : "Salvar"}</span>
+                    </button>
+                  )}
+
+                  {!currentUser && (
+                    <button
+                      onClick={() => { setIsLoginModalOpen(true); }}
+                      className={cn(
+                        "flex items-center justify-center gap-2 h-11 px-4 md:h-12 md:px-6 rounded-2xl border-2 font-retro font-bold text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
+                        isDark 
+                          ? "bg-purple-600 border-purple-400 text-white shadow-purple-500/20" 
+                          : "bg-purple-600 border-purple-700 text-white shadow-purple-600/20"
+                      )}
+                    >
+                      <Lock className="w-4 h-4" />
+                      <span className="hidden md:inline">LOGIN</span>
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -471,16 +516,55 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
               <AuthGate variant="section" className="mb-12" />
             )}
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               {post.comments?.slice(0, visibleComments).map((comment) => (
-                <div key={comment.id} className={cn("p-6 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] flex justify-between gap-5 retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="font-retro font-bold text-base uppercase text-purple-400">{comment.author}</div>
-                      <span className="text-xs opacity-40 ml-auto">{formatDate(comment.createdAt)}</span>
+                <div key={comment.id} className={cn("p-6 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] flex gap-5 retro-card items-start", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+                  {/* Avatar Pixel Art */}
+                  <div className="shrink-0">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl border-2 border-black bg-purple-900/20 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                      <img 
+                        src={comment.authorAvatar ? comment.authorAvatar : getPixelAvatar(comment.authorId)} 
+                        alt={comment.author} 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = getPixelAvatar(comment.authorId);
+                        }}
+                      />
                     </div>
-                    <p className="text-base font-medium">{comment.text}</p>
                   </div>
+
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <div className="font-retro font-bold text-sm md:text-base uppercase text-purple-400 tracking-wide">
+                        {comment.author}
+                      </div>
+                      <span className="text-[10px] md:text-xs opacity-40 font-bold uppercase tracking-widest whitespace-nowrap">
+                        {formatDate(comment.createdAt)}
+                      </span>
+                    </div>
+                    <p className={cn(
+                      "text-sm md:text-base leading-relaxed font-medium",
+                      isDark ? "text-gray-300" : "text-gray-700"
+                    )}>
+                      {comment.text}
+                    </p>
+                  </div>
+
+                  {/* Moderação (Admin ou Dono) */}
+                  {(currentUser?.role === 'admin' || currentUser?.id === comment.authorId) && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Deseja realmente excluir este comentário?")) {
+                          deleteCommentMutation.mutate({ postId: post.id, commentId: comment.id });
+                        }
+                      }}
+                      className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
+                      title="Excluir Comentário"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
