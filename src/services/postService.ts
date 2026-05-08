@@ -16,10 +16,14 @@ import {
   where,
   QueryDocumentSnapshot,
   DocumentData,
-  QuerySnapshot
+  QuerySnapshot,
+  arrayUnion,
+  arrayRemove,
+  runTransaction
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
 import { Post, Comment, PostSchema } from '../features/posts/schemas';
+import { errorService } from './errorService';
 
 /**
  * Serviço para abstrair as chamadas ao Firestore para a entidade Post.
@@ -108,14 +112,18 @@ export const PostService = {
   },
 
   /**
-   * Incrementa o número de visualizações de um post.
+   * Incrementa o contador de visualizações do post.
    */
-  async incrementPostViews(postId: string): Promise<boolean> {
-    const postRef = doc(db, "posts", postId);
-    await updateDoc(postRef, {
-      views: increment(1)
-    });
-    return true;
+  async incrementPostViews(postId: string): Promise<void> {
+    if (import.meta.env.DEV) return;
+    try {
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, {
+        views: increment(1)
+      });
+    } catch (error) {
+      errorService.handle(error, "ao incrementar views");
+    }
   },
 
   /**
@@ -147,63 +155,108 @@ export const PostService = {
   },
 
   /**
-   * Alterna o like de um usuário no post.
+   * Alterna o like de um usuário no post usando transação para garantir atomicidade.
    * Retorna 'liked' ou 'unliked' para controle de XP.
+   * ✅ CORRIGIDO: Usa arrayUnion/arrayRemove para evitar race conditions
    */
   async toggleLike(postId: string, userId: string): Promise<'liked' | 'unliked' | null> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return null;
-
-    const data = postSnap.data() as Post;
-    const likedBy = data.likedBy || [];
-    const hasLiked = likedBy.includes(userId);
-
-    if (hasLiked) {
-      await updateDoc(postRef, {
-        likedBy: likedBy.filter(id => id !== userId),
-        likes: increment(-1)
+    console.log(`[PostService.toggleLike] Iniciando toggle para postId=${postId}, userId=${userId}`);
+    
+    try {
+      let action: 'liked' | 'unliked' = 'liked';
+      
+      const result = await runTransaction(db, async (transaction) => {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await transaction.get(postRef);
+        
+        if (!postSnap.exists()) {
+          console.error(`[PostService.toggleLike] Post não existe: ${postId}`);
+          return null;
+        }
+        
+        const data = postSnap.data() as Post;
+        const likedBy = data.likedBy || [];
+        const hasLiked = likedBy.includes(userId);
+        
+        console.log(`[PostService.toggleLike] Post encontrado. hasLiked=${hasLiked}, likedBy=${JSON.stringify(likedBy)}`);
+        
+        if (hasLiked) {
+          // Remove o like
+          console.log(`[PostService.toggleLike] Removendo like de ${userId}`);
+          transaction.update(postRef, {
+            likedBy: arrayRemove(userId),
+            likes: increment(-1),
+            updatedAt: serverTimestamp()
+          });
+          action = 'unliked';
+        } else {
+          // Adiciona o like
+          console.log(`[PostService.toggleLike] Adicionando like de ${userId}`);
+          transaction.update(postRef, {
+            likedBy: arrayUnion(userId),
+            likes: increment(1),
+            updatedAt: serverTimestamp()
+          });
+          action = 'liked';
+        }
+        
+        return action;
       });
-      return 'unliked';
-    } else {
-      await updateDoc(postRef, {
-        likedBy: [...likedBy, userId],
-        likes: increment(1)
-      });
-      return 'liked';
+      
+      console.log(`[PostService.toggleLike] ✅ Sucesso! Ação: ${result}`);
+      return result;
+    } catch (error) {
+      console.error(`[PostService.toggleLike] ❌ ERRO:`, error);
+      errorService.handle(error, "ao fazer toggle de like");
+      return null;
     }
   },
 
   /**
-   * Adiciona um comentário ao post.
+   * Adiciona um comentário ao post usando operação atômica.
+   * ✅ CORRIGIDO: Usa arrayUnion para evitar perda de comentários
    */
   async addComment(postId: string, comment: Partial<Comment>): Promise<void> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return;
-
-    const data = postSnap.data() as Post;
-    const comments = data.comments || [];
-    
-    await updateDoc(postRef, {
-      comments: [...comments, { ...comment, id: Date.now() }]
-    });
+    try {
+      const postRef = doc(db, "posts", postId);
+      
+      await updateDoc(postRef, {
+        comments: arrayUnion({ ...comment, id: Date.now() } as any),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      errorService.handle(error, "ao adicionar comentário");
+      throw error;
+    }
   },
 
   /**
-   * Remove um comentário do post.
+   * Remove um comentário do post usando operação atômica com transação.
+   * ✅ CORRIGIDO: Usa transação para garantir consistência
    */
   async deleteComment(postId: string, commentId: string | number): Promise<void> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await transaction.get(postRef);
+        
+        if (!postSnap.exists()) return;
 
-    const data = postSnap.data() as Post;
-    const comments = data.comments || [];
+        const data = postSnap.data() as Post;
+        const comments = data.comments || [];
+        const commentToRemove = comments.find(c => c.id === commentId);
 
-    await updateDoc(postRef, {
-      comments: comments.filter(c => c.id !== commentId)
-    });
+        if (commentToRemove) {
+          transaction.update(postRef, {
+            comments: arrayRemove(commentToRemove),
+            updatedAt: serverTimestamp()
+          });
+        }
+      });
+    } catch (error) {
+      errorService.handle(error, "ao remover comentário");
+      throw error;
+    }
   },
 
   /**

@@ -19,15 +19,16 @@ import FormSkeleton from "./components/ui/FormSkeleton";
 import AboutSkeleton from "./components/ui/AboutSkeleton";
 import ContactSkeleton from "./components/ui/ContactSkeleton";
 
-// Páginas (lazy loaded para reduzir bundle inicial)
-const HomePage = lazy(() => import("./pages/HomePage"));
-const PostDetailPage = lazy(() => import("./pages/PostDetailPage"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
-const ContactPage = lazy(() => import("./pages/ContactPage"));
-const AdminPage = lazy(() => import("./pages/AdminPage"));
-const PostEditorPage = lazy(() => import("./pages/PostEditorPage"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
-const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+// Páginas (Imports diretos para estabilidade de contexto)
+import HomePage from "./pages/HomePage";
+import PostDetailPage from "./pages/PostDetailPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import AdminPage from "./pages/AdminPage";
+import PostEditorPage from "./pages/PostEditorPage";
+import DashboardPage from "./pages/DashboardPage";
+import DebugPage from "./pages/DebugPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -41,12 +42,12 @@ export default function App() {
     const root = document.documentElement;
     if (isDark) {
       root.style.setProperty('--retro-border-color', '#a855f7');
-      root.style.setProperty('--retro-card-shadow', '4px 4px 0px 0px rgba(168,85,247,0.5)');
+      root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #000000');
       root.style.setProperty('--retro-button-border', '#c084fc');
-      root.style.setProperty('--retro-button-shadow', '3px 3px 0px 0px #c084fc');
-      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #c084fc');
+      root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #000000');
+      root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #000000');
       root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(0, 0, 0, 1)');
+      root.style.setProperty('--magazine-drop-cap-shadow', '4px 4px 0px #000000');
     } else {
       root.style.setProperty('--retro-border-color', '#4f43ae');
       root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #211a21');
@@ -54,7 +55,7 @@ export default function App() {
       root.style.setProperty('--retro-button-shadow', '4px 4px 0px 0px #211a21');
       root.style.setProperty('--retro-button-active-shadow', '1px 1px 0px 0px #211a21');
       root.style.setProperty('--magazine-drop-cap-color', '#4f43ae');
-      root.style.setProperty('--magazine-drop-cap-shadow', '3px 3px 0px rgba(144,138,153,0.4)');
+      root.style.setProperty('--magazine-drop-cap-shadow', '4px 4px 0px #211a21');
     }
   }, [isDark]);
 
@@ -79,63 +80,32 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               <Routes location={location} key={location.pathname}>
-                <Route path="/" element={
-                  <Suspense fallback={
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                      {[1, 2, 3].map(i => <PostSkeleton key={i} isDark={isDark} />)}
-                    </div>
-                  }>
-                    <HomePage />
-                  </Suspense>
-                } />
-                <Route path="/post/:slug" element={
-                  <Suspense fallback={<PostDetailSkeleton isDark={isDark} />}>
-                    <PostDetailPage />
-                  </Suspense>
-                } />
-                <Route path="/about" element={
-                  <Suspense fallback={<AboutSkeleton isDark={isDark} />}>
-                    <AboutPage />
-                  </Suspense>
-                } />
-                <Route path="/contact" element={
-                  <Suspense fallback={<ContactSkeleton isDark={isDark} />}>
-                    <ContactPage />
-                  </Suspense>
-                } />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/post/:slug" element={<PostDetailPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <Suspense fallback={<FormSkeleton isDark={isDark} />}>
-                      <DashboardPage />
-                    </Suspense>
+                    <DashboardPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin" element={
                   <ProtectedRoute requiredRole="admin">
-                    <Suspense fallback={<FormSkeleton isDark={isDark} />}>
-                      <AdminPage />
-                    </Suspense>
+                    <AdminPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/editor" element={
                   <ProtectedRoute requiredRole="admin">
-                    <Suspense fallback={<FormSkeleton isDark={isDark} />}>
-                      <PostEditorPage />
-                    </Suspense>
+                    <PostEditorPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/editor/:id" element={
                   <ProtectedRoute requiredRole="admin">
-                    <Suspense fallback={<FormSkeleton isDark={isDark} />}>
-                      <PostEditorPage />
-                    </Suspense>
+                    <PostEditorPage />
                   </ProtectedRoute>
                 } />
-                <Route path="*" element={
-                  <Suspense fallback={<div className="h-96" />}>
-                    <NotFoundPage />
-                  </Suspense>
-                } />
+                <Route path="/debug" element={<DebugPage />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

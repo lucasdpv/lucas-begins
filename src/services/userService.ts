@@ -1,5 +1,5 @@
 import { db } from "../lib/firebase";
-import { doc, getDoc, setDoc, DocumentData, DocumentSnapshot } from "firebase/firestore";
+import { doc, getDoc, setDoc, DocumentData, DocumentSnapshot, arrayUnion, arrayRemove, runTransaction } from "firebase/firestore";
 import { COLLECTIONS } from "../constants";
 import { errorService } from "./errorService";
 import { User as FirebaseUser } from "firebase/auth";
@@ -17,6 +17,9 @@ export interface UserProfile {
   role: 'admin' | 'user';
 }
 
+// Helper para detectar modo bypass
+const isBypass = (userId: string) => userId === 'local-admin-debug' && import.meta.env.DEV;
+
 /**
  * Serviço para gerenciar dados de usuários e permissões.
  */
@@ -25,6 +28,20 @@ export const userService = {
    * Busca o perfil completo do usuário pelo ID
    */
   getUserProfileById: async (userId: string): Promise<UserProfile | null> => {
+    if (isBypass(userId)) {
+      return {
+        id: userId,
+        name: "Lucas Admin (Local)",
+        email: "admin@local.test",
+        avatar: "",
+        bio: "",
+        aka: "",
+        level: 99,
+        xp: 0,
+        favorites: [],
+        role: 'admin'
+      };
+    }
     try {
       const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, userId));
       if (!userDoc.exists()) return null;
@@ -100,35 +117,57 @@ export const userService = {
   },
 
   /**
-   * Alterna um post nos favoritos do usuário.
+   * Alterna um post nos favoritos do usuário usando operação atômica.
    * Retorna 'added' ou 'removed' para controle de XP.
+   * ✅ CORRIGIDO: Usa arrayUnion/arrayRemove para evitar race conditions
    */
   toggleFavorite: async (userId: string, postId: string): Promise<'added' | 'removed' | null> => {
+    if (isBypass(userId)) return 'added'; // Simula sempre adição para teste visual
+    
+    console.log(`[userService.toggleFavorite] Iniciando toggle para userId=${userId}, postId=${postId}`);
+    
     try {
-      const userRef = doc(db, COLLECTIONS.USERS, userId);
-      const userSnap = await getDoc(userRef);
+      let action: 'added' | 'removed' = 'added';
       
-      let favorites: string[] = [];
+      const result = await runTransaction(db, async (transaction) => {
+        const userRef = doc(db, COLLECTIONS.USERS, userId);
+        const userSnap = await transaction.get(userRef);
+        
+        let favorites: string[] = [];
+        
+        if (userSnap.exists()) {
+          favorites = userSnap.data().favorites || [];
+        }
+
+        console.log(`[userService.toggleFavorite] Usuário encontrado. favorites=${JSON.stringify(favorites)}`);
+        
+        const isFavorited = favorites.includes(postId);
+
+        if (isFavorited) {
+          // Remove dos favoritos
+          console.log(`[userService.toggleFavorite] Removendo postId=${postId} dos favoritos`);
+          transaction.update(userRef, { 
+            favorites: arrayRemove(postId),
+            updatedAt: new Date()
+          });
+          action = 'removed';
+        } else {
+          // Adiciona aos favoritos
+          console.log(`[userService.toggleFavorite] Adicionando postId=${postId} aos favoritos`);
+          transaction.update(userRef, { 
+            favorites: arrayUnion(postId),
+            updatedAt: new Date()
+          });
+          action = 'added';
+        }
+        
+        return action;
+      });
       
-      if (userSnap.exists()) {
-        favorites = userSnap.data().favorites || [];
-      }
-
-      const isFavorited = favorites.includes(postId);
-      let action: 'added' | 'removed';
-      let newFavorites: string[];
-
-      if (isFavorited) {
-        newFavorites = favorites.filter((id: string) => id !== postId);
-        action = 'removed';
-      } else {
-        newFavorites = [...favorites, postId];
-        action = 'added';
-      }
-
-      await setDoc(userRef, { favorites: newFavorites }, { merge: true });
-      return action;
+      console.log(`[userService.toggleFavorite] ✅ Sucesso! Ação: ${result}`);
+      return result;
     } catch (error) {
+      console.error(`[userService.toggleFavorite] ❌ ERRO:`, error);
       errorService.handle(error, "ao alternar favorito");
       return null;
     }
@@ -140,7 +179,8 @@ export const userService = {
   /**
    * Adiciona XP ao usuário e verifica Level Up.
    */
-  addXP: async (userId: string, amount: number): Promise<void> => {
+  addXP: async (userId: string, amount: number): Promise<{leveledUp: boolean, newLevel: number}> => {
+    if (isBypass(userId)) return { leveledUp: false, newLevel: 99 };
     try {
       const userRef = doc(db, COLLECTIONS.USERS, userId);
       const userSnap = await getDoc(userRef);

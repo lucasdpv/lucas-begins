@@ -34,9 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { showToast } = useUIStore();
 
   useEffect(() => {
+    // Modo Admin Local: Ativo em DEV, a menos que o usuário tenha saído explicitamente nesta sessão
+    const isLocalAdminEnabled = import.meta.env.DEV && !sessionStorage.getItem('bypassDisabled'); 
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
         if (user) {
+          // Se o usuário logou de verdade, removemos o bloqueio do bypass para o futuro
+          sessionStorage.removeItem('bypassDisabled');
           const profile = await userService.getUserProfile(user);
           setCurrentUser(profile as User);
         } else {
@@ -79,6 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleLogout = useCallback(async () => {
     try {
       await signOut(auth);
+      // Marca que o usuário saiu explicitamente para não forçar o Admin Local nesta sessão
+      sessionStorage.setItem('bypassDisabled', 'true');
+      setCurrentUser(null);
       showToast("Sessão encerrada. Até a próxima!");
     } catch (err) {
       showToast("Erro ao sair.", "error");
@@ -111,10 +119,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
-};
+}

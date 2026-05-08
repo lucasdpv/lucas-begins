@@ -193,7 +193,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
         {/* Hero */}
         <div
           className={cn(
-            "w-full h-[350px] md:h-[550px] rounded-none border-2 border-black relative overflow-hidden retro-card flex items-center justify-center",
+            "w-full h-[350px] md:h-[550px] rounded-none relative overflow-hidden retro-card flex items-center justify-center",
             (!post.imageUrl || imgError) && `bg-gradient-to-br ${(post as any).gradient || 'from-gray-900 to-purple-900'}`
           )}
           style={heroStyle}
@@ -291,7 +291,10 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                 <>
                   {currentUser ? (
                     <button
-                      onClick={() => likeMutation.mutate({ postId: post.id, userId: currentUser.id })}
+                      onClick={() => {
+                        console.log("Like button clicked", { postId: post.id, userId: currentUser.id });
+                        likeMutation.mutate({ postId: post.id, userId: currentUser.id });
+                      }}
                       className={cn(
                         "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
                         hasLiked 
@@ -316,7 +319,10 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
                   {currentUser && (
                     <button
-                      onClick={() => favoriteMutation.mutate({ userId: currentUser.id, postId: post.id })}
+                      onClick={() => {
+                        console.log("Favorite button clicked", { userId: currentUser.id, postId: post.id });
+                        favoriteMutation.mutate({ userId: currentUser.id, postId: post.id });
+                      }}
                       title={profile?.favorites?.includes(post.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                       className={cn(
                         "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",

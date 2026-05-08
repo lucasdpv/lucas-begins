@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from "../../../context/AuthProvider";
 import { PostService } from '../../../services/postService';
 import { userService } from '../../../services/userService';
 import { POSTS_PER_PAGE } from '../../../constants';
@@ -41,7 +42,6 @@ interface PostFilters {
 export function usePosts(filters: PostFilters = { search: "", category: "Todos" }) {
   const isGlobal = filters.search !== "" || filters.category !== "Todos";
 
-  // Query para buscar TUDO quando há filtro ativo
   const allPostsQuery = useQuery({
     queryKey: postKeys.list({ ...filters, type: 'all' }),
     queryFn: () => PostService.getAllPosts() as Promise<Post[]>,
@@ -49,11 +49,8 @@ export function usePosts(filters: PostFilters = { search: "", category: "Todos" 
     staleTime: 1000 * 60 * 5,
   });
 
-  // Query infinita para a Home sem filtros
   const infinitePostsQuery = useInfinitePosts();
 
-  // Se for global, retornamos os dados do allPostsQuery
-  // Se não for, retornamos os dados do infinitePostsQuery
   const isLoading = isGlobal ? allPostsQuery.isLoading : infinitePostsQuery.isLoading;
   const posts = isGlobal 
     ? allPostsQuery.data || [] 
@@ -73,7 +70,7 @@ export function useAllPosts() {
   return useQuery({
     queryKey: postKeys.list('all'),
     queryFn: () => PostService.getAllPosts() as Promise<Post[]>,
-    staleTime: 1000 * 60 * 10, // 10 minutos para a lista completa
+    staleTime: 1000 * 60 * 10,
   });
 }
 
@@ -123,41 +120,62 @@ export function useLikeMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ postId, userId }: { postId: string, userId: string }) => {
-      await PostService.toggleLike(postId, userId);
-      // Ganha 5 XP por curtir
-      await userService.addXP(userId, 5);
+      console.log("[useLikeMutation] Triggered", { postId, userId });
+      const action = await PostService.toggleLike(postId, userId);
+      console.log("[useLikeMutation] Action result", action);
+      if (action === 'liked') {
+        await userService.addXP(userId, 5);
+      }
+      return action;
     },
     onMutate: async ({ postId, userId }) => {
-      // Cancela queries
       await queryClient.cancelQueries({ queryKey: postKeys.all });
       await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
       await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
 
-      // Snapshots
       const prevPost = queryClient.getQueryData(postKeys.detail(postId));
       const prevProfile = queryClient.getQueryData(['userProfile', userId]);
 
-      // Update Post Detail
-      queryClient.setQueryData(postKeys.detail(postId), (old: any) => {
+      // 1. Atualiza a lista global (Home/Search)
+      queryClient.setQueryData(postKeys.all, (old: any) => {
         if (!old) return old;
-        const likedBy = old.likedBy || [];
-        const hasLiked = likedBy.includes(userId);
-        const newLikes = hasLiked ? (old.likes || 1) - 1 : (old.likes || 0) + 1;
-        const newLikedBy = hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId];
-        return { ...old, likes: newLikes, likedBy: newLikedBy };
+        return old.map((p: any) => {
+          if (p.id === postId) {
+            const likedBy = p.likedBy || [];
+            const hasLiked = likedBy.includes(userId);
+            return {
+              ...p,
+              likes: hasLiked ? (p.likes || 1) - 1 : (p.likes || 0) + 1,
+              likedBy: hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId]
+            };
+          }
+          return p;
+        });
       });
 
-      // Update Profile XP
+      // 2. Atualiza TODOS os caches de detalhe (por ID ou por Slug)
+      queryClient.setQueriesData({ queryKey: ['post'] }, (old: any) => {
+        if (!old || old.id !== postId) return old;
+        const likedBy = old.likedBy || [];
+        const hasLiked = likedBy.includes(userId);
+        return {
+          ...old,
+          likes: hasLiked ? (old.likes || 1) - 1 : (old.likes || 0) + 1,
+          likedBy: hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId]
+        };
+      });
+
+      // 3. Atualiza o perfil do usuário (XP será atualizado por listener real-time)
       queryClient.setQueryData(['userProfile', userId], (old: any) => {
         if (!old) return old;
-        const postData = queryClient.getQueryData(postKeys.detail(postId)) as any;
-        const alreadyLiked = postData?.likedBy?.includes(userId);
-        return { ...old, xp: alreadyLiked ? old.xp : old.xp + 5 };
+        // Apenas atualizar optimistically o cache local
+        return { ...old };
       });
 
       return { prevPost, prevProfile };
     },
     onError: (err, variables, context: any) => {
+      console.error("[useLikeMutation] Error:", err);
       if (context?.prevPost) {
         queryClient.setQueryData(postKeys.detail(variables.postId), context.prevPost);
       }
@@ -165,27 +183,53 @@ export function useLikeMutation() {
         queryClient.setQueryData(['userProfile', variables.userId], context.prevProfile);
       }
     },
-    onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
+    onSettled: (data, error, { postId, userId }) => {
+      // Invalidar queries para garantir sincronização com banco
+      if (!error) {
+        queryClient.invalidateQueries({ queryKey: postKeys.all });
+        queryClient.invalidateQueries({ queryKey: ['post'] });
+        queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
+      }
     },
   });
 }
 
 export function useCommentMutation() {
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
   return useMutation({
-    mutationFn: async ({ postId, comment }: { postId: string, comment: Partial<Comment> }) => {
+    mutationFn: async ({ postId, comment }: { postId: string, comment: any }) => {
       await PostService.addComment(postId, comment);
-      // Ganha 10 XP por comentar
-      if (comment.authorId) {
-        await userService.addXP(comment.authorId, 20);
+      await userService.addXP(comment.authorId, 20);
+    },
+    onMutate: async ({ postId, comment }) => {
+      await queryClient.cancelQueries({ queryKey: ['post'] });
+      const previousData = queryClient.getQueriesData({ queryKey: ['post'] });
+
+      queryClient.setQueriesData({ queryKey: ['post'] }, (old: any) => {
+        if (!old || old.id !== postId) return old;
+        return {
+          ...old,
+          comments: [...(old.comments || []), { ...comment, id: Date.now() }]
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, variables, context: any) => {
+      console.error("[useCommentMutation] Error:", err);
+      if (context?.previousData) {
+        context.previousData.forEach(([key, value]: [any, any]) => {
+          queryClient.setQueryData(key, value);
+        });
       }
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
+    onSettled: (data, error, { postId }) => {
+      // Invalidar para sincronização em tempo real
+      if (!error) {
+        queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
+        queryClient.invalidateQueries({ queryKey: ['post'] });
+      }
     },
   });
 }
@@ -194,19 +238,18 @@ export function useFavoriteMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, postId }: { userId: string, postId: string }) => {
-      await userService.toggleFavorite(userId, postId);
-      // Ganha 15 XP por favoritar (incentiva a leitura futura)
-      await userService.addXP(userId, 15);
+      console.log("[useFavoriteMutation] Triggered", { userId, postId });
+      const action = await userService.toggleFavorite(userId, postId);
+      console.log("[useFavoriteMutation] Action result", action);
+      if (action === 'added') {
+        await userService.addXP(userId, 15);
+      }
+      return action;
     },
-    // Otimistic Update: Atualiza a UI antes mesmo da resposta do banco
     onMutate: async ({ userId, postId }) => {
-      // Cancela refetches em andamento para não sobrescrever o estado otimista
       await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
-
-      // Salva o estado anterior para rollback em caso de erro
       const previousProfile = queryClient.getQueryData(['userProfile', userId]);
 
-      // Atualiza o cache localmente
       queryClient.setQueryData(['userProfile', userId], (old: any) => {
         if (!old) return old;
         const favorites = old.favorites || [];
@@ -218,21 +261,25 @@ export function useFavoriteMutation() {
         return {
           ...old,
           favorites: newFavorites,
-          xp: isFavorited ? old.xp : old.xp + 15 // XP só sobe se estiver adicionando
+          xp: isFavorited ? old.xp : old.xp + 15
         };
       });
 
       return { previousProfile };
     },
-    // Se falhar, volta ao estado anterior
     onError: (err, variables, context) => {
+      console.error("[useFavoriteMutation] Error:", err);
       if (context?.previousProfile) {
         queryClient.setQueryData(['userProfile', variables.userId], context.previousProfile);
       }
     },
-    // Sempre invalida ao final para sincronizar com a verdade do servidor
-    onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
+    onSettled: (data, error, { userId, postId }) => {
+      // Invalidar sempre para garantir sincronização
+      if (!error) {
+        queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
+        queryClient.invalidateQueries({ queryKey: postKeys.all });
+        queryClient.invalidateQueries({ queryKey: ['post'] });
+      }
     },
   });
 }
@@ -240,7 +287,28 @@ export function useFavoriteMutation() {
 export function useDeleteCommentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, commentId }: { postId: string, commentId: string | number }) => PostService.deleteComment(postId, commentId),
+    mutationFn: ({ postId, commentId }: { postId: string, commentId: string | number }) => 
+      PostService.deleteComment(postId, commentId),
+    onMutate: async ({ postId, commentId }) => {
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+      const previousData = queryClient.getQueryData(postKeys.detail(postId));
+
+      queryClient.setQueryData(postKeys.detail(postId), (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          comments: (old.comments || []).filter((c: any) => c.id !== commentId)
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, variables, context: any) => {
+      console.error("[useDeleteCommentMutation] Error:", err);
+      if (context?.previousData) {
+        queryClient.setQueryData(postKeys.detail(variables.postId), context.previousData);
+      }
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
     },

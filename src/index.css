@@ -12,12 +12,12 @@
 
   /* Tokens do tema retro (padrão: dark) */
   --retro-border-color: #a855f7;
-  --retro-card-shadow: 4px 4px 0px 0px rgba(168, 85, 247, 0.5);
+  --retro-card-shadow: 6px 6px 0px 0px #000000;
   --retro-button-border: #c084fc;
-  --retro-button-shadow: 3px 3px 0px 0px #c084fc;
-  --retro-button-active-shadow: 1px 1px 0px 0px #c084fc;
+  --retro-button-shadow: 4px 4px 0px 0px #000000;
+  --retro-button-active-shadow: 1px 1px 0px 0px #000000;
   --magazine-drop-cap-color: #c084fc;
-  --magazine-drop-cap-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
+  --magazine-drop-cap-shadow: 4px 4px 0px #000000;
 }
 
 /* ============================================================
@@ -65,7 +65,7 @@
 }
 
 .text-glow-retro {
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.2);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
 }
 
 /* ============================================================
