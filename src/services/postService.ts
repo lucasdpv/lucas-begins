@@ -19,7 +19,7 @@ import {
   QuerySnapshot
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
-import { Post, Comment } from '../features/posts/schemas';
+import { Post, Comment, PostSchema } from '../features/posts/schemas';
 
 /**
  * Serviço para abstrair as chamadas ao Firestore para a entidade Post.
@@ -49,9 +49,16 @@ export const PostService = {
   async getAllPosts(): Promise<Post[]> {
     const q = query(collection(db, "posts"));
     const snapshot = await getDocs(q);
-    const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Post[];
-    // Ordena manualmente no JS caso falte o campo no Firestore
-    return posts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    
+    return snapshot.docs.map(doc => {
+      const data = { id: doc.id, ...doc.data() };
+      const result = PostSchema.safeParse(data);
+      if (!result.success) {
+        console.warn(`[PostService] Validation failed for post ${doc.id}, using raw data.`, result.error.format());
+      }
+      // Retornamos sempre o data bruto por enquanto para não quebrar a Home
+      return data as Post;
+    }).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   },
 
   /**
@@ -61,7 +68,13 @@ export const PostService = {
     const postRef = doc(db, "posts", postId);
     const snap = await getDoc(postRef);
     if (!snap.exists()) return null;
-    return { id: snap.id, ...snap.data() } as Post;
+    
+    const data = { id: snap.id, ...snap.data() };
+    const result = PostSchema.safeParse(data);
+    if (!result.success) {
+      console.warn(`[PostService] Validation failed for post ${postId}, using raw data.`);
+    }
+    return data as Post;
   },
 
   /**
@@ -72,7 +85,13 @@ export const PostService = {
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
     const postDoc = snapshot.docs[0];
-    return { id: postDoc.id, ...postDoc.data() } as Post;
+    
+    const data = { id: postDoc.id, ...postDoc.data() };
+    const result = PostSchema.safeParse(data);
+    if (!result.success) {
+      console.warn(`[PostService] Validation failed for slug ${slug}, using raw data.`);
+    }
+    return data as Post;
   },
 
   /**

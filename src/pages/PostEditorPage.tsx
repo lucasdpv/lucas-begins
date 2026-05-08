@@ -206,7 +206,7 @@ export default function PostEditorPage() {
               <input
                 type="text"
                 name="title"
-                value={formData.title}
+                value={formData.title || ""}
                 onChange={handleChange}
                 required
                 className={inputClass}
@@ -222,7 +222,7 @@ export default function PostEditorPage() {
               <input
                 type="url"
                 name="imageUrl"
-                value={formData.imageUrl}
+                value={formData.imageUrl || ""}
                 onChange={handleChange}
                 className={inputClass}
                 placeholder="https://..."
@@ -232,7 +232,7 @@ export default function PostEditorPage() {
             {/* Categoria */}
             <div className="space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
-              <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
+              <select name="category" value={formData.category || ""} onChange={handleChange} className={inputClass}>
                 {(categories as string[]).map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -248,7 +248,7 @@ export default function PostEditorPage() {
                 min="0"
                 max="10"
                 name="score"
-                value={formData.score}
+                value={formData.score ?? ""}
                 onChange={handleChange}
                 className={inputClass}
                 placeholder="Opcional. Ex: 9.5"
@@ -261,7 +261,7 @@ export default function PostEditorPage() {
               <input
                 type="text"
                 name="verdict"
-                value={formData.verdict}
+                value={formData.verdict || ""}
                 onChange={handleChange}
                 className={inputClass}
                 placeholder="Ex: Obra-prima, Fraco..."
@@ -274,7 +274,7 @@ export default function PostEditorPage() {
               <label className="text-sm font-bold uppercase font-retro opacity-80">Resumo (Linha Fina) *</label>
               <textarea
                 name="excerpt"
-                value={formData.excerpt}
+                value={formData.excerpt || ""}
                 onChange={handleChange}
                 required
                 rows={2}

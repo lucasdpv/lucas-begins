@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '../../../services/postService';
 import { POSTS_PER_PAGE } from '../../../constants';
-import { Post, Comment } from '../schemas';
+import { Post, Comment, PostSchema } from '../schemas';
 
 export const postKeys = {
   all: ['posts'] as const,
@@ -16,7 +16,14 @@ export function useInfinitePosts() {
     queryKey: postKeys.list('paginated'),
     queryFn: async ({ pageParam = null }: { pageParam: any }) => {
       const snapshot = await PostService.getPaginatedPosts(POSTS_PER_PAGE, pageParam);
-      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Post[];
+      const posts = snapshot.docs.map(doc => {
+        const data = { id: doc.id, ...doc.data() };
+        const result = PostSchema.safeParse(data);
+        if (!result.success) {
+          console.warn(`[useInfinitePosts] Validation failed for post ${doc.id}, using raw data.`, result.error.format());
+        }
+        return data as Post;
+      });
       const lastDoc = snapshot.docs.length === POSTS_PER_PAGE ? snapshot.docs[snapshot.docs.length - 1] : null;
       return { posts, lastDoc };
     },

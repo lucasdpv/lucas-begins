@@ -10,7 +10,7 @@ import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { usePosts } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify } from "../lib/utils";
+import { cn, slugify, formatNumber } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 
 export default function HomePage() {
@@ -146,8 +146,8 @@ export default function HomePage() {
                         <div className="flex items-center gap-2 mt-1.5 opacity-40 text-[10px] font-bold uppercase tracking-wider">
                            <span>
                              {activeSidebarTab === 'acessados' 
-                               ? `${post.views || 0} visualizações` 
-                               : `${post.likes || 0} curtidas`}
+                               ? `${formatNumber(post.views || 0)} visualizações` 
+                               : `${formatNumber(post.likes || 0)} curtidas`}
                            </span>
                         </div>
                       </div>

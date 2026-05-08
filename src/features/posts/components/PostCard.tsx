@@ -1,6 +1,6 @@
 import React from "react";
 import { Heart, MessageSquare, Clock, Eye } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, coverBgStyle } from "../../../lib/utils";
+import { calculateReadingTime, formatDate, cn, coverBgStyle, formatNumber } from "../../../lib/utils";
 import { BRUTAL_DESIGN } from "../../../constants";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
@@ -19,7 +19,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
   const likeMutation = useLikeMutation();
-  const imgError = useImageFallback(post.imageUrl);
+  const imgError = useImageFallback(post.imageUrl ?? undefined);
   const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
 
@@ -77,7 +77,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
       </div>
 
       {/* Conteúdo */}
-      <div className="p-7 flex flex-col flex-grow">
+      <div className="px-5 py-6 flex flex-col flex-grow">
         <h3 className="font-retro font-bold text-lg md:text-xl mb-3 uppercase line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300">
           {post.title}
         </h3>
@@ -90,7 +90,7 @@ export default function PostCard({ post, onClick }: PostCardProps) {
           {/* Data e tempo de leitura */}
           <div className="flex flex-col gap-1 shrink-0">
             <span className="font-retro font-bold text-[10px] uppercase tracking-wider opacity-60 whitespace-nowrap">
-              {formatDate(post.createdAt, post.date)}
+              {formatDate(post.createdAt, post.date ?? undefined)}
             </span>
             <span className="text-[10px] md:text-xs flex items-center gap-1 font-bold uppercase opacity-40 whitespace-nowrap">
               <Clock className="w-3 h-3 shrink-0" />
@@ -99,31 +99,35 @@ export default function PostCard({ post, onClick }: PostCardProps) {
           </div>
 
           {/* Ações */}
-          <div className="flex items-center justify-end gap-2.5 md:gap-4 ml-2" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-end gap-2 sm:gap-3 ml-auto" onClick={(e) => e.stopPropagation()}>
             <button
               className={cn(
-                "flex items-center gap-1.5 font-bold text-sm transition-all hover:scale-110 active:scale-95",
+                "flex items-center gap-1 font-bold text-[11px] sm:text-sm transition-all hover:scale-110 active:scale-95",
                 hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-500 hover:text-red-500"
               )}
               onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
               title={currentUser ? "Curtir" : "Faça login para curtir"}
               disabled={!currentUser}
             >
-              <Heart className={cn("w-4 h-4", hasLiked && "fill-current")} />
-              <span>{post.likes || 0}</span>
+              <Heart className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", hasLiked && "fill-current")} />
+              <span>{formatNumber(post.likes || 0)}</span>
             </button>
 
-            <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
-              <MessageSquare className="w-4 h-4" />
-              <span>{commentCount}</span>
+            <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+              <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>{formatNumber(commentCount)}</span>
             </div>
 
-            <div className={cn("flex items-center gap-1.5 font-bold text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
-              <Eye className="w-4 h-4" />
-              <span>{post.views || 0}</span>
+            <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+              <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>{formatNumber(post.views || 0)}</span>
             </div>
 
-            {!currentUser && <AuthGate variant="inline" className="ml-auto" />}
+            {!currentUser && (
+              <div className="ml-1 sm:ml-2">
+                <AuthGate variant="inline" />
+              </div>
+            )}
           </div>
         </div>
       </div>

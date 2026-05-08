@@ -11,7 +11,7 @@ import {
   Eye,
   Lock,
 } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle } from "../lib/utils";
+import { calculateReadingTime, formatDate, cn, slugify, coverBgStyle, formatNumber } from "../lib/utils";
 import ArticleRenderer from "../features/posts/components/ArticleRenderer";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "../context/AuthProvider";
@@ -53,7 +53,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   }, [posts]);
 
   const [commentText, setCommentText] = useState("");
-  const imgError = useImageFallback(post?.imageUrl);
+  const imgError = useImageFallback(post?.imageUrl ?? undefined);
   const COMMENTS_PER_PAGE = 5;
   const [visibleComments] = useState(COMMENTS_PER_PAGE);
 
@@ -229,7 +229,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   <span className="text-gray-500 font-bold text-xs uppercase">
-                    {formatDate(post.createdAt, (post as any).date)}
+                     {formatDate(post.createdAt, (post as any).date ?? undefined)}
                   </span>
                   <span className="text-gray-500 font-bold text-xs flex items-center gap-1 uppercase">
                     <Clock className="w-3 h-3" /> {calculateReadingTime(post.content || "")}
@@ -258,7 +258,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                   )}
                 >
                   <Heart className={cn("w-5 h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current group-hover:scale-110")} />
-                  {post.likes || 0}
+                  {formatNumber(post.likes || 0)}
                 </button>
               ) : (
                 <span className={cn(
@@ -266,7 +266,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                   isDark ? "bg-gray-800 border-gray-600 text-white" : "bg-snes-surface border-gray-400 text-black"
                 )}>
                   <Heart className="w-5 h-5" />
-                  {post.likes || 0}
+                  {formatNumber(post.likes || 0)}
                 </span>
               )}
 
@@ -275,7 +275,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                 isDark ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-snes-surface border-gray-400 text-gray-700"
               )}>
                 <Eye className="w-5 h-5" />
-                {post.views || 0}
+                {formatNumber(post.views || 0)}
               </span>
 
               {!currentUser && (
@@ -378,7 +378,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
             {/* Conteúdo */}
             <div className="flex items-center gap-5 md:gap-8 p-5 md:p-7">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] shrink-0 -rotate-2 group-hover:rotate-0 transition-transform">
-                <img src={post.author?.avatar} alt={post.author?.name} className="w-full h-full object-cover" />
+                <img src={post.author?.avatar ?? undefined} alt={post.author?.name} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-retro font-bold text-base md:text-2xl uppercase tracking-wide truncate">
@@ -448,7 +448,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           <section id="comments-section" className="pt-12 border-t-4 border-gray-800">
             <h3 className="font-retro text-3xl mb-10 flex items-center gap-3 uppercase font-bold">
               <MessageSquare className="w-8 h-8 text-purple-500" />
-              Comunidade ({post.comments?.length || 0})
+              Comunidade ({formatNumber(post.comments?.length || 0)})
             </h3>
 
             {currentUser ? (
