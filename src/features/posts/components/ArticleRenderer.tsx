@@ -1,0 +1,174 @@
+import React, { useState } from "react";
+import DOMPurify from "dompurify";
+import { cn } from "../../../lib/utils";
+import RetroSeparator from "../../../components/ui/RetroSeparator";
+
+interface ArticleImageProps {
+  src: string;
+  alt: string;
+  isDark?: boolean;
+}
+
+/**
+ * Sub-componente para renderizar imagens com tratamento de erro gamificado.
+ */
+function ArticleImage({ src, alt, isDark }: ArticleImageProps) {
+  const [error, setError] = useState(false);
+
+  return (
+    <figure className="my-14 w-full animate-in fade-in duration-700 relative group">
+      <div className={cn(
+        "w-full rounded-none border-4 relative overflow-hidden flex items-center justify-center min-h-[300px]",
+        isDark 
+          ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)] bg-gray-900" 
+          : "border-snes-dark shadow-[8px_8px_0px_rgba(45,27,105,1)] bg-snes-mid"
+      )}>
+        {!error ? (
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            onError={() => setError(true)}
+            className="w-full h-auto object-cover max-h-[700px]"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center p-10 text-center">
+            <div className="text-red-500 font-retro text-xl mb-4 animate-pulse bg-black/40 px-4 py-2 rounded border-2 border-red-500">
+              ⚠️ RENDER_FAILED_0x77
+            </div>
+            <p className={cn("font-retro text-sm uppercase tracking-wide max-w-md", isDark ? "text-gray-400" : "text-gray-600")}>
+              Falha na descompressão de assets. O Buffer de vídeo no Setor 4 parou de responder. Tentando reconectar aos servidores de pixel...
+            </p>
+            <div className="mt-6 w-48 h-2 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+              <div className="h-full bg-red-500 animate-[loading_3s_infinite]" style={{ width: '45%' }} />
+            </div>
+          </div>
+        )}
+        <div className="absolute inset-0 scanline-overlay opacity-20 pointer-events-none" />
+      </div>
+      {alt && !error && (
+        <figcaption className={cn("text-center text-sm mt-5 font-retro font-bold tracking-widest uppercase", isDark ? "text-purple-400" : "text-purple-600")}>
+          ▲ {alt}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+interface ArticleVideoProps {
+  url: string;
+  isDark?: boolean;
+}
+
+/**
+ * Sub-componente para renderizar vídeos do YouTube com fallback gamificado.
+ */
+function ArticleVideo({ url, isDark }: ArticleVideoProps) {
+  const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.*v=))([^&]{11})/)?.[1];
+
+  return (
+    <div className={cn(
+      "my-14 w-full aspect-video rounded-none overflow-hidden border-4 flex items-center justify-center bg-black relative",
+      isDark ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)]" : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]"
+    )}>
+      {videoId ? (
+        <iframe
+          className="w-full h-full relative z-10"
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      ) : (
+        <div className="flex flex-col items-center justify-center p-10 text-center z-10">
+          <div className="text-yellow-500 font-retro text-xl mb-4 animate-pulse bg-black/40 px-4 py-2 rounded border-2 border-yellow-500">
+            ⚠️ SIGNAL_LOST_0x13
+          </div>
+          <p className={cn("font-retro text-sm uppercase tracking-wide max-w-md", isDark ? "text-gray-400" : "text-gray-500")}>
+            Sinal de vídeo instável ou link de teletransporte inválido. Verifique se o endereço do YouTube não foi interceptado por piratas espaciais.
+          </p>
+          <div className="mt-6 w-48 h-2 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+            <div className="h-full bg-yellow-500 animate-[loading_4s_infinite]" style={{ width: '15%' }} />
+          </div>
+        </div>
+      )}
+      <div className="absolute inset-0 scanline-overlay opacity-40 pointer-events-none z-20" />
+    </div>
+  );
+}
+
+interface ArticleRendererProps {
+  content?: string;
+  isDark?: boolean;
+}
+
+export default function ArticleRenderer({ content, isDark }: ArticleRendererProps) {
+  if (!content) return null;
+  const lines = content.split('\n');
+
+  const formatInline = (text: string) => {
+    const raw = text
+      .replace(/\*\*(.*?)\*\*/g, `<strong class="font-bold text-purple-600 ${isDark ? 'dark:text-purple-400' : ''}">$1</strong>`)
+      .replace(/\*(.*?)\*/g, `<em class="italic text-yellow-600 ${isDark ? 'dark:text-yellow-400' : ''}">$1</em>`);
+    return DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em'], ALLOWED_ATTR: ['class'] });
+  };
+
+  // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo
+  let firstParagraphIndex = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    if (!line.startsWith('## ') && line.trim() !== '---' && !line.match(/^!\[/) && !line.match(/^@\[youtube\]/) && firstParagraphIndex === -1) {
+      firstParagraphIndex = i;
+      break;
+    }
+  }
+
+  return (
+    <>
+      {lines.map((line, index) => {
+        if (!line.trim()) return null;
+
+        if (line.startsWith('## ')) {
+          const headingText = line.slice(3).trim();
+          return (
+            <h2 key={index} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
+              {headingText}
+            </h2>
+          );
+        }
+
+        if (line.trim() === '---') {
+          return <RetroSeparator key={index} isDark={isDark} />;
+        }
+
+        const imgMatch = line.match(/^!\[([^\]]*)\]\((.+?)\)$/);
+        if (imgMatch) {
+          return <ArticleImage key={index} src={imgMatch[2]} alt={imgMatch[1]} isDark={isDark} />;
+        }
+
+        const videoMatch = line.match(/^@\[youtube\]\((.*?)\)$/);
+        if (videoMatch) {
+          return <ArticleVideo key={index} url={videoMatch[1]} isDark={isDark} />;
+        }
+
+        if (line.startsWith('@[youtube]')) return null;
+
+        // Parágrafo
+        const isFirst = index === firstParagraphIndex;
+
+        return (
+          <p
+            key={index}
+            className={cn("mb-6 leading-loose text-lg md:text-xl font-medium", isFirst && 'magazine-article')}
+            dangerouslySetInnerHTML={{ __html: formatInline(line) }}
+          />
+        );
+      }).filter(Boolean)}
+    </>
+  );
+}
