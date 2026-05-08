@@ -22,6 +22,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Normalização de Dados**: Implementação de ferramenta para resetar contadores de visualizações inflados, ajustando-os para valores realistas baseados no engajamento real.
 
 ### 🛡️ Estabilidade & Segurança
+- **Migração TypeScript**: Refatoração completa da arquitetura do projeto de JavaScript para TypeScript, garantindo tipagem estática e maior robustez contra bugs de tempo de execução.
 - **Anti-Loop de Visualizações**: Implementação de trava técnica via `useRef` para impedir o consumo excessivo de cota do Firebase por múltiplos incrementos de views.
 - **Refatoração de Permissões**: Novo `ProtectedRoute` com lógica de hierarquia inteligente, permitindo que Admins acessem áreas de usuários sem restrições.
 - **Correções de Código**: Resolução de erros de referência e importação no `AdminPage` e `PostDetailPage`.
