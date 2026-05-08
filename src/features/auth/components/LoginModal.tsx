@@ -76,16 +76,10 @@ export default function LoginModal() {
           {/* Scanline overlay para efeito retro */}
           <div className="absolute inset-0 scanline-overlay opacity-30 pointer-events-none" />
           {/* Circles decorativos */}
-          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10" />
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/5" />
+          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
+          <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
 
-          <button
-            onClick={() => setIsLoginModalOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/20"
-            aria-label="Fechar"
-          >
-            <X className="w-5 h-5" />
-          </button>
+
 
           <div className="relative flex flex-col items-center text-center">
             <div className="w-16 h-16 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center mb-4 shadow-[4px_4px_0px_rgba(0,0,0,0.3)]">
@@ -98,6 +92,14 @@ export default function LoginModal() {
               Faça login para desbloquear tudo
             </p>
           </div>
+
+          <button
+            onClick={() => setIsLoginModalOpen(false)}
+            className="absolute top-4 right-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 z-50 cursor-pointer active:scale-90 shadow-lg"
+            aria-label="Fechar"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Corpo */}

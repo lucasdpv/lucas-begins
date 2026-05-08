@@ -32,19 +32,26 @@ interface BlockEditorProps {
 export default function BlockEditor({ value, onChange, isDark }: BlockEditorProps) {
   const [blocks, setBlocks] = useState<Block[]>([]);
 
-  // 1. Parser: Markdown -> Blocks (carrega apenas na inicialização)
+  // 1. Parser: Markdown -> Blocks (carrega na inicialização ou quando o valor muda externamente)
   const isFirstRun = useRef(true);
   useEffect(() => {
-    if (isFirstRun.current && value && blocks.length === 0) {
-      setBlocks(parseMarkdownToBlocks(value));
+    if (value && (isFirstRun.current || blocks.length === 0)) {
+      const parsed = parseMarkdownToBlocks(value);
+      if (parsed.length > 0) {
+        setBlocks(parsed);
+        isFirstRun.current = false;
+      }
+    } else if (!value && isFirstRun.current) {
       isFirstRun.current = false;
     }
-  }, [value, blocks.length]);
+  }, [value]);
 
   // 2. Serializer: Blocks -> Markdown
   useEffect(() => {
     const markdown = blocksToMarkdown(blocks);
-    if (markdown !== value && !isFirstRun.current) {
+    // Trava de segurança: só envia a mudança se houver blocos ou se o valor original também estiver vazio
+    // Isso evita que o editor zere o texto se os blocos demorarem a carregar
+    if (markdown !== value && !isFirstRun.current && (blocks.length > 0 || value === "")) {
       onChange(markdown);
     }
   }, [blocks, value, onChange]);

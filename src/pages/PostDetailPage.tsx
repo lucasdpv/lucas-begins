@@ -47,10 +47,9 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const deleteCommentMutation = useDeleteCommentMutation();
   const incrementViewMutation = useIncrementViewMutation();
 
-  // Busca o post usando React Query se não for um preview e não estiver na lista global
-  // Busca o post usando React Query: tenta por slug primeiro, se falhar ou não existir, o próprio hook pode ser usado com ID
-  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug!, true);
-  const { data: postById, isLoading: isLoadingId } = usePost(slug!, false);
+  // Busca o post usando React Query: tenta as duas formas para garantir que carregue
+  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true);
+  const { data: postById, isLoading: isLoadingId } = usePost(slug || "", false);
   
   // A ordem de prioridade: Preview > Lista Global > Busca por Slug > Busca por ID
   const post = previewPost || 
@@ -58,7 +57,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                postBySlug || 
                postById;
 
-  const isFetchingLocal = isLoadingSlug && isLoadingId;
+  const isFetchingLocal = isLoadingSlug || isLoadingId;
 
   const trendingPosts = useMemo(() => {
     return [...(posts as Post[])]
@@ -79,7 +78,20 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     if (post && post.id && !previewPost && !hasIncremented.current) {
       // Se estivermos logados, esperamos o currentUser estar disponível para garantir o XP
       if (!authLoading) {
-        incrementViewMutation.mutate({ postId: post.id, userId: currentUser?.id });
+        // Recupera ou gera um ID anônimo para este navegador/visitante
+        let guestId = localStorage.getItem('retro_guest_id');
+        if (!guestId) {
+          guestId = `guest_${Math.random().toString(36).substring(2, 15)}`;
+          localStorage.setItem('retro_guest_id', guestId);
+        }
+
+        const viewerId = currentUser?.id || guestId;
+
+        incrementViewMutation.mutate({ 
+          postId: post.id, 
+          userId: currentUser?.id,
+          viewerId
+        });
         hasIncremented.current = true;
       }
     }
@@ -292,7 +304,6 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                   {currentUser ? (
                     <button
                       onClick={() => {
-                        console.log("Like button clicked", { postId: post.id, userId: currentUser.id });
                         likeMutation.mutate({ postId: post.id, userId: currentUser.id });
                       }}
                       className={cn(
@@ -320,8 +331,8 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                   {currentUser && (
                     <button
                       onClick={() => {
-                        console.log("Favorite button clicked", { userId: currentUser.id, postId: post.id });
-                        favoriteMutation.mutate({ userId: currentUser.id, postId: post.id });
+                        const isFavorited = profile?.favorites?.includes(post.id) || false;
+                        favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
                       }}
                       title={profile?.favorites?.includes(post.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                       className={cn(

@@ -51,14 +51,6 @@ export default function BackToTop() {
               )}
               aria-label="Voltar ao topo"
             >
-              {/* Label estilo carcaça do console - Escondida no Mobile por padrão */}
-              <span className={cn(
-                "hidden md:block font-retro text-[8px] font-bold uppercase tracking-[0.3em] mb-2 drop-shadow-sm",
-                isDark ? "text-purple-400" : "text-purple-700"
-              )}>
-                Power to Top
-              </span>
-
               {/* O Botão Físico (Interruptor) - Mais compacto no Mobile */}
               <div className={cn(
                 "w-20 h-8 md:w-32 md:h-11 rounded-sm border-[2px] md:border-[3px] border-black relative",

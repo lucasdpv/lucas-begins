@@ -60,7 +60,6 @@ export function useUserProfile(userId: string | undefined) {
             };
           });
 
-          console.log(`[useUserProfile] Real-time update for user ${userId}:`, profileData);
         }
       },
       (error) => {

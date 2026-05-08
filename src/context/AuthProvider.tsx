@@ -5,6 +5,10 @@ import { userService } from '../services/userService';
 import { errorService } from '../services/errorService';
 import { useUIStore } from '../store/useUIStore';
 
+import { onSnapshot, doc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { COLLECTIONS } from '../constants';
+
 export interface User {
   id: string;
   name: string;
@@ -15,6 +19,7 @@ export interface User {
   level: number;
   xp: number;
   favorites: string[];
+  readPosts?: string[];
   role: 'admin' | 'user';
 }
 
@@ -34,17 +39,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { showToast } = useUIStore();
 
   useEffect(() => {
-    // Modo Admin Local: Ativo em DEV, a menos que o usuário tenha saído explicitamente nesta sessão
-    const isLocalAdminEnabled = import.meta.env.DEV && !sessionStorage.getItem('bypassDisabled'); 
+    let unsubscribeProfile: (() => void) | null = null;
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       try {
         if (user) {
-          // Se o usuário logou de verdade, removemos o bloqueio do bypass para o futuro
-          sessionStorage.removeItem('bypassDisabled');
-          const profile = await userService.getUserProfile(user);
-          setCurrentUser(profile as User);
+          // 1. Busca inicial para garantir o Role (admin/user) e dados básicos
+          const initialProfile = await userService.getUserProfile(user);
+          setCurrentUser(initialProfile as User);
+
+          // 2. Escuta em tempo real para mudanças (XP, Level, Favorites, ReadPosts)
+          // Isso garante a sincronização entre múltiplos dispositivos e abas
+          const userDocRef = doc(db, COLLECTIONS.USERS, user.uid);
+          unsubscribeProfile = onSnapshot(userDocRef, (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              setCurrentUser(prev => {
+                if (!prev) return initialProfile as User;
+                // Faz o merge dos dados do Firestore com os dados do Auth (como o Role)
+                return {
+                  ...prev,
+                  ...data,
+                  id: user.uid,
+                  email: user.email || prev.email,
+                  avatar: data.avatar || prev.avatar,
+                  name: data.name || prev.name
+                } as User;
+              });
+            }
+          }, (err) => {
+            console.error("[AuthProvider] Erro no listener de perfil:", err);
+          });
+
         } else {
+          // Se deslogou, para de escutar o perfil anterior
+          if (unsubscribeProfile) {
+            unsubscribeProfile();
+            unsubscribeProfile = null;
+          }
           setCurrentUser(null);
         }
       } catch (err) {
@@ -54,7 +86,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
   }, []);
 
   const loginWithProvider = useCallback(async (provider: FirebaseAuthProvider, providerName: string) => {

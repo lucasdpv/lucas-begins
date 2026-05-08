@@ -147,7 +147,12 @@ export default function PostCard({ post, onClick, variant = "default" }: PostCar
                     ? "hover:scale-110 active:scale-95 cursor-pointer hover:text-yellow-400" 
                     : "opacity-40 cursor-not-allowed"
                 )}
-                onClick={() => currentUser ? favoriteMutation.mutate({ userId: currentUser.id, postId: post.id }) : null}
+                onClick={() => {
+                  if (currentUser) {
+                    const isFavorited = profile?.favorites?.includes(post.id) || false;
+                    favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
+                  }
+                }}
                 title={currentUser ? "Favoritar" : "Faça login para favoritar"}
                 disabled={!currentUser}
               >

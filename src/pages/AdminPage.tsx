@@ -34,6 +34,7 @@ import { contactService } from "../services/contactService";
 import { Post } from "../features/posts/schemas";
 import { PostService } from "../services/postService";
 import { useUserProfile } from "../hooks/useUserQuery";
+import { errorService } from "../services/errorService";
 
 const POSTS_PER_PAGE = 8;
 
@@ -83,6 +84,7 @@ export default function AdminPage() {
   const [filterCategory, setFilterCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isResettingViews, setIsResettingViews] = useState(false);
+  const [isResettingAll, setIsResettingAll] = useState(false);
 
   // Lógica de Filtragem
   const filteredPosts = (posts as Post[]).filter(post => {
@@ -223,6 +225,22 @@ export default function AdminPage() {
       }
     } finally {
       setIsResettingViews(false);
+    }
+  };
+
+  const handleResetAllMetrics = async () => {
+    if (!window.confirm("ATENÇÃO: Isso vai ZERAR todas as curtidas e visualizações de TODOS os posts. Esta ação é irreversível. Deseja continuar?")) return;
+    if (!window.confirm("ÚLTIMO AVISO: Tem certeza absoluta?")) return;
+    
+    setIsResettingAll(true);
+    try {
+      await PostService.resetAllMetrics();
+      showToast("Engajamento zerado com sucesso! Limpeza concluída. 🧹");
+    } catch (error: any) {
+      errorService.handle(error, "ao zerar métricas");
+      showToast("Erro ao zerar métricas.", "error");
+    } finally {
+      setIsResettingAll(false);
     }
   };
 
@@ -952,6 +970,38 @@ export default function AdminPage() {
                       </>
                     ) : (
                       "Executar Reset"
+                    )}
+                  </button>
+                </div>
+
+                <div className={cn(
+                  "p-6 rounded-2xl border-2 flex flex-col md:flex-row items-center justify-between gap-6",
+                  isDark ? "bg-red-900/10 border-red-500/30" : "bg-red-50 border-red-200"
+                )}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-red-500/10 text-red-500 rounded-xl">
+                      <Trash2 size={24} className={cn(isResettingAll && "animate-pulse")} />
+                    </div>
+                    <div>
+                      <h4 className="font-retro text-sm font-bold uppercase text-red-600">Zerar Engajamento</h4>
+                      <p className="text-xs opacity-60">Zera Likes e Views de todos os artigos.</p>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={handleResetAllMetrics}
+                    disabled={isResettingAll}
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-3 rounded-xl font-retro text-xs font-bold uppercase transition-all active:scale-95 disabled:opacity-50",
+                      "bg-red-600 text-white hover:bg-red-500 shadow-lg shadow-red-900/20"
+                    )}
+                  >
+                    {isResettingAll ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} /> Zerando...
+                      </>
+                    ) : (
+                      "Zerar Tudo"
                     )}
                   </button>
                 </div>
