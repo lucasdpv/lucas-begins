@@ -1,259 +1,328 @@
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { PostService } from '../../../services/postService';
+import { Post } from '../schemas';
+import { useUIStore } from '../../../store/useUIStore';
 import { userService } from '../../../services/userService';
-import { POSTS_PER_PAGE } from '../../../constants';
-import { Post, Comment, PostSchema } from '../schemas';
+import { useAuth } from '../../../context/AuthProvider';
+import { useMemo } from 'react';
 
+/**
+ * Keys para gerenciamento do cache do React Query.
+ */
 export const postKeys = {
   all: ['posts'] as const,
   lists: () => [...postKeys.all, 'list'] as const,
   list: (filters: any) => [...postKeys.lists(), { filters }] as const,
   details: () => [...postKeys.all, 'detail'] as const,
   detail: (id: string) => [...postKeys.details(), id] as const,
+  featured: () => [...postKeys.all, 'featured'] as const,
+  latest: (count: number) => [...postKeys.all, 'latest', count] as const,
 };
 
-export function useInfinitePosts() {
-  return useInfiniteQuery({
-    queryKey: postKeys.list('paginated'),
-    queryFn: async ({ pageParam = null }: { pageParam: any }) => {
-      const snapshot = await PostService.getPaginatedPosts(POSTS_PER_PAGE, pageParam);
-      const posts = snapshot.docs.map(doc => {
-        const data = { id: doc.id, ...doc.data() };
-        const result = PostSchema.safeParse(data);
-        if (!result.success) {
-          console.warn(`[useInfinitePosts] Validation failed for post ${doc.id}, using raw data.`, result.error.format());
-        }
-        return data as Post;
-      });
-      const lastDoc = snapshot.docs.length === POSTS_PER_PAGE ? snapshot.docs[snapshot.docs.length - 1] : null;
-      return { posts, lastDoc };
-    },
-    getNextPageParam: (lastPage) => lastPage.lastDoc,
-    initialPageParam: null,
+/**
+ * Hook para buscar todos os posts (usado no Admin e componentes simples).
+ */
+export function useAllPosts() {
+  return useQuery({
+    queryKey: postKeys.all,
+    queryFn: () => PostService.getAllPosts(),
+    staleTime: 1000 * 60 * 5,
   });
 }
 
-interface PostFilters {
-  search: string;
-  category: string;
-}
-
-export function usePosts(filters: PostFilters = { search: "", category: "Todos" }) {
-  const isGlobal = filters.search !== "" || filters.category !== "Todos";
-
-  // Query para buscar TUDO quando há filtro ativo
-  const allPostsQuery = useQuery({
-    queryKey: postKeys.list({ ...filters, type: 'all' }),
-    queryFn: () => PostService.getAllPosts() as Promise<Post[]>,
-    enabled: isGlobal,
+/**
+ * Hook principal de busca de posts com paginação infinita (usado na Home).
+ * Compatibilizado com a assinatura esperada pelo HomePage.tsx
+ */
+export function usePosts({ category = 'Todos', search = '' }: { category?: string, search?: string } = {}) {
+  const query = useInfiniteQuery({
+    queryKey: postKeys.list({ category, search }),
+    queryFn: ({ pageParam }) => 
+      PostService.getPaginatedPosts(
+        6, 
+        pageParam, 
+        category !== 'Todos' ? category : undefined
+      ),
+    initialPageParam: null as any,
+    getNextPageParam: (lastPage: any) => lastPage.lastDoc || undefined,
     staleTime: 1000 * 60 * 5,
   });
 
-  // Query infinita para a Home sem filtros
-  const infinitePostsQuery = useInfinitePosts();
+  // Achatando as páginas de posts em um único array para facilitar o uso na UI
+  const posts = useMemo(() => {
+    return query.data?.pages.flatMap((page: any) => page.posts) || [];
+  }, [query.data?.pages]);
 
-  // Se for global, retornamos os dados do allPostsQuery
-  // Se não for, retornamos os dados do infinitePostsQuery
-  const isLoading = isGlobal ? allPostsQuery.isLoading : infinitePostsQuery.isLoading;
-  const posts = isGlobal 
-    ? allPostsQuery.data || [] 
-    : infinitePostsQuery.data?.pages.flatMap(page => page.posts) || [];
-  
   return {
+    ...query,
     posts,
-    isLoading,
-    isFetchingNextPage: infinitePostsQuery.isFetchingNextPage,
-    hasNextPage: infinitePostsQuery.hasNextPage,
-    fetchNextPage: infinitePostsQuery.fetchNextPage,
-    isError: isGlobal ? allPostsQuery.isError : infinitePostsQuery.isError,
   };
 }
 
-export function useAllPosts() {
+/**
+ * Hook para buscar posts em destaque (Carrossel).
+ */
+export function useFeaturedPosts() {
   return useQuery({
-    queryKey: postKeys.list('all'),
-    queryFn: () => PostService.getAllPosts() as Promise<Post[]>,
-    staleTime: 1000 * 60 * 10, // 10 minutos para a lista completa
+    queryKey: postKeys.featured(),
+    queryFn: () => PostService.getFeaturedPosts(),
+    staleTime: 1000 * 60 * 10,
   });
 }
 
-export function usePost(slugOrId: string, isSlug: boolean = false) {
+/**
+ * Hook para buscar os posts mais recentes.
+ */
+export function useLatestPosts(count: number = 5) {
   return useQuery({
-    queryKey: isSlug ? ['postBySlug', slugOrId] : postKeys.detail(slugOrId),
-    queryFn: () => isSlug ? PostService.getPostBySlug(slugOrId) : PostService.getPostById(slugOrId) as Promise<Post>,
-    enabled: !!slugOrId,
+    queryKey: postKeys.latest(count),
+    queryFn: () => PostService.getLatestPosts(count),
+    staleTime: 1000 * 60 * 5,
   });
 }
 
+/**
+ * Hook para buscar um único post por ID ou Slug.
+ */
+export function usePost(idOrSlug: string, isSlug: boolean = false) {
+  return useQuery({
+    queryKey: isSlug ? ['postBySlug', idOrSlug] : postKeys.detail(idOrSlug),
+    queryFn: () => isSlug ? PostService.getPostBySlug(idOrSlug) : PostService.getPostById(idOrSlug),
+    enabled: !!idOrSlug,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
+ * Hook para criar um novo post.
+ */
 export function useCreatePostMutation() {
   const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+  const { currentUser } = useAuth();
+
   return useMutation({
-    mutationFn: ({ postData, currentUser }: { postData: Partial<Post>, currentUser: any }) => 
-      PostService.createPost(postData, currentUser),
+    mutationFn: (post: Partial<Post>) => PostService.createPost(post as Post, currentUser),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      showToast("Post publicado com sucesso! 🚀");
     },
+    onError: () => {
+      showToast("Erro ao publicar post.", "error");
+    }
   });
 }
 
+/**
+ * Hook para deletar um post.
+ */
 export function useDeletePostMutation() {
   const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
   return useMutation({
     mutationFn: (id: string) => PostService.deletePost(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      showToast("Post deletado permanentemente. 🗑️");
     },
+    onError: () => {
+      showToast("Erro ao deletar post.", "error");
+    }
   });
 }
 
+/**
+ * Hook para atualizar um post.
+ */
 export function useUpdatePostMutation() {
   const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string, data: Partial<Post> }) => PostService.updatePost(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
-      if (variables.id) {
-        queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
-      }
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
+      showToast("Post atualizado com sucesso! ✨");
     },
+    onError: () => {
+      showToast("Erro ao atualizar post.", "error");
+    }
   });
 }
 
+/**
+ * Hook para Curtir/Descurtir um post.
+ */
 export function useLikeMutation() {
   const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
   return useMutation({
     mutationFn: async ({ postId, userId }: { postId: string, userId: string }) => {
-      await PostService.toggleLike(postId, userId);
-      // Ganha 5 XP por curtir
-      await userService.addXP(userId, 5);
+      const action = await PostService.toggleLike(postId, userId);
+      if (action === 'liked') {
+        await userService.addXP(userId, 5);
+      }
+      return action;
     },
+    
     onMutate: async ({ postId, userId }) => {
-      // Cancela queries
       await queryClient.cancelQueries({ queryKey: postKeys.all });
-      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
-      await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
+      await queryClient.cancelQueries({ queryKey: postKeys.details() });
+      await queryClient.cancelQueries({ queryKey: ['postBySlug'] });
 
-      // Snapshots
-      const prevPost = queryClient.getQueryData(postKeys.detail(postId));
-      const prevProfile = queryClient.getQueryData(['userProfile', userId]);
+      const previousAll = queryClient.getQueryData(postKeys.all);
 
-      // Update Post Detail
-      queryClient.setQueryData(postKeys.detail(postId), (old: any) => {
-        if (!old) return old;
-        const likedBy = old.likedBy || [];
+      const updatePostData = (p: any) => {
+        if (!p || (p.id !== postId && p.slug !== postId)) return p;
+        const likedBy = p.likedBy || [];
         const hasLiked = likedBy.includes(userId);
-        const newLikes = hasLiked ? (old.likes || 1) - 1 : (old.likes || 0) + 1;
-        const newLikedBy = hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId];
-        return { ...old, likes: newLikes, likedBy: newLikedBy };
-      });
+        return {
+          ...p,
+          likes: hasLiked ? Math.max((p.likes || 1) - 1, 0) : (p.likes || 0) + 1,
+          likedBy: hasLiked ? likedBy.filter((id: string) => id !== userId) : [...likedBy, userId]
+        };
+      };
 
-      // Update Profile XP
-      queryClient.setQueryData(['userProfile', userId], (old: any) => {
+      queryClient.setQueriesData({ queryKey: postKeys.all }, (old: any) => {
         if (!old) return old;
-        const postData = queryClient.getQueryData(postKeys.detail(postId)) as any;
-        const alreadyLiked = postData?.likedBy?.includes(userId);
-        return { ...old, xp: alreadyLiked ? old.xp : old.xp + 5 };
+        if (old.pages) {
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => ({
+              ...page,
+              posts: page.posts.map(updatePostData)
+            }))
+          };
+        }
+        if (Array.isArray(old)) return old.map(updatePostData);
+        return old;
       });
 
-      return { prevPost, prevProfile };
+      queryClient.setQueriesData({ queryKey: postKeys.details() }, updatePostData);
+      queryClient.setQueriesData({ queryKey: ['postBySlug'] }, updatePostData);
+
+      return { previousAll };
     },
-    onError: (err, variables, context: any) => {
-      if (context?.prevPost) {
-        queryClient.setQueryData(postKeys.detail(variables.postId), context.prevPost);
+
+    onError: (err, variables, context) => {
+      if (context?.previousAll) {
+        queryClient.setQueryData(postKeys.all, context.previousAll);
       }
-      if (context?.prevProfile) {
-        queryClient.setQueryData(['userProfile', variables.userId], context.prevProfile);
-      }
+      showToast("Falha na conexão com o servidor de likes. 📡", "error");
     },
+
     onSettled: (data, error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
-    },
+    }
   });
 }
 
-export function useCommentMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ postId, comment }: { postId: string, comment: Partial<Comment> }) => {
-      await PostService.addComment(postId, comment);
-      // Ganha 10 XP por comentar
-      if (comment.authorId) {
-        await userService.addXP(comment.authorId, 20);
-      }
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
-    },
-  });
-}
-
+/**
+ * Hook para Favoritos.
+ */
 export function useFavoriteMutation() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ userId, postId }: { userId: string, postId: string }) => {
-      await userService.toggleFavorite(userId, postId);
-      // Ganha 15 XP por favoritar (incentiva a leitura futura)
-      await userService.addXP(userId, 15);
-    },
-    // Otimistic Update: Atualiza a UI antes mesmo da resposta do banco
-    onMutate: async ({ userId, postId }) => {
-      // Cancela refetches em andamento para não sobrescrever o estado otimista
-      await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
+  const { showToast } = useUIStore();
 
-      // Salva o estado anterior para rollback em caso de erro
+  return useMutation({
+    mutationFn: ({ userId, postId, isFavorited }: { userId: string, postId: string, isFavorited: boolean }) => 
+      userService.toggleFavorite(userId, postId, isFavorited),
+    
+    onMutate: async ({ userId, postId }) => {
+      await queryClient.cancelQueries({ queryKey: ['userProfile', userId] });
       const previousProfile = queryClient.getQueryData(['userProfile', userId]);
 
-      // Atualiza o cache localmente
       queryClient.setQueryData(['userProfile', userId], (old: any) => {
         if (!old) return old;
         const favorites = old.favorites || [];
         const isFavorited = favorites.includes(postId);
-        const newFavorites = isFavorited 
-          ? favorites.filter((id: string) => id !== postId)
-          : [...favorites, postId];
-        
         return {
           ...old,
-          favorites: newFavorites,
-          xp: isFavorited ? old.xp : old.xp + 15 // XP só sobe se estiver adicionando
+          favorites: isFavorited 
+            ? favorites.filter((id: string) => id !== postId)
+            : [...favorites, postId]
         };
       });
 
       return { previousProfile };
     },
-    // Se falhar, volta ao estado anterior
+
+    onSuccess: (action, variables) => {
+      if (action === 'added') {
+        userService.addXP(variables.userId, 15);
+      }
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
+      showToast(action === 'added' ? "Adicionado aos seus favoritos! ⭐" : "Removido dos favoritos.");
+    },
+
     onError: (err, variables, context) => {
       if (context?.previousProfile) {
         queryClient.setQueryData(['userProfile', variables.userId], context.previousProfile);
       }
+      showToast("Erro ao atualizar favoritos.", "error");
     },
-    // Sempre invalida ao final para sincronizar com a verdade do servidor
+
     onSettled: (data, error, variables) => {
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
-    },
+    }
   });
 }
 
-export function useDeleteCommentMutation() {
+/**
+ * Hook para comentários.
+ */
+export function useCommentMutation() {
   const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
   return useMutation({
-    mutationFn: ({ postId, commentId }: { postId: string, commentId: string | number }) => PostService.deleteComment(postId, commentId),
+    mutationFn: ({ postId, comment }: { postId: string, comment: any }) => 
+      PostService.addComment(postId, comment),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-    },
+      if (variables.comment.authorId) {
+        userService.addXP(variables.comment.authorId, 20);
+        queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
+      }
+      showToast("Comentário enviado! 💬");
+    }
   });
 }
 
-export function useIncrementViewMutation() {
+/**
+ * Hook para deletar comentários.
+ */
+export function useDeleteCommentMutation() {
+  const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
   return useMutation({
-    mutationFn: async ({ postId, userId }: { postId: string, userId?: string }) => {
-      await PostService.incrementPostViews(postId);
-      if (userId) {
-        await userService.addXP(userId, 10);
-      }
-    },
+    mutationFn: ({ postId, commentId }: { postId: string, commentId: string | number }) => 
+      PostService.deleteComment(postId, commentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      showToast("Comentário removido.");
+    }
+  });
+}
+
+/**
+ * Hook para incrementar visualizações.
+ */
+export function useIncrementViewMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ postId, userId, viewerId }: { postId: string, userId?: string, viewerId: string }) => 
+      PostService.incrementPostViews(postId, userId, viewerId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+    }
   });
 }

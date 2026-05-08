@@ -1,5 +1,5 @@
 import { db } from "../lib/firebase";
-import { doc, getDoc, setDoc, DocumentData, DocumentSnapshot } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, DocumentData, DocumentSnapshot, arrayUnion, arrayRemove, runTransaction } from "firebase/firestore";
 import { COLLECTIONS } from "../constants";
 import { errorService } from "./errorService";
 import { User as FirebaseUser } from "firebase/auth";
@@ -14,8 +14,11 @@ export interface UserProfile {
   level: number;
   xp: number;
   favorites: string[];
+  readPosts?: string[];
   role: 'admin' | 'user';
 }
+
+
 
 /**
  * Serviço para gerenciar dados de usuários e permissões.
@@ -25,6 +28,7 @@ export const userService = {
    * Busca o perfil completo do usuário pelo ID
    */
   getUserProfileById: async (userId: string): Promise<UserProfile | null> => {
+    
     try {
       const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, userId));
       if (!userDoc.exists()) return null;
@@ -100,33 +104,19 @@ export const userService = {
   },
 
   /**
-   * Alterna um post nos favoritos do usuário.
-   * Retorna 'added' ou 'removed' para controle de XP.
+   * Alterna um post nos favoritos do usuário usando operação rápida.
+   * Retorna 'added' ou 'removed' com base no estado anterior passado.
    */
-  toggleFavorite: async (userId: string, postId: string): Promise<'added' | 'removed' | null> => {
+  toggleFavorite: async (userId: string, postId: string, currentlyFavorited: boolean): Promise<'added' | 'removed' | null> => {
     try {
       const userRef = doc(db, COLLECTIONS.USERS, userId);
-      const userSnap = await getDoc(userRef);
+      const action: 'added' | 'removed' = currentlyFavorited ? 'removed' : 'added';
       
-      let favorites: string[] = [];
+      await updateDoc(userRef, { 
+        favorites: currentlyFavorited ? arrayRemove(postId) : arrayUnion(postId),
+        updatedAt: new Date()
+      });
       
-      if (userSnap.exists()) {
-        favorites = userSnap.data().favorites || [];
-      }
-
-      const isFavorited = favorites.includes(postId);
-      let action: 'added' | 'removed';
-      let newFavorites: string[];
-
-      if (isFavorited) {
-        newFavorites = favorites.filter((id: string) => id !== postId);
-        action = 'removed';
-      } else {
-        newFavorites = [...favorites, postId];
-        action = 'added';
-      }
-
-      await setDoc(userRef, { favorites: newFavorites }, { merge: true });
       return action;
     } catch (error) {
       errorService.handle(error, "ao alternar favorito");
@@ -135,49 +125,60 @@ export const userService = {
   },
 
   /**
-   * Adiciona XP ao usuário e verifica Level Up.
+   * Adiciona XP ao usuário, verifica Level Up e impede ganho duplicado por post.
    */
-  /**
-   * Adiciona XP ao usuário e verifica Level Up.
-   */
-  addXP: async (userId: string, amount: number): Promise<void> => {
+  addXP: async (userId: string, amount: number, postId?: string): Promise<{leveledUp: boolean, newLevel: number} | null> => {
     try {
       const userRef = doc(db, COLLECTIONS.USERS, userId);
-      const userSnap = await getDoc(userRef);
       
-      let currentXP = 0;
-      let currentLevel = 1;
-      let email = "";
-      let name = "Player";
+      return await runTransaction(db, async (transaction) => {
+        const userSnap = await transaction.get(userRef);
+        
+        let currentXP = 0;
+        let currentLevel = 1;
+        let readPosts: string[] = [];
+        let data = { name: "Player", email: "", avatar: "" };
 
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        currentXP = data.xp || 0;
-        currentLevel = data.level || 1;
-        email = data.email || "";
-        name = data.name || "Player";
-      }
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          currentXP = userData.xp || 0;
+          currentLevel = userData.level || 1;
+          readPosts = userData.readPosts || [];
+          data = { ...data, ...userData };
+        }
 
-      let newXP = currentXP + amount;
-      let newLevel = currentLevel;
+        // Se um postId foi fornecido, verifica se o usuário já ganhou XP para este post
+        if (postId && readPosts.includes(postId)) {
+          return null;
+        }
 
-      // Lógica de Level Up acumulativa
-      while (newXP >= newLevel * 100) {
-        newXP -= newLevel * 100;
-        newLevel++;
-      }
+        let newXP = currentXP + amount;
+        let newLevel = currentLevel;
 
-      await setDoc(userRef, { 
-        xp: newXP, 
-        level: newLevel,
-        // Garante campos básicos se for criação
-        id: userId,
-        email,
-        name,
-        updatedAt: new Date()
-      }, { merge: true });
+        // Lógica de Level Up acumulativa (Ex: 100 XP para lvl 2, +200 para lvl 3...)
+        while (newXP >= newLevel * 100) {
+          newXP -= newLevel * 100;
+          newLevel++;
+        }
+
+        const updates: any = {
+          xp: newXP,
+          level: newLevel,
+          updatedAt: new Date()
+        };
+
+        // Se ganhou XP por leitura, registra o post na lista de já lidos
+        if (postId) {
+          updates.readPosts = arrayUnion(postId);
+        }
+
+        transaction.set(userRef, updates, { merge: true });
+
+        return { leveledUp: newLevel > currentLevel, newLevel };
+      });
     } catch (error) {
       errorService.handle(error, "ao adicionar XP");
+      return null;
     }
   }
 };

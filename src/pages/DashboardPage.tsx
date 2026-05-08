@@ -3,8 +3,9 @@ import { useAuth } from '../context/AuthProvider';
 import { useUserProfile } from '../hooks/useUserQuery';
 import { useAllPosts, useFavoriteMutation } from '../features/posts/hooks/usePostsQuery';
 import { useThemeStore } from '../store/useThemeStore';
+import { useUIStore } from '../store/useUIStore';
 import { cn, formatNumber } from '../lib/utils';
-import { Star, Trophy, MessageSquare, Heart, Bookmark, ChevronRight, Gamepad2, Zap, Info, Edit, X, Check, Camera, User } from 'lucide-react';
+import { Star, Trophy, MessageSquare, Heart, Bookmark, ChevronRight, Gamepad2, Zap, Info, Edit, X, Check, Camera, User, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PostCard from '../features/posts/components/PostCard';
@@ -14,6 +15,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const { currentUser, handleUpdateProfile } = useAuth();
   const { isDark } = useThemeStore();
+  const { showToast } = useUIStore();
   const { data: profile, isLoading: isProfileLoading } = useUserProfile(currentUser?.id);
   const { data: allPosts = [] } = useAllPosts();
   const favoriteMutation = useFavoriteMutation();
@@ -44,6 +46,23 @@ export default function DashboardPage() {
       setIsEditing(false);
     } catch (error) {
       // O toast já é mostrado pelo handleUpdateProfile no AuthProvider
+    }
+  };
+
+  const handleResetProfile = async () => {
+    if (!currentUser) return;
+    if (window.confirm("Deseja resetar seu XP, Nível e Histórico? Essa ação não pode ser desfeita.")) {
+      try {
+        await handleUpdateProfile({
+          xp: 0,
+          level: 1,
+          readPosts: [],
+          favorites: []
+        });
+        showToast("Seu progresso foi resetado! 🎮");
+      } catch (error) {
+        showToast("Erro ao resetar perfil.", "error");
+      }
     }
   };
 
@@ -240,6 +259,14 @@ export default function DashboardPage() {
                     )}
                   >
                     <Edit size={14} /> Editar Perfil
+                  </button>
+
+                  <button 
+                    onClick={handleResetProfile}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 border-2 border-black bg-red-500 text-white font-retro text-[10px] font-bold uppercase shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all"
+                    title="Resetar meu progresso"
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </>

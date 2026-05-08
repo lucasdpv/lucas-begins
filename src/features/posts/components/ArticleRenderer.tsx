@@ -18,10 +18,8 @@ function ArticleImage({ src, alt, isDark }: ArticleImageProps) {
   return (
     <figure className="my-14 w-full animate-in fade-in duration-700 relative group">
       <div className={cn(
-        "w-full rounded-none border-4 relative overflow-hidden flex items-center justify-center min-h-[300px]",
-        isDark 
-          ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)] bg-gray-900" 
-          : "border-snes-dark shadow-[8px_8px_0px_rgba(45,27,105,1)] bg-snes-mid"
+        "w-full rounded-none relative overflow-hidden flex items-center justify-center min-h-[300px] retro-card",
+        isDark ? "bg-gray-900" : "bg-snes-mid"
       )}>
         {!error ? (
           <img
@@ -69,8 +67,7 @@ function ArticleVideo({ url, isDark }: ArticleVideoProps) {
 
   return (
     <div className={cn(
-      "my-14 w-full aspect-video rounded-none overflow-hidden border-4 flex items-center justify-center bg-black relative",
-      isDark ? "border-purple-500 shadow-[8px_8px_0px_rgba(168,85,247,0.4)]" : "border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]"
+      "my-14 w-full aspect-video rounded-none overflow-hidden flex items-center justify-center bg-black relative retro-card"
     )}>
       {videoId ? (
         <iframe

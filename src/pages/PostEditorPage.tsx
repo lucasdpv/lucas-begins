@@ -103,14 +103,13 @@ export default function PostEditorPage() {
     try {
       if (id) {
         await updatePostMutation.mutateAsync({ id, data: postToSave });
-        showToast('Artigo atualizado com sucesso!');
       } else {
-        await createPostMutation.mutateAsync({ postData: postToSave, currentUser: currentUser! });
-        showToast('Novo artigo publicado!');
+        await createPostMutation.mutateAsync(postToSave);
       }
       navigate("/admin");
-    } catch (error) {
-      showToast('Erro ao salvar o artigo.', 'error');
+    } catch (error: any) {
+      console.error("Erro ao salvar post:", error);
+      showToast(`Erro ao salvar o artigo: ${error.message || 'Falha na conexão'}`, 'error');
     }
   };
 

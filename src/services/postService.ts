@@ -16,10 +16,15 @@ import {
   where,
   QueryDocumentSnapshot,
   DocumentData,
-  QuerySnapshot
+  QuerySnapshot,
+  arrayUnion,
+  arrayRemove,
+  runTransaction,
+  writeBatch
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
 import { Post, Comment, PostSchema } from '../features/posts/schemas';
+import { errorService } from './errorService';
 
 /**
  * Serviço para abstrair as chamadas ao Firestore para a entidade Post.
@@ -28,19 +33,54 @@ export const PostService = {
   /**
    * Busca posts com paginação.
    */
-  async getPaginatedPosts(limitNumber: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null = null): Promise<QuerySnapshot<DocumentData>> {
+  async getPaginatedPosts(limitNumber: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null = null, category?: string): Promise<any> {
     const constraints: any[] = [
       orderBy("createdAt", "desc"),
       limit(limitNumber)
     ];
     
+    if (category && category !== 'all') {
+      constraints.unshift(where("category", "==", category));
+    }
+
     if (lastDoc) {
-      constraints.splice(1, 0, startAfter(lastDoc));
+      constraints.push(startAfter(lastDoc));
     }
 
     const q = query(collection(db, "posts"), ...constraints);
     const snapshot = await getDocs(q);
-    return snapshot;
+    
+    return {
+      posts: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post)),
+      lastDoc: snapshot.docs[snapshot.docs.length - 1] || null
+    };
+  },
+
+  /**
+   * Busca posts em destaque (isFeatured).
+   */
+  async getFeaturedPosts(): Promise<Post[]> {
+    const q = query(
+      collection(db, "posts"), 
+      where("isFeatured", "==", true),
+      orderBy("createdAt", "desc"),
+      limit(5)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+  },
+
+  /**
+   * Busca os posts mais recentes.
+   */
+  async getLatestPosts(limitNumber: number = 5): Promise<Post[]> {
+    const q = query(
+      collection(db, "posts"),
+      orderBy("createdAt", "desc"),
+      limit(limitNumber)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
   },
 
   /**
@@ -99,8 +139,12 @@ export const PostService = {
    */
   async updatePost(postId: string, data: Partial<Post>): Promise<boolean> {
     const postRef = doc(db, "posts", postId);
+    
+    // Removemos o ID dos dados para evitar erro no Firestore
+    const { id, ...cleanData } = data as any;
+    
     const updateData = {
-      ...data,
+      ...cleanData,
       updatedAt: serverTimestamp()
     };
     await updateDoc(postRef, updateData as DocumentData);
@@ -108,102 +152,177 @@ export const PostService = {
   },
 
   /**
-   * Incrementa o número de visualizações de um post.
+   * Incrementa o contador de visualizações do post de forma única.
    */
-  async incrementPostViews(postId: string): Promise<boolean> {
-    const postRef = doc(db, "posts", postId);
-    await updateDoc(postRef, {
-      views: increment(1)
-    });
-    return true;
+  async incrementPostViews(postId: string, userId?: string, viewerId?: string): Promise<void> {
+    try {
+      const postRef = doc(db, "posts", postId);
+      
+      await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return;
+
+        const data = postSnap.data();
+        const viewedBy = data.viewedBy || [];
+
+        if (!viewedBy.includes(viewerId)) {
+          transaction.update(postRef, {
+            views: increment(1),
+            viewedBy: arrayUnion(viewerId)
+          });
+        }
+      });
+    } catch (error) {
+      errorService.handle(error, "ao incrementar views");
+    }
   },
 
   /**
    * Cria um novo post com metadados automáticos (slug, author, timestamps).
    */
   async createPost(postData: Partial<Post>, currentUser: any): Promise<Post | null> {
-    const baseSlug = slugify(postData.title);
-    const uniqueHash = Math.random().toString(36).substring(2, 7);
+    try {
+      const baseSlug = slugify(postData.title || 'post');
+      const uniqueHash = Math.random().toString(36).substring(2, 7);
+      
+      const { id, ...cleanData } = postData as any;
 
-    const newPostData = {
-      likes: 0,
-      likedBy: [],
-      comments: [],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      ...postData,
-      slug: `${baseSlug}-${uniqueHash}`,
-      // Garante que o author do editor (com avatar, bio, level, aka) seja preservado,
-      // adicionando apenas o role se não estiver definido
-      author: {
-        name: currentUser?.name || 'Anônimo',
-        role: currentUser?.role === 'admin' ? 'Editor Chefe' : 'Colaborador',
-        ...postData.author,
-      },
-    };
+      const newPostData = {
+        ...cleanData,
+        likes: 0,
+        likedBy: [],
+        comments: [],
+        views: 0,
+        viewedBy: [],
+        slug: `${baseSlug}-${uniqueHash}`,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        author: {
+          id: currentUser?.uid || currentUser?.id || "",
+          name: currentUser?.name || currentUser?.displayName || 'Anônimo',
+          avatar: currentUser?.avatar || currentUser?.photoURL || "",
+          role: currentUser?.role || 'autor'
+        },
+      };
 
-    const docRef = await addDoc(collection(db, "posts"), newPostData as DocumentData);
-    return this.getPostById(docRef.id);
-  },
-
-  /**
-   * Alterna o like de um usuário no post.
-   * Retorna 'liked' ou 'unliked' para controle de XP.
-   */
-  async toggleLike(postId: string, userId: string): Promise<'liked' | 'unliked' | null> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return null;
-
-    const data = postSnap.data() as Post;
-    const likedBy = data.likedBy || [];
-    const hasLiked = likedBy.includes(userId);
-
-    if (hasLiked) {
-      await updateDoc(postRef, {
-        likedBy: likedBy.filter(id => id !== userId),
-        likes: increment(-1)
+      // LIMPEZA CRÍTICA: Firestore não aceita 'undefined'. Convertemos para 'null' ou removemos.
+      Object.keys(newPostData).forEach(key => {
+        if ((newPostData as any)[key] === undefined) {
+          delete (newPostData as any)[key];
+        }
       });
-      return 'unliked';
-    } else {
-      await updateDoc(postRef, {
-        likedBy: [...likedBy, userId],
-        likes: increment(1)
-      });
-      return 'liked';
+
+      const docRef = await addDoc(collection(db, "posts"), newPostData as DocumentData);
+      return this.getPostById(docRef.id);
+    } catch (error: any) {
+      // Relançamos para que o Toast na UI mostre o erro real (ex: missing permissions)
+      throw new Error(error.message || "Erro desconhecido no Firebase");
     }
   },
 
   /**
-   * Adiciona um comentário ao post.
+   * Alterna o like de um usuário no post de forma atômica e segura.
+   * Impede curtidas negativas e duplicidade.
    */
-  async addComment(postId: string, comment: Partial<Comment>): Promise<void> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return;
+  async toggleLike(postId: string, userId: string): Promise<'liked' | 'unliked' | null> {
 
-    const data = postSnap.data() as Post;
-    const comments = data.comments || [];
     
-    await updateDoc(postRef, {
-      comments: [...comments, { ...comment, id: Date.now() }]
-    });
+    try {
+      const postRef = doc(db, "posts", postId);
+      
+      return await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return null;
+
+        const data = postSnap.data();
+        const likedBy = data.likedBy || [];
+        const hasLiked = likedBy.includes(userId);
+        
+        const action: 'liked' | 'unliked' = hasLiked ? 'unliked' : 'liked';
+        
+        transaction.update(postRef, {
+          likedBy: hasLiked ? arrayRemove(userId) : arrayUnion(userId),
+          likes: hasLiked ? Math.max((data.likes || 1) - 1, 0) : (data.likes || 0) + 1,
+          updatedAt: serverTimestamp()
+        });
+
+        return action;
+      });
+    } catch (error) {
+      console.error(`[PostService.toggleLike] ❌ ERRO Atômico:`, error);
+      errorService.handle(error, "ao fazer toggle de like atômico");
+      return null;
+    }
   },
 
   /**
-   * Remove um comentário do post.
+   * Adiciona um comentário ao post usando operação atômica.
+   * ✅ CORRIGIDO: Usa arrayUnion para evitar perda de comentários
+   */
+  async addComment(postId: string, comment: Partial<Comment>): Promise<void> {
+    try {
+      const postRef = doc(db, "posts", postId);
+      
+      await updateDoc(postRef, {
+        comments: arrayUnion({ ...comment, id: Date.now() } as any),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      errorService.handle(error, "ao adicionar comentário");
+      throw error;
+    }
+  },
+
+  /**
+   * Remove um comentário do post usando operação atômica com transação.
+   * ✅ CORRIGIDO: Usa transação para garantir consistência
    */
   async deleteComment(postId: string, commentId: string | number): Promise<void> {
-    const postRef = doc(db, "posts", postId);
-    const postSnap = await getDoc(postRef);
-    if (!postSnap.exists()) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await transaction.get(postRef);
+        
+        if (!postSnap.exists()) return;
 
-    const data = postSnap.data() as Post;
-    const comments = data.comments || [];
+        const data = postSnap.data() as Post;
+        const comments = data.comments || [];
+        const commentToRemove = comments.find(c => c.id === commentId);
 
-    await updateDoc(postRef, {
-      comments: comments.filter(c => c.id !== commentId)
-    });
+        if (commentToRemove) {
+          transaction.update(postRef, {
+            comments: arrayRemove(commentToRemove),
+            updatedAt: serverTimestamp()
+          });
+        }
+      });
+    } catch (error) {
+      errorService.handle(error, "ao remover comentário");
+      throw error;
+    }
+  },
+
+  /**
+   * Zera todas as curtidas e visualizações de todos os posts.
+   * Ação drástica para resetar o engajamento da plataforma.
+   */
+  async resetAllMetrics(): Promise<void> {
+    const posts = await this.getAllPosts();
+
+    for (const post of posts) {
+      if (!post.id) continue;
+      
+      try {
+        await updateDoc(postRef, { 
+          likes: 0, 
+          likedBy: [], 
+          views: 0, 
+          viewedBy: [] 
+        });
+      } catch (err) {
+        console.error(`❌ Erro no post ${post.id}:`, err);
+      }
+    }
   },
 
   /**
@@ -212,18 +331,21 @@ export const PostService = {
   async normalizeAllPostViews(): Promise<void> {
     const posts = await this.getAllPosts();
     
-    // Criamos uma lista de promessas para atualizar tudo em paralelo
-    const updatePromises = posts.map(post => {
-      if (!post.id) return Promise.resolve();
+    const CHUNK_SIZE = 400;
+    for (let i = 0; i < posts.length; i += CHUNK_SIZE) {
+      const chunk = posts.slice(i, i + CHUNK_SIZE);
+      const batch = writeBatch(db);
       
-      const likes = post.likes || 0;
-      const normalizedViews = Math.max(likes + (Math.floor(Math.random() * 10) + 5), 5);
+      chunk.forEach(post => {
+        if (!post.id) return;
+        const likes = post.likes || 0;
+        const normalizedViews = Math.max(likes + (Math.floor(Math.random() * 10) + 5), 5);
+        const postRef = doc(db, "posts", post.id);
+        batch.update(postRef, { views: normalizedViews });
+      });
       
-      const postRef = doc(db, "posts", post.id);
-      return updateDoc(postRef, { views: normalizedViews });
-    });
-
-    await Promise.all(updatePromises);
+      await batch.commit();
+    }
   },
 
   /**

@@ -1,6 +1,11 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager,
+  memoryLocalCache
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
@@ -17,7 +22,12 @@ const app = initializeApp(firebaseConfig);
 
 // Exporta serviços para uso no App
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Configuração de cache para performance e offline
+// No momento, vamos usar apenas cache em memória para evitar travamentos em escritas pesadas
+export const db = initializeFirestore(app, {
+  localCache: memoryLocalCache() 
+});
 
 // Google
 export const googleProvider = new GoogleAuthProvider();
