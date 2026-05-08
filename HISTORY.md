@@ -4,6 +4,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🛰️ [v2.1.0] - The Stability & Sync Update
+*Data: 08 de Maio de 2026*
+
+### 🚀 Sincronização Multi-Dispositivo
+- **Firestore Server-First**: Desativação da persistência local agressiva para garantir que favoritos e XP sejam sincronizados instantaneamente entre Celular, Tablet e Desktop.
+- **Cache Inteligente**: Redução do `staleTime` para zero no perfil do usuário, forçando a re-sincronização da "verdade do banco" a cada nova sessão ou navegação.
+- **Linkagem Inteligente**: Implementado sistema de busca por ID/Slug na `PostDetailPage`, garantindo que favoritos antigos sempre levem ao post correto.
+
+### 🪙 Refinamento de Gamificação
+- **XP Justo**: Correção na lógica de Favoritos e Likes; agora o bônus de XP só é concedido na primeira interação (adicionar), evitando abusos de XP infinito.
+- **Persistência de Novos Jogadores**: Agora o sistema cria automaticamente o documento do usuário ao ganhar o primeiro XP, eliminando a perda de progresso em contas novas.
+- **Ajuste de Regras**: Recompensa por Comentário atualizada para **+20 XP** conforme a nova tabela de economia de jogo.
+
+---
+
 ## 🏆 [v2.0.0] - The Community & Maintenance Update
 *Data: 08 de Maio de 2026*
 
