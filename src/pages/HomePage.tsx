@@ -8,7 +8,7 @@ import PostSkeleton from "../features/posts/components/PostSkeleton";
 import CarouselSkeleton from "../features/posts/components/CarouselSkeleton";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { usePosts } from "../features/posts/hooks/usePostsQuery";
+import { useAllPosts } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
@@ -16,43 +16,19 @@ import { Post } from "../features/posts/schemas";
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const { activeCategory, searchQuery } = useUIStore();
-  const { 
-    posts, 
-    isLoading: isLoadingPosts, 
-    isFetchingNextPage: isFetchingMore, 
-    hasNextPage, 
-    fetchNextPage: loadMore 
-  } = usePosts({ search: searchQuery, category: activeCategory });
+  const { data: allPosts = [], isLoading: isLoadingPosts } = useAllPosts();
+  const posts = allPosts as Post[];
   const navigate = useNavigate();
   const observerTarget = useRef<HTMLDivElement>(null);
   const [activeSidebarTab, setActiveSidebarTab] = useState<"acessados" | "curtidos">("acessados");
 
+  // Scroll to top on category change
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos") {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
-    return () => {
-      if (currentTarget) observer.disconnect();
-    };
-  }, [hasNextPage, isLoadingPosts, searchQuery, activeCategory, loadMore]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeCategory, searchQuery]);
 
   const { filteredPosts, featuredPosts, mostViewedPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
-  const onPostClick = (post: Post) => {
-    const targetSlug = post.slug || slugify(post.title);
-    navigate(`/post/${targetSlug}`);
-  };
 
   return (
     <div className="flex flex-col gap-12">
@@ -82,9 +58,8 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Carrossel Principal */}
             <div className="lg:col-span-3">
-              <Carousel posts={featuredPosts} onPostClick={onPostClick} isDark={isDark} />
+              <Carousel posts={featuredPosts} isDark={isDark} />
             </div>
 
             {/* Sidebar Mais Acessados - Altura Casada com o Carrossel */}
@@ -102,9 +77,9 @@ export default function HomePage() {
                 
                 <div className="flex flex-col justify-between h-full relative z-10 gap-1">
                   {mostViewedPosts.map((post, idx) => (
-                    <div
+                    <Link
                       key={post.id}
-                      onClick={() => onPostClick(post)}
+                      to={`/post/${post.slug || slugify(post.title)}`}
                       className={cn(
                         "flex items-center gap-5 cursor-pointer group py-3 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-2",
                         isDark ? "border-white/5" : "border-snes-mid/30"
@@ -127,7 +102,7 @@ export default function HomePage() {
                            <span>{formatNumber(post.views || 0)} visualizações</span>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -161,17 +136,9 @@ export default function HomePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredPosts.map((post) => (
                   <div key={post.id} className="animate-fade-in h-full">
-                    <PostCard post={post} onClick={() => onPostClick(post)} />
+                    <PostCard post={post} />
                   </div>
                 ))}
-                {/* Skeletons de Rodapé para o Scroll Infinito */}
-                {isFetchingMore && (
-                  <>
-                    <PostSkeleton isDark={isDark} />
-                    <PostSkeleton isDark={isDark} />
-                    <PostSkeleton isDark={isDark} />
-                  </>
-                )}
               </div>
             ) : (
               <div className={cn("p-12 text-center rounded-2xl retro-card", isDark ? "bg-gray-800" : "bg-snes-surface border-2 border-snes-dark")}>
@@ -181,16 +148,7 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Trigger para Scroll Infinito */}
-            {hasNextPage && !isLoadingPosts && searchQuery === "" && activeCategory === "Todos" && (
-              <div ref={observerTarget} className="mt-16 flex justify-center py-10">
-                <div className="flex items-center gap-3 opacity-50">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" />
-                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce delay-100" />
-                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce delay-200" />
-                </div>
-              </div>
-            )}
+            {/* Trigger para Scroll Infinito removido para estabilidade do filtro */}
           </section>
         </div>
       </div>

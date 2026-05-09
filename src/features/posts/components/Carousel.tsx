@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
-import { calculateReadingTime, cn, coverBgStyle, formatNumber } from "../../../lib/utils";
+import { Link } from "react-router-dom";
+import { calculateReadingTime, cn, coverBgStyle, formatNumber, slugify } from "../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 import { Post } from "../schemas";
 
 interface CarouselProps {
   posts: Post[];
-  onPostClick: (post: Post) => void;
   isDark?: boolean;
 }
 
@@ -14,7 +14,7 @@ interface CarouselProps {
  * Carrossel automático com autoplay, pausa no hover, navegação por teclado.
  * Respeita o campo imagePosition de cada post.
  */
-export default function Carousel({ posts, onPostClick }: CarouselProps) {
+export default function Carousel({ posts }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -55,13 +55,13 @@ export default function Carousel({ posts, onPostClick }: CarouselProps) {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Slide */}
-      <div
+      <Link
+        to={`/post/${currentPost.slug || slugify(currentPost.title)}`}
         className={cn(
-          "w-full h-[400px] md:h-[560px] relative cursor-pointer transition-all duration-700",
+          "w-full h-[400px] md:h-[560px] relative transition-all duration-700 block",
           !currentPost.imageUrl && currentPost.gradient && `bg-gradient-to-br ${currentPost.gradient}`
         )}
         style={bgStyle}
-        onClick={() => onPostClick(currentPost)}
       >
         {/* Scanlines */}
         <div className="absolute inset-0 scanline-overlay opacity-30 group-hover/carousel:opacity-50 transition-opacity" />
@@ -100,7 +100,7 @@ export default function Carousel({ posts, onPostClick }: CarouselProps) {
             </div>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Botões de navegação — Prioridade Máxima */}
       {posts.length > 1 && (

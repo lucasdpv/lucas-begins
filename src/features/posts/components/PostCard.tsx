@@ -1,6 +1,6 @@
-import React from "react";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
-import { calculateReadingTime, formatDate, cn, coverBgStyle, formatNumber } from "../../../lib/utils";
+import { Link } from "react-router-dom";
+import { calculateReadingTime, formatDate, cn, coverBgStyle, formatNumber, slugify } from "../../../lib/utils";
 import { BRUTAL_DESIGN } from "../../../constants";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
@@ -13,11 +13,10 @@ import { Post } from "../schemas";
 
 interface PostCardProps {
   post: Post;
-  onClick: () => void;
   variant?: "default" | "compact";
 }
 
-export default function PostCard({ post, onClick, variant = "default" }: PostCardProps) {
+export default function PostCard({ post, variant = "default" }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
@@ -33,16 +32,19 @@ export default function PostCard({ post, onClick, variant = "default" }: PostCar
   const commentCount = post.comments?.length || 0;
   const isCompact = variant === "compact";
 
+  const targetSlug = post.slug || slugify(post.title);
+  const targetPath = `/post/${targetSlug}`;
+
   return (
-    <article
+    <Link
+      to={targetPath}
       className={cn(
-        "flex flex-col h-full cursor-pointer group",
+        "flex flex-col h-full group",
         BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT,
         "hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
         isDark ? "bg-gray-800" : "bg-snes-light",
         isCompact && "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(168,85,247,1)]"
       )}
-      onClick={onClick}
     >
       {/* Thumb */}
       <div
@@ -183,6 +185,6 @@ export default function PostCard({ post, onClick, variant = "default" }: PostCar
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
