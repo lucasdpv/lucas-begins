@@ -4,6 +4,23 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🧩 [v2.3.0] - Architecture & Stability Overhaul
+*Data: 09 de Maio de 2026*
+
+### 🏛️ Arquitetura Modular
+- **Decomposition of "God Components"**: Refatoração completa da `AdminPage` e `PostDetailPage` (antes com 1000+ linhas) em componentes atômicos e especializados.
+- **Hooks Dedicados**: Centralização da lógica de mensagens e ações administrativas no hook `useAdminActions`, garantindo que o contador de mensagens nunca mais fique zerado ao entrar no painel.
+- **Tipagem Estrita**: Resolução de erros de TypeScript em mutações de Like, Favoritos e Comentários, garantindo maior segurança na comunicação com o Firebase.
+
+### ✨ UI/UX & Navbar
+- **Meu Painel (Admin)**: Substituição do ícone de engrenagem pelo botão textual "MEU PAINEL", seguindo a mesma identidade visual premium do "MEU QG".
+- **Navegação Inteligente**: Ajuste na Navbar para limpar a busca automaticamente ao selecionar categorias, além de garantir o scroll para o topo da página.
+
+### 🚀 Performance & Robustez
+- **Fetch Local Estratégico**: Transição da Home para o hook `useAllPosts`, permitindo busca global e filtragem de categorias instantâneas na memória, sem dependência de índices complexos do Firebase para consultas paginadas.
+- **Sorting Resiliente**: Nova lógica de ordenação no `PostService` que suporta diversos formatos de timestamp e datas, prevenindo falhas de exibição na Home.
+
+
 ## 🛰️ [v2.1.0] - The Stability & Sync Update
 *Data: 08 de Maio de 2026*
 

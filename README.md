@@ -1,8 +1,8 @@
-# 🕹️ Lucas Begins - Retro Gaming Journal (v2.0)
+# 🕹️ Lucas Begins - Retro Gaming Journal (v2.3)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 2.0, o projeto evoluiu de um simples blog para uma plataforma de comunidade gamificada, onde cada leitura e interação aproxima o usuário da era dourada dos videogames através de níveis e conquistas.
+O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 2.3, o projeto atingiu maturidade arquitetural com uma estrutura totalmente modular, mantendo o sistema de gamificação onde cada interação aproxima o usuário da era dourada dos videogames.
 
 ---
 
@@ -12,11 +12,14 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 
 -   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Configuração do ambiente e arquitetura TypeScript.
 -   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação e ferramentas admin.
--   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre esquemas Zod, queries e stores.
+-   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre TanStack Query, Zustand e Estrutura de Features.
 
 ---
 
-## ✨ Destaques da Versão 2.0
+## ✨ Destaques da Versão 2.3
+
+### 🧩 Arquitetura Modular (Features)
+Os componentes "gigantes" foram decompostos em unidades menores e especializadas (Admin, Posts, Auth). Isso facilita a manutenção e permite que novas funcionalidades sejam adicionadas sem afetar a estabilidade do core.
 
 ### 🎮 Gamificação (XP System)
 Sistema de progressão real. Usuários ganham XP ao ler, curtir e comentar, subindo de nível e desbloqueando emblemas de "Veterano". Tudo persistido em tempo real no Firestore.
@@ -24,8 +27,8 @@ Sistema de progressão real. Usuários ganham XP ao ler, curtir e comentar, subi
 ### 🏠 QG de Comunidade (Dashboard)
 Um painel exclusivo para cada usuário gerenciar seu inventário de favoritos, acompanhar seu nível de experiência e personalizar sua identidade (Bio/AKA) com estética Modern Brutalist.
 
-### ⚡ Arquitetura "Turbo-Type"
-O projeto foi totalmente migrado para **TypeScript**, utilizando **React Query** para gerenciamento de cache inteligente e **Zustand** para estados globais ultra-leves. Performance extrema com tipagem estática.
+### ⚡ Performance "Instant-Browse"
+Implementação de estratégia de carregamento total na Home combinada com filtragem local. A busca global e a troca de categorias agora são instantâneas, sem telas de carregamento intermediárias.
 
 ### 🔐 Segurança & Manutenção
 Painel Administrativo com ferramentas integradas para normalização de dados e gestão de categorias, protegido por rotas inteligentes que respeitam a hierarquia de acesso.

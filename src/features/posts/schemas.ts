@@ -17,9 +17,10 @@ export const CommentSchema = z.object({
   authorId: z.string().catch('unknown'),
   author: z.string().catch('Anônimo'),
   authorAvatar: z.string().optional().nullable(),
+  authorLevel: z.number().optional().nullable().catch(1),
   text: z.string().catch(''),
   createdAt: z.any().optional(),
-}).catch({ id: Date.now(), authorId: 'unknown', author: 'Anônimo', text: '' });
+}).catch({ id: Date.now(), authorId: 'unknown', author: 'Anônimo', text: '', authorLevel: 1 });
 
 export type Comment = z.infer<typeof CommentSchema>;
 
