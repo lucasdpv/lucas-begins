@@ -54,27 +54,29 @@ export default function Carousel({ posts }: CarouselProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Slide */}
-      <Link
-        to={`/post/${currentPost.slug || slugify(currentPost.title)}`}
+      {/* Slide Content */}
+      <div
         className={cn(
-          "w-full h-[400px] md:h-[560px] relative transition-all duration-700 block",
+          "w-full h-[400px] md:h-[560px] relative transition-all duration-700",
           !currentPost.imageUrl && currentPost.gradient && `bg-gradient-to-br ${currentPost.gradient}`
         )}
         style={bgStyle}
       >
-        {/* Scanlines */}
-        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover/carousel:opacity-50 transition-opacity" />
-        
-        {/* Deep Gradient Overlay - Improved for better contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/70 to-transparent pointer-events-none" />
-        
-        {/* Decorative corner lights (Modern/Harmonious touch) */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-600/10 blur-[120px] pointer-events-none" />
+        {/* Link Esticado (Stretched Link) - Fica por cima da imagem mas por baixo dos botões de seta */}
+        <Link 
+          to={`/post/${currentPost.slug || slugify(currentPost.title)}`}
+          className="absolute inset-0 z-10"
+          aria-label={`Ler matéria: ${currentPost.title}`}
+        />
 
-        {/* Content Container - Centered on Mobile to avoid arrows */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[2] pointer-events-none flex justify-center md:justify-start">
+        {/* Scanlines */}
+        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover/carousel:opacity-50 transition-opacity z-[5]" />
+        
+        {/* Deep Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/70 to-transparent pointer-events-none z-[5]" />
+        
+        {/* Content Container */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
           <div className="max-w-[75%] md:max-w-3xl pointer-events-auto text-center md:text-left flex flex-col items-center md:items-start">
             <div className="mb-4">
               <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
@@ -100,23 +102,21 @@ export default function Carousel({ posts }: CarouselProps) {
             </div>
           </div>
         </div>
-      </Link>
+      </div>
 
-      {/* Botões de navegação — Prioridade Máxima */}
+      {/* Botões de navegação - Devem estar acima do link (Z-INDEX 20+) */}
       {posts.length > 1 && (
         <>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            tabIndex={0}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
             aria-label="Anterior"
           >
             <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
-            tabIndex={0}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 focus:outline-none opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-xl bg-black/60 text-white border-2 border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
             aria-label="Próximo"
           >
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
@@ -124,7 +124,7 @@ export default function Carousel({ posts }: CarouselProps) {
         </>
       )}
 
-      {/* Dots + barra de progresso — Centralizado no Mobile */}
+      {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 flex items-center gap-3 z-30">
         {posts.map((_, idx) => (
           <button
@@ -141,7 +141,7 @@ export default function Carousel({ posts }: CarouselProps) {
 
       {/* Indicador de pausa */}
       {isPaused && (
-        <div className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-black/50 text-white text-xs font-retro font-bold uppercase tracking-wider border border-white/20 backdrop-blur-sm">
+        <div className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-black/50 text-white text-xs font-retro font-bold uppercase tracking-wider border border-white/20 backdrop-blur-sm z-30">
           ⏸ Pausado
         </div>
       )}

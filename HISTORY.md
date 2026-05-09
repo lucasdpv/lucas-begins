@@ -4,6 +4,18 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v2.3.1] - UX & Navigation Fix
+*Data: 09 de Maio de 2026*
+
+### ✨ Melhorias de Navegação
+- **Native Link Support**: Refatoração dos componentes `PostCard` e `Carousel` utilizando o padrão **Stretched Link**. Isso permite que o card inteiro seja um link real (`<a>`), habilitando funcionalidades nativas como "Abrir em nova aba" (botão do meio) e "Ctrl + Clique".
+- **Limpeza de Lógica**: Remoção de navegação imperativa via código (`navigate`) na Home, favorecendo o comportamento declarativo e mais performático do navegador.
+
+### 🛠️ Correções e Ajustes
+- **Import Fixes**: Correção de caminhos de importação quebrados após a refatoração modular.
+- **Merge Resolution**: Consolidação da branch após resolução de conflitos, garantindo a integridade da arquitetura v2.3.0.
+
+
 ## 🧩 [v2.3.0] - Architecture & Stability Overhaul
 *Data: 09 de Maio de 2026*
 

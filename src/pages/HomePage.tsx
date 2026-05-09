@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef, useState } from "react";
 import { Gamepad2, Star, Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
@@ -18,7 +18,6 @@ export default function HomePage() {
   const { activeCategory, searchQuery } = useUIStore();
   const { data: allPosts = [], isLoading: isLoadingPosts } = useAllPosts();
   const posts = allPosts as Post[];
-  const navigate = useNavigate();
   const observerTarget = useRef<HTMLDivElement>(null);
   const [activeSidebarTab, setActiveSidebarTab] = useState<"acessados" | "curtidos">("acessados");
 

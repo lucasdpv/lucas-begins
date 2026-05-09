@@ -1,3 +1,4 @@
+import React from "react";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
 import { Link } from "react-router-dom";
 import { calculateReadingTime, formatDate, cn, coverBgStyle, formatNumber, slugify } from "../../../lib/utils";
@@ -36,20 +37,26 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
   const targetPath = `/post/${targetSlug}`;
 
   return (
-    <Link
-      to={targetPath}
+    <article
       className={cn(
-        "flex flex-col h-full group",
+        "flex flex-col h-full group relative",
         BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT,
         "hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
         isDark ? "bg-gray-800" : "bg-snes-light",
         isCompact && "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(168,85,247,1)]"
       )}
     >
+      {/* Link Esticado (Stretched Link) - Captura o clique em todo o card */}
+      <Link 
+        to={targetPath} 
+        className="absolute inset-0 z-0" 
+        aria-label={`Ler matéria: ${post.title}`}
+      />
+
       {/* Thumb */}
       <div
         className={cn(
-          "w-full relative overflow-hidden border-b-2 border-black flex items-center justify-center",
+          "w-full relative overflow-hidden border-b-2 border-black flex items-center justify-center z-10 pointer-events-none",
           isCompact ? "h-32 sm:h-40" : "h-56 md:h-64",
           isDark ? "bg-gray-900" : "bg-snes-mid",
           !post.imageUrl && !imgError && post.gradient && `bg-gradient-to-br ${post.gradient}`
@@ -86,7 +93,7 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
       </div>
 
       {/* Conteúdo */}
-      <div className={cn("flex flex-col flex-grow", isCompact ? "p-3" : "px-5 py-6")}>
+      <div className={cn("flex flex-col flex-grow relative z-10 pointer-events-none", isCompact ? "p-3" : "px-5 py-6")}>
         <h3 className={cn(
           "font-retro font-bold uppercase line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300",
           isCompact ? "text-xs mb-2" : "text-lg md:text-xl mb-3"
@@ -119,8 +126,8 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
             )}
           </div>
 
-          {/* Container de Ações e Status */}
-          <div className="flex items-center gap-3 sm:gap-4 ml-auto" onClick={(e) => e.stopPropagation()}>
+          {/* Container de Ações e Status - Z-INDEX 20 e pointer-events-auto para ser clicável por cima do link */}
+          <div className="flex items-center gap-3 sm:gap-4 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
             {/* Stats Group */}
             <div className="flex items-center gap-2 sm:gap-3">
               <button
@@ -185,6 +192,6 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
