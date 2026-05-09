@@ -34,14 +34,14 @@ export const PostService = {
    * Busca posts com paginacao.
    */
   async getPaginatedPosts(limitNumber: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null = null, category?: string): Promise<any> {
-    const constraints: any[] = [
-      orderBy("createdAt", "desc"),
-      limit(limitNumber)
-    ];
+    const constraints: any[] = [];
     
-    if (category && category !== 'all') {
-      constraints.unshift(where("category", "==", category));
+    if (category && category !== 'Todos' && category !== 'all') {
+      constraints.push(where("category", "==", category));
     }
+
+    constraints.push(orderBy("createdAt", "desc"));
+    constraints.push(limit(limitNumber));
 
     if (lastDoc) {
       constraints.push(startAfter(lastDoc));
@@ -87,21 +87,25 @@ export const PostService = {
    * Busca todos os posts (para busca global e filtros).
    */
   async getAllPosts(): Promise<Post[]> {
-    const q = query(collection(db, COLLECTIONS.POSTS));
-    const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => {
-      const data = { id: doc.id, ...doc.data() };
-      const result = PostSchema.safeParse(data);
-      if (!result.success) {
-        console.warn(`[PostService] Validation failed for post ${doc.id}, using raw data.`, result.error.format());
-      }
-      return data as Post;
-    }).sort((a, b) => {
-      const dateA = a.createdAt?.seconds || 0;
-      const dateB = b.createdAt?.seconds || 0;
-      return dateB - dateA;
-    });
+    try {
+      const q = query(collection(db, COLLECTIONS.POSTS));
+      const snapshot = await getDocs(q);
+      
+      const posts = snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      } as Post));
+
+      // Ordenação resiliente: tenta pegar o timestamp do Firebase, senão usa 0
+      return posts.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+        const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+        return timeB - timeA;
+      });
+    } catch (error) {
+      console.error("[PostService] Error fetching all posts:", error);
+      return [];
+    }
   },
 
   /**
