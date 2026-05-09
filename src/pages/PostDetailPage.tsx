@@ -129,6 +129,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
       author: currentUser.name,
       authorAvatar: currentUser.avatar,
       authorId: currentUser.id,
+      authorLevel: currentUser.level || 1,
       createdAt: new Date().toISOString()
     };
 
@@ -231,17 +232,22 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           {/* Barra de Autor e Ações */}
           <div className={cn("flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b-4", isDark ? "border-gray-800" : "border-gray-200")}>
             <div className="flex items-center gap-4">
-              {post.author?.avatar ? (
-                <img 
-                  src={post.author.avatar} 
-                  alt={post.author.name} 
-                  className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
-                />
-              ) : (
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", isDark ? "bg-purple-900" : "bg-purple-200")}>
-                  ✍️
+              <div className="relative">
+                {post.author?.avatar ? (
+                  <img 
+                    src={post.author.avatar} 
+                    alt={post.author.name} 
+                    className="w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] object-cover" 
+                  />
+                ) : (
+                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", isDark ? "bg-purple-900" : "bg-purple-200")}>
+                    ✍️
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 bg-yellow-400 text-black px-1.5 py-0.5 rounded-lg border-2 border-black font-retro font-bold text-[8px] shadow-[2px_2px_0px_rgba(0,0,0,1)] z-10">
+                  LV.{post.author?.level || 1}
                 </div>
-              )}
+              </div>
               <div className="flex-1">
                 <p className="font-retro font-bold text-lg uppercase tracking-wide">
                   {post.author?.name || "Autor Desconhecido"}
@@ -437,8 +443,13 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
             </div>
             {/* Conteúdo */}
             <div className="flex items-center gap-5 md:gap-8 p-5 md:p-7">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] shrink-0 -rotate-2 group-hover:rotate-0 transition-transform">
-                <img src={post.author?.avatar ?? undefined} alt={post.author?.name} className="w-full h-full object-cover" />
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-2 group-hover:rotate-0 transition-transform">
+                  <img src={post.author?.avatar ?? undefined} alt={post.author?.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black px-2 py-0.5 rounded-lg border-2 border-black font-retro font-bold text-[10px] shadow-[2px_2px_0px_rgba(0,0,0,1)] z-10">
+                  LV.{post.author?.level || 1}
+                </div>
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-retro font-bold text-base md:text-2xl uppercase tracking-wide truncate">
@@ -535,7 +546,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
               {post.comments?.slice(0, visibleComments).map((comment) => (
                 <div key={comment.id} className={cn("p-6 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] flex gap-5 retro-card items-start", isDark ? "bg-gray-800" : "bg-snes-surface")}>
                   {/* Avatar Pixel Art */}
-                  <div className="shrink-0">
+                  <div className="shrink-0 relative">
                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl border-2 border-black bg-purple-900/20 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,1)]">
                       <img 
                         src={comment.authorAvatar ? comment.authorAvatar : getPixelAvatar(comment.authorId)} 
@@ -546,6 +557,9 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
                           target.src = getPixelAvatar(comment.authorId);
                         }}
                       />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 bg-yellow-400 text-black px-1.5 py-0.5 rounded-md border-2 border-black font-retro font-bold text-[8px] shadow-[1px_1px_0px_rgba(0,0,0,1)] z-10">
+                      LV.{comment.authorLevel || 1}
                     </div>
                   </div>
 

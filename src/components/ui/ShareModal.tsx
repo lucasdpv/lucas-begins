@@ -4,6 +4,8 @@ import { Post } from '../../features/posts/schemas';
 import { useUIStore } from '../../store/useUIStore';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../context/AuthProvider';
+import { USER_ROLES } from '../../constants';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -14,7 +16,9 @@ interface ShareModalProps {
 
 export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModalProps) {
   const { showToast } = useUIStore();
+  const { currentUser } = useAuth();
   const postUrl = window.location.href;
+  const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
 
   // Fecha com Esc
   useEffect(() => {
@@ -44,68 +48,60 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
   const shareSystem = async () => {
     if (navigator.share) {
       try {
+        // Simplificamos ao máximo para evitar rejeição do sistema
         await navigator.share({
           title: post.title,
-          text: post.excerpt || "Dá uma olhada nessa matéria no Lucas Begins!",
           url: postUrl,
         });
         onClose();
       } catch (err: any) {
         if (err.name !== 'AbortError') {
-          showToast("Erro ao compartilhar.", "error");
+          console.error("Share error:", err);
+          copyToClipboard();
         }
       }
     } else {
+      showToast("Seu navegador não suporta o menu nativo. Link copiado!", "info");
       copyToClipboard();
     }
   };
 
   /**
-   * Tenta compartilhar para o Instagram Stories.
-   * No mobile, prioriza o compartilhamento de arquivo via API nativa.
+   * Kit de Compartilhamento Manual para Instagram
+   * Força o download via blob para garantir que funcione em qualquer celular
    */
   const shareInstagramStories = async () => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      try {
-        // 1. Tentar compartilhar a imagem (Melhor experiência para Stories)
-        if (post.imageUrl) {
-          const response = await fetch(post.imageUrl);
-          const blob = await response.blob();
-          const file = new File([blob], 'share-card.jpg', { type: blob.type });
-
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: post.title,
-              text: `Confira: ${postUrl}`,
-            });
-            onClose();
-            return;
-          }
-        }
-
-        // 2. Fallback: Compartilhamento de texto nativo (Mais confiável que deep link)
-        if (navigator.share) {
-          await navigator.share({
-            title: post.title,
-            text: `Leia agora no Lucas Begins: ${post.title}`,
-            url: postUrl,
-          });
-          onClose();
-          return;
-        }
-      } catch (err) {
-        console.error("Erro no compartilhamento nativo:", err);
-      }
+    try {
+      // 1. Copiar Link (Sempre funciona)
+      await navigator.clipboard.writeText(postUrl);
       
-      // 3. Se tudo falhar (ex: navegador antigo), copia o link
-      copyToClipboard();
-      showToast("Link copiado! Abra o Instagram e cole no sticker de Link.", "info");
+      // 2. Download da Imagem
+      if (post.imageUrl) {
+        try {
+          const response = await fetch(post.imageUrl, { mode: 'cors' });
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `lucas-begins-${post.slug || 'artigo'}.jpg`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          showToast("Link copiado e imagem salva! 📸");
+        } catch (corsErr) {
+          // Fallback para Desktop/Browsers com restrição de CORS: Abre em nova aba
+          window.open(post.imageUrl, '_blank');
+          showToast("Link copiado! Salve a imagem que abriu na outra aba. 📸");
+        }
+      } else {
+        showToast("Link copiado! Este post não possui imagem de capa.", "info");
+      }
       onClose();
-    } else {
-      showToast("No PC: Salve a imagem e envie pelo celular! 📱", "info");
+    } catch (err) {
+      copyToClipboard();
+      showToast("Link copiado!", "info");
+      onClose();
     }
   };
 
@@ -158,29 +154,19 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
 
               {/* Share Options */}
               <div className="grid grid-cols-2 gap-4">
-                {/* Instagram Stories - Especial */}
-                <button
-                  onClick={shareInstagramStories}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-2 p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all group",
-                    "bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white"
-                  )}
-                >
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    className="w-8 h-8 group-hover:scale-110 transition-transform"
+                {/* Instagram Kit - Apenas para Admins */}
+                {isAdmin && (
+                  <button
+                    onClick={shareInstagramStories}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-2 p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all group",
+                      "bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white"
+                    )}
                   >
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                  <span className="font-retro text-[10px] font-bold uppercase">Stories</span>
-                </button>
+                    <Download className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                    <span className="font-retro text-[10px] font-bold uppercase text-center">Instagram Kit</span>
+                  </button>
+                )}
 
                 {/* WhatsApp */}
                 <button
@@ -208,7 +194,8 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                   onClick={shareSystem}
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all group",
-                    isDark ? "bg-purple-900/30 border-purple-500/50" : "bg-purple-100 border-purple-300"
+                    isDark ? "bg-purple-900/30 border-purple-500/50" : "bg-purple-100 border-purple-300",
+                    !isAdmin && "col-span-2"
                   )}
                 >
                   <Share2 className="w-8 h-8 group-hover:scale-110 transition-transform" />
@@ -216,16 +203,18 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                 </button>
               </div>
 
-              {/* Instructions / Footer */}
-              <div className={cn(
-                "p-4 border-2 border-dashed flex items-start gap-3",
-                isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-300 bg-gray-50"
-              )}>
-                <Download className="w-5 h-5 text-purple-500 shrink-0" />
-                <p className="text-[10px] font-medium leading-relaxed opacity-70">
-                  DICA: No Instagram, use o sticker de <strong>LINK</strong> e cole a URL para que seus seguidores possam abrir o artigo diretamente!
-                </p>
-              </div>
+              {/* Instructions / Footer - Apenas para Admin */}
+              {isAdmin && (
+                <div className={cn(
+                  "p-4 border-2 border-dashed flex items-start gap-3",
+                  isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-300 bg-gray-50"
+                )}>
+                  <Download className="w-5 h-5 text-purple-500 shrink-0" />
+                  <p className="text-[10px] font-medium leading-relaxed opacity-70">
+                    DICA: Use o <strong>Instagram Kit</strong> para baixar a capa e copiar o link. No Instagram, use o sticker de LINK!
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Bottom Deco */}
