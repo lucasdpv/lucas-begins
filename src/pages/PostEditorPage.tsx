@@ -17,6 +17,7 @@ import { useUIStore } from "../store/useUIStore";
 import { useCreatePostMutation, useUpdatePostMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
 import { useCategories } from "../features/posts/hooks/useCategoriesQuery";
 import BlockEditor from "../components/editor/BlockEditor";
+import ImageUpload from "../components/ui/ImageUpload";
 import { Helmet } from "react-helmet-async";
 import { STORAGE_KEYS } from "../constants";
 import { Post } from "../features/posts/schemas";
@@ -114,7 +115,7 @@ export default function PostEditorPage() {
   };
 
   const inputClass = cn(
-    "w-full p-4 rounded-xl outline-none border-2 font-medium focus:border-purple-500 transition-all",
+    "w-full p-3.5 rounded-xl outline-none border-2 font-medium transition-all focus:border-purple-500",
     isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
   );
 
@@ -198,9 +199,9 @@ export default function PostEditorPage() {
             {formData.content && <span>{calculateReadingTime(formData.content)}</span>}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Título */}
-            <div className="md:col-span-2 space-y-3">
+            <div className="md:col-span-2 space-y-2">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Título da Matéria *</label>
               <input
                 type="text"
@@ -214,17 +215,12 @@ export default function PostEditorPage() {
             </div>
 
             {/* Imagem de Capa */}
-            <div className="space-y-3">
-              <label className="text-sm font-bold uppercase font-retro opacity-80 flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" /> URL da Imagem de Capa
-              </label>
-              <input
-                type="url"
-                name="imageUrl"
-                value={formData.imageUrl || ""}
-                onChange={handleChange}
-                className={inputClass}
-                placeholder="https://..."
+            <div className="md:col-span-2">
+              <ImageUpload 
+                label="Imagem de Capa (Upload ou Link)"
+                initialValue={formData.imageUrl || ""}
+                onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                folder="posts"
               />
             </div>
 
@@ -269,7 +265,7 @@ export default function PostEditorPage() {
             </div>
 
             {/* Resumo */}
-            <div className="md:col-span-2 space-y-3">
+            <div className="md:col-span-2 space-y-2">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Resumo (Linha Fina) *</label>
               <textarea
                 name="excerpt"
@@ -283,7 +279,7 @@ export default function PostEditorPage() {
             </div>
 
             {/* Conteúdo */}
-            <div className="md:col-span-2 space-y-4">
+            <div className="md:col-span-2 space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Conteúdo Completo *</label>
               <div data-color-mode={isDark ? "dark" : "light"}>
                 <BlockEditor

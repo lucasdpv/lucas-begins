@@ -9,6 +9,7 @@ import { Star, Trophy, MessageSquare, Heart, Bookmark, ChevronRight, Gamepad2, Z
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PostCard from '../features/posts/components/PostCard';
+import ImageUpload from '../components/ui/ImageUpload';
 import { getPixelAvatar } from '../lib/utils';
 
 export default function DashboardPage() {
@@ -195,15 +196,11 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-retro font-bold uppercase opacity-50">URL do Avatar (Opcional)</label>
-                  <input 
-                    type="text" 
-                    value={editData.avatar}
-                    onChange={(e) => setEditData({...editData, avatar: e.target.value})}
-                    className={cn(
-                      "w-full p-3 border-2 border-black outline-none font-medium text-xs",
-                      isDark ? "bg-gray-900 text-white focus:border-purple-500" : "bg-gray-50 focus:border-purple-600"
-                    )}
+                  <ImageUpload 
+                    label="Avatar (Upload ou Link)"
+                    initialValue={editData.avatar}
+                    onUploadComplete={(url) => setEditData({...editData, avatar: url})}
+                    folder="avatars"
                   />
                 </div>
                 <div className="flex gap-3 pt-2">

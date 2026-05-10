@@ -4,6 +4,25 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🖼️ [v2.4.0] - The Image Hosting & Performance Update
+*Data: 10 de Maio de 2026*
+
+### ☁️ Firebase Image Hosting
+- **Native Storage Integration**: Implementação de sistema de upload direto para o Firebase Storage, eliminando a dependência de URLs externas.
+- **Auto Image Compression**: Integração da biblioteca `browser-image-compression` para otimizar imagens automaticamente antes do envio, economizando até 80% de espaço sem perda perceptível de qualidade.
+
+### ✨ Novo Media Selector (UX/UI)
+- **Unified Component**: Novo componente `ImageUpload` unificado que gerencia tanto Upload de arquivos quanto Links de URL com sistema de abas.
+- **Drag & Drop & Preview**: Suporte a arrastar-e-soltar e visualização em tamanho real (Full-size Preview) com overlay de ações.
+- **Layout Compacto**: Redesign do formulário no `PostEditor` e `Dashboard`, reduzindo espaços vazios e unificando a estética Neo-Brutalista arredondada.
+
+### 🛠️ Estabilidade & Correções
+- **Preview Lock**: Bloqueio de interações (curtidas, comentários, links) durante o modo de visualização para evitar inconsistências de dados.
+- **Dashboard Fixes**: Resolução de crash ao carregar o ID do perfil e remoção de campos redundantes.
+- **CORS Config**: Adição do arquivo `cors.json` para configuração correta do bucket do Firebase.
+
+---
+
 ## 🚀 [v2.3.1] - UX & Navigation Fix
 *Data: 09 de Maio de 2026*
 

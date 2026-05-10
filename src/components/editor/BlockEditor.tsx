@@ -11,6 +11,7 @@ import {
   Play
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import ImageUpload from '../ui/ImageUpload';
 
 interface Block {
   id: string;
@@ -156,21 +157,12 @@ export default function BlockEditor({ value, onChange, isDark }: BlockEditorProp
 
               {block.type === 'image' && (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-black/10 dark:bg-black/40 border border-white/5">
-                    <ImageIcon size={20} className="text-purple-500" />
-                    <input 
-                      type="url"
-                      value={block.url || ''}
-                      onChange={(e) => updateBlock(block.id, { url: e.target.value })}
-                      placeholder="URL da Imagem..."
-                      className="flex-1 bg-transparent outline-none text-sm font-mono"
-                    />
-                  </div>
-                  {block.url && (
-                    <div className="relative rounded-none overflow-hidden border-2 border-purple-500/20">
-                      <img src={block.url} alt="Preview" className="w-full h-auto max-h-80 object-contain bg-black/20" />
-                    </div>
-                  )}
+                  <ImageUpload 
+                    label="Upload de Imagem ou Link"
+                    initialValue={block.url || ""}
+                    onUploadComplete={(url) => updateBlock(block.id, { url })}
+                    folder="posts/content"
+                  />
                   <input 
                     type="text"
                     value={block.content}

@@ -8,9 +8,10 @@ interface PostRelatedProps {
   posts: Post[];
   currentPostId: string;
   isDark: boolean;
+  isPreview?: boolean;
 }
 
-export default function PostRelated({ posts, currentPostId, isDark }: PostRelatedProps) {
+export default function PostRelated({ posts, currentPostId, isDark, isPreview = false }: PostRelatedProps) {
   const related = [...posts]
     .filter((p) => p.id !== currentPostId && !p.isDraft)
     .sort((a, b) => (b.likes || 0) - (a.likes || 0))
@@ -42,10 +43,16 @@ export default function PostRelated({ posts, currentPostId, isDark }: PostRelate
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {related.map((p) => (
-            <Link to={`/post/${p.slug || slugify(p.title)}`} key={p.id} className="block group">
+            <Link 
+              to={isPreview ? "#" : `/post/${p.slug || slugify(p.title)}`} 
+              key={p.id} 
+              className={cn("block group", isPreview && "cursor-default opacity-50 grayscale")}
+              onClick={(e) => isPreview && e.preventDefault()}
+            >
               <div
                 className={cn(
-                  "h-36 md:h-40 w-full mb-3 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all overflow-hidden",
+                  "h-36 md:h-40 w-full mb-3 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                  !isPreview && "group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all",
                   !p.imageUrl && `bg-gradient-to-br ${(p as any).gradient || 'from-gray-900 to-purple-900'}`
                 )}
                 style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})` } : {}}
