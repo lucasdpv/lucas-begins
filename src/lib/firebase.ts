@@ -6,6 +6,7 @@ import {
   persistentMultipleTabManager,
   memoryLocalCache
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
@@ -28,6 +29,9 @@ export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
   localCache: memoryLocalCache() 
 });
+
+// Firebase Storage
+export const storage = getStorage(app);
 
 // Google
 export const googleProvider = new GoogleAuthProvider();

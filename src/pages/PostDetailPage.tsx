@@ -167,6 +167,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
             isDark={isDark}
             authLoading={authLoading}
             isFavorited={isFavorited}
+            isPreview={!!previewPost}
             onLike={() => currentUser && likeMutation.mutate({ postId: post.id, userId: currentUser.id })}
             onFavorite={() => currentUser && favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited })}
             onShare={() => setIsShareModalOpen(true)}
@@ -211,6 +212,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           posts={posts as Post[]} 
           currentPostId={post.id} 
           isDark={isDark} 
+          isPreview={!!previewPost}
         />
 
         <PostComments 
@@ -227,6 +229,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           isDark={isDark}
           visibleComments={visibleComments}
           onLoadMore={() => setVisibleComments(prev => prev + COMMENTS_PER_PAGE)}
+          isPreview={!!previewPost}
         />
       </div>
 

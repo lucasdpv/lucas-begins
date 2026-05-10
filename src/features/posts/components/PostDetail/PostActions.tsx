@@ -20,6 +20,7 @@ interface PostActionsProps {
   onLoginClick: () => void;
   isFavorited: boolean;
   authLoading: boolean;
+  isPreview?: boolean;
 }
 
 export default function PostActions({
@@ -31,7 +32,8 @@ export default function PostActions({
   onShare,
   onLoginClick,
   isFavorited,
-  authLoading
+  authLoading,
+  isPreview = false
 }: PostActionsProps) {
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
 
@@ -72,13 +74,15 @@ export default function PostActions({
       <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={onShare}
+          disabled={isPreview}
           className={cn(
-            "h-11 w-11 md:h-12 md:w-12 rounded-2xl border-2 transition-all hover:scale-105 flex items-center justify-center shrink-0",
+            "h-11 w-11 md:h-12 md:w-12 rounded-2xl border-2 transition-all flex items-center justify-center shrink-0",
+            isPreview ? "opacity-30 cursor-not-allowed" : "hover:scale-105",
             isDark 
               ? "bg-gray-800 border-purple-500/50 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]" 
               : "bg-white border-snes-dark/20 text-snes-accent shadow-sm"
           )}
-          title="Compartilhar"
+          title={isPreview ? "Indisponível no modo Preview" : "Compartilhar"}
         >
           <Share2 className="w-4 h-4 md:w-5 md:h-5" />
         </button>
@@ -100,14 +104,17 @@ export default function PostActions({
             {currentUser ? (
               <button
                 onClick={onLike}
+                disabled={isPreview}
                 className={cn(
-                  "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
+                  "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all shadow-lg shrink-0",
+                  isPreview ? "opacity-30 cursor-not-allowed" : "hover:scale-105 active:scale-95",
                   hasLiked 
                     ? "bg-red-500 border-red-400 text-white shadow-red-500/20" 
                     : isDark 
                       ? "bg-gray-800 border-purple-500/50 text-white shadow-purple-500/10" 
                       : "bg-white border-snes-dark/20 text-snes-accent shadow-sm"
                 )}
+                title={isPreview ? "Indisponível no modo Preview" : "Curtir"}
               >
                 <Heart className={cn("w-4 h-4 md:w-5 md:h-5 transition-transform", hasLiked ? "fill-current scale-110" : "group-hover:fill-current")} />
                 <span>{formatNumber(post.likes || 0)}</span>
@@ -125,9 +132,11 @@ export default function PostActions({
             {currentUser && (
               <button
                 onClick={onFavorite}
-                title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                disabled={isPreview}
+                title={isPreview ? "Indisponível no modo Preview" : (isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos")}
                 className={cn(
-                  "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all hover:scale-105 active:scale-95 shadow-lg shrink-0",
+                  "flex items-center justify-center gap-1.5 md:gap-3 h-11 px-3 md:h-12 md:px-6 rounded-2xl font-retro font-bold text-xs md:text-base uppercase border-2 transition-all shadow-lg shrink-0",
+                  isPreview ? "opacity-30 cursor-not-allowed" : "hover:scale-105 active:scale-95",
                   isFavorited 
                     ? "bg-yellow-400 border-yellow-500 text-black shadow-yellow-400/20" 
                     : isDark 

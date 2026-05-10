@@ -14,6 +14,7 @@ interface PostCommentsProps {
   isDark: boolean;
   visibleComments: number;
   onLoadMore: () => void;
+  isPreview?: boolean;
 }
 
 export default function PostComments({
@@ -25,7 +26,8 @@ export default function PostComments({
   onDeleteComment,
   isDark,
   visibleComments,
-  onLoadMore
+  onLoadMore,
+  isPreview = false
 }: PostCommentsProps) {
   const comments = post.comments || [];
   const hasMore = visibleComments < comments.length;
@@ -38,18 +40,27 @@ export default function PostComments({
       </h3>
 
       {currentUser ? (
-        <form onSubmit={onSubmitComment} className={cn("mb-12 p-8 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] retro-card", isDark ? "bg-gray-800" : "bg-snes-surface")}>
+        <form onSubmit={onSubmitComment} className={cn(
+          "mb-12 p-8 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] retro-card", 
+          isDark ? "bg-gray-800" : "bg-snes-surface",
+          isPreview && "opacity-50 pointer-events-none"
+        )}>
           <textarea
             className={cn("w-full p-5 rounded-none mb-5 resize-none outline-none border-2 focus:border-purple-500 text-lg", isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent")}
             rows={4}
-            placeholder="Mande o papo reto..."
+            placeholder={isPreview ? "Comentários desabilitados no modo Preview" : "Mande o papo reto..."}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             required
+            disabled={isPreview}
           />
           <div className="flex justify-end">
-            <button type="submit" disabled={!commentText.trim()} className="flex items-center gap-2 px-8 py-4 rounded-none font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button">
-              <Send className="w-5 h-5" /> Enviar
+            <button 
+              type="submit" 
+              disabled={!commentText.trim() || isPreview} 
+              className="flex items-center gap-2 px-8 py-4 rounded-none font-retro uppercase text-lg font-bold text-white bg-purple-600 retro-button"
+            >
+              <Send className="w-5 h-5" /> {isPreview ? "Bloqueado" : "Enviar"}
             </button>
           </div>
         </form>
