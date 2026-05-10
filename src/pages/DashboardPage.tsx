@@ -228,7 +228,7 @@ export default function DashboardPage() {
                   {profile?.aka && <span className="text-sm md:text-lg text-purple-500 ml-3 opacity-80">(aka {profile.aka})</span>}
                 </h1>
                 <p className="text-gray-500 font-medium mb-4 uppercase tracking-wider text-xs">
-                  ID: {profile?.id.substring(0, 8)}...
+                  ID: {profile?.id?.substring(0, 8)}...
                 </p>
                 <p className={cn("text-xs md:text-sm font-medium mb-6 line-clamp-2 max-w-xl", isDark ? "text-gray-400" : "text-gray-600")}>
                   {profile?.bio || "Nenhuma biografia definida ainda. Clique em editar para contar sua história!"}
@@ -417,7 +417,6 @@ export default function DashboardPage() {
                     key={post.id} 
                     post={post} 
                     variant="compact"
-                    onClick={() => navigate(`/post/${post.slug || post.id}`)}
                   />
                 ))}
              </div>
