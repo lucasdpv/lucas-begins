@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import { cn } from "../../../lib/utils";
 
+import ImageUpload from "../../../components/ui/ImageUpload";
+
 interface TabProfileProps {
   initialData: {
     name: string;
@@ -35,7 +37,7 @@ export default function TabProfile({ initialData, onSave, isDark }: TabProfilePr
         </h3>
         
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
             <div className="space-y-2">
               <label className="text-[10px] md:text-sm font-bold uppercase font-retro opacity-80">Nome</label>
               <input
@@ -61,19 +63,15 @@ export default function TabProfile({ initialData, onSave, isDark }: TabProfilePr
                 placeholder="Ex: Luck, The Boss..."
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] md:text-sm font-bold uppercase font-retro opacity-80">URL Foto</label>
-              <input
-                type="url"
-                value={profileData.avatar}
-                onChange={(e) => setProfileData(prev => ({ ...prev, avatar: e.target.value }))}
-                className={cn(
-                  "w-full p-3 md:p-4 rounded-xl outline-none border-2 focus:border-purple-500 transition-all font-medium text-sm md:text-base",
-                  isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
-                )}
-                placeholder="https://..."
-              />
-            </div>
+            
+            <ImageUpload 
+              label="Foto de Perfil"
+              initialValue={profileData.avatar}
+              onUploadComplete={(url) => setProfileData(prev => ({ ...prev, avatar: url }))}
+              folder="avatars"
+              className="md:col-span-2"
+            />
+
             <div className="space-y-2">
               <label className="text-[10px] md:text-sm font-bold uppercase font-retro opacity-80">Level</label>
               <input
