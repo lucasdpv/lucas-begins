@@ -25,6 +25,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## ⚔️ [v2.5.1] - The RPG & Terminal Update
+*Data: 11 de Maio de 2026*
+
+### 💬 RPG Contact System
+- **Dialogue Box UI**: Redesign completo da página de contato. Agora utiliza uma caixa de diálogo estilo SNES com avatar animado.
+- **Typing Effect**: Implementação de efeito de digitação de texto para as mensagens do Game Master (Player 1).
+- **Gamified Form**: Campos de entrada renomeados para "Nickname", "Canal de Comunicação" e "Detalhes da Missão".
+
+### 📟 Retro Search Console
+- **Terminal Esthetic**: A barra de busca agora simula um console de comando antigo (fundo preto, texto verde fósforo).
+- **Command Prompt**: Adição do prompt `>` piscando e placeholders estilo comando de sistema (`SEARCH_DB...`, `ENTER_QUERY_...`).
+- **Scanline FX**: Aplicação de overlay de scanlines na busca mobile para imersão total.
+
+---
+
 ## 🖼️ [v2.4.0] - The Image Hosting & Performance Update
 *Data: 10 de Maio de 2026*
 

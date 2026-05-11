@@ -1,16 +1,34 @@
-import React, { useState } from "react";
-import { Send, Loader2, Gamepad2, User, Mail, MessageSquare } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Send, Loader2, Gamepad2, User, Mail, MessageSquare, ChevronRight } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
 import { cn } from "../lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ContactPage() {
   const { isDark } = useThemeStore();
   const { showToast } = useUIStore();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dialogText, setDialogText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+
+  const fullText = "Saudações, viajante! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova fase? Envie seu pergaminho de contato abaixo e eu responderei em breve! 🎮";
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDialogText(fullText.slice(0, i));
+      i++;
+      if (i > fullText.length) {
+        setIsTyping(false);
+        clearInterval(interval);
+      }
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,7 +58,7 @@ export default function ContactPage() {
     
     try {
       await contactService.sendMessage(formData);
-      showToast("MENSAGEM ENVIADA! PLAYER 1 LOGADO COM SUCESSO.", "success");
+      showToast("MENSAGEM ENVIADA! QUEST COMPLETED.", "success");
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       showToast("ERRO NO SISTEMA. TENTE NOVAMENTE.", "error");
@@ -50,66 +68,86 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-6 md:py-12 px-4 relative overflow-hidden">
+    <div className="min-h-[85vh] py-12 px-4 relative overflow-hidden flex flex-col items-center">
       <Helmet>
-        <title>Contato | Lucas Begins</title>
+        <title>Quest Log: Contato | Lucas Begins</title>
         <meta name="description" content="Fale com o Player 1 do Lucas Begins." />
       </Helmet>
 
       {/* Efeito de Scanlines */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.04] z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
 
-      <div className="w-full max-w-4xl relative z-10">
-        {/* Título com Text Shadow Retro */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="inline-block px-6 md:px-10 py-3 md:py-4 bg-purple-600 border-4 md:border-[6px] border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] md:shadow-[10px_10px_0px_rgba(0,0,0,1)] mb-6 md:mb-8">
-             <h1 className="font-retro font-bold text-2xl md:text-6xl text-white uppercase tracking-tighter drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                Fale <span className="text-yellow-400">Conosco</span>
-             </h1>
+      <div className="w-full max-w-4xl space-y-12 relative z-10">
+        
+        {/* RPG Dialogue Box */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            "p-6 md:p-8 border-[6px] border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] flex flex-col md:flex-row gap-6 relative",
+            isDark ? "bg-blue-900/40" : "bg-blue-600"
+          )}
+        >
+          {/* NPC Avatar Area */}
+          <div className="shrink-0 flex flex-col items-center gap-2">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-purple-500 border-4 border-white shadow-lg overflow-hidden flex items-center justify-center p-1">
+               <Gamepad2 className="w-12 h-12 text-white animate-bounce" />
+            </div>
+            <span className="bg-yellow-400 text-black border-2 border-black px-3 py-1 font-retro text-[10px] font-bold uppercase shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+              Player 1
+            </span>
           </div>
-          <p className={cn(
-            "font-retro text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold drop-shadow-sm",
-            isDark ? "text-purple-400" : "text-purple-900"
-          )}>
-            Insert Coin to Start Conversation
-          </p>
-        </div>
 
-        {/* Card do Formulário (Estilo Caixa de Diálogo SNES Expandida) */}
+          {/* Dialogue Text */}
+          <div className="flex-1 bg-black/40 border-4 border-black/20 p-4 md:p-6 relative min-h-[120px]">
+            <p className="font-retro text-sm md:text-lg text-white leading-relaxed tracking-wide">
+              {dialogText}
+              {isTyping && <span className="inline-block w-2 h-4 bg-white animate-pulse ml-1" />}
+            </p>
+            {!isTyping && (
+              <div className="absolute bottom-2 right-2 animate-bounce">
+                <ChevronRight className="w-6 h-6 text-yellow-400 rotate-90" />
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Quest Input Card */}
         <div className={cn(
-          "p-6 md:p-16 border-4 md:border-[8px] shadow-[10px_10px_0px_rgba(0,0,0,1)] md:shadow-[20px_20px_0px_rgba(0,0,0,1)] relative transition-all",
-          isDark 
-            ? "bg-gray-900/80 backdrop-blur-sm border-purple-600" 
-            : "bg-snes-surface border-snes-dark"
+          "p-8 md:p-12 border-[8px] border-black shadow-[15px_15px_0px_rgba(0,0,0,1)] relative overflow-hidden",
+          isDark ? "bg-gray-800" : "bg-snes-surface"
         )}>
-          
-          <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12 relative z-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          <div className="absolute -top-1 -right-1 bg-yellow-400 text-black border-b-4 border-l-4 border-black px-6 py-2 font-retro font-bold text-xs uppercase z-20">
+            Quest: Enviar Mensagem
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Nome */}
-              <div className="space-y-3 md:space-y-4">
-                <label className="flex items-center gap-3 font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-80">
-                  <User size={16} className="text-purple-500" /> Player 1 (Nome)
+              <div className="space-y-3 group">
+                <label className="font-retro text-[10px] font-bold uppercase tracking-widest text-purple-500 flex items-center gap-2">
+                  <User size={14} /> Nickname / Nome
                 </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="DIGITE SEU NOME..."
-                  className={cn(
-                    "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
-                    isDark 
-                      ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
-                      : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
-                  )}
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={cn(
+                      "w-full px-5 py-4 border-4 font-retro text-xs uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                      isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-snes-dark text-black"
+                    )}
+                    placeholder="DIGITE SEU NOME..."
+                  />
+                </div>
               </div>
 
               {/* Email */}
-              <div className="space-y-3 md:space-y-4">
-                <label className="flex items-center gap-3 font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-80">
-                  <Mail size={16} className="text-purple-500" /> E-mail
+              <div className="space-y-3 group">
+                <label className="font-retro text-[10px] font-bold uppercase tracking-widest text-purple-500 flex items-center gap-2">
+                  <Mail size={14} /> Canal de Comunicação (Email)
                 </label>
                 <input
                   type="email"
@@ -117,56 +155,51 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="SEU@EMAIL.COM"
                   className={cn(
-                    "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
-                    isDark 
-                      ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
-                      : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
+                    "w-full px-5 py-4 border-4 font-retro text-xs uppercase outline-none transition-all shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-snes-dark text-black"
                   )}
+                  placeholder="SEU@EMAIL.COM"
                 />
               </div>
             </div>
 
             {/* Mensagem */}
-            <div className="space-y-3 md:space-y-4">
-              <label className="flex items-center gap-3 font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-80">
-                <MessageSquare size={16} className="text-purple-500" /> Mensagem do Quest
+            <div className="space-y-3 group">
+              <label className="font-retro text-[10px] font-bold uppercase tracking-widest text-purple-500 flex items-center gap-2">
+                <MessageSquare size={14} /> Detalhes da Missão (Mensagem)
               </label>
               <textarea
                 required
                 name="message"
-                rows={5}
+                rows={4}
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="ESCREVA SUA MENSAGEM AQUI..."
                 className={cn(
-                  "w-full px-4 md:px-6 py-4 md:py-5 border-4 md:border-[6px] font-retro text-xs md:text-sm uppercase outline-none transition-all resize-none shadow-[4px_4px_0px_rgba(0,0,0,0.2)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
-                  isDark 
-                    ? "bg-gray-800 border-gray-700 text-white focus:border-purple-500" 
-                    : "bg-white border-snes-dark/30 text-black focus:border-snes-dark"
+                  "w-full px-5 py-4 border-4 font-retro text-xs uppercase outline-none transition-all resize-none shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:shadow-none focus:translate-x-1 focus:translate-y-1",
+                  isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-snes-dark text-black"
                 )}
+                placeholder="CONTE-ME SEU PLANO..."
               />
             </div>
 
-            {/* Botão de Envio (Estilo Retro Button Gigante) */}
-            <div className="pt-4 md:pt-6">
+            {/* Botão Start */}
+            <div className="pt-4">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "w-full flex items-center justify-center gap-3 md:gap-4 py-4 md:py-6 border-4 md:border-[6px] font-retro text-sm md:text-2xl font-bold uppercase shadow-[6px_6px_0px_rgba(0,0,0,1)] md:shadow-[10px_10px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] md:active:translate-x-[10px] active:translate-y-[6px] md:active:translate-y-[10px] transition-all group",
-                  isDark 
-                    ? "bg-purple-600 text-white border-black hover:bg-purple-500" 
-                    : "bg-snes-accent text-white border-black hover:opacity-90"
+                  "w-full flex items-center justify-center gap-4 py-5 border-[6px] font-retro text-xl font-bold uppercase shadow-[10px_10px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[10px] active:translate-y-[10px] transition-all relative group overflow-hidden",
+                  isDark ? "bg-purple-600 text-white border-black" : "bg-purple-600 text-white border-black"
                 )}
               >
+                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
                 {isSubmitting ? (
-                  <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin" />
+                  <Loader2 className="w-8 h-8 animate-spin" />
                 ) : (
                   <>
-                    <Gamepad2 className="w-5 h-5 md:w-8 md:h-8 group-hover:animate-bounce shrink-0" /> 
-                    <span className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] md:drop-shadow-[3px_3px_0px_rgba(0,0,0,1)] truncate">PRESS START (ENVIAR)</span>
+                    <Send className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                    <span>PRESS START TO SEND</span>
                   </>
                 )}
               </button>
