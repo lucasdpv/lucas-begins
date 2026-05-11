@@ -96,12 +96,12 @@ export default function Navbar() {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-500 font-retro font-bold text-xs opacity-60 pointer-events-none">{">"}</span>
               <input
                 type="text"
-                placeholder="SEARCH_DB..."
+                placeholder="Pesquisar..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className={cn(
-                  "w-full pl-8 pr-10 py-2 font-retro font-bold outline-none text-[10px] transition-all border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                  isDark ? "bg-black border-purple-600 focus:border-purple-400 text-green-500" : "bg-gray-100 border-snes-dark focus:border-purple-600 text-snes-accent"
+                  "w-full pl-8 pr-10 py-2 font-bold outline-none text-xs transition-all border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                  isDark ? "bg-gray-800 border-purple-600 focus:border-purple-500 text-white" : "bg-white border-snes-dark focus:border-purple-600 text-snes-accent"
                 )}
               />
               <AnimatePresence>
@@ -114,9 +114,9 @@ export default function Navbar() {
                   >
                     <button
                       onClick={handleCancelSearch}
-                      className="p-1 hover:bg-red-500/20 text-red-500 transition-colors"
+                      className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-lg transition-colors"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
@@ -127,31 +127,31 @@ export default function Navbar() {
             <AnimatePresence>
               {isSearchExpanded && (
                 <motion.div
-                  initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
                   className={cn(
-                    "absolute inset-x-0 top-0 h-20 z-[60] flex items-center px-4 gap-3 border-b-4 border-black shadow-[0px_10px_30px_rgba(0,0,0,0.5)]",
-                    isDark ? "bg-black" : "bg-[#1a1a1a]"
+                    "absolute inset-x-0 top-0 h-20 z-[60] flex items-center px-4 gap-3 border-b-4 border-black",
+                    isDark ? "bg-gray-900 shadow-[0_10px_20px_rgba(168,85,247,0.2)]" : "bg-snes-light shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
                   )}
                 >
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-500 font-retro font-bold text-lg animate-pulse">{">"}</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500 font-retro font-bold text-lg">{">"}</span>
                     <input
                       type="text"
-                      placeholder="ENTER_QUERY_..."
+                      placeholder="PESQUISAR NO BLOG..."
                       value={searchQuery}
                       onChange={(e) => handleSearch(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
                       autoFocus
                       className={cn(
-                        "w-full pl-10 pr-12 py-3 border-4 border-green-900 font-retro font-bold outline-none text-sm bg-black text-green-500 placeholder:text-green-900",
+                        "w-full pl-10 pr-12 py-3 border-4 font-retro font-bold outline-none text-sm shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                        isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-purple-600 text-gray-900"
                       )}
                     />
-                    <div className="absolute inset-0 scanline-overlay opacity-20 pointer-events-none" />
                     <button
                       onClick={handleCancelSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-red-600 text-white border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white rounded-xl shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
                     >
                       <X size={18} />
                     </button>

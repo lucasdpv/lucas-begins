@@ -33,10 +33,10 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Typing Effect**: Implementação de efeito de digitação de texto para as mensagens do Game Master (Player 1).
 - **Gamified Form**: Campos de entrada renomeados para "Nickname", "Canal de Comunicação" e "Detalhes da Missão".
 
-### 📟 Retro Search Console
-- **Terminal Esthetic**: A barra de busca agora simula um console de comando antigo (fundo preto, texto verde fósforo).
-- **Command Prompt**: Adição do prompt `>` piscando e placeholders estilo comando de sistema (`SEARCH_DB...`, `ENTER_QUERY_...`).
-- **Scanline FX**: Aplicação de overlay de scanlines na busca mobile para imersão total.
+### 📟 Retro Search Menu
+- **Console Esthetic**: A barra de busca agora simula um menu de seleção de console retrô, mantendo as cores harmônicas do projeto.
+- **Menu Pointer**: Adição do prompt `>` estilizado como cursor de seleção de jogo.
+- **Neo-Brutalist Layout**: Bordas sólidas e sombras rígidas aplicadas ao campo de busca para consistência visual absoluta.
 
 ---
 
