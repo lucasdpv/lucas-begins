@@ -93,15 +93,17 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:gap-3">
             {/* Desktop Search Bar */}
             <div className="hidden xl:block relative w-48 xl:w-64 group">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-500 font-retro font-bold text-xs opacity-60 pointer-events-none">{">"}</span>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-50 group-focus-within:opacity-100 transition-opacity" />
               <input
                 type="text"
                 placeholder="Pesquisar..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className={cn(
-                  "w-full pl-8 pr-10 py-2 font-bold outline-none text-xs transition-all border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                  isDark ? "bg-gray-800 border-purple-600 focus:border-purple-500 text-white" : "bg-white border-snes-dark focus:border-purple-600 text-snes-accent"
+                  "w-full pl-10 pr-10 py-2 outline-none text-sm transition-all border-2 rounded-xl",
+                  isDark 
+                    ? "bg-gray-800/50 border-purple-500/20 focus:border-purple-500/50 text-white" 
+                    : "bg-white border-gray-200 focus:border-purple-500 text-gray-900"
                 )}
               />
               <AnimatePresence>
@@ -114,7 +116,7 @@ export default function Navbar() {
                   >
                     <button
                       onClick={handleCancelSearch}
-                      className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-lg transition-colors"
+                      className="p-1.5 hover:bg-gray-500/10 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -127,16 +129,16 @@ export default function Navbar() {
             <AnimatePresence>
               {isSearchExpanded && (
                 <motion.div
-                  initial={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className={cn(
-                    "absolute inset-x-0 top-0 h-20 z-[60] flex items-center px-4 gap-3 border-b-4 border-black",
-                    isDark ? "bg-gray-900 shadow-[0_10px_20px_rgba(168,85,247,0.2)]" : "bg-snes-light shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
+                    "absolute inset-x-0 top-0 h-20 z-[60] flex items-center px-4 gap-3",
+                    isDark ? "bg-gray-900/95 backdrop-blur-md" : "bg-white/95 backdrop-blur-md"
                   )}
                 >
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500 font-retro font-bold text-lg">{">"}</span>
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
                     <input
                       type="text"
                       placeholder="PESQUISAR NO BLOG..."
@@ -145,15 +147,17 @@ export default function Navbar() {
                       onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
                       autoFocus
                       className={cn(
-                        "w-full pl-10 pr-12 py-3 border-4 font-retro font-bold outline-none text-sm shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                        isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-purple-600 text-gray-900"
+                        "w-full pl-12 pr-12 py-3 rounded-2xl border-2 font-bold outline-none text-sm transition-all",
+                        isDark 
+                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" 
+                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900"
                       )}
                     />
                     <button
                       onClick={handleCancelSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white rounded-xl shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <X size={18} />
+                      <X size={22} />
                     </button>
                   </div>
                 </motion.div>

@@ -33,10 +33,10 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Typing Effect**: Implementação de efeito de digitação de texto para as mensagens do Game Master (Player 1).
 - **Gamified Form**: Campos de entrada renomeados para "Nickname", "Canal de Comunicação" e "Detalhes da Missão".
 
-### 📟 Retro Search Menu
-- **Console Esthetic**: A barra de busca agora simula um menu de seleção de console retrô, mantendo as cores harmônicas do projeto.
-- **Menu Pointer**: Adição do prompt `>` estilizado como cursor de seleção de jogo.
-- **Neo-Brutalist Layout**: Bordas sólidas e sombras rígidas aplicadas ao campo de busca para consistência visual absoluta.
+### 🔍 Subtle & Premium Search
+- **Polished UI**: Redesign da barra de busca para um visual mais sutil e integrado à Navbar.
+- **Improved UX**: Feedback visual suave ao focar no campo e transições fluidas no mobile com efeito de desfoque (backdrop-blur).
+- **Theme Sync**: Cores e bordas ajustadas para perfeita harmonia com os modos claro e escuro.
 
 ---
 
