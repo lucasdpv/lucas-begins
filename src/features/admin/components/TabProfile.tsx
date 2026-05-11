@@ -69,6 +69,7 @@ export default function TabProfile({ initialData, onSave, isDark }: TabProfilePr
               initialValue={profileData.avatar}
               onUploadComplete={(url) => setProfileData(prev => ({ ...prev, avatar: url }))}
               folder="avatars"
+              circular={true}
               className="md:col-span-2"
             />
 

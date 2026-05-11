@@ -4,12 +4,17 @@ import { uploadFile } from '../../services/uploadService';
 import { cn } from '../../lib/utils';
 import { useThemeStore } from '../../store/useThemeStore';
 
+import ImageCropper from './ImageCropper';
+import imageCompression from 'browser-image-compression';
+
 interface ImageUploadProps {
   onUploadComplete: (url: string) => void;
   initialValue?: string;
   folder?: string;
   label?: string;
   className?: string;
+  aspect?: number;
+  circular?: boolean;
 }
 
 type UploadMode = 'file' | 'url';
@@ -19,7 +24,9 @@ export default function ImageUpload({
   initialValue = "", 
   folder = "uploads",
   label = "Imagem de Capa",
-  className 
+  className,
+  aspect = 1,
+  circular = false
 }: ImageUploadProps) {
   const { isDark } = useThemeStore();
   const [preview, setPreview] = useState<string>(initialValue);
@@ -27,28 +34,48 @@ export default function ImageUpload({
   const [progress, setProgress] = useState(0);
   const [mode, setMode] = useState<UploadMode>(initialValue && !initialValue.includes('firebasestorage') ? 'url' : 'file');
   const [dragActive, setDragActive] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = async (file: File) => {
+  const handleFileSelection = (file: File) => {
     if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
-    const localUrl = URL.createObjectURL(file);
-    setPreview(localUrl);
+  const handleCroppedImage = async (blob: Blob) => {
+    setImageToCrop(null);
     setIsUploading(true);
     setProgress(0);
 
     try {
-      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-      const downloadUrl = await uploadFile(file, `${folder}/${fileName}`, (p) => {
+      // Opções de compressão
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        initialQuality: 0.8
+      };
+
+      // Converter Blob em File para compressão
+      const imageFile = new File([blob], "upload.jpg", { type: 'image/jpeg' });
+      
+      // Comprimir
+      const compressedFile = await imageCompression(imageFile, options);
+      
+      const fileName = `${Date.now()}-compressed.jpg`;
+      const downloadUrl = await uploadFile(compressedFile, `${folder}/${fileName}`, (p) => {
         setProgress(Math.round(p));
       });
       
       onUploadComplete(downloadUrl);
       setPreview(downloadUrl);
     } catch (error) {
-      console.error("Upload failed", error);
-      alert("Falha ao subir imagem. Verifique o tamanho.");
-      setPreview(initialValue);
+      console.error("Upload/Compression failed", error);
+      alert("Falha ao processar imagem.");
     } finally {
       setIsUploading(false);
     }
@@ -56,7 +83,7 @@ export default function ImageUpload({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    if (file) handleFileSelection(file);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -70,7 +97,7 @@ export default function ImageUpload({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files?.[0]) handleFileSelection(e.dataTransfer.files[0]);
   };
 
   const removeImage = (e: React.MouseEvent) => {
@@ -82,6 +109,16 @@ export default function ImageUpload({
 
   return (
     <div className={cn("space-y-3", className)}>
+      {/* Cropper Modal */}
+      {imageToCrop && (
+        <ImageCropper 
+          image={imageToCrop}
+          aspect={aspect}
+          circular={circular}
+          onCropComplete={handleCroppedImage}
+          onCancel={() => setImageToCrop(null)}
+        />
+      )}
       <div className="flex items-center justify-between">
         <label className="text-xs font-retro font-bold uppercase tracking-widest opacity-80 flex items-center gap-2">
           <Camera className="w-4 h-4 text-purple-500" /> {label}

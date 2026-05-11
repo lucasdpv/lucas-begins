@@ -135,10 +135,23 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
       <Helmet>
         <title>{post.title ? `${post.title} | Lucas Begins` : "Matéria | Lucas Begins"}</title>
         <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
+        
+        {/* OpenGraph / Facebook */}
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
         <meta property="og:title" content={post.title || "Lucas Begins"} />
         <meta property="og:description" content={post.excerpt || ""} />
+        <meta property="og:site_name" content="Lucas Begins" />
         {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={window.location.href} />
+        <meta name="twitter:title" content={post.title || "Lucas Begins"} />
+        <meta name="twitter:description" content={post.excerpt || ""} />
+        {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
+        
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       {/* Voltar */}

@@ -201,6 +201,7 @@ export default function DashboardPage() {
                     initialValue={editData.avatar}
                     onUploadComplete={(url) => setEditData({...editData, avatar: url})}
                     folder="avatars"
+                    circular={true}
                   />
                 </div>
                 <div className="flex gap-3 pt-2">

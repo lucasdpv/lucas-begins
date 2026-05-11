@@ -221,6 +221,7 @@ export default function PostEditorPage() {
                 initialValue={formData.imageUrl || ""}
                 onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
                 folder="posts"
+                aspect={16 / 9}
               />
             </div>
 
