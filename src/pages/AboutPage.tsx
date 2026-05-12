@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { useThemeStore } from "../store/useThemeStore";
 import RetroSeparator from "../components/ui/RetroSeparator";
 import { cn } from "../lib/utils";
-import { InstagramIcon, ThreadsIcon } from "../components/icons/SocialIcons";
 
 /**
  * Página Sobre: hero, texto de origem do blog e perfil do autor.
@@ -145,33 +144,6 @@ export default function AboutPage() {
                         #{tag}
                       </span>
                     ))}
-                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-purple-500/10 mt-6">
-                      <p className="text-[10px] font-retro font-bold uppercase opacity-40 mr-2 tracking-widest">Conectar:</p>
-                      <a
-                        href="https://www.threads.com/@lucasbegins"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(
-                          "p-2 rounded-lg border-2 transition-all hover:scale-110 active:scale-95 group",
-                          isDark ? "bg-purple-900/20 border-purple-500/30 text-purple-400 hover:border-purple-400" : "bg-purple-50 border-purple-500/20 text-purple-600 hover:border-purple-500"
-                        )}
-                        title="Siga no Threads"
-                      >
-                        <ThreadsIcon className="w-5 h-5" />
-                      </a>
-                      <a
-                        href="https://www.instagram.com/lucasbegins/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(
-                          "p-2 rounded-lg border-2 transition-all hover:scale-110 active:scale-95 group",
-                          isDark ? "bg-purple-900/20 border-purple-500/30 text-purple-400 hover:border-purple-400" : "bg-purple-50 border-purple-500/20 text-purple-600 hover:border-purple-500"
-                        )}
-                        title="Siga no Instagram"
-                      >
-                        <InstagramIcon className="w-5 h-5" />
-                      </a>
-                    </div>
                   </div>
                 </div>
               </div>
