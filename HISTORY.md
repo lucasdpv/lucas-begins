@@ -4,6 +4,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 📱 [v2.6.0] - The Social Connection Update
+*Data: 12 de Maio de 2026*
+
+### 🌐 Integração com Redes Sociais
+- **Social Hub**: Implementação de links diretos para Instagram e Threads no cabeçalho (Navbar) e rodapé (Footer), facilitando o engajamento do público.
+- **Mobile Connectivity**: Adição de atalhos de redes sociais no menu lateral mobile para acesso rápido em dispositivos móveis.
+- **Unified Icons**: Padronização dos ícones de redes sociais com estética retro e efeitos de hover dinâmicos.
+
+### 🛠️ Refinamento de Rodapé & Estabilidade
+- **Multiplayer Hub Cleanup**: Limpeza da seção social do rodapé, removendo ícones não utilizados (YouTube/Twitch) e adicionando selo de "Em Breve" para o X (Twitter).
+- **Merge Stability**: Resolução de conflitos críticos entre as branches de desenvolvimento, garantindo a integridade dos sistemas de Cropper e Compressão de imagens.
+- **Version Bump**: Atualização global para v2.6.0.
+
+---
+
 ## 🎨 [v2.5.0] - The Advanced Media & Interactivity Update
 *Data: 11 de Maio de 2026*
 
