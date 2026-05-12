@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, getPixelAvatar } from "../../../lib/utils";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
+import { InstagramIcon, ThreadsIcon } from "../../icons/SocialIcons";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -228,6 +229,35 @@ export default function MobileMenu({
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            {/* Social Links (Mobile Footer) */}
+            <div className="mt-auto pt-8 border-t border-white/10">
+              <p className="text-[10px] font-retro font-bold uppercase opacity-40 mb-4 tracking-[0.2em]">Siga-nos nas Redes</p>
+              <div className="flex gap-4">
+                <a
+                  href="https://www.threads.com/@lucasbegins"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
+                    isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
+                  )}
+                >
+                  <ThreadsIcon className="w-6 h-6" />
+                </a>
+                <a
+                  href="https://www.instagram.com/lucasbegins/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
+                    isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
+                  )}
+                >
+                  <InstagramIcon className="w-6 h-6" />
+                </a>
+              </div>
             </div>
           </motion.div>
         </div>

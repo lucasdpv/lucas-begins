@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../lib/utils";
 import { BRUTAL_DESIGN } from "../../constants";
+import { InstagramIcon, ThreadsIcon } from "../icons/SocialIcons";
 
 // Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -188,6 +189,34 @@ export default function Navbar() {
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
+
+                {/* Social Links (Desktop) */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <a
+                    href="https://www.threads.com/@lucasbegins"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
+                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
+                    )}
+                    title="Threads"
+                  >
+                    <ThreadsIcon className="w-5 h-5" />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/lucasbegins/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
+                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
+                    )}
+                    title="Instagram"
+                  >
+                    <InstagramIcon className="w-5 h-5" />
+                  </a>
+                </div>
 
                 <div className="hidden xl:flex items-center gap-3">
                   <NavUserMenu 
