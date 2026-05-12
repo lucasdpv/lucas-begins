@@ -4,6 +4,56 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 📱 [v2.6.0] - The Social Connection Update
+*Data: 12 de Maio de 2026*
+
+### 🌐 Integração com Redes Sociais
+- **Social Hub**: Implementação de links diretos para Instagram e Threads no cabeçalho (Navbar) e rodapé (Footer), facilitando o engajamento do público.
+- **Mobile Connectivity**: Adição de atalhos de redes sociais no menu lateral mobile para acesso rápido em dispositivos móveis.
+- **Unified Icons**: Padronização dos ícones de redes sociais com estética retro e efeitos de hover dinâmicos.
+
+### 🛠️ Refinamento de Rodapé & Estabilidade
+- **Multiplayer Hub Cleanup**: Limpeza da seção social do rodapé, removendo ícones não utilizados (YouTube/Twitch) e adicionando selo de "Em Breve" para o X (Twitter).
+- **Merge Stability**: Resolução de conflitos críticos entre as branches de desenvolvimento, garantindo a integridade dos sistemas de Cropper e Compressão de imagens.
+- **Version Bump**: Atualização global para v2.6.0.
+
+---
+
+## 🎨 [v2.5.0] - The Advanced Media & Interactivity Update
+*Data: 11 de Maio de 2026*
+
+### ✂️ Edição de Mídia & Cropper
+- **Interactive Image Cropping**: Integração da biblioteca `react-easy-crop`. Agora é possível ajustar zoom e posição da imagem antes do upload.
+- **Molduras Inteligentes**: Suporte a corte circular para avatares e proporção 16:9 para capas de posts, garantindo visual consistente em todo o site.
+- **Smart Compression v2**: Otimização automática (max 1MB) integrada ao fluxo de edição, economizando storage e acelerando o carregamento.
+
+### 📟 Nova Experiência 404
+- **BIOS Terminal Interface**: Redesign interativo da página 404 que simula um boot de sistema retrô com logs animados e comandos (`GOTO_HOME`, `REBOOT`).
+- **Estabilidade de Animação**: Correção de bugs de renderização no loop de logs para evitar crashes abruptos.
+
+### 🌐 SEO & Social Media
+- **Advanced Metadata**: Implementação de metadados dinâmicos para SEO e redes sociais (Twitter Cards / OpenGraph).
+- **Social Preview**: Posts agora exibem capas, títulos e resumos profissionais ao serem compartilhados.
+
+### 🛠️ Manutenção
+- **Version Bump**: Atualização global para v2.5.0.
+
+---
+
+## ⚔️ [v2.5.1] - The RPG & Terminal Update
+*Data: 11 de Maio de 2026*
+
+### 💬 RPG Contact System
+- **Dialogue Box UI**: Redesign completo da página de contato. Agora utiliza uma caixa de diálogo estilo SNES com avatar animado.
+- **Typing Effect**: Implementação de efeito de digitação de texto para as mensagens do Game Master (Player 1).
+- **Gamified Form**: Campos de entrada renomeados para "Nickname", "Canal de Comunicação" e "Detalhes da Missão".
+
+### 🔍 Subtle & Premium Search
+- **Polished UI**: Redesign da barra de busca para um visual mais sutil e integrado à Navbar.
+- **Improved UX**: Feedback visual suave ao focar no campo e transições fluidas no mobile com efeito de desfoque (backdrop-blur).
+- **Theme Sync**: Cores e bordas ajustadas para perfeita harmonia com os modos claro e escuro.
+
+---
 ## 🖼️ [v2.4.0] - The Image Hosting & Performance Update
 *Data: 10 de Maio de 2026*
 

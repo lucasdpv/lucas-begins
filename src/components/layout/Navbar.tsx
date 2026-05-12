@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../lib/utils";
 import { BRUTAL_DESIGN } from "../../constants";
+import { InstagramIcon, ThreadsIcon } from "../icons/SocialIcons";
 
 // Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -93,16 +94,17 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:gap-3">
             {/* Desktop Search Bar */}
             <div className="hidden xl:block relative w-48 xl:w-64 group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-60" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-50 group-focus-within:opacity-100 transition-opacity" />
               <input
                 type="text"
                 placeholder="Pesquisar..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className={cn(
-                  "w-full pl-10 pr-10 py-2 font-bold outline-none text-sm transition-all",
-                  BRUTAL_DESIGN.ROUNDED_MODERN, BRUTAL_DESIGN.BORDER,
-                  isDark ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" : "bg-snes-input border-snes-dark/20 focus:border-snes-dark text-snes-accent"
+                  "w-full pl-10 pr-10 py-2 outline-none text-sm transition-all border-2 rounded-xl",
+                  isDark 
+                    ? "bg-gray-800/50 border-purple-500/20 focus:border-purple-500/50 text-white" 
+                    : "bg-white border-gray-200 focus:border-purple-500 text-gray-900"
                 )}
               />
               <AnimatePresence>
@@ -115,9 +117,9 @@ export default function Navbar() {
                   >
                     <button
                       onClick={handleCancelSearch}
-                      className="p-1.5 hover:bg-purple-600/20 text-purple-500 rounded-xl transition-colors"
+                      className="p-1.5 hover:bg-gray-500/10 text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <PlusCircle className="w-4 h-4 rotate-45" />
+                      <X className="w-4 h-4" />
                     </button>
                   </motion.div>
                 )}
@@ -128,12 +130,12 @@ export default function Navbar() {
             <AnimatePresence>
               {isSearchExpanded && (
                 <motion.div
-                  initial={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className={cn(
-                    "absolute inset-0 z-[60] flex items-center px-4 gap-3",
-                    isDark ? "bg-gray-900" : "bg-snes-light"
+                    "absolute inset-x-0 top-0 h-20 z-[60] flex items-center px-4 gap-3",
+                    isDark ? "bg-gray-900/95 backdrop-blur-md" : "bg-white/95 backdrop-blur-md"
                   )}
                 >
                   <div className="relative flex-1">
@@ -146,15 +148,17 @@ export default function Navbar() {
                       onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
                       autoFocus
                       className={cn(
-                        "w-full pl-12 pr-12 py-3 rounded-2xl border-2 font-retro font-bold outline-none text-sm shadow-xl",
-                        isDark ? "bg-gray-800 border-purple-500 text-white" : "bg-white border-purple-600 text-gray-900"
+                        "w-full pl-12 pr-12 py-3 rounded-2xl border-2 font-bold outline-none text-sm transition-all",
+                        isDark 
+                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" 
+                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900"
                       )}
                     />
                     <button
                       onClick={handleCancelSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-purple-600 text-white rounded-xl shadow-lg active:scale-90 transition-transform"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-red-500 transition-colors"
                     >
-                      <X size={18} />
+                      <X size={22} />
                     </button>
                   </div>
                 </motion.div>
@@ -185,6 +189,34 @@ export default function Navbar() {
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
+
+                {/* Social Links (Desktop) */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <a
+                    href="https://www.threads.com/@lucasbegins"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
+                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
+                    )}
+                    title="Threads"
+                  >
+                    <ThreadsIcon className="w-5 h-5" />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/lucasbegins/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
+                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
+                    )}
+                    title="Instagram"
+                  >
+                    <InstagramIcon className="w-5 h-5" />
+                  </a>
+                </div>
 
                 <div className="hidden xl:flex items-center gap-3">
                   <NavUserMenu 
