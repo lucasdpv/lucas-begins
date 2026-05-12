@@ -29,6 +29,7 @@ import PostEditorPage from "./pages/PostEditorPage";
 import DashboardPage from "./pages/DashboardPage";
 import DebugPage from "./pages/DebugPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ArchivePage from "./pages/ArchivePage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -104,6 +105,7 @@ export default function App() {
                     <PostEditorPage />
                   </ProtectedRoute>
                 } />
+                <Route path="/archive" element={<ArchivePage />} />
                 <Route path="/debug" element={<DebugPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
