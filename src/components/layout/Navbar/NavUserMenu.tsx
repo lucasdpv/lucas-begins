@@ -23,10 +23,10 @@ export default function NavUserMenu({
       <button 
         onClick={onLoginClick} 
         className={cn(
-          "px-6 py-2.5 rounded-2xl font-retro font-bold text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 border-2 shadow-lg",
+          "px-5 py-2 rounded-xl font-retro font-black text-[10px] uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 border",
           isDark 
-            ? "bg-purple-600 border-purple-400 text-white shadow-purple-500/20" 
-            : "bg-purple-600 border-purple-700 text-white shadow-purple-600/20"
+            ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500 hover:text-white" 
+            : "bg-purple-600/5 border-purple-500/20 text-purple-600 hover:bg-purple-600 hover:text-white"
         )}
       >
         LOGIN
@@ -35,63 +35,54 @@ export default function NavUserMenu({
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-1">
       {currentUser.role === 'admin' && (
         <Link 
           to="/admin" 
           className={cn(
-            "flex items-center gap-2 p-1.5 pr-3 rounded-xl border-2 transition-all group",
-            isDark ? "border-purple-600/40 bg-purple-600/10 hover:bg-purple-600/20" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100"
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all group hover:bg-white/5",
+            isDark ? "text-purple-400" : "text-purple-600"
           )}
           title="Painel Administrativo"
         >
-          <div className={cn(
-            "w-8 h-8 rounded-lg flex items-center justify-center border-2 transition-all group-hover:scale-110",
-            isDark ? "bg-purple-600 border-purple-400 text-white" : "bg-purple-600 border-purple-700 text-white"
-          )}>
-            <ShieldCheck size={18} />
-          </div>
-          <span className="font-retro text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Meu Painel</span>
+          <ShieldCheck size={16} className="transition-transform group-hover:scale-110" />
+          <span className="hidden lg:block font-retro text-[9px] font-black uppercase tracking-[0.05em] whitespace-nowrap">Painel</span>
         </Link>
       )}
 
-      <div className="flex items-center gap-2">
-        <Link 
-          to="/dashboard" 
-          className={cn(
-            "flex items-center gap-2 p-1.5 pr-3 rounded-xl border-2 transition-all group",
-            isDark ? "border-purple-500/30 hover:bg-purple-500/20" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100"
-          )}
-          title="Meu QG"
-        >
-          <div className="relative shrink-0">
-            <img
-              src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))}
-              alt=""
-              className="w-8 h-8 rounded-lg border border-purple-500/50 object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = getPixelAvatar(currentUser.id);
-              }}
-            />
-            <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
-          </div>
-          <span className="font-retro text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Meu QG</span>
-        </Link>
-        
-        <button
-          onClick={onLogout}
-          className={cn(
-            "p-2 rounded-xl border-2 transition-all",
-            isDark 
-              ? "border-red-500/30 text-red-400 hover:bg-red-500/20" 
-              : "border-red-500/20 text-red-500 hover:bg-red-50"
-          )}
-          title="Sair"
-        >
-          <LogOut size={18} />
-        </button>
-      </div>
+      <Link 
+        to="/dashboard" 
+        className={cn(
+          "flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all group hover:bg-white/5",
+          isDark ? "text-purple-400" : "text-purple-600"
+        )}
+        title="Meu QG"
+      >
+        <div className="relative shrink-0">
+          <img
+            src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))}
+            alt=""
+            className="w-7 h-7 rounded-[10px] border border-purple-500/30 object-cover transition-all group-hover:border-purple-500"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = getPixelAvatar(currentUser.id);
+            }}
+          />
+          <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
+        </div>
+        <span className="hidden lg:block font-retro text-[9px] font-black uppercase tracking-[0.05em] whitespace-nowrap">Meu QG</span>
+      </Link>
+      
+      <button
+        onClick={onLogout}
+        className={cn(
+          "p-2 rounded-xl transition-all group hover:bg-red-500/10",
+          isDark ? "text-red-400" : "text-red-500"
+        )}
+        title="Sair"
+      >
+        <LogOut size={16} className="group-hover:translate-x-0.5 transition-transform" />
+      </button>
     </div>
   );
 }

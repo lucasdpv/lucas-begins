@@ -239,13 +239,31 @@ export default function DashboardPage() {
                       <span className="font-retro text-[10px] font-bold uppercase text-purple-500">Experiência (XP)</span>
                       <span className="font-retro text-[10px] font-bold text-gray-400">{profile?.xp} / {xpLimit}</span>
                     </div>
-                    <div className="h-6 w-full bg-black/20 border-2 border-black p-1 rounded-none overflow-hidden">
+                    <div className="h-8 w-full bg-black/30 border-[3px] border-black p-1 rounded-sm overflow-hidden relative shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)]">
+                      {/* Grid de Fundo (Retro Pattern) */}
+                      <div className="absolute inset-0 opacity-20 pointer-events-none" 
+                        style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '12px 100%' }} 
+                      />
+                      
                       <div 
-                        className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all duration-1000 ease-out relative"
+                        className="h-full bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-400 transition-all duration-1000 ease-out relative group"
                         style={{ width: `${xpPercentage}%` }}
                       >
-                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        {/* Efeito Glossy Superior */}
+                        <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-white/30 to-transparent" />
+                        
+                        {/* Sombra Inferior Interna */}
+                        <div className="absolute bottom-0 left-0 w-full h-[30%] bg-black/20" />
+                        
+                        {/* Brilho Pulsante Neon */}
+                        <div className="absolute inset-0 bg-white/10 animate-pulse" />
+                        
+                        {/* Indicador de Fim (Laser Line) */}
+                        <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/80 shadow-[0_0_15px_rgba(168,85,247,1)]" />
                       </div>
+
+                      {/* Scanlines Específicas da Barra */}
+                      <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px]" />
                     </div>
                   </div>
 

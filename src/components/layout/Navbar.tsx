@@ -60,17 +60,23 @@ export default function Navbar() {
       <header
         className={cn(
           "sticky top-0 z-50 transition-all duration-300 border-b-4",
-          isDark ? "border-purple-600 bg-gray-900" : "border-snes-dark bg-snes-light",
+          isDark ? "border-purple-600/30 bg-gray-900/60 backdrop-blur-xl shadow-2xl" : "border-snes-dark/10 bg-white/70 backdrop-blur-md shadow-lg",
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}
       >
+        {/* Neon Accent Bottom Line */}
+        <div className="absolute -bottom-[4px] left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-40 group-hover:opacity-100 transition-opacity" />
+
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4 relative">
           {/* Esquerda: Logo */}
           <div className="flex items-center gap-2 group shrink-0">
             <Link to="/" className="flex items-center gap-2" onClick={() => { handleCategorySelect("Todos"); setSearchQuery(""); }}>
-              <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:rotate-12", isDark ? "text-purple-400" : "text-purple-600")} />
-              <h1 className="font-retro font-bold text-xl md:text-3xl tracking-tighter uppercase">
-                Lucas<span className="text-purple-500 inline-block animate-glitch">Begins</span>
+              <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:rotate-12 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]", isDark ? "text-purple-400" : "text-purple-600")} />
+              <h1 className={cn(
+                "font-retro font-bold text-xl md:text-3xl tracking-tighter uppercase transition-all",
+                isDark ? "text-white text-glow" : "text-gray-900"
+              )}>
+                Lucas<span className="text-purple-500 inline-block animate-glitch drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]">Begins</span>
               </h1>
             </Link>
           </div>
@@ -86,46 +92,24 @@ export default function Navbar() {
               isDark={isDark}
             />
 
-            <Link to="/about" className="px-3 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm whitespace-nowrap">Sobre Nós</Link>
-            <Link to="/contact" className="px-3 py-2 font-retro font-bold uppercase tracking-widest hover:text-purple-500 transition-colors text-sm whitespace-nowrap">Contatos</Link>
+            <Link 
+              to="/about" 
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+            >
+              Sobre Nós
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
+            </Link>
+            <Link 
+              to="/contact" 
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+            >
+              Contatos
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
+            </Link>
           </div>
 
           {/* Direita: Ações */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Desktop Search Bar */}
-            <div className="hidden xl:block relative w-48 xl:w-64 group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 opacity-50 group-focus-within:opacity-100 transition-opacity" />
-              <input
-                type="text"
-                placeholder="Pesquisar..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className={cn(
-                  "w-full pl-10 pr-10 py-2 outline-none text-sm transition-all border-2 rounded-xl",
-                  isDark 
-                    ? "bg-gray-800/50 border-purple-500/20 focus:border-purple-500/50 text-white" 
-                    : "bg-white border-gray-200 focus:border-purple-500 text-gray-900"
-                )}
-              />
-              <AnimatePresence>
-                {searchQuery && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="absolute inset-y-0 right-2 flex items-center"
-                  >
-                    <button
-                      onClick={handleCancelSearch}
-                      className="p-1.5 hover:bg-gray-500/10 text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
             {/* Mobile/Tablet Search Overlay */}
             <AnimatePresence>
               {isSearchExpanded && (
@@ -165,7 +149,71 @@ export default function Navbar() {
               )}
             </AnimatePresence>
 
-            {!isSearchExpanded && (
+            {/* --- SEAMLESS ACTION ZONE (Desktop) --- */}
+            <div className="hidden xl:flex items-center gap-6">
+              {/* Minimal Search Pill */}
+              <div className={cn(
+                "flex items-center px-4 h-9 rounded-full transition-all duration-300 min-w-[180px] border border-transparent focus-within:border-purple-500/50 group/search",
+                isDark ? "bg-white/10 hover:bg-white/15" : "bg-gray-100 hover:bg-gray-200"
+              )}>
+                <Search className={cn(
+                  "w-4 h-4 opacity-40 group-focus-within/search:opacity-100",
+                  isDark ? "text-purple-400" : "text-purple-600"
+                )} />
+                <input
+                  type="text"
+                  placeholder="Pesquisar..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className={cn(
+                    "w-full bg-transparent border-none font-bold text-xs outline-none px-3 placeholder:opacity-30",
+                    isDark ? "text-white" : "text-black"
+                  )}
+                />
+              </div>
+
+              {/* Individual Actions (Integrated) */}
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={toggleTheme} 
+                  className={cn(
+                    "p-2.5 rounded-xl transition-all active:scale-90 hover:bg-white/5",
+                    isDark ? "text-yellow-400" : "text-purple-600"
+                  )}
+                  title="Trocar Tema"
+                >
+                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+
+                <a
+                  href="https://www.threads.com/@lucasbegins"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                >
+                  <ThreadsIcon className="w-4 h-4" />
+                </a>
+                
+                <a
+                  href="https://www.instagram.com/lucasbegins/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                >
+                  <InstagramIcon className="w-4 h-4" />
+                </a>
+
+                <NavUserMenu 
+                  currentUser={currentUser}
+                  profile={profile}
+                  onLogout={handleLogout}
+                  onLoginClick={() => setIsLoginModalOpen(true)}
+                  isDark={isDark}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsSearchExpanded(true)}
                 className={cn(
@@ -175,70 +223,17 @@ export default function Navbar() {
               >
                 <Search size={22} />
               </button>
-            )}
 
-            {!isSearchExpanded && (
-              <>
-                <button 
-                  onClick={toggleTheme} 
-                  className={cn(
-                    "hidden xl:flex p-2.5 rounded-xl border-2 transition-all group",
-                    isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-yellow-400" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-purple-600"
-                  )}
-                  title={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
-                >
-                  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-
-                {/* Social Links (Desktop) */}
-                <div className="hidden sm:flex items-center gap-2">
-                  <a
-                    href="https://www.threads.com/@lucasbegins"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
-                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
-                    )}
-                    title="Threads"
-                  >
-                    <ThreadsIcon className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="https://www.instagram.com/lucasbegins/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      "p-2.5 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
-                      isDark ? "border-purple-500/30 hover:bg-purple-500/20 text-white" : "border-purple-500/30 bg-purple-50 hover:bg-purple-100 text-black"
-                    )}
-                    title="Instagram"
-                  >
-                    <InstagramIcon className="w-5 h-5" />
-                  </a>
-                </div>
-
-                <div className="hidden xl:flex items-center gap-3">
-                  <NavUserMenu 
-                    currentUser={currentUser}
-                    profile={profile}
-                    onLogout={handleLogout}
-                    onLoginClick={() => setIsLoginModalOpen(true)}
-                    isDark={isDark}
-                  />
-                </div>
-
-                <button
-                  onClick={() => setIsMobileMenuOpen(true)}
-                  className={cn(
-                    "p-2.5 xl:hidden rounded-xl border-2 transition-all active:scale-95",
-                    isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-purple-50 border-purple-500 text-purple-600"
-                  )}
-                >
-                  <Menu size={22} />
-                </button>
-              </>
-            )}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className={cn(
+                  "p-2.5 xl:hidden rounded-xl border-2 transition-all active:scale-95",
+                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-purple-50 border-purple-500 text-purple-600"
+                )}
+              >
+                <Menu size={22} />
+              </button>
+            </div>
           </div>
         </div>
       </header>

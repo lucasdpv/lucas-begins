@@ -4,6 +4,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v2.7.0] - The Seamless Glass Update
+*Data: 12 de Maio de 2026*
+
+### ✨ Redesign: Seamless Glass Navbar
+- **Glassmorphism Overhaul**: Transição do cabeçalho rígido para uma estética "Seamless Glass" (vidro contínuo), utilizando transparências suaves (`bg-white/10`) e desfoque de fundo (`backdrop-blur`) para um visual ultra-premium e leve.
+- **Integrated Control Dock**: Substituição dos balões e recipientes monolíticos por um sistema de "Nodos Flutuantes". Agora os controles de busca, redes sociais e menu de usuário integram-se de forma fluida à barra, eliminando divisores físicos (pipes) e bordas excessivas.
+- **Readability & Typography**: Implementação de tipografia extra-bold (`font-black`) em todos os elementos de navegação para garantir acessibilidade e clareza, mantendo a identidade visual forte do projeto.
+- **Glass Login Button**: Redesign completo do botão de Login, abandonando o estilo Neo-Brutalista pesado por um botão de vidro roxo translúcido que se alinha perfeitamente ao novo ritmo horizontal.
+
+### 🔍 UX & Busca
+- **Hybrid Search Bar**: Refinamento do campo de busca com fundo de baixo contraste que ganha destaque apenas no foco, proporcionando uma navegação menos intrusiva.
+- **Horizontal Rhythm**: Ajuste preciso de gaps e paddings para garantir que a interface se comporte de forma equilibrada tanto para usuários logados (Admin/User) quanto para visitantes.
+
+---
+
 ## 📱 [v2.6.0] - The Social Connection Update
 *Data: 12 de Maio de 2026*
 
