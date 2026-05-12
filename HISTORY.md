@@ -39,7 +39,6 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Theme Sync**: Cores e bordas ajustadas para perfeita harmonia com os modos claro e escuro.
 
 ---
-
 ## 🖼️ [v2.4.0] - The Image Hosting & Performance Update
 *Data: 10 de Maio de 2026*
 

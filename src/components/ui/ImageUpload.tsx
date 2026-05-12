@@ -6,7 +6,6 @@ import { useThemeStore } from '../../store/useThemeStore';
 
 import ImageCropper from './ImageCropper';
 import imageCompression from 'browser-image-compression';
-
 interface ImageUploadProps {
   onUploadComplete: (url: string) => void;
   initialValue?: string;
