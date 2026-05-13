@@ -82,7 +82,7 @@ export default function NavCategoryMenu({
                     </div>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="font-retro font-bold text-[11px] uppercase tracking-wider truncate">
+                    <span className="font-retro font-bold text-xs uppercase tracking-wider truncate">
                       {cat}
                     </span>
                     <span className="text-[9px] opacity-50 font-bold uppercase tracking-tight">

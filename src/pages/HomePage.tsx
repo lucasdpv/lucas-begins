@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Gamepad2, TrendingUp, ChevronRight } from "lucide-react";
+import { Gamepad2, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
@@ -36,11 +36,23 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
-  // Grid always shows 3 most recent posts (no deduplication — carousel is a separate editorial section)
-  const gridPosts = filteredPosts.slice(0, 3);
+  // Grid shows 6 most recent posts in horizontal list
+  const gridPosts = filteredPosts.slice(0, 5);
 
   // Reviews for the bottom band
-  const reviewPosts = posts.filter((p) => p.score && !p.isDraft).slice(0, 4);
+  const reviewPosts = posts
+    .filter((p) => p.score && !p.isDraft)
+    .sort((a, b) => Number(b.score) - Number(a.score))
+    .slice(0, 3);
+
+  // Dossiês for the bottom band
+  const dossiePosts = posts
+    .filter((p) => {
+      const cat = p.category?.toLowerCase() || "";
+      const title = p.title?.toLowerCase() || "";
+      return (cat.includes("dossi") || title.includes("dossi")) && !p.isDraft;
+    })
+    .slice(0, 3);
 
   return (
     <div className="flex flex-col gap-12">
@@ -162,172 +174,255 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      {/* ── 2. GRID DE NOTÍCIAS ──────────────────────────── */}
+      {/* ── 2. PORTAL LAYOUT: Notícias + Reviews Sidebar ─ */}
       <section>
-        <div
-          className={cn(
-            "flex items-center justify-between mb-8 pb-5",
+        {/* Section headers */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-0">
+          {/* Left header */}
+          <div className={cn(
+            "lg:col-span-2 flex items-center justify-between pb-5",
             isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-            <div>
-              <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-glow-blue leading-none">
-                {isLoadingPosts
-                  ? "Carregando Fases..."
-                  : searchQuery
-                  ? `Resultados: "${searchQuery}"`
-                  : activeCategory !== "Todos"
-                  ? activeCategory
-                  : "Últimas Notícias"}
-              </h2>
-              {!isLoadingPosts && (
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-0.5">
-                  {searchQuery
-                    ? `${filteredPosts.length} resultado${filteredPosts.length !== 1 ? "s" : ""}`
+          )}>
+            <div className="flex items-center gap-3">
+              <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+              <div>
+                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-glow-blue leading-none">
+                  {isLoadingPosts
+                    ? "Carregando..."
+                    : searchQuery
+                    ? `Resultados: "${searchQuery}"`
                     : activeCategory !== "Todos"
-                    ? "Filtrando por categoria"
-                    : "Mais recentes do portal"}
-                </p>
-              )}
+                    ? activeCategory
+                    : "Últimas Notícias"}
+                </h2>
+                {!isLoadingPosts && (
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-0.5">
+                    {searchQuery ? `${filteredPosts.length} resultado${filteredPosts.length !== 1 ? "s" : ""}` : "Mais recentes do portal"}
+                  </p>
+                )}
+              </div>
             </div>
+            {!isLoadingPosts && isDefaultView && (
+              <Link
+                to="/archive"
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 font-retro font-black text-[11px] uppercase tracking-widest border transition-all duration-200 hover:translate-x-0.5",
+                  isDark
+                    ? "border-blue-500/40 text-blue-400 hover:border-blue-400 hover:text-blue-300"
+                    : "border-blue-500/40 text-blue-600 hover:border-blue-600"
+                )}
+              >
+                Ver Todos <ChevronRight className="w-3 h-3" />
+              </Link>
+            )}
           </div>
 
-          {/* Ver Todos — inline com o header */}
-          {!isLoadingPosts && (
-            <Link
-              to="/archive"
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 font-retro font-black text-xs uppercase tracking-widest border-2 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0",
-                isDark
-                  ? "border-blue-500 text-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.3)] hover:bg-blue-500 hover:text-white"
-                  : "border-blue-600 text-blue-600 shadow-[4px_4px_0px_0px_#2563eb] hover:bg-blue-600 hover:text-white"
-              )}
-            >
-              Ver Todos <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
+          {/* Right header */}
+          {reviewPosts.length > 0 && isDefaultView && (
+            <div className={cn(
+              "hidden lg:flex items-center gap-3 pb-5",
+              isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
+            )}>
+              <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
+              <div>
+                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-white leading-none">
+                  Reviews
+                </h2>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-500 mt-0.5">
+                  Análises com Nota
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
-        {isLoadingPosts ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => <PostSkeleton key={i} isDark={isDark} />)}
-          </div>
-        ) : gridPosts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {gridPosts.map((post, i) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.05, 0.4), type: "spring", stiffness: 80 }}
-                  className="h-full"
-                >
-                  <PostCard post={post} />
-                </motion.div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div
-            className={cn(
-              "p-16 text-center retro-card",
-              isDark ? "bg-gray-800/40" : "bg-snes-surface border-2 border-snes-dark"
-            )}
-          >
-            <Gamepad2 className="w-16 h-16 mx-auto mb-4 opacity-30 text-purple-500" />
-            <p className="font-retro text-xl mb-2 font-bold uppercase">Nenhum artigo encontrado.</p>
-            <p className="opacity-50 font-medium tracking-tight text-sm">
-              Tente buscar por outro termo ou categoria.
-            </p>
-          </div>
-        )}
-      </section>
+        {/* Content: list + sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
 
-      {/* ── 3. HALL OF FAME: Reviews ────────────────────── */}
-      {reviewPosts.length > 0 && isDefaultView && (
-        <section
-          className={cn(
-            "relative w-screen left-1/2 -translate-x-1/2 overflow-hidden py-16",
-            isDark ? "bg-gray-950 border-y-2 border-purple-900/30" : "bg-snes-mid border-y-4 border-snes-dark"
-          )}
-        >
-          <div className="relative z-10 max-w-7xl mx-auto px-4">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-12">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
-                <div>
-                  <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-white leading-none">
-                    Hall of Fame
-                  </h2>
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-500 mt-0.5">
-                    Análises com Nota
-                  </p>
-                </div>
+          {/* LEFT: Horizontal article list */}
+          <div className="lg:col-span-2">
+            {isLoadingPosts ? (
+              <div className="flex flex-col gap-4">
+                {[1,2,3,4,5,6].map((i) => (
+                  <div key={i} className={cn("flex gap-4 p-4 animate-pulse", isDark ? "bg-white/[0.02]" : "bg-gray-100")}>
+                    <div className={cn("w-28 h-20 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
+                    <div className="flex-1 space-y-2">
+                      <div className={cn("h-3 w-16 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
+                      <div className={cn("h-4 w-full rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
+                      <div className={cn("h-4 w-2/3 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <Link
-                to="/category/Reviews"
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 font-retro font-black text-xs uppercase tracking-widest border-2 border-yellow-500 text-yellow-500 transition-all duration-200 hover:bg-yellow-500 hover:text-black",
-                  SHADOW_LG
-                )}
-              >
-                Ver Ranking <TrendingUp className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {/* Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {reviewPosts.map((post, i) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08, type: "spring", stiffness: 80 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -6 }}
-                  className="group cursor-pointer"
-                >
-                  <Link to={`/post/${post.slug || slugify(post.title)}`}>
-                    <div
-                      className={cn(
-                        "aspect-[3/4] overflow-hidden relative mb-4",
-                        BORDER,
-                        SHADOW_LG,
-                        "group-hover:shadow-[6px_6px_0px_0px_rgba(234,179,8,0.5)] transition-shadow duration-300"
-                      )}
+            ) : gridPosts.length > 0 ? (
+              <div className="flex flex-col divide-y divide-white/5">
+                {gridPosts.map((post, i) => (
+                  <motion.article
+                    key={post.id}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 90 }}
+                    className="group flex gap-6 py-6 first:pt-0 last:pb-0"
+                  >
+                    {/* Thumbnail */}
+                    <Link
+                      to={`/post/${post.slug || slugify(post.title)}`}
+                      className="shrink-0 w-40 h-28 overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(168,85,247,0.5)] transition-shadow"
                     >
-                      {post.imageUrl && (
+                      {post.imageUrl ? (
                         <img
                           src={post.imageUrl}
                           alt={post.title}
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
+                      ) : (
+                        <div className={cn("w-full h-full flex items-center justify-center", isDark ? "bg-gray-800" : "bg-gray-200")}>
+                          <Gamepad2 className="w-8 h-8 opacity-20" />
+                        </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute top-3 right-3">
-                        <ScoreBadge score={post.score!} />
+                    </Link>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 border border-purple-500/30 px-2 py-0.5">
+                            {post.category}
+                          </span>
+                          {post.score && (
+                            <span className="text-[9px] font-black uppercase tracking-widest text-yellow-500">
+                              ★ {post.score}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-retro font-bold text-[17px] leading-snug line-clamp-2 group-hover:text-purple-400 transition-colors duration-200">
+                          <Link to={`/post/${post.slug || slugify(post.title)}`}>{post.title}</Link>
+                        </h3>
+                        {post.excerpt && (
+                          <p className="text-[13px] text-slate-500 line-clamp-2 mt-1.5 hidden sm:block">
+                            {post.excerpt}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 mt-3 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                        <span>{post.author?.name || "Lucas"}</span>
+                        <span>·</span>
+                        <span>{formatNumber(post.views || 0)} views</span>
                       </div>
                     </div>
-                    <h3
-                      className={cn(
-                        "font-retro font-bold text-sm leading-snug line-clamp-2 transition-colors duration-300 uppercase",
-                        isDark ? "text-slate-200 group-hover:text-yellow-400" : "text-gray-900 group-hover:text-yellow-600"
-                      )}
-                    >
-                      {post.title}
-                    </h3>
-                  </Link>
-                </motion.article>
-              ))}
-            </div>
+                  </motion.article>
+                ))}
+              </div>
+            ) : (
+              <div className={cn("p-12 text-center retro-card", isDark ? "bg-gray-800/40" : "bg-snes-surface border-2 border-snes-dark")}>
+                <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500" />
+                <p className="font-retro font-bold uppercase">Nenhum artigo encontrado.</p>
+              </div>
+            )}
           </div>
-        </section>
-      )}
+
+          {/* RIGHT: Full-width review mini cards */}
+          {reviewPosts.length > 0 && isDefaultView && (
+            <aside className="hidden lg:block">
+              <div className="flex flex-col gap-3">
+                {reviewPosts.map((post, i) => (
+                  <motion.article
+                    key={post.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.07, type: "spring", stiffness: 90 }}
+                    className="group relative w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.5)] transition-shadow cursor-pointer"
+                  >
+                    <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
+
+                    {/* BG image */}
+                    {post.imageUrl && (
+                      <img
+                        src={post.imageUrl}
+                        alt={post.title}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    )}
+
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+
+                    {/* Score badge — top left */}
+                    {post.score && (
+                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
+                        ★ {post.score}
+                      </span>
+                    )}
+
+                    {/* Category — top right */}
+                    <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-yellow-400 bg-black/60 px-2 py-0.5 border border-yellow-500/30">
+                      {post.category}
+                    </span>
+
+                    {/* Title — bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                      <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-yellow-300 transition-colors">
+                        {post.title}
+                      </h4>
+                    </div>
+                  </motion.article>
+                ))}
+
+                {/* DOSSIÊS */}
+                {dossiePosts.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-3 pt-4 pb-2 mt-2">
+                      <div className="w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
+                      <div>
+                        <h2 className="font-retro text-xl font-black uppercase tracking-wide text-white leading-none">
+                          Dossiês
+                        </h2>
+                        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
+                          Reportagens Especiais
+                        </p>
+                      </div>
+                    </div>
+                    {dossiePosts.map((post, i) => (
+                      <motion.article
+                        key={post.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: (i + reviewPosts.length) * 0.07, type: "spring", stiffness: 90 }}
+                        className="group relative w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(59,130,246,0.5)] transition-shadow cursor-pointer"
+                      >
+                        <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
+
+                        {post.imageUrl && (
+                          <img
+                            src={post.imageUrl}
+                            alt={post.title}
+                            loading="lazy"
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        )}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+
+                        <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-blue-400 bg-black/60 px-2 py-0.5 border border-blue-500/30">
+                          {post.category}
+                        </span>
+
+                        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                          <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-blue-300 transition-colors">
+                            {post.title}
+                          </h4>
+                        </div>
+                      </motion.article>
+                    ))}
+                  </>
+                )}
+              </div>
+            </aside>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

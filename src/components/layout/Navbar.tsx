@@ -19,6 +19,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useUIStore } from "../../store/useUIStore";
 import { useCategories } from "../../features/posts/hooks/useCategoriesQuery";
+import { useAllPosts } from "../../features/posts/hooks/usePostsQuery";
 import { useUserProfile } from "../../hooks/useUserQuery";
 import { useNavbar } from "./Navbar/useNavbar";
 
@@ -39,6 +40,14 @@ export default function Navbar() {
   const { currentUser, handleLogout } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { data: categories = [] } = useCategories();
+  const { data: allPosts = [] } = useAllPosts();
+
+  // Filtra apenas categorias que possuem pelo menos um post publicado
+  const activeCategories = React.useMemo(() => {
+    return categories.filter(cat => 
+      allPosts.some(post => post.category === cat && !post.isDraft)
+    );
+  }, [categories, allPosts]);
 
   const {
     isMobileMenuOpen,
@@ -84,7 +93,7 @@ export default function Navbar() {
           {/* Centro: Links de Navegação (Desktop) */}
           <div className="hidden xl:flex items-center gap-1 flex-1 justify-center px-4 whitespace-nowrap">
             <NavCategoryMenu 
-              categories={categories}
+              categories={activeCategories}
               activeCategory={activeCategory}
               isOpen={isCategoryMenuOpen}
               setIsOpen={setIsCategoryMenuOpen}
@@ -94,14 +103,14 @@ export default function Navbar() {
 
             <Link 
               to="/about" 
-              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-sm whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
             >
               Sobre Nós
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
             </Link>
             <Link 
               to="/contact" 
-              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-sm whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
             >
               Contatos
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
@@ -248,7 +257,7 @@ export default function Navbar() {
         profile={profile}
         handleLogout={handleLogout}
         onLoginClick={() => setIsLoginModalOpen(true)}
-        categories={categories}
+        categories={activeCategories}
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         isCategoriesOpen={isMobileCategoriesOpen}
