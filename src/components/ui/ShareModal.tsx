@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, MessageCircle, Copy, Share2, Download } from 'lucide-react';
+import { X, MessageCircle, Copy, Share2, Download, Link as LinkIcon, Loader2 } from 'lucide-react';
 import { Post } from '../../features/posts/schemas';
 import { useUIStore } from '../../store/useUIStore';
 import { cn } from '../../lib/utils';
@@ -20,6 +20,9 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
   const postUrl = window.location.href;
   const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
 
+  const [shortUrl, setShortUrl] = useState<string | null>(null);
+  const [isLoadingShortUrl, setIsLoadingShortUrl] = useState(false);
+
   // Fecha com Esc
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -36,6 +39,29 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
       onClose();
     } catch (err) {
       showToast("Erro ao copiar link.", "error");
+    }
+  };
+
+  const getShortUrl = async () => {
+    if (shortUrl) {
+      await navigator.clipboard.writeText(shortUrl);
+      showToast("Link curto copiado! 🔗");
+      onClose();
+      return;
+    }
+    
+    setIsLoadingShortUrl(true);
+    try {
+      const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(postUrl)}`);
+      const text = await res.text();
+      setShortUrl(text);
+      await navigator.clipboard.writeText(text);
+      showToast("Link curto gerado e copiado! 🔗");
+      onClose();
+    } catch (err) {
+      showToast("Erro ao gerar link curto.", "error");
+    } finally {
+      setIsLoadingShortUrl(false);
     }
   };
 
@@ -177,7 +203,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                   <span className="font-retro text-[10px] font-bold uppercase">WhatsApp</span>
                 </button>
 
-                {/* Copiar Link */}
+                {/* Copiar Link Oficial */}
                 <button
                   onClick={copyToClipboard}
                   className={cn(
@@ -186,7 +212,24 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                   )}
                 >
                   <Copy className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                  <span className="font-retro text-[10px] font-bold uppercase">Copiar Link</span>
+                  <span className="font-retro text-[10px] font-bold uppercase text-center">Copiar Oficial</span>
+                </button>
+
+                {/* Gerar Link Curto */}
+                <button
+                  onClick={getShortUrl}
+                  disabled={isLoadingShortUrl}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-2 p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all group",
+                    isDark ? "bg-blue-900/40 text-blue-400" : "bg-blue-100 text-blue-700"
+                  )}
+                >
+                  {isLoadingShortUrl ? (
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                  ) : (
+                    <LinkIcon className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                  )}
+                  <span className="font-retro text-[10px] font-bold uppercase text-center">Link Curto</span>
                 </button>
 
                 {/* System Share */}
@@ -195,7 +238,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] active:translate-y-[2px] active:shadow-none transition-all group",
                     isDark ? "bg-purple-900/30 border-purple-500/50" : "bg-purple-100 border-purple-300",
-                    !isAdmin && "col-span-2"
+                    !isAdmin ? "col-span-2" : ""
                   )}
                 >
                   <Share2 className="w-8 h-8 group-hover:scale-110 transition-transform" />
