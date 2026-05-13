@@ -1,6 +1,6 @@
 # ⚙️ Documentação Técnica — Lucas Begins
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v2.3.0+**.
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.0.0**.
 
 ---
 

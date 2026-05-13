@@ -18,7 +18,7 @@ Diferente da versão anterior, a segurança agora é baseada em **Roles** (Papé
 
 ## 🛠️ Ferramentas Administrativas (Painel de Controle)
 
-A Versão 2.0 introduziu a aba **"Ferramentas"** no Painel Admin, eliminando a necessidade de scripts manuais.
+A partir da Versão 2.0 foi introduzida a aba **"Ferramentas"** no Painel Admin, eliminando a necessidade de scripts manuais.
 
 ### 📊 Normalização de Visualizações
 Se as visualizações de um post parecerem irreais (ex: 10.000 views para 2 likes), use esta ferramenta:
@@ -36,7 +36,7 @@ O progresso dos usuários é armazenado nos campos `xp` e `level` da coleção `
 ### Recuperação de XP:
 Se um usuário relatar perda de nível ou XP:
 1. Verifique o histórico de edições de perfil no Firestore.
-2. O sistema de proteção (v2.0) impede sobrescritas, mas em caso de falha, você pode editar manualmente os campos `xp` e `level` para restaurar o progresso do jogador.
+2. O sistema de proteção (v3.0.0) impede sobrescritas, mas em caso de falha, você pode editar manualmente os campos `xp` e `level` para restaurar o progresso do jogador.
 
 ---
 
