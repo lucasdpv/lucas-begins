@@ -59,6 +59,7 @@ export default function HomePage() {
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>Lucas Begins | Portal de Games, Reviews e Cultura Pop</title>
+        <link rel="canonical" href="https://lucasbegins.com.br/" />
         <meta
           name="description"
           content="Seu portal premium de games e cultura pop. Reviews profundos, nostalgia, RPG, cinema e as últimas novidades da cultura gamer brasileira."
