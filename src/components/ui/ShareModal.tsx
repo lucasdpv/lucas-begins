@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, MessageCircle, Copy, Share2, Download, Link as LinkIcon, Loader2 } from 'lucide-react';
 import { Post } from '../../features/posts/schemas';
 import { useUIStore } from '../../store/useUIStore';
