@@ -143,8 +143,8 @@ export default function Navbar() {
                       className={cn(
                         "w-full pl-12 pr-12 py-3 rounded-2xl border-2 font-bold outline-none text-sm transition-all",
                         isDark 
-                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" 
-                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900"
+                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white placeholder:text-white/30" 
+                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900 placeholder:text-gray-900/60"
                       )}
                     />
                     <button
@@ -166,8 +166,8 @@ export default function Navbar() {
                 isDark ? "bg-white/10 hover:bg-white/15" : "bg-gray-100 hover:bg-gray-200"
               )}>
                 <Search className={cn(
-                  "w-4 h-4 opacity-40 group-focus-within/search:opacity-100",
-                  isDark ? "text-purple-400" : "text-purple-600"
+                  "w-4 h-4 group-focus-within/search:opacity-100 transition-opacity",
+                  isDark ? "text-purple-400 opacity-40" : "text-purple-600 opacity-70"
                 )} />
                 <input
                   type="text"
@@ -175,8 +175,8 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   className={cn(
-                    "w-full bg-transparent border-none font-bold text-xs outline-none px-3 placeholder:opacity-30",
-                    isDark ? "text-white" : "text-black"
+                    "w-full bg-transparent border-none font-bold text-xs outline-none px-3",
+                    isDark ? "text-white placeholder:text-white/30" : "text-black placeholder:text-black/70"
                   )}
                 />
               </div>
@@ -198,7 +198,12 @@ export default function Navbar() {
                   href="https://www.threads.com/@lucasbegins"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                  className={cn(
+                    "p-2.5 transition-all hover:scale-110 rounded-xl",
+                    isDark 
+                      ? "text-gray-400 hover:text-white hover:bg-white/5" 
+                      : "text-gray-600 hover:text-purple-600 hover:bg-black/5"
+                  )}
                 >
                   <ThreadsIcon className="w-4 h-4" />
                 </a>
@@ -207,7 +212,12 @@ export default function Navbar() {
                   href="https://www.instagram.com/lucasbegins/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                  className={cn(
+                    "p-2.5 transition-all hover:scale-110 rounded-xl",
+                    isDark 
+                      ? "text-gray-400 hover:text-white hover:bg-white/5" 
+                      : "text-gray-600 hover:text-pink-600 hover:bg-black/5"
+                  )}
                 >
                   <InstagramIcon className="w-4 h-4" />
                 </a>

@@ -102,7 +102,7 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         </h3>
         
         {!isCompact && (
-          <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
+          <p className={cn("text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-700")}>
             {post.excerpt}
           </p>
         )}
@@ -115,11 +115,11 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         )}>
           {/* Data e tempo de leitura */}
           <div className="flex flex-col gap-0.5 min-w-[80px]">
-            <span className="font-retro font-bold uppercase tracking-wider opacity-60 text-[9px] sm:text-[10px] whitespace-nowrap">
+            <span className={cn("font-retro font-bold uppercase tracking-wider text-[9px] sm:text-[10px] whitespace-nowrap", isDark ? "opacity-60" : "opacity-80")}>
               {formatDate(post.createdAt, post.date ?? undefined)}
             </span>
             {!isCompact && (
-              <span className="text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase opacity-40 whitespace-nowrap">
+              <span className={cn("text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase whitespace-nowrap", isDark ? "opacity-40" : "opacity-60")}>
                 <Clock className="w-3 h-3 shrink-0" />
                 {calculateReadingTime(post.content || "").replace(" min de leitura", "m")}
               </span>
@@ -134,10 +134,10 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all",
                   isCompact ? "text-[10px]" : "text-[11px] sm:text-sm",
-                  hasLiked ? "text-red-500" : isDark ? "text-gray-400" : "text-gray-500",
+                  hasLiked ? "text-red-500" : isDark ? "text-gray-400" : "text-gray-600",
                   currentUser 
                     ? "hover:scale-110 active:scale-95 cursor-pointer hover:text-red-400" 
-                    : "opacity-40 cursor-not-allowed"
+                    : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
                 title={currentUser ? "Curtir" : "Faça login para curtir"}
@@ -151,10 +151,10 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all",
                   isCompact ? "text-[10px]" : "text-[11px] sm:text-sm",
-                  profile?.favorites?.includes(post.id) ? "text-yellow-500" : isDark ? "text-gray-400" : "text-gray-500",
+                  profile?.favorites?.includes(post.id) ? "text-yellow-500" : isDark ? "text-gray-400" : "text-gray-600",
                   currentUser 
                     ? "hover:scale-110 active:scale-95 cursor-pointer hover:text-yellow-400" 
-                    : "opacity-40 cursor-not-allowed"
+                    : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => {
                   if (currentUser) {

@@ -97,10 +97,10 @@ export default function HomePage() {
             <div className="lg:col-span-3 flex items-center gap-3">
               <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
               <div>
-                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-glow leading-none">
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
                   Em Destaque
                 </h2>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-0.5">
+                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
                   Seleção Editorial
                 </p>
               </div>
@@ -108,10 +108,10 @@ export default function HomePage() {
             <div className="hidden lg:flex items-center gap-3">
               <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
               <div>
-                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-glow-amber leading-none">
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
                   Mais Lidos
                 </h2>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-0.5">
+                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
                   Em Alta no Portal
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
                     >
                       <span className={cn(
                         "text-2xl font-retro font-bold trending-number transition-all duration-300 min-w-[40px]",
-                        isDark ? "text-purple-500/50" : "text-purple-600/30"
+                        isDark ? "text-purple-500/50" : "text-purple-600/50"
                       )}>
                         {(idx + 1).toString().padStart(2, "0")}
                       </span>
@@ -161,7 +161,7 @@ export default function HomePage() {
                         )}>
                           {post.title}
                         </h4>
-                        <div className="flex items-center gap-2 mt-1.5 opacity-40 text-[10px] font-bold uppercase tracking-wider">
+                        <div className={cn("flex items-center gap-2 mt-1.5 text-[10px] font-bold uppercase tracking-wider", isDark ? "opacity-40" : "opacity-60")}>
                           <span>{formatNumber(post.views || 0)} visualizações</span>
                         </div>
                       </div>
@@ -186,7 +186,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
               <div>
-                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-glow-blue leading-none">
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
                   {isLoadingPosts
                     ? "Carregando..."
                     : searchQuery
@@ -196,7 +196,7 @@ export default function HomePage() {
                     : "Últimas Notícias"}
                 </h2>
                 {!isLoadingPosts && (
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 mt-0.5">
+                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
                     {searchQuery ? `${filteredPosts.length} resultado${filteredPosts.length !== 1 ? "s" : ""}` : "Mais recentes do portal"}
                   </p>
                 )}
@@ -225,10 +225,10 @@ export default function HomePage() {
             )}>
               <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
               <div>
-                <h2 className="font-retro text-2xl md:text-3xl font-black uppercase tracking-wide text-white leading-none">
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
                   Reviews
                 </h2>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-500 mt-0.5">
+                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
                   Análises com Nota
                 </p>
               </div>
@@ -300,12 +300,12 @@ export default function HomePage() {
                           <Link to={`/post/${post.slug || slugify(post.title)}`}>{post.title}</Link>
                         </h3>
                         {post.excerpt && (
-                          <p className="text-[13px] text-slate-500 line-clamp-2 mt-1.5 hidden sm:block">
+                          <p className={cn("text-[13px] line-clamp-2 mt-1.5 hidden sm:block", isDark ? "text-slate-500" : "text-slate-700")}>
                             {post.excerpt}
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-4 mt-3 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                      <div className={cn("flex items-center gap-4 mt-3 text-[10px] font-black uppercase tracking-widest", isDark ? "text-slate-400" : "text-slate-700")}>
                         <span>{post.author?.name || "Lucas"}</span>
                         <span>·</span>
                         <span>{formatNumber(post.views || 0)} views</span>
@@ -376,7 +376,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-3 pt-4 pb-2 mt-2">
                       <div className="w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
                       <div>
-                        <h2 className="font-retro text-xl font-black uppercase tracking-wide text-white leading-none">
+                        <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none", isDark ? "text-white" : "text-snes-accent")}>
                           Dossiês
                         </h2>
                         <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
