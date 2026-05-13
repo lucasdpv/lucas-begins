@@ -174,7 +174,7 @@ export default function ImageUpload({
                   <div className="bg-purple-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg text-white">
                     <Upload className="w-5 h-5" />
                   </div>
-                  <button onClick={removeImage} className="bg-red-500 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-red-600 transition-colors text-white">
+                  <button type="button" onClick={removeImage} className="bg-red-500 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-red-600 transition-colors text-white">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -190,7 +190,7 @@ export default function ImageUpload({
                         placeholder="Mudar URL..."
                         onClick={(e) => e.stopPropagation()}
                       />
-                      <button onClick={removeImage} className="p-1.5 hover:text-red-400 transition-colors text-white/60">
+                      <button type="button" onClick={removeImage} className="p-1.5 hover:text-red-400 transition-colors text-white/60">
                         <X className="w-4 h-4" />
                       </button>
                    </div>
