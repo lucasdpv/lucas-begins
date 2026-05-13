@@ -59,13 +59,13 @@ export default function HomePage() {
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>Lucas Begins | Portal de Games, Reviews e Cultura Pop</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/" />
+        <link rel="canonical" href="https://www.lucasbegins.com.br/" />
         <meta
           name="description"
           content="Seu portal premium de games e cultura pop. Reviews profundos, nostalgia, RPG, cinema e as últimas novidades da cultura gamer brasileira."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://lucasbegins.com.br/" />
+        <meta property="og:url" content="https://www.lucasbegins.com.br/" />
         <meta property="og:title" content="Lucas Begins | Portal de Games e Cultura Pop" />
         <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
         <meta property="og:image" content="https://lucasbegins.com.br/og-image.jpg" />
@@ -78,10 +78,10 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "Lucas Begins",
-            url: "https://lucasbegins.com.br/",
+            url: "https://www.lucasbegins.com.br/",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://lucasbegins.com.br/?q={search_term_string}",
+              target: "https://www.lucasbegins.com.br/?q={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           })}
