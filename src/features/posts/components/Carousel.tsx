@@ -17,6 +17,8 @@ interface CarouselProps {
 export default function Carousel({ posts }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const next = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % posts.length);
@@ -43,6 +45,31 @@ export default function Carousel({ posts }: CarouselProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
+  // Touch Swipe Handlers
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      next();
+    } else if (isRightSwipe) {
+      prev();
+    }
+  };
+
   const currentPost = posts[currentIndex];
   if (!currentPost) return null;
 
@@ -50,9 +77,12 @@ export default function Carousel({ posts }: CarouselProps) {
 
   return (
     <div
-      className="relative rounded-none border-2 border-black overflow-hidden retro-card group/carousel"
+      className="relative rounded-none border-2 border-black overflow-hidden retro-card group/carousel select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {/* Slide Content */}
       <div
@@ -77,7 +107,7 @@ export default function Carousel({ posts }: CarouselProps) {
         
         {/* Content Container */}
         <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
-          <div className="max-w-[75%] md:max-w-3xl pointer-events-auto text-center md:text-left flex flex-col items-center md:items-start">
+          <div className="max-w-[75%] md:max-w-3xl text-center md:text-left flex flex-col items-center md:items-start">
             <div className="mb-4">
               <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
             </div>
