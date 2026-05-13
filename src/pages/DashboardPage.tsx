@@ -80,6 +80,11 @@ export default function DashboardPage() {
   // Filtra os posts favoritos
   const favoritePosts = allPosts.filter(post => profile?.favorites?.includes(post.id));
 
+  // Conta total de comentários do usuário
+  const totalComments = allPosts.reduce((acc, post) => {
+    return acc + (post.comments?.filter(c => c.authorId === currentUser?.id).length || 0);
+  }, 0);
+
   // Cálculo de XP para a barra de progresso
   const xpLimit = (profile?.level || 1) * 100;
   const xpPercentage = Math.min(((profile?.xp || 0) / xpLimit) * 100, 100);
@@ -99,7 +104,7 @@ export default function DashboardPage() {
       icon: <MessageSquare className="w-5 h-5" />, 
       label: 'Conversador', 
       color: 'bg-blue-500', 
-      active: false, // Futuramente: totalComments > 0
+      active: totalComments > 0,
       description: 'Deixe seu primeiro comentário.'
     },
     { 
@@ -305,7 +310,7 @@ export default function DashboardPage() {
              </div>
              <div className="flex justify-between items-center border-b-2 border-black/20 pb-2">
                <span className="font-bold uppercase text-sm opacity-80">Comentários</span>
-               <span className="font-retro text-2xl">--</span>
+               <span className="font-retro text-2xl">{totalComments}</span>
              </div>
              <div className="flex justify-between items-center">
                <span className="font-bold uppercase text-sm opacity-80">Rank</span>

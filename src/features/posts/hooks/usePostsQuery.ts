@@ -289,6 +289,8 @@ export function useCommentMutation() {
     onSuccess: (_, variables) => {
       trackEvent('post_commented', { post_id: variables.postId, user_id: variables.comment.authorId });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
       if (variables.comment.authorId) {
         userService.addXP(variables.comment.authorId, 20);
         queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
