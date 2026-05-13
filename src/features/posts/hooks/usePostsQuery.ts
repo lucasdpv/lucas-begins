@@ -5,6 +5,7 @@ import { useUIStore } from '../../../store/useUIStore';
 import { userService } from '../../../services/userService';
 import { useAuth } from '../../../context/AuthProvider';
 import { useMemo } from 'react';
+import { trackEvent } from '../../../lib/analytics';
 
 /**
  * Keys para gerenciamento do cache do React Query.
@@ -163,6 +164,7 @@ export function useLikeMutation() {
     mutationFn: async ({ postId, userId }: { postId: string, userId: string }) => {
       const action = await PostService.toggleLike(postId, userId);
       if (action === 'liked') {
+        trackEvent('post_liked', { post_id: postId, user_id: userId });
         await userService.addXP(userId, 5);
       }
       return action;
@@ -254,6 +256,7 @@ export function useFavoriteMutation() {
 
     onSuccess: (action, variables) => {
       if (action === 'added') {
+        trackEvent('post_favorited', { post_id: variables.postId, user_id: variables.userId });
         userService.addXP(variables.userId, 15);
       }
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
@@ -284,6 +287,7 @@ export function useCommentMutation() {
     mutationFn: ({ postId, comment }: { postId: string, comment: any }) => 
       PostService.addComment(postId, comment),
     onSuccess: (_, variables) => {
+      trackEvent('post_commented', { post_id: variables.postId, user_id: variables.comment.authorId });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       if (variables.comment.authorId) {
         userService.addXP(variables.comment.authorId, 20);

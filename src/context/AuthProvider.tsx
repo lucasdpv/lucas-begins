@@ -4,6 +4,7 @@ import { onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut, AuthP
 import { userService } from '../services/userService';
 import { errorService } from '../services/errorService';
 import { useUIStore } from '../store/useUIStore';
+import { trackEvent } from '../lib/analytics';
 
 import { onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -95,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginWithProvider = useCallback(async (provider: FirebaseAuthProvider, providerName: string) => {
     try {
       await signInWithPopup(auth, provider);
+      trackEvent('login', { method: providerName });
       showToast("Bem-vindo de volta, Player 1! 🎮");
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
