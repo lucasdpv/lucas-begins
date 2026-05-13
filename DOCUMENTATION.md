@@ -56,19 +56,20 @@ Os usuários ganham XP por interações, persistido no Firestore:
 - **Comentar**: +20 XP
 - **Favoritar**: +15 XP
 
-### Estratégia de Busca (Fetch-All)
-Na **HomePage**, optamos por carregar todos os posts ativos via `useAllPosts()` e filtrar localmente no frontend. 
-- **Vantagem**: Busca e troca de categorias instantâneas (zero delay).
-- **Escalabilidade**: Ideal para blogs de até ~500 artigos. Para volumes maiores, o `PostService.getPaginatedPosts` está preparado para transição para paginação infinita.
+### Estratégia de Busca & Smart Nav
+Na **HomePage**, optamos por carregar todos os posts ativos via `useAllPosts()` e filtrar localmente:
+- **Smart Navigation**: O menu de categorias agora é dinâmico. Ele verifica se existem posts publicados em cada categoria e oculta as vazias automaticamente.
+- **Vantagem**: Busca e troca de categorias instantâneas (zero delay) e uma interface sempre limpa.
 
 ---
 
-## 🎨 Design System: Neo-Brutalist
+## 🎨 Design System: Neo-Brutalist 2.0
 
-A estética do portal é inspirada no movimento Neo-Brutalista com toques de consoles retro:
-- **Bordas**: `border-4 border-black` ou `border-purple-600`.
+A estética do portal evoluiu para um Neo-Brutalismo refinado:
+- **Bordas**: `border-2 border-black` para leveza ou `border-purple-600` para destaque.
 - **Sombras**: Sombras sólidas 2D (`shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`).
-- **Cores SNES**: Paleta baseada no cinza e roxo clássico do Super Nintendo.
+- **Slim Footer**: Rodapé minimalista em estilo barra de ferramentas.
+- **Acessibilidade**: Contraste otimizado para o modo claro (SNES).
 
 ---
-**Documentação atualizada em: 09 de Maio de 2026.**
+**Documentação atualizada em: 13 de Maio de 2026.**

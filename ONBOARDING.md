@@ -22,7 +22,7 @@ O **Lucas Begins** não é apenas um blog; é uma experiência visual. Nossa est
 
 ---
 
-## 📂 3. Estrutura de Pastas (v2.0)
+## 📂 3. Estrutura de Pastas (v3.0.0)
 Seguimos uma organização modular para facilitar a manutenção:
 
 ```text

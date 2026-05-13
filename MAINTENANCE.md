@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — Lucas Begins (v2.0)
+# 🔧 Guia de Manutenção — Lucas Begins (v3.0.0)
 
 Este documento é o seu manual de operações para manter a economia de jogo e a integridade do banco de dados do portal.
 
