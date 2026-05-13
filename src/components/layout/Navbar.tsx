@@ -19,6 +19,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useUIStore } from "../../store/useUIStore";
 import { useCategories } from "../../features/posts/hooks/useCategoriesQuery";
+import { useAllPosts } from "../../features/posts/hooks/usePostsQuery";
 import { useUserProfile } from "../../hooks/useUserQuery";
 import { useNavbar } from "./Navbar/useNavbar";
 
@@ -39,6 +40,14 @@ export default function Navbar() {
   const { currentUser, handleLogout } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { data: categories = [] } = useCategories();
+  const { data: allPosts = [] } = useAllPosts();
+
+  // Filtra apenas categorias que possuem pelo menos um post publicado
+  const activeCategories = React.useMemo(() => {
+    return categories.filter(cat => 
+      allPosts.some(post => post.category === cat && !post.isDraft)
+    );
+  }, [categories, allPosts]);
 
   const {
     isMobileMenuOpen,
@@ -84,7 +93,7 @@ export default function Navbar() {
           {/* Centro: Links de Navegação (Desktop) */}
           <div className="hidden xl:flex items-center gap-1 flex-1 justify-center px-4 whitespace-nowrap">
             <NavCategoryMenu 
-              categories={categories}
+              categories={activeCategories}
               activeCategory={activeCategory}
               isOpen={isCategoryMenuOpen}
               setIsOpen={setIsCategoryMenuOpen}
@@ -94,14 +103,14 @@ export default function Navbar() {
 
             <Link 
               to="/about" 
-              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-sm whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
             >
               Sobre Nós
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
             </Link>
             <Link 
               to="/contact" 
-              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-[11px] whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
+              className="px-3 py-2 font-retro font-black uppercase tracking-[0.15em] text-sm whitespace-nowrap relative group/link transition-colors hover:text-purple-400"
             >
               Contatos
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover/link:w-full transition-all duration-300 shadow-[0_0_8px_rgba(168,85,247,1)]" />
@@ -134,8 +143,8 @@ export default function Navbar() {
                       className={cn(
                         "w-full pl-12 pr-12 py-3 rounded-2xl border-2 font-bold outline-none text-sm transition-all",
                         isDark 
-                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white" 
-                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900"
+                          ? "bg-gray-800 border-purple-500/30 focus:border-purple-500 text-white placeholder:text-white/30" 
+                          : "bg-gray-50 border-gray-200 focus:border-purple-600 text-gray-900 placeholder:text-gray-900/60"
                       )}
                     />
                     <button
@@ -157,8 +166,8 @@ export default function Navbar() {
                 isDark ? "bg-white/10 hover:bg-white/15" : "bg-gray-100 hover:bg-gray-200"
               )}>
                 <Search className={cn(
-                  "w-4 h-4 opacity-40 group-focus-within/search:opacity-100",
-                  isDark ? "text-purple-400" : "text-purple-600"
+                  "w-4 h-4 group-focus-within/search:opacity-100 transition-opacity",
+                  isDark ? "text-purple-400 opacity-40" : "text-purple-600 opacity-70"
                 )} />
                 <input
                   type="text"
@@ -166,8 +175,8 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   className={cn(
-                    "w-full bg-transparent border-none font-bold text-xs outline-none px-3 placeholder:opacity-30",
-                    isDark ? "text-white" : "text-black"
+                    "w-full bg-transparent border-none font-bold text-xs outline-none px-3",
+                    isDark ? "text-white placeholder:text-white/30" : "text-black placeholder:text-black/70"
                   )}
                 />
               </div>
@@ -189,7 +198,12 @@ export default function Navbar() {
                   href="https://www.threads.com/@lucasbegins"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                  className={cn(
+                    "p-2.5 transition-all hover:scale-110 rounded-xl",
+                    isDark 
+                      ? "text-gray-400 hover:text-white hover:bg-white/5" 
+                      : "text-gray-600 hover:text-purple-600 hover:bg-black/5"
+                  )}
                 >
                   <ThreadsIcon className="w-4 h-4" />
                 </a>
@@ -198,7 +212,12 @@ export default function Navbar() {
                   href="https://www.instagram.com/lucasbegins/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 text-gray-400 hover:text-white transition-all hover:scale-110 hover:bg-white/5 rounded-xl"
+                  className={cn(
+                    "p-2.5 transition-all hover:scale-110 rounded-xl",
+                    isDark 
+                      ? "text-gray-400 hover:text-white hover:bg-white/5" 
+                      : "text-gray-600 hover:text-pink-600 hover:bg-black/5"
+                  )}
                 >
                   <InstagramIcon className="w-4 h-4" />
                 </a>
@@ -248,7 +267,7 @@ export default function Navbar() {
         profile={profile}
         handleLogout={handleLogout}
         onLoginClick={() => setIsLoginModalOpen(true)}
-        categories={categories}
+        categories={activeCategories}
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         isCategoriesOpen={isMobileCategoriesOpen}

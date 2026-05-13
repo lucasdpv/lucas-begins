@@ -35,25 +35,25 @@ export default function NavUserMenu({
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-3">
       {currentUser.role === 'admin' && (
         <Link 
           to="/admin" 
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl transition-all group hover:bg-white/5",
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all group hover:bg-white/5 shrink-0",
             isDark ? "text-purple-400" : "text-purple-600"
           )}
           title="Painel Administrativo"
         >
-          <ShieldCheck size={16} className="transition-transform group-hover:scale-110" />
-          <span className="hidden lg:block font-retro text-[9px] font-black uppercase tracking-[0.05em] whitespace-nowrap">Painel</span>
+          <ShieldCheck size={18} className="transition-transform group-hover:scale-110 shrink-0" />
+          <span className="hidden lg:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Painel</span>
         </Link>
       )}
 
       <Link 
         to="/dashboard" 
         className={cn(
-          "flex items-center gap-2 px-2.5 py-1.5 rounded-xl transition-all group hover:bg-white/5",
+          "flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all group hover:bg-white/5 shrink-0",
           isDark ? "text-purple-400" : "text-purple-600"
         )}
         title="Meu QG"
@@ -62,7 +62,7 @@ export default function NavUserMenu({
           <img
             src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))}
             alt=""
-            className="w-7 h-7 rounded-[10px] border border-purple-500/30 object-cover transition-all group-hover:border-purple-500"
+            className="w-8 h-8 rounded-[10px] border border-purple-500/30 object-cover transition-all group-hover:border-purple-500"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = getPixelAvatar(currentUser.id);
@@ -70,9 +70,12 @@ export default function NavUserMenu({
           />
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
         </div>
-        <span className="hidden lg:block font-retro text-[9px] font-black uppercase tracking-[0.05em] whitespace-nowrap">Meu QG</span>
+        <span className="hidden lg:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Meu QG</span>
       </Link>
       
+      {/* Divider */}
+      <div className={cn("w-px h-5 shrink-0", isDark ? "bg-white/10" : "bg-black/10")} />
+
       <button
         onClick={onLogout}
         className={cn(
@@ -81,7 +84,7 @@ export default function NavUserMenu({
         )}
         title="Sair"
       >
-        <LogOut size={16} className="group-hover:translate-x-0.5 transition-transform" />
+        <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
       </button>
     </div>
   );

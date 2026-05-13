@@ -21,12 +21,11 @@ export function usePostsFilter(posts: Post[], category = "Todos", search = "") {
     });
   }, [posts, category, search]);
 
-  // 2. Posts em Destaque (Marcados manualmente)
+  // 2. Posts em Destaque (Marcados manualmente) — todos, sem limite
   const featuredPosts = useMemo(() => {
     return posts
       .filter((p) => !p.isDraft && p.isFeatured)
-      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-      .slice(0, 5);
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   }, [posts]);
 
   // 3. Posts Mais Vistos

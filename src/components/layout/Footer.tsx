@@ -14,82 +14,98 @@ export default function Footer() {
   return (
     <footer
       className={cn(
-        "border-t-4 mt-16 pt-16 pb-8 transition-colors duration-300",
+        "border-t-4 mt-6 pt-4 pb-4 transition-colors duration-300",
         isDark ? "border-purple-600 bg-gray-900" : "border-black bg-white"
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-        {/* Marca e Descrição */}
-        <div className="col-span-1 md:col-span-2 space-y-8">
-          <Link to="/" className="flex items-center gap-3 group cursor-pointer w-fit">
-            <Gamepad2
-              className={cn("w-8 h-8 shrink-0 hover:rotate-12 transition-transform", isDark ? "text-purple-400" : "text-purple-600")}
-            />
-            <h2 className="font-retro font-bold text-2xl sm:text-3xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">
+      {/* === MOBILE: layout compacto em 2 colunas === */}
+      <div className="md:hidden max-w-7xl mx-auto px-4 mb-4">
+        {/* Linha 1: Marca + Sociais */}
+        <div className="flex items-center justify-between mb-4">
+          <Link to="/" className="flex items-center gap-2 cursor-pointer w-fit">
+            <Gamepad2 className={cn("w-6 h-6 shrink-0", isDark ? "text-purple-400" : "text-purple-600")} />
+            <span className="font-retro font-bold text-xl tracking-wider uppercase">
               <span className={isDark ? "text-white" : "text-black"}>Lucas</span>
               <span className={isDark ? "text-purple-400" : "text-purple-600"}>Begins</span>
-            </h2>
+            </span>
           </Link>
-          <p className={cn("text-base font-medium leading-relaxed max-w-sm pl-11", isDark ? "text-gray-400" : "text-gray-600")}>
-            Sua revista digital para a era de ouro dos videogames. Análises críticas, memórias
-            inesquecíveis e as últimas novidades do mundo retro.
-          </p>
-        </div>
-
-        {/* Links Rápidos */}
-        <div>
-          <h3 className="font-retro font-bold text-lg uppercase tracking-wider mb-6 flex items-center gap-3">
-            <span className={cn("w-3 h-6 shrink-0 retro-card", isDark ? "bg-purple-500" : "bg-purple-600")} />
-            <span>Diretório</span>
-          </h3>
-          <ul className={cn("space-y-4 text-base font-bold font-retro uppercase pl-6", isDark ? "text-gray-400" : "text-gray-600")}>
-            <li>
-              <Link to="/about" className="hover:text-purple-500 transition-all hover:translate-x-2 flex items-center gap-2">
-                <ChevronRight className="w-4 h-4 text-purple-500" /> Sobre Nós
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" className="hover:text-purple-500 transition-all hover:translate-x-2 flex items-center gap-2">
-                <ChevronRight className="w-4 h-4 text-purple-500" /> Contatos
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Redes Sociais */}
-        <div>
-          <h3 className="font-retro font-bold text-lg uppercase tracking-wider mb-6 flex items-center gap-3">
-            <span className={cn("w-3 h-6 shrink-0 retro-card", isDark ? "bg-yellow-400" : "bg-yellow-500")} />
-            <span>Multiplayer</span>
-          </h3>
-          <div className="flex flex-wrap gap-4 pl-6">
+          {/* Sociais inline */}
+          <div className="flex items-center gap-2">
             <a
               href="https://www.threads.com/@lucasbegins"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn("p-4 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-white" : "bg-white text-black hover:border-purple-600")}
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="Threads"
             >
-              <ThreadsIcon className="w-5 h-5 shrink-0" />
+              <ThreadsIcon className="w-4 h-4" />
             </a>
             <a
               href="https://www.instagram.com/lucasbegins/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn("p-4 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-pink-500" : "bg-white text-black hover:border-pink-600")}
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
               title="Instagram"
             >
-              <InstagramIcon className="w-5 h-5 shrink-0" />
+              <InstagramIcon className="w-4 h-4" />
             </a>
-            <div className="flex items-center gap-3">
-              <div
-                className={cn("p-4 rounded-xl retro-button border-black opacity-40 filter grayscale cursor-not-allowed", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
-                title="X (Antigo Twitter) - Em Breve"
-              >
-                <XIcon className="w-5 h-5 shrink-0" />
-              </div>
-              <span className="font-retro text-[8px] uppercase font-bold opacity-40 leading-none">Em<br/>Breve</span>
-            </div>
+          </div>
+        </div>
+
+        {/* Linha 2: Links rápidos inline */}
+        <div className={cn("flex items-center gap-4 text-[10px] font-retro font-bold uppercase tracking-wider", isDark ? "text-gray-400" : "text-gray-500")}>
+          <Link to="/about" className="hover:text-purple-500 transition-colors flex items-center gap-1">
+            <ChevronRight className="w-3 h-3 text-purple-500" /> Sobre Nós
+          </Link>
+          <span className="opacity-30">|</span>
+          <Link to="/contact" className="hover:text-purple-500 transition-colors flex items-center gap-1">
+            <ChevronRight className="w-3 h-3 text-purple-500" /> Contatos
+          </Link>
+        </div>
+      </div>
+
+      {/* === DESKTOP: layout ultra slim em linha === */}
+      <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between mb-4">
+        {/* Marca */}
+        <Link to="/" className="flex items-center gap-2 group cursor-pointer shrink-0">
+          <Gamepad2 className={cn("w-7 h-7 shrink-0 hover:rotate-12 transition-transform", isDark ? "text-purple-400" : "text-purple-600")} />
+          <h2 className="font-retro font-bold text-2xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">
+            <span className={isDark ? "text-white" : "text-black"}>Lucas</span>
+            <span className={isDark ? "text-purple-400" : "text-purple-600"}>Begins</span>
+          </h2>
+        </Link>
+
+        {/* Agrupamento: Links + Sociais na Direita */}
+        <div className="flex items-center gap-8">
+          {/* Links Inline */}
+          <div className={cn("flex items-center gap-6 text-xs font-retro font-bold uppercase tracking-wider", isDark ? "text-gray-400" : "text-gray-600")}>
+            <Link to="/about" className="hover:text-purple-500 transition-colors flex items-center gap-1.5">
+              <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Sobre Nós
+            </Link>
+            <Link to="/contact" className="hover:text-purple-500 transition-colors flex items-center gap-1.5">
+              <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Contatos
+            </Link>
+          </div>
+
+          {/* Divisor */}
+          <div className={cn("w-px h-6", isDark ? "bg-white/10" : "bg-black/10")} />
+
+          {/* Sociais */}
+          <div className="flex items-center gap-3 shrink-0">
+            <a
+              href="https://www.threads.com/@lucasbegins"
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-white" : "bg-white text-black hover:border-purple-600")}
+              title="Threads"
+            >
+              <ThreadsIcon className="w-4 h-4 shrink-0" />
+            </a>
+            <a
+              href="https://www.instagram.com/lucasbegins/"
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-pink-500" : "bg-white text-black hover:border-pink-600")}
+              title="Instagram"
+            >
+              <InstagramIcon className="w-4 h-4 shrink-0" />
+            </a>
           </div>
         </div>
       </div>
@@ -97,17 +113,21 @@ export default function Footer() {
       {/* Linha de Copyright */}
       <div
         className={cn(
-          "max-w-7xl mx-auto px-4 pt-8 border-t-2 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] sm:text-xs font-retro font-bold uppercase tracking-widest",
+          "max-w-7xl mx-auto px-4 pt-3 md:pt-3 border-t flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 text-[9px] md:text-[10px] font-retro font-bold uppercase tracking-widest",
           isDark ? "border-gray-800 text-gray-500" : "border-gray-300 text-gray-500"
         )}
       >
-        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
-          <p>© {new Date().getFullYear()} Lucas Begins. Insert Coin to Continue.</p>
-          <span className="hidden md:inline opacity-30">|</span>
-          <span className="opacity-50">Version {version}</span>
-        </div>
-        <p className="flex items-center gap-2">
-          Feito com <Heart className="w-4 h-4 text-red-500 fill-red-500 shrink-0" /> e nostalgia
+        <p className="opacity-70">© {new Date().getFullYear()} Lucas Begins</p>
+        
+        <span className="opacity-20 hidden md:inline">|</span>
+        <span className="opacity-40 hidden md:inline">Insert Coin to Continue.</span>
+        
+        <span className="opacity-20 hidden md:inline">|</span>
+        <span className="opacity-50 hidden md:inline">v{version}</span>
+        
+        <span className="opacity-20 hidden md:inline">|</span>
+        <p className="flex items-center gap-1.5 opacity-80">
+          Feito com <Heart className="w-3 h-3 text-red-500 fill-red-500 shrink-0" /> e nostalgia
         </p>
       </div>
     </footer>

@@ -4,6 +4,25 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.0.0] - The Ultimate UI Polish & Dynamic Navigation
+*Data: 13 de Maio de 2026*
+
+### ✨ UI/UX: Refinamento Minimalista
+- **Slim Footer Bar**: Redesign radical do rodapé para uma estética ultra-slim e minimalista, reduzindo a altura e removendo poluição visual para um fechamento de página mais elegante.
+- **Light Mode Accessibility**: Grande revisão de contraste no Modo Claro. Subtítulos agora usam `slate-700` para melhor leitura, metadados tiveram opacidade aumentada e cabeçalhos dinâmicos corrigidos para evitar invisibilidade em fundos claros.
+- **Search Visibility**: Otimização completa dos campos de busca com placeholders e ícones de alto contraste, garantindo que a funcionalidade seja imediatamente legível no modo claro.
+- **Social Icon Overhaul**: Transição de efeitos de hover estáticos para dinâmicos (Purple/Pink) que se adaptam ao tema e fornecem feedback visual premium.
+
+### ⚙️ Navegação Inteligente
+- **Dynamic Category Menu**: Implementação de lógica de filtragem em tempo real no Navbar. Categorias vazias (sem posts publicados) são ocultadas automaticamente, garantindo que o usuário nunca encontre seções sem conteúdo.
+- **Refined Section Labels**: Remoção de efeitos de "glow" (brilho) em textos sobre fundos claros para garantir nitidez absoluta em telas de alta resolução.
+
+### 🛠️ Documentação & Firebase
+- **Firebase Universal Guide**: Criação de um guia mestre em Markdown para facilitar a replicação da infraestrutura de backend em outros projetos.
+- **Version Jump**: Atualização global para v3.0.0, marcando o amadurecimento final da interface do portal.
+
+---
+
 ## 💎 [v2.7.0] - The Seamless Glass Update
 *Data: 12 de Maio de 2026*
 

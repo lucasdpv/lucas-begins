@@ -109,6 +109,8 @@
     image-rendering: pixelated;
     image-rendering: crisp-edges;
   }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
 /* Animações de Entrada */

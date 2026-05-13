@@ -1,8 +1,8 @@
-# 🕹️ Lucas Begins - Retro Gaming Journal (v2.3)
+# 🕹️ Lucas Begins - Retro Gaming Journal (v3.0.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 2.3, o projeto atingiu maturidade arquitetural com uma estrutura totalmente modular, mantendo o sistema de gamificação onde cada interação aproxima o usuário da era dourada dos videogames.
+O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.0.0, o projeto atinge seu ápice estético com uma interface ultra-refinada, navegação inteligente baseada em conteúdo e acessibilidade total para todos os temas.
 
 ---
 
@@ -13,22 +13,23 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 -   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Configuração do ambiente e arquitetura TypeScript.
 -   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação e ferramentas admin.
 -   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre TanStack Query, Zustand e Estrutura de Features.
+-   **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Tutorial passo a passo para integrar seu próprio backend.
 
 ---
 
-## ✨ Destaques da Versão 2.3
+## ✨ Destaques da Versão 3.0.0
 
-### 🧩 Arquitetura Modular (Features)
-Os componentes "gigantes" foram decompostos em unidades menores e especializadas (Admin, Posts, Auth). Isso facilita a manutenção e permite que novas funcionalidades sejam adicionadas sem afetar a estabilidade do core.
+### 🎨 UI Ultra-Slim & Premium
+Redesign completo do rodapé para uma barra minimalista elegante e revisão de contraste em toda a interface. O modo claro agora conta com legibilidade absoluta em todos os elementos de texto e metadados.
 
-### 🎮 Gamificação (XP System)
-Sistema de progressão real. Usuários ganham XP ao ler, curtir e comentar, subindo de nível e desbloqueando emblemas de "Veterano". Tudo persistido em tempo real no Firestore.
+### 🧭 Navegação Inteligente (Smart Nav)
+O menu de categorias agora é dinâmico: ele analisa o conteúdo em tempo real e oculta automaticamente seções que ainda não possuem artigos publicados, garantindo um portal sempre vibrante e pronto.
 
-### 🏠 QG de Comunidade (Dashboard)
-Um painel exclusivo para cada usuário gerenciar seu inventário de favoritos, acompanhar seu nível de experiência e personalizar sua identidade (Bio/AKA) com estética Modern Brutalist.
+### 🎮 Gamificação & QG (Dashboard)
+Sistema de progressão real com XP e níveis. O "Meu QG" permite que cada usuário acompanhe seu progresso, gerencie favoritos e personalize sua identidade com estética Modern Brutalist.
 
 ### ⚡ Performance "Instant-Browse"
-Implementação de estratégia de carregamento total na Home combinada com filtragem local. A busca global e a troca de categorias agora são instantâneas, sem telas de carregamento intermediárias.
+Utilização estratégica de cache local para filtragem instantânea. A busca global e a troca de categorias acontecem sem atrasos, proporcionando uma experiência de navegação fluida e moderna.
 
 ### 🔐 Segurança & Manutenção
 Painel Administrativo com ferramentas integradas para normalização de dados e gestão de categorias, protegido por rotas inteligentes que respeitam a hierarquia de acesso.
