@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { X, Gamepad2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useUIStore } from "../../../store/useUIStore";
@@ -146,6 +147,15 @@ export default function LoginModal() {
             ))}
           </div>
 
+          {/* Privacy Disclaimer */}
+          <div className="pt-2 text-center">
+            <p className={cn("text-[10px] uppercase font-retro tracking-wider opacity-60", isDark ? "text-gray-400" : "text-gray-500")}>
+              Ao entrar, você concorda com a nossa{" "}
+              <Link to="/privacy" onClick={() => setIsLoginModalOpen(false)} className="text-purple-500 hover:underline font-bold">
+                Política de Privacidade
+              </Link>.
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,19 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## ⚖️ [v3.0.1] - The Legal & SEO Update
+*Data: 13 de Maio de 2026*
+
+### ✨ Legal & Privacidade
+- **Política de Privacidade**: Criação da página oficial de privacidade (`/privacy`) abordando uso de Cookies (Google AdSense), armazenamento do Firebase Auth e LGPD.
+- **Cookie Consent Banner**: Implementação de um banner global, animado com framer-motion e design Neo-Brutalista, persistindo a aprovação do usuário no `localStorage`.
+- **Login Disclaimer**: Adição do termo de consentimento e link direto no Modal de Login para blindar o site juridicamente.
+
+### 🌐 SEO & Indexação
+- **Sitemap & Robots**: Atualização do `robots.txt` bloqueando rotas administrativas (`/admin`, `/editor`, `/dashboard`) e correção do `sitemap.xml` para apontar para as rotas corretas do React.
+
+---
+
 ## 🎨 [v3.0.0] - The Ultimate UI Polish & Dynamic Navigation
 *Data: 13 de Maio de 2026*
 

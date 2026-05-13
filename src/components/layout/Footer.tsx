@@ -51,13 +51,17 @@ export default function Footer() {
         </div>
 
         {/* Linha 2: Links rápidos inline */}
-        <div className={cn("flex items-center gap-4 text-[10px] font-retro font-bold uppercase tracking-wider", isDark ? "text-gray-400" : "text-gray-500")}>
+        <div className={cn("flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[10px] font-retro font-bold uppercase tracking-wider", isDark ? "text-gray-400" : "text-gray-500")}>
           <Link to="/about" className="hover:text-purple-500 transition-colors flex items-center gap-1">
             <ChevronRight className="w-3 h-3 text-purple-500" /> Sobre Nós
           </Link>
           <span className="opacity-30">|</span>
           <Link to="/contact" className="hover:text-purple-500 transition-colors flex items-center gap-1">
             <ChevronRight className="w-3 h-3 text-purple-500" /> Contatos
+          </Link>
+          <span className="opacity-30">|</span>
+          <Link to="/privacy" className="hover:text-purple-500 transition-colors flex items-center gap-1">
+            <ChevronRight className="w-3 h-3 text-purple-500" /> Privacidade
           </Link>
         </div>
       </div>
@@ -82,6 +86,9 @@ export default function Footer() {
             </Link>
             <Link to="/contact" className="hover:text-purple-500 transition-colors flex items-center gap-1.5">
               <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Contatos
+            </Link>
+            <Link to="/privacy" className="hover:text-purple-500 transition-colors flex items-center gap-1.5">
+              <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Privacidade
             </Link>
           </div>
 

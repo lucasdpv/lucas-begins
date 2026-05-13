@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /editor
+Disallow: /dashboard
+Disallow: /debug
 
 Sitemap: https://lucasbegins.com.br/sitemap.xml

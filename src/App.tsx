@@ -12,6 +12,7 @@ import Footer from "./components/layout/Footer";
 import Toast from "./components/ui/Toast";
 import LoginModal from "./features/auth/components/LoginModal";
 import BackToTop from "./components/ui/BackToTop";
+import CookieConsent from "./components/ui/CookieConsent";
 import SystemInitializer from "./components/SystemInitializer";
 import PostSkeleton from "./features/posts/components/PostSkeleton";
 import PostDetailSkeleton from "./features/posts/components/PostDetailSkeleton";
@@ -30,6 +31,7 @@ import DashboardPage from "./pages/DashboardPage";
 import DebugPage from "./pages/DebugPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ArchivePage from "./pages/ArchivePage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -107,6 +109,7 @@ export default function App() {
                 } />
                 <Route path="/archive" element={<ArchivePage />} />
                 <Route path="/debug" element={<DebugPage />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </motion.div>
@@ -115,6 +118,7 @@ export default function App() {
 
         <Footer />
         <BackToTop />
+        <CookieConsent />
         {isLoginModalOpen && <LoginModal />}
       </div>
     </div>
