@@ -4,6 +4,28 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🧩 [v3.1.0] - The Block Master & Drag Update
+*Data: 14 de Maio de 2026*
+
+### 🧱 Editor de Blocos (Block Editor)
+- **Drag-and-Drop Reordering**: Implementação de sistema de arraste e solte (`framer-motion`) para reordenação fluida de blocos de conteúdo, facilitando a montagem da estrutura do post.
+- **Floating Toolbar**: Substituição dos controles estáticos por uma barra de ferramentas flutuante no topo de cada bloco, contendo ações de movimentação e exclusão rápida.
+- **Enhanced Safety**: Adição de divisor visual no botão de exclusão para prevenir cliques acidentais e remoção do conflito visual com seletores de imagem.
+- **Unified Controls**: Centralização da lógica de blocos para garantir que capas e imagens de conteúdo sigam o mesmo padrão de recorte (16:9).
+
+### 🖼️ Mídia & Upload
+- **Global Image Stability**: Correção de bug crítico que disparava salvamento precoce do post durante o recorte de fotos. Agora todos os botões de modal são protegidos (`type="button"`).
+- **Aspect Ratio Sync**: Padronização de todas as imagens do corpo do texto para a proporção **16:9**, espelhando a estética das imagens de capa.
+
+### ⚙️ UX & Navegação
+- **Bottom Preview Toggle**: Adição de botões secundários de "Editar/Preview" no rodapé da página de edição e pré-visualização, otimizando o workflow em matérias extensas.
+- **Smooth Navigation**: Implementação de scroll automático para o topo ao trocar de abas no rodapé, garantindo uma revisão sem interrupções.
+
+### 🛠️ Manutenção
+- **Version Bump**: Atualização global para v3.1.0, focada em produtividade e estabilidade do CMS.
+
+---
+
 ## ⚖️ [v3.0.1] - The Legal & SEO Update
 *Data: 13 de Maio de 2026*
 
