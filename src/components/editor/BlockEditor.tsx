@@ -10,6 +10,7 @@ import {
   Heading,
   Play
 } from 'lucide-react';
+import { motion, Reorder, useDragControls } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import ImageUpload from '../ui/ImageUpload';
 
@@ -104,113 +105,25 @@ export default function BlockEditor({ value, onChange, isDark }: BlockEditorProp
 
   return (
     <div className="space-y-6">
-      {blocks.map((block, idx) => (
-        <div 
-          key={block.id} 
-          className={cn(
-            "group relative p-6 rounded-2xl border-2 transition-all animate-in slide-in-from-bottom-2 duration-300",
-            isDark ? "bg-gray-800 border-gray-700 hover:border-purple-500" : "bg-white border-gray-200 hover:border-black"
-          )}
-        >
-          {/* Controles do Bloco */}
-          <div className="absolute -left-4 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <ControlButton onClick={() => moveBlock(idx, -1)} icon={<ArrowUp size={16} />} isDark={isDark} disabled={idx === 0} />
-            <ControlButton onClick={() => moveBlock(idx, 1)} icon={<ArrowDown size={16} />} isDark={isDark} disabled={idx === blocks.length - 1} />
-          </div>
-
-          <div className="absolute -right-4 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <ControlButton onClick={() => removeBlock(block.id)} icon={<Trash2 size={16} />} isDark={isDark} variant="danger" />
-          </div>
-
-          {/* Conteúdo do Bloco */}
-          <div className="flex gap-4">
-            <div className="mt-1 opacity-30 cursor-grab active:cursor-grabbing">
-              <GripVertical size={20} />
-            </div>
-            
-            <div className="flex-1">
-              {block.type === 'heading' && (
-                <input 
-                  type="text"
-                  value={block.content}
-                  onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                  placeholder="Título da Seção..."
-                  className={cn(
-                    "w-full bg-transparent font-retro text-2xl font-bold uppercase outline-none focus:text-purple-500 transition-colors",
-                    isDark ? "text-white" : "text-black"
-                  )}
-                />
-              )}
-
-              {block.type === 'text' && (
-                <textarea 
-                  value={block.content}
-                  onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                  placeholder="Escreva seu texto aqui... (Suporta Markdown simples)"
-                  rows={4}
-                  className={cn(
-                    "w-full bg-transparent outline-none resize-none font-medium leading-relaxed",
-                    isDark ? "text-gray-300" : "text-gray-700"
-                  )}
-                />
-              )}
-
-              {block.type === 'image' && (
-                <div className="space-y-4">
-                  <ImageUpload 
-                    label="Upload de Imagem ou Link"
-                    initialValue={block.url || ""}
-                    onUploadComplete={(url) => updateBlock(block.id, { url })}
-                    folder="posts/content"
-                  />
-                  <input 
-                    type="text"
-                    value={block.content}
-                    onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                    placeholder="Legenda da imagem (opcional)..."
-                    className="w-full bg-transparent outline-none text-xs italic opacity-60"
-                  />
-                </div>
-              )}
-
-              {block.type === 'video' && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-black/10 dark:bg-black/40 border border-white/5">
-                    <Play size={20} className="text-purple-500" />
-                    <input 
-                      type="url"
-                      value={block.url || ''}
-                      onChange={(e) => updateBlock(block.id, { url: e.target.value })}
-                      placeholder="URL do vídeo do YouTube..."
-                      className="flex-1 bg-transparent outline-none text-sm font-mono"
-                    />
-                  </div>
-                  {block.url && (
-                    <div className="relative rounded-none overflow-hidden border-2 border-purple-500/20 aspect-video bg-black">
-                      <iframe
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${block.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/)?.[1]}`}
-                        title="YouTube video player"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {block.type === 'divider' && (
-                <div className="py-4 flex items-center gap-4">
-                  <div className="flex-1 h-1 bg-purple-500/20 rounded-full" />
-                  <Minus className="text-purple-500" />
-                  <div className="flex-1 h-1 bg-purple-500/20 rounded-full" />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
+      <Reorder.Group 
+        axis="y" 
+        values={blocks} 
+        onReorder={setBlocks} 
+        className="space-y-6"
+      >
+        {blocks.map((block, idx) => (
+          <BlockItem 
+            key={block.id}
+            block={block}
+            idx={idx}
+            blocks={blocks}
+            isDark={isDark}
+            updateBlock={updateBlock}
+            removeBlock={removeBlock}
+            moveBlock={moveBlock}
+          />
+        ))}
+      </Reorder.Group>
 
       {/* Toolbar Inferior */}
       <div className={cn(
@@ -224,6 +137,135 @@ export default function BlockEditor({ value, onChange, isDark }: BlockEditorProp
         <ToolbarButton onClick={() => addBlock('divider')} icon={<Minus size={18} />} label="Divisor" isDark={isDark} small />
       </div>
     </div>
+  );
+}
+
+// Sub-componente para cada item da lista (necessário para useDragControls)
+interface BlockItemProps {
+  block: Block;
+  idx: number;
+  blocks: Block[];
+  isDark: boolean;
+  updateBlock: (id: string, updates: Partial<Block>) => void;
+  removeBlock: (id: string) => void;
+  moveBlock: (index: number, direction: number) => void;
+}
+
+function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveBlock }: BlockItemProps) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item 
+      value={block}
+      dragListener={false}
+      dragControls={dragControls}
+      className="relative"
+    >
+      <div className={cn(
+        "group relative p-6 rounded-2xl border-2 transition-all duration-300",
+        isDark ? "bg-gray-800 border-gray-700 hover:border-purple-500" : "bg-white border-gray-200 hover:border-black"
+      )}>
+        {/* Controles do Bloco (Barra Flutuante Superior) */}
+        <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 p-1 rounded-xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-all z-30 scale-90 group-hover:scale-100 bg-white dark:bg-gray-800">
+          <ControlButton onClick={() => moveBlock(idx, -1)} icon={<ArrowUp size={14} />} isDark={isDark} disabled={idx === 0} />
+          <ControlButton onClick={() => moveBlock(idx, 1)} icon={<ArrowDown size={14} />} isDark={isDark} disabled={idx === blocks.length - 1} />
+          <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+          <ControlButton onClick={() => removeBlock(block.id)} icon={<Trash2 size={14} />} isDark={isDark} variant="danger" />
+        </div>
+
+        {/* Conteúdo do Bloco */}
+        <div className="flex gap-4">
+          <div 
+            onPointerDown={(e) => dragControls.start(e)}
+            className="mt-1 opacity-30 cursor-grab active:cursor-grabbing hover:opacity-100 transition-opacity flex items-center"
+          >
+            <GripVertical size={20} />
+          </div>
+          
+          <div className="flex-1">
+            {block.type === 'heading' && (
+              <input 
+                type="text"
+                value={block.content}
+                onChange={(e) => updateBlock(block.id, { content: e.target.value })}
+                placeholder="Título da Seção..."
+                className={cn(
+                  "w-full bg-transparent font-retro text-2xl font-bold uppercase outline-none focus:text-purple-500 transition-colors",
+                  isDark ? "text-white" : "text-black"
+                )}
+              />
+            )}
+
+            {block.type === 'text' && (
+              <textarea 
+                value={block.content}
+                onChange={(e) => updateBlock(block.id, { content: e.target.value })}
+                placeholder="Escreva seu texto aqui... (Suporta Markdown simples)"
+                rows={4}
+                className={cn(
+                  "w-full bg-transparent outline-none resize-none font-medium leading-relaxed",
+                  isDark ? "text-gray-300" : "text-gray-700"
+                )}
+              />
+            )}
+
+            {block.type === 'image' && (
+              <div className="space-y-4">
+                <ImageUpload 
+                  label="Imagem do Bloco (Upload ou Link)"
+                  initialValue={block.url || ""}
+                  onUploadComplete={(url) => updateBlock(block.id, { url })}
+                  folder="posts/content"
+                  aspect={16 / 9}
+                />
+                <input 
+                  type="text"
+                  value={block.content}
+                  onChange={(e) => updateBlock(block.id, { content: e.target.value })}
+                  placeholder="Legenda da imagem (opcional)..."
+                  className="w-full bg-transparent outline-none text-xs italic opacity-60"
+                />
+              </div>
+            )}
+
+            {block.type === 'video' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-black/10 dark:bg-black/40 border border-white/5">
+                  <Play size={20} className="text-purple-500" />
+                  <input 
+                    type="url"
+                    value={block.url || ''}
+                    onChange={(e) => updateBlock(block.id, { url: e.target.value })}
+                    placeholder="URL do vídeo do YouTube..."
+                    className="flex-1 bg-transparent outline-none text-sm font-mono"
+                  />
+                </div>
+                {block.url && (
+                  <div className="relative rounded-none overflow-hidden border-2 border-purple-500/20 aspect-video bg-black">
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${block.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&]{11})/)?.[1]}`}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {block.type === 'divider' && (
+              <div className="py-4 flex items-center gap-4">
+                <div className="flex-1 h-1 bg-purple-500/20 rounded-full" />
+                <Minus className="text-purple-500" />
+                <div className="flex-1 h-1 bg-purple-500/20 rounded-full" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Reorder.Item>
   );
 }
 

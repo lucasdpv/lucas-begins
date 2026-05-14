@@ -94,12 +94,14 @@ export default function ImageCropper({
 
           <div className="flex gap-4">
             <button
+              type="button"
               onClick={onCancel}
               className="flex-1 py-3 px-6 rounded-xl font-retro font-bold uppercase border-4 border-black hover:bg-black/10 transition-all"
             >
               Cancelar
             </button>
             <button
+              type="button"
               onClick={generateResult}
               className="flex-1 py-3 px-6 rounded-xl font-retro font-bold uppercase bg-purple-600 text-white border-4 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_rgba(0,0,0,1)] active:translate-y-[0px] transition-all flex items-center justify-center gap-2"
             >

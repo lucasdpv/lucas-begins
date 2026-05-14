@@ -26,9 +26,7 @@ export const uploadFile = async (
         initialQuality: 0.8 // 80% de qualidade
       };
       
-      console.log(`Comprimindo imagem original: ${file.size / 1024 / 1024} MB`);
       fileToUpload = await imageCompression(file, options);
-      console.log(`Imagem comprimida: ${fileToUpload.size / 1024 / 1024} MB`);
     } catch (error) {
       console.warn("Falha na compressão, enviando original...", error);
     }

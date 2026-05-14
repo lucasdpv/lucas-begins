@@ -345,22 +345,49 @@ export default function PostEditorPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row justify-end gap-4">
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, true)}
-              className={cn("flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold border-2 transition-colors", 
-                isDark ? "bg-gray-700 text-white border-gray-600 hover:bg-gray-600" : "bg-gray-200 text-gray-800 border-gray-400 hover:bg-gray-300")}
-            >
-              💾 Salvar Rascunho
-            </button>
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, false)}
-              className="flex items-center justify-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black hover:bg-purple-500 transition-colors"
-            >
-              <Save className="w-6 h-6" /> Publicar Matéria
-            </button>
+          <div className="pt-8 border-t-2 border-gray-300 dark:border-gray-700 flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Toggle de Atalho Inferior */}
+            <div className={cn("flex p-1.5 rounded-xl border-2 retro-card shrink-0", isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black")}>
+              {[
+                { key: "edit" as EditorTab, icon: <Pencil className="w-4 h-4" />, label: "Editar" },
+                { key: "preview" as EditorTab, icon: <Eye className="w-4 h-4" />, label: "Preview" },
+              ].map(({ key, icon, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(key);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all",
+                    activeTab === key
+                      ? "bg-purple-600 text-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      : "text-gray-500 hover:text-purple-500"
+                  )}
+                >
+                  {icon} {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-end gap-4 w-full lg:w-auto">
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, true)}
+                className={cn("flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-retro uppercase text-lg font-bold border-2 transition-colors", 
+                  isDark ? "bg-gray-700 text-white border-gray-600 hover:bg-gray-600" : "bg-gray-200 text-gray-800 border-gray-400 hover:bg-gray-300")}
+              >
+                💾 Salvar Rascunho
+              </button>
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, false)}
+                className="flex items-center justify-center gap-3 bg-purple-600 text-white px-10 py-4 rounded-xl font-retro uppercase text-lg font-bold retro-button border-black hover:bg-purple-500 transition-colors"
+              >
+                <Save className="w-6 h-6" /> Publicar Matéria
+              </button>
+            </div>
           </div>
         </form>
       ) : (
@@ -370,13 +397,39 @@ export default function PostEditorPage() {
             Modo de Pré-Visualização
           </div>
           <PostDetailPage previewPost={previewPost} />
-          <div className="mt-12 flex justify-center pb-8 border-t-4 border-dashed border-purple-500/50 pt-8 relative">
+          <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-t-4 border-dashed border-purple-500/50 pt-10 relative">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase border-2 border-black z-10">
               Ação de Teste
             </div>
+
+            {/* Toggle de Atalho Inferior no Preview */}
+            <div className={cn("flex p-1.5 rounded-xl border-2 retro-card shrink-0", isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black")}>
+              {[
+                { key: "edit" as EditorTab, icon: <Pencil className="w-4 h-4" />, label: "Editar" },
+                { key: "preview" as EditorTab, icon: <Eye className="w-4 h-4" />, label: "Preview" },
+              ].map(({ key, icon, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(key);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all",
+                    activeTab === key
+                      ? "bg-purple-600 text-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      : "text-gray-500 hover:text-purple-500"
+                  )}
+                >
+                  {icon} {label}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={(e) => handleSubmit(e, false)}
-              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20 hover:bg-yellow-300 transition-colors"
+              className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20 hover:bg-yellow-300 transition-colors w-full md:w-auto"
             >
               <Save className="w-7 h-7" /> Lançar Revista (Publicar)
             </button>
