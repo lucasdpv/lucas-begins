@@ -62,18 +62,18 @@ export default function HomePage() {
         <link rel="canonical" href="https://www.lucasbegins.com.br/" />
         <meta
           name="description"
-          content="Bem-vindo ao BeginsProject (antigo Lucas Begins/Projeto Begins). Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
+          content="Bem-vindo ao BeginsProject. Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
         />
         <meta name="keywords" content="BeginsProject, Lucas Begins, Projeto Begins, Lucas Begins Blog, Revista Retro, Games Retro, Cultura Pop, Reviews de Jogos" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.lucasbegins.com.br/" />
         <meta property="og:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
-        <meta property="og:image" content="https://lucasbegins.com.br/og-image.jpg" />
+        <meta property="og:image" content="https://www.lucasbegins.com.br/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta name="twitter:description" content="Reviews, nostalgia e cultura gamer brasileira." />
-        <meta name="twitter:image" content="https://lucasbegins.com.br/og-image.jpg" />
+        <meta name="twitter:image" content="https://www.lucasbegins.com.br/og-image.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

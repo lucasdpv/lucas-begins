@@ -12,5 +12,5 @@
   <circle cx="408" cy="256" r="16" fill="#A855F7"/>
   
   <!-- Initials LB -->
-  <text x="256" y="264" font-family="'Inter', system-ui, sans-serif" font-weight="900" font-size="80" fill="#A855F7" text-anchor="middle" dominant-baseline="middle" letter-spacing="4">LB</text>
+  <text x="256" y="264" font-family="'Inter', system-ui, sans-serif" font-weight="900" font-size="80" fill="#A855F7" text-anchor="middle" dominant-baseline="middle" letter-spacing="4">BP</text>
 </svg>

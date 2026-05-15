@@ -1,6 +1,6 @@
-# 📜 Histórico de Evolução | Lucas Begins
+# 📜 Histórico de Evolução | BeginsProject
 
-Este documento registra os marcos de desenvolvimento, melhorias de interface e implementações técnicas do portal **Lucas Begins**.
+Este documento registra os marcos de desenvolvimento, melhorias de interface e implementações técnicas do portal **BeginsProject**.
 
 ---
 
