@@ -236,7 +236,7 @@ export default function MobileMenu({
               <p className="text-[10px] font-retro font-bold uppercase opacity-40 mb-4 tracking-[0.2em]">Siga-nos nas Redes</p>
               <div className="flex gap-4">
                 <a
-                  href="https://www.threads.com/@lucasbegins"
+                  href="https://www.threads.com/@beginsproject"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
@@ -247,7 +247,7 @@ export default function MobileMenu({
                   <ThreadsIcon className="w-6 h-6" />
                 </a>
                 <a
-                  href="https://www.instagram.com/lucasbegins/"
+                  href="https://www.instagram.com/beginsproject/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(

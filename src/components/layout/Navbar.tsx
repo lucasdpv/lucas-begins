@@ -179,7 +179,7 @@ export default function Navbar() {
             {/* Social Group (Desktop Only) */}
             <div className="hidden xl:flex items-center gap-3 pr-6 border-r-2 border-purple-500/10">
                 <a
-                  href="https://www.threads.com/@lucasbegins"
+                  href="https://www.threads.com/@beginsproject"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
@@ -197,7 +197,7 @@ export default function Navbar() {
                 </a>
                 
                 <a
-                  href="https://www.instagram.com/lucasbegins/"
+                  href="https://www.instagram.com/beginsproject"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
