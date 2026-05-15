@@ -119,8 +119,8 @@ export function useAdminActions(posts: Post[]) {
   };
 
   const handleReply = (email: string, name: string) => {
-    const subject = encodeURIComponent(`Re: Contato Lucas Begins - Olá ${name}`);
-    const body = encodeURIComponent(`Olá ${name},\n\nRecebi sua mensagem através do portal Lucas Begins e gostaria de dar um retorno.\n\n---\nSua mensagem:\n[Conteúdo da mensagem]\n\nMinha resposta:\n\n`);
+    const subject = encodeURIComponent(`Re: Contato BeginsProject - Olá ${name}`);
+    const body = encodeURIComponent(`Olá ${name},\n\nRecebi sua mensagem através do portal BeginsProject e gostaria de dar um retorno.\n\n---\nSua mensagem:\n[Conteúdo da mensagem]\n\nMinha resposta:\n\n`);
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
     window.open(gmailUrl, '_blank');
   };

@@ -128,7 +128,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-in fade-in duration-500">
       <Helmet>
-        <title>Meu QG | Lucas Begins</title>
+        <title>Meu QG | BeginsProject</title>
       </Helmet>
 
       {/* Header do Dashboard */}

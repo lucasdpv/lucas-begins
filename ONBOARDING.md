@@ -1,11 +1,11 @@
-# 🕹️ Bem-vindo ao Lucas Begins — Guia do Desenvolvedor
+# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor
 
 Este guia foi criado para que você entenda rapidamente como o projeto funciona e como você pode contribuir de forma eficiente.
 
 ---
 
 ## 🌟 1. Visão Geral e Estética
-O **Lucas Begins** não é apenas um blog; é uma experiência visual. Nossa estética é focada no **Retro-Hardware**, com sombras sólidas, bordas grossas e efeitos de *scanline*.
+O **BeginsProject** não é apenas um blog; é uma experiência visual. Nossa estética é focada no **Retro-Hardware**, com sombras sólidas, bordas grossas e efeitos de *scanline*.
 
 - **Temas**: Temos um modo Escuro (padrão) e um modo Claro ("Lavender Retro" inspirado no SNES).
 - **UX**: Interações devem ser rápidas, com micro-animações e feedback visual imediato (Optimistic UI).
@@ -50,7 +50,7 @@ src/
 
 ---
 
-## 🧠 5. Fluxo de Trabalho (O "Novo Jeito Lucas Begins")
+## 🧠 5. Fluxo de Trabalho (O "Novo Jeito BeginsProject")
 
 ### A. Adicionando dados:
 1.  Defina o Schema Zod em `src/features/[feature]/schemas.ts`.

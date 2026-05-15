@@ -1,4 +1,4 @@
-# ⚙️ Documentação Técnica — Lucas Begins
+# ⚙️ Documentação Técnica — BeginsProject
 
 Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.0.0**.
 

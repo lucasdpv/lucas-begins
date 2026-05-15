@@ -66,7 +66,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
   };
 
   const shareWhatsApp = () => {
-    const text = `Confira esse artigo no Lucas Begins: ${post.title}\n\n${postUrl}`;
+    const text = `Confira esse artigo no BeginsProject: ${post.title}\n\n${postUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     onClose();
   };

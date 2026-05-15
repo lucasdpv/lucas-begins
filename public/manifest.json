@@ -1,6 +1,6 @@
 {
-  "name": "Lucas Begins",
-  "short_name": "LucasBegins",
+  "name": "BeginsProject",
+  "short_name": "BeginsProject",
   "description": "Sua revista digital retro de games e tecnologia.",
   "start_url": "/",
   "display": "standalone",
