@@ -28,8 +28,9 @@ export default function ArchivePage() {
   return (
     <div className="flex flex-col gap-10">
       <Helmet>
-        <title>Todos os Artigos | Lucas Begins</title>
-        <meta name="description" content="Arquivo completo de artigos, reviews e notícias do portal Lucas Begins." />
+        <title>Todos os Artigos | BeginsProject</title>
+        <meta name="description" content="Arquivo completo de artigos, reviews e notícias do portal BeginsProject (antigo Lucas Begins). Tudo sobre a cultura retro em um só lugar." />
+        <meta name="keywords" content="BeginsProject, Lucas Begins, Arquivo de Posts, Reviews de Games Retro, Notícias Retro Gaming" />
       </Helmet>
 
       {/* Voltar */}

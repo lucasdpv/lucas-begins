@@ -4,6 +4,26 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v3.2.0] - The Cockpit UX & Responsive Discovery
+*Data: 15 de Maio de 2026*
+
+### 🛸 Navbar: Cockpit "Command Center"
+- **Unified Cockpit Design**: Redesign radical da barra de navegação para uma estética de "Centro de Comando". Centralização da barra de busca como peça de destaque, equilibrada por blocos de branding à esquerda e utilitários à direita.
+- **Improved Spatial Hierarchy**: Introdução de divisores verticais sutis para separar zonas de Branding, Navegação e Ferramentas, eliminando a poluição visual e melhorando o rastreio ocular.
+- **Utility Slot Upgrades**: Transformação dos ícones sociais em "Action Slots" com molduras quadradas neo-brutalistas, cores de marca permanentes e efeitos de brilho (glow) dinâmicos.
+- **UX Refinements**: Adição de scanlines decorativas no campo de busca e otmigação do contraste dos placeholders para legibilidade absoluta em todos os temas.
+
+### 📱 Mobile Responsive Mastery
+- **Horizontal Discovery Modules**: Re-engenharia das seções de "Reviews" e "Dossiês" para smartphones. Agora funcionam como módulos de rolagem horizontal com *snap-scrolling*, permitindo navegação fluida sem estender excessivamente o feed vertical.
+- **Smart Mobile Top Bar**: Fixação da lógica de visibilidade mobile. Apenas Logo, Busca e Menu Hambúrguer permanecem visíveis, com todas as outras ferramentas integradas de forma limpa dentro do menu lateral.
+- **Balanced Alignment**: Implementação de `justify-between` global para garantir que elementos mobile fiquem perfeitamente ancorados nos cantos, eliminando deslocamentos visuais.
+
+### 🛠️ Estabilidade & Sintaxe
+- **JSX Architecture Fix**: Correção de aninhamentos complexos de `div` e `AnimatePresence` que causavam quebras no layout mobile durante a transição para o novo design centralizado.
+- **Version Bump**: Atualização global para v3.2.0, focada em design de elite e acessibilidade mobile.
+
+---
+
 ## 🧩 [v3.1.0] - The Block Master & Drag Update
 *Data: 14 de Maio de 2026*
 

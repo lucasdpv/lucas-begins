@@ -102,7 +102,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     return (
       <div className="animate-in fade-in max-w-5xl mx-auto py-20 text-center">
         <Helmet>
-          <title>Não Encontrado | Lucas Begins</title>
+          <title>Não Encontrado | BeginsProject</title>
         </Helmet>
         <h1 className="font-retro text-4xl mb-4">Post não encontrado</h1>
         <button onClick={() => navigate("/")} className="text-purple-500 underline font-retro">Voltar ao início</button>
@@ -133,21 +133,21 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   return (
     <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full relative">
       <Helmet>
-        <title>{post.title ? `${post.title} | Lucas Begins` : "Matéria | Lucas Begins"}</title>
+        <title>{post.title ? `${post.title} | BeginsProject` : "Matéria | BeginsProject"}</title>
         <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
         
         {/* OpenGraph / Facebook */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={window.location.href} />
-        <meta property="og:title" content={post.title || "Lucas Begins"} />
+        <meta property="og:title" content={post.title || "BeginsProject"} />
         <meta property="og:description" content={post.excerpt || ""} />
-        <meta property="og:site_name" content="Lucas Begins" />
+        <meta property="og:site_name" content="BeginsProject" />
         {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={window.location.href} />
-        <meta name="twitter:title" content={post.title || "Lucas Begins"} />
+        <meta name="twitter:title" content={post.title || "BeginsProject"} />
         <meta name="twitter:description" content={post.excerpt || ""} />
         {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
         

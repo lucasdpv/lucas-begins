@@ -5,7 +5,7 @@
 
 // LocalStorage keys
 export const STORAGE_KEYS = {
-  THEME: "lucas_begins_theme",
+  THEME: "beginsproject_theme",
   DRAFT: "retro_blog_draft",
   MIGRATION_VERSION: "retro_blog_migration_version",
 } as const;

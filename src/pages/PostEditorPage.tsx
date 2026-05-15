@@ -139,7 +139,7 @@ export default function PostEditorPage() {
   return (
     <div className="animate-in fade-in max-w-5xl mx-auto">
       <Helmet>
-        <title>{post ? "Editar Fase" : "Nova Fase"} | Lucas Begins</title>
+        <title>{post ? "Editar Fase" : "Nova Fase"} | BeginsProject</title>
       </Helmet>
 
       {/* Cabeçalho com abas */}

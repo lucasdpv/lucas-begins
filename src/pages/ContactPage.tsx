@@ -15,7 +15,7 @@ export default function ContactPage() {
   const [dialogText, setDialogText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
-  const fullText = "Saudações, viajante! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova fase? Envie seu pergaminho de contato abaixo e eu responderei em breve! 🎮";
+  const fullText = "Fala galera!!! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova fase? Envie sua mensagem abaixo e eu responderei em breve! 🎮";
 
   useEffect(() => {
     let i = 0;
@@ -70,8 +70,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-[85vh] py-12 px-4 relative overflow-hidden flex flex-col items-center">
       <Helmet>
-        <title>Quest Log: Contato | Lucas Begins</title>
-        <meta name="description" content="Fale com o Player 1 do Lucas Begins." />
+        <title>Quest Log: Contato | BeginsProject</title>
+        <meta name="description" content="Fale com o Player 1 do BeginsProject." />
       </Helmet>
 
       {/* Efeito de Scanlines */}

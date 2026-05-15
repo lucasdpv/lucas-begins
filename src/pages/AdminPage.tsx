@@ -57,7 +57,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-[80vh] py-8 px-4 md:px-8 relative overflow-hidden animate-in fade-in duration-700">
       <Helmet>
-        <title>Painel de Controle | Lucas Begins</title>
+        <title>Painel de Controle | BeginsProject</title>
       </Helmet>
 
       {/* Elementos de Fundo Decorativos */}

@@ -58,26 +58,27 @@ export default function HomePage() {
     <div className="flex flex-col gap-12">
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
-        <title>Lucas Begins | Portal de Games, Reviews e Cultura Pop</title>
+        <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
         <link rel="canonical" href="https://www.lucasbegins.com.br/" />
         <meta
           name="description"
-          content="Seu portal premium de games e cultura pop. Reviews profundos, nostalgia, RPG, cinema e as últimas novidades da cultura gamer brasileira."
+          content="Bem-vindo ao BeginsProject (antigo Lucas Begins/Projeto Begins). Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
         />
+        <meta name="keywords" content="BeginsProject, Lucas Begins, Projeto Begins, Lucas Begins Blog, Revista Retro, Games Retro, Cultura Pop, Reviews de Jogos" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.lucasbegins.com.br/" />
-        <meta property="og:title" content="Lucas Begins | Portal de Games e Cultura Pop" />
+        <meta property="og:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
         <meta property="og:image" content="https://lucasbegins.com.br/og-image.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Lucas Begins | Portal de Games e Cultura Pop" />
+        <meta name="twitter:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta name="twitter:description" content="Reviews, nostalgia e cultura gamer brasileira." />
         <meta name="twitter:image" content="https://lucasbegins.com.br/og-image.jpg" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            name: "Lucas Begins",
+            name: "BeginsProject",
             url: "https://www.lucasbegins.com.br/",
             potentialAction: {
               "@type": "SearchAction",
@@ -218,7 +219,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Right header */}
+          {/* Right header (Visible ONLY on Desktop, as part of the sidebar header row) */}
           {reviewPosts.length > 0 && isDefaultView && (
             <div className={cn(
               "hidden lg:flex items-center gap-3 pb-5",
@@ -323,17 +324,34 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* RIGHT: Full-width review mini cards */}
+          {/* RIGHT: Full-width review mini cards (Scrolling on mobile) */}
           {reviewPosts.length > 0 && isDefaultView && (
-            <aside className="hidden lg:block">
-              <div className="flex flex-col gap-3">
+            <aside className="block lg:col-span-1">
+              {/* REVIEWS HEADER (Mobile Only - stacks here) */}
+              <div className={cn(
+                "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6",
+                isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
+              )}>
+                <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
+                <div>
+                  <h2 className={cn("font-retro text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                    Reviews
+                  </h2>
+                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
+                    Análises com Nota
+                  </p>
+                </div>
+              </div>
+
+              {/* Reviews Scroll Container */}
+              <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
                 {reviewPosts.map((post, i) => (
                   <motion.article
                     key={post.id}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.07, type: "spring", stiffness: 90 }}
-                    className="group relative w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.5)] transition-shadow cursor-pointer"
+                    className="group relative min-w-[280px] lg:min-w-0 w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.5)] transition-shadow cursor-pointer snap-center"
                   >
                     <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
 
@@ -370,28 +388,32 @@ export default function HomePage() {
                     </div>
                   </motion.article>
                 ))}
+              </div>
 
-                {/* DOSSIÊS */}
-                {dossiePosts.length > 0 && (
-                  <>
-                    <div className="flex items-center gap-3 pt-4 pb-2 mt-2">
-                      <div className="w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
-                      <div>
-                        <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none", isDark ? "text-white" : "text-snes-accent")}>
-                          Dossiês
-                        </h2>
-                        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
-                          Reportagens Especiais
-                        </p>
-                      </div>
+              {/* DOSSIÊS (Mobile version needs its own header here since the sidebar stacks) */}
+              {dossiePosts.length > 0 && (
+                <div className="mt-8 lg:mt-4">
+                  <div className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0">
+                    <div className="w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
+                    <div>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-white" : "text-snes-accent")}>
+                        Dossiês
+                      </h2>
+                      <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
+                        Reportagens Especiais
+                      </p>
                     </div>
+                  </div>
+                  
+                  {/* Dossies Scroll Container */}
+                  <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
                     {dossiePosts.map((post, i) => (
                       <motion.article
                         key={post.id}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: (i + reviewPosts.length) * 0.07, type: "spring", stiffness: 90 }}
-                        className="group relative w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(59,130,246,0.5)] transition-shadow cursor-pointer"
+                        className="group relative min-w-[280px] lg:min-w-0 w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(59,130,246,0.5)] transition-shadow cursor-pointer snap-center"
                       >
                         <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
 
@@ -417,9 +439,9 @@ export default function HomePage() {
                         </div>
                       </motion.article>
                     ))}
-                  </>
-                )}
-              </div>
+                  </div>
+                </div>
+              )}
             </aside>
           )}
         </div>

@@ -59,12 +59,12 @@ export default async function handler(req, res) {
       <html lang="pt-BR">
       <head>
         <meta charset="UTF-8">
-        <title>${post.title} | Lucas Begins</title>
+        <title>${post.title} | BeginsProject</title>
         <meta name="description" content="${post.excerpt || post.title}" />
         
         <!-- Open Graph -->
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Lucas Begins" />
+        <meta property="og:site_name" content="BeginsProject" />
         <meta property="og:title" content="${post.title}" />
         <meta property="og:description" content="${post.excerpt || post.title}" />
         <meta property="og:image" content="${post.imageUrl || defaultImage}" />

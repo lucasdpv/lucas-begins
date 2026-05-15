@@ -1,8 +1,8 @@
-# 🕹️ Lucas Begins - Retro Gaming Journal (v3.0.0)
+# 🕹️ BeginsProject - Retro Gaming Journal (v3.2.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **Lucas Begins** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.0.0, o projeto atinge seu ápice estético com uma interface ultra-refinada, navegação inteligente baseada em conteúdo e acessibilidade total para todos os temas.
+O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.0.0, o projeto atinge seu ápice estético com uma interface ultra-refinada, navegação inteligente baseada em conteúdo e acessibilidade total para todos os temas.
 
 ---
 
@@ -52,8 +52,8 @@ Painel Administrativo com ferramentas integradas para normalização de dados e 
 
 1.  **Clone e Instale:**
     ```bash
-    git clone https://github.com/lucasdpv/lucas-begins.git
-    cd lucas-begins
+    git clone https://github.com/lucasdpv/begins-project.git
+    cd begins-project
     npm install
     ```
 
