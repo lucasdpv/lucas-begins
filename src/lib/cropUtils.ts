@@ -38,7 +38,7 @@ export const getCroppedImg = async (
         return;
       }
       resolve(blob);
-    }, 'image/jpeg', 0.9);
+    }, 'image/webp', 0.95);
   });
 };
 

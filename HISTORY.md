@@ -4,6 +4,26 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.3.0] - The Editorial Precision Update
+*Data: 15 de Maio de 2026*
+
+### 🛠️ Block Editor: UI Stabilization & Precision
+- **Advanced Command Dock**: Redesign radical da barra de ferramentas do editor. Transição para um layout vertical (ícone sobre texto) que otimiza o espaço horizontal e elimina sobreposições em telas menores.
+- **Stable Interaction Logic**: Implementação de `type="button"` em todos os controles de imagem e editor, eliminando o bug de "pulos" de página (page jumps) e envios de formulário acidentais.
+- **Editorial Buttons**: Refinamento estético dos botões com tipografia retro ampliada (`11px`), tracking generoso e efeitos de hover em roxo editorial com escala dinâmica.
+- **Slim Interface**: Otimização do container de ferramentas com remoção de paddings excessivos e ajuste de margens para um workflow mais direto e compacto.
+
+### 🖼️ Media & Layout Intelligence
+- **Dynamic Aspect Ratio**: Implementação de proporções inteligentes para upload de imagens. Agora o editor sugere automaticamente **16:9** para imagens centralizadas e **4:3** para layouts "Lado a Lado", garantindo harmonia visual instantânea.
+- **Text Overflow Protection**: Blindagem global contra textos longos sem espaços (character spam). Implementação de `break-words` e `overflow-hidden` tanto no editor quanto no renderer final, prevenindo quebras de layout.
+- **Magazine Row Fixes**: Estabilização do componente de imagem lateral com suporte a alinhamento dinâmico e quebra de linha forçada para descrições longas.
+
+### ⚙️ Manutenção & Versão
+- **Architecture Cleanup**: Refatoração de componentes internos para o nível superior, melhorando o ciclo de vida do React e prevenindo bugs de sombra/referência.
+- **Version Bump**: Atualização global para v3.3.0, focada em precisão editorial e estabilidade de interface.
+
+---
+
 ## 💎 [v3.2.0] - The Cockpit UX & Responsive Discovery
 *Data: 15 de Maio de 2026*
 

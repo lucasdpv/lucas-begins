@@ -51,21 +51,23 @@ export default function ImageUpload({
     setProgress(0);
 
     try {
-      // Opções de compressão
+      // Opções de compressão - WebP suporta transparência e compressão alta
       const options = {
         maxSizeMB: 1,
         maxWidthOrHeight: 1920,
         useWebWorker: true,
-        initialQuality: 0.8
+        initialQuality: 0.8,
+        fileType: 'image/webp' as any // Força saída em WebP para manter transparência
       };
 
-      // Converter Blob em File para compressão
-      const imageFile = new File([blob], "upload.jpg", { type: 'image/jpeg' });
+      // Tenta manter o tipo original se possível, ou vai para webp
+      const outputType = blob.type === 'image/png' ? 'image/png' : 'image/webp';
+      const imageFile = new File([blob], `upload.${outputType.split('/')[1]}`, { type: outputType });
       
       // Comprimir
       const compressedFile = await imageCompression(imageFile, options);
       
-      const fileName = `${Date.now()}-compressed.jpg`;
+      const fileName = `${Date.now()}-compressed.webp`;
       const downloadUrl = await uploadFile(compressedFile, `${folder}/${fileName}`, (p) => {
         setProgress(Math.round(p));
       });
@@ -174,7 +176,11 @@ export default function ImageUpload({
                   <div className="bg-purple-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg text-white">
                     <Upload className="w-5 h-5" />
                   </div>
-                  <button onClick={removeImage} className="bg-red-500 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-red-600 transition-colors text-white">
+                  <button 
+                    type="button"
+                    onClick={removeImage} 
+                    className="bg-red-500 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-red-600 transition-colors text-white"
+                  >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -190,7 +196,11 @@ export default function ImageUpload({
                         placeholder="Mudar URL..."
                         onClick={(e) => e.stopPropagation()}
                       />
-                      <button onClick={removeImage} className="p-1.5 hover:text-red-400 transition-colors text-white/60">
+                      <button 
+                        type="button"
+                        onClick={removeImage} 
+                        className="p-1.5 hover:text-red-400 transition-colors text-white/60"
+                      >
                         <X className="w-4 h-4" />
                       </button>
                    </div>
