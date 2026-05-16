@@ -1,4 +1,4 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v3.2.0)
+# 🕹️ BeginsProject - Retro Gaming Journal (v3.4.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 

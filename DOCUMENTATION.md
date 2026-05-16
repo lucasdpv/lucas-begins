@@ -1,6 +1,6 @@
 # ⚙️ Documentação Técnica — BeginsProject
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.0.0**.
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.4.0**.
 
 ---
 
@@ -72,4 +72,4 @@ A estética do portal evoluiu para um Neo-Brutalismo refinado:
 - **Acessibilidade**: Contraste otimizado para o modo claro (SNES).
 
 ---
-**Documentação atualizada em: 13 de Maio de 2026.**
+**Documentação atualizada em: 16 de Maio de 2026.**

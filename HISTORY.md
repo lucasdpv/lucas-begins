@@ -4,6 +4,25 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v3.4.0] - The Editorial Flow & Data Integrity Update
+*Data: 16 de Maio de 2026*
+
+### 🛠️ Block Editor: Logic & Persistence
+- **Component Integrity**: Refatoração do parser Markdown para respeitar a individualidade de blocos de texto consecutivos. Agora, componentes de texto separados no editor permanecem independentes após o preview.
+- **Enhanced Info Box**: Implementação de suporte a **títulos customizados** em boxes de informação. O cabeçalho preto agora é editável e permite personalização total por bloco.
+- **Multi-line Consistency**: Estabilização do suporte a múltiplas linhas e listas (bullet points) dentro de boxes de informação e pullquotes, garantindo que a formatação não se perca ao alternar modos de edição.
+
+### 🎨 Editorial Aesthetics & Alignment
+- **Professional Justification**: Implementação de `text-align: justify` e hifenização automática em todos os parágrafos de artigos, eliminando bordas irregulares e otimizando o fluxo visual ao redor de imagens flutuantes.
+- **Smart Float Alignment**: Refinamento das margens de imagens flutuantes (`margin-top`) para um encaixe perfeito com a primeira linha do parágrafo adjacente.
+- **Visual Depth**: Adição de sombras sólidas e bordas de alto contraste nos títulos de boxes de informação, reforçando a estética de recordatórios de HQ.
+
+### 🔗 Robust Link Handling
+- **Double-Link Prevention**: Implementação de estratégia de tokenização para processamento de links, eliminando conflitos entre links manuais Markdown e auto-links de URLs puras.
+- **Intelligent Truncation**: Sistema de encurtamento de links que preserva o hostname para limpeza visual, mantendo a URL completa funcional no atributo `href`.
+
+---
+
 ## 🎨 [v3.3.0] - The Editorial Precision Update
 *Data: 15 de Maio de 2026*
 

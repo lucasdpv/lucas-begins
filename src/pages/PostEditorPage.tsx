@@ -431,7 +431,7 @@ export default function PostEditorPage() {
               onClick={(e) => handleSubmit(e, false)}
               className="flex items-center gap-3 bg-yellow-400 text-black border-2 border-black px-10 py-5 rounded-xl font-retro uppercase font-bold retro-button text-xl z-20 hover:bg-yellow-300 transition-colors w-full md:w-auto"
             >
-              <Save className="w-7 h-7" /> Lançar Revista (Publicar)
+              <Save className="w-7 h-7" /> Publicar Matéria
             </button>
           </div>
         </div>

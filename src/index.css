@@ -52,17 +52,29 @@
 /* ============================================================
    Drop-cap estilo revista (primeiro parágrafo do artigo)
    ============================================================ */
+.magazine-article {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 .magazine-article::first-letter {
   font-family: var(--font-retro);
-  font-size: 5.5rem;
+  font-size: 4rem;
   float: left;
-  line-height: 0.7;
-  margin-right: 0.5rem;
-  margin-top: 0.2rem;
+  line-height: 0.8;
+  margin-right: 0.75rem;
+  margin-top: 0.1rem;
   color: var(--magazine-drop-cap-color, #a855f7);
   text-shadow: var(--magazine-drop-cap-shadow, 4px 4px 0px rgba(0,0,0,0.2));
   font-weight: bold;
   padding: 0.1em;
+}
+
+.article-paragraph {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 
 /* ============================================================
@@ -70,16 +82,20 @@
    ============================================================ */
 .magazine-float-left {
   float: left;
-  margin-right: 2rem;
+  margin-right: 2.5rem;
   margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
   max-width: 45%;
+  shape-outside: rect(0, 100%, 100%, 0);
 }
 
 .magazine-float-right {
   float: right;
-  margin-left: 2rem;
+  margin-left: 2.5rem;
   margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
   max-width: 45%;
+  shape-outside: rect(0, 100%, 100%, 0);
 }
 
 .magazine-columns-2 {

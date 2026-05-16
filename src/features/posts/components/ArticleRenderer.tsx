@@ -188,10 +188,53 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
   const lines = content.split('\n');
 
   const formatInline = (text: string) => {
-    const raw = text
+    const links: Record<string, { url: string, label: string }> = {};
+    let linkCounter = 0;
+
+    const truncateText = (str: string, maxLength = 50) => {
+      if (!str) return "";
+      if (str.startsWith('http')) {
+        try {
+          const urlObj = new URL(str);
+          const displayUrl = urlObj.hostname + (urlObj.pathname !== '/' ? urlObj.pathname : '');
+          if (displayUrl.length <= maxLength) return displayUrl;
+          return displayUrl.substring(0, maxLength) + "...";
+        } catch {
+          return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
+        }
+      }
+      return str;
+    };
+
+    // 1. Extrair links de Markdown [texto](url)
+    let processed = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+      const id = `__LINK_${linkCounter++}__`;
+      links[id] = { url, label: truncateText(label) };
+      return id;
+    });
+
+    // 2. Extrair URLs soltas (auto-link), ignorando as que já viraram tokens
+    processed = processed.replace(/(https?:\/\/[^\s<]+)/g, (url) => {
+      const id = `__LINK_${linkCounter++}__`;
+      links[id] = { url, label: truncateText(url) };
+      return id;
+    });
+
+    // 3. Bold e Italic (agora seguro, pois links são tokens)
+    processed = processed
       .replace(/\*\*(.*?)\*\*/g, `<strong class="font-bold text-purple-600 ${isDark ? 'dark:text-purple-400' : ''}">$1</strong>`)
       .replace(/\*(.*?)\*/g, `<em class="italic text-yellow-600 ${isDark ? 'dark:text-yellow-400' : ''}">$1</em>`);
-    return DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['strong', 'em'], ALLOWED_ATTR: ['class'] });
+
+    // 4. Restaurar os links como HTML real
+    Object.entries(links).forEach(([id, data]) => {
+      const linkHtml = `<a href="${data.url}" class="text-purple-500 hover:text-purple-400 underline decoration-2 underline-offset-4 transition-colors font-bold" target="_blank" rel="noopener noreferrer">${data.label}</a>`;
+      processed = processed.replace(id, linkHtml);
+    });
+    
+    return DOMPurify.sanitize(processed, { 
+      ALLOWED_TAGS: ['strong', 'em', 'a'], 
+      ALLOWED_ATTR: ['class', 'href', 'target', 'rel']
+    });
   };
 
   // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo
@@ -220,9 +263,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
     // 1. Heading
     if (line.startsWith('## ')) {
       renderedLines.push(
-        <h2 key={i} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}>
-          {line.slice(3).trim()}
-        </h2>
+        <h2 key={i} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}
+            dangerouslySetInnerHTML={{ __html: formatInline(line.slice(3).trim()) }}
+        />
       );
       i++;
       continue;
@@ -249,12 +292,14 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
           isDark ? "bg-purple-900/10 border-purple-500" : "bg-purple-50 border-purple-400 shadow-[8px_8px_0_rgba(0,0,0,1)]"
         )}>
           <div className="absolute top-2 left-4 text-8xl opacity-10 font-retro select-none">"</div>
-          <p className={cn(
-            "font-retro text-3xl md:text-5xl font-bold leading-tight relative z-10 tracking-tighter",
+          <div className={cn(
+            "font-retro text-3xl md:text-5xl font-bold leading-tight relative z-10 tracking-tighter space-y-4",
             isDark ? "text-white" : "text-purple-900"
           )}>
-            {pullquoteContent.trim()}
-          </p>
+            {pullquoteContent.trim().split('\n').map((line, idx) => (
+              <p key={idx} dangerouslySetInnerHTML={{ __html: formatInline(line.trim()) }} />
+            ))}
+          </div>
           <div className="absolute bottom-2 right-4 text-8xl opacity-10 font-retro rotate-180 select-none">"</div>
         </blockquote>
       );
@@ -264,6 +309,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
 
     // 3.1 Info Box
     if (line.startsWith(':::info-box')) {
+      const titleMatch = line.match(/\{#title-([^}]+)\}/);
+      const customTitle = titleMatch ? titleMatch[1] : "Extra Stage: Info";
+      
       let infoContent = "";
       i++;
       while (i < lines.length && !lines[i].startsWith(':::')) {
@@ -271,11 +319,25 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
         i++;
       }
       renderedLines.push(
-        <aside key={i} className="magazine-info-box my-12 font-medium leading-relaxed clear-both break-words overflow-hidden">
-          <div className="absolute -top-5 left-6 bg-purple-600 text-white px-4 py-1 font-retro text-xs font-bold uppercase border-2 border-black">
-            Extra Stage: Info
+        <aside key={i} className="magazine-info-box my-12 font-medium leading-relaxed clear-both break-words">
+          <div className="absolute -top-5 left-6 bg-black text-white px-4 py-1 font-retro text-xs font-bold uppercase border-2 border-white shadow-[3px_3px_0px_#6b21a8]">
+            {customTitle}
           </div>
-          <div dangerouslySetInnerHTML={{ __html: formatInline(infoContent.trim()) }} />
+          <div className="space-y-4">
+            {infoContent.trim().split('\n').map((line, idx) => {
+              if (!line.trim()) return null;
+              return (
+                <p 
+                  key={idx} 
+                  className={cn(
+                    "text-base md:text-lg",
+                    line.trim().startsWith('•') || line.trim().startsWith('-') ? "pl-4 -indent-4" : ""
+                  )}
+                  dangerouslySetInnerHTML={{ __html: formatInline(line.trim()) }} 
+                />
+              );
+            })}
+          </div>
         </aside>
       );
       i++;
@@ -386,7 +448,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
     renderedLines.push(
       <p
         key={i}
-        className={cn("mb-6 leading-loose text-lg md:text-xl font-medium break-words", isFirst && 'magazine-article')}
+        className={cn("mb-6 leading-loose text-lg md:text-xl font-medium break-words article-paragraph", isFirst && 'magazine-article')}
         dangerouslySetInnerHTML={{ __html: formatInline(line) }}
       />
     );
