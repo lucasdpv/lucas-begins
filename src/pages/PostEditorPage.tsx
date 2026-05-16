@@ -143,24 +143,24 @@ export default function PostEditorPage() {
       </Helmet>
 
       {/* Cabeçalho com abas */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <h2 className="font-retro text-3xl font-bold uppercase flex items-center gap-3 drop-shadow-[2px_2px_0px_rgba(168,85,247,0.5)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-8 md:mb-10">
+        <h2 className="font-retro text-xl md:text-3xl font-bold uppercase flex items-center gap-2 md:gap-3 drop-shadow-[2px_2px_0px_rgba(168,85,247,0.5)]">
           {post ? <Edit className="text-purple-500 w-8 h-8" /> : <Plus className="text-purple-500 w-8 h-8" />}
           {post ? "Editando Level" : "Nova Fase (Post)"}
         </h2>
 
-        <div className="flex items-center gap-4">
-          <div className={cn("flex p-1.5 rounded-xl border-2 retro-card", isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black")}>
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+          <div className={cn("flex p-1 rounded-xl border-2 retro-card", isDark ? "bg-gray-800 border-purple-500" : "bg-gray-200 border-black")}>
             {[
-              { key: "edit" as EditorTab, icon: <Pencil className="w-4 h-4" />, label: "Editar" },
-              { key: "preview" as EditorTab, icon: <Eye className="w-4 h-4" />, label: "Preview" },
+              { key: "edit" as EditorTab, icon: <Pencil className="w-3.5 h-3.5 md:w-4 h-4" />, label: "Editar" },
+              { key: "preview" as EditorTab, icon: <Eye className="w-3.5 h-3.5 md:w-4 h-4" />, label: "Preview" },
             ].map(({ key, icon, label }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => setActiveTab(key)}
                 className={cn(
-                  "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold uppercase font-retro transition-all",
+                  "flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold uppercase font-retro transition-all",
                   activeTab === key
                     ? "bg-purple-600 text-white border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                     : "text-gray-500 hover:text-purple-500"
@@ -173,7 +173,7 @@ export default function PostEditorPage() {
           <button
             onClick={() => navigate("/admin")}
             className={cn(
-              "px-5 py-3 rounded-xl text-sm font-retro uppercase font-bold transition-colors retro-button",
+              "px-4 md:px-5 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-retro uppercase font-bold transition-colors retro-button",
               isDark ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700" : "bg-snes-surface text-snes-accent border-snes-dark hover:bg-snes-mid"
             )}
           >

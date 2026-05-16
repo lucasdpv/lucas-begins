@@ -24,6 +24,7 @@ interface Block {
   content: string;
   url?: string;
   title?: string;
+  author?: string;
   layout?: 'full' | 'left' | 'right'; 
   useShape?: boolean;
   wrapType?: 'silhouette' | 'circle' | 'diagonal';
@@ -43,30 +44,30 @@ interface BlockEditorProps {
  */
 export default function BlockEditor({ value, onChange, isDark }: BlockEditorProps) {
   const [blocks, setBlocks] = useState<Block[]>([]);
-
-  // 1. Parser: Markdown -> Blocks (carrega na inicialização ou quando o valor muda externamente)
+  const [hasInitialized, setHasInitialized] = useState(false);
   const isFirstRun = useRef(true);
+
+  // 1. Parser: Markdown -> Blocks
   useEffect(() => {
-    if (value && (isFirstRun.current || blocks.length === 0)) {
-      const parsed = parseMarkdownToBlocks(value);
-      if (parsed.length > 0) {
+    if (isFirstRun.current) {
+      if (value) {
+        const parsed = parseMarkdownToBlocks(value);
         setBlocks(parsed);
-        isFirstRun.current = false;
       }
-    } else if (!value && isFirstRun.current) {
+      setHasInitialized(true);
       isFirstRun.current = false;
     }
   }, [value]);
 
   // 2. Serializer: Blocks -> Markdown
   useEffect(() => {
+    if (!hasInitialized) return;
+
     const markdown = blocksToMarkdown(blocks);
-    // Trava de segurança: só envia a mudança se houver blocos ou se o valor original também estiver vazio
-    // Isso evita que o editor zere o texto se os blocos demorarem a carregar
-    if (markdown !== value && !isFirstRun.current && (blocks.length > 0 || value === "")) {
+    if (markdown !== value) {
       onChange(markdown);
     }
-  }, [blocks, value, onChange]);
+  }, [blocks, value, onChange, hasInitialized]);
 
   // Handlers de Bloco
   const addBlock = (type: Block['type']) => {
@@ -325,16 +326,36 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
                 <div className="flex items-center gap-2 text-yellow-500 font-retro text-[10px] font-bold uppercase tracking-widest">
                   <Star size={14} className="fill-yellow-500" /> Frase em Destaque (Olho)
                 </div>
-                <textarea 
-                  value={block.content}
-                  onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                  placeholder="DIGITE AQUI AQUELA FRASE DE EFEITO..."
-                  rows={2}
-                  className={cn(
-                    "w-full bg-transparent outline-none resize-none font-retro text-2xl font-bold italic border-l-8 pl-4 transition-all",
-                    isDark ? "text-purple-300 border-purple-500" : "text-purple-700 border-purple-400"
-                  )}
-                />
+                <div className={cn(
+                  "relative p-6 rounded-2xl border-l-8 transition-all",
+                  isDark ? "bg-purple-900/10 border-purple-500" : "bg-purple-50 border-purple-400"
+                )}>
+                  <textarea 
+                    value={block.content}
+                    onChange={(e) => updateBlock(block.id, { content: e.target.value })}
+                    placeholder="DIGITE AQUI AQUELA FRASE DE EFEITO..."
+                    rows={2}
+                    className={cn(
+                      "w-full bg-transparent outline-none resize-none font-retro text-xl font-bold italic",
+                      isDark ? "text-purple-300" : "text-purple-700"
+                    )}
+                  />
+                  <div className="mt-2 flex justify-end">
+                    <div className="flex items-center gap-2">
+                      <span className="font-retro text-[9px] opacity-40 uppercase tracking-tighter">Citado:</span>
+                      <input 
+                        type="text"
+                        value={block.author || ''}
+                        onChange={(e) => updateBlock(block.id, { author: e.target.value })}
+                        placeholder="Nome do Autor"
+                        className={cn(
+                          "bg-transparent border-b border-dashed border-current outline-none font-retro text-sm uppercase text-right w-fit min-w-[150px]",
+                          isDark ? "text-purple-400/80" : "text-purple-600/80"
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -446,8 +467,14 @@ function parseMarkdownToBlocks(markdown: string): Block[] {
   lines.forEach(line => {
     const trimmedLine = line.trim();
 
-    if (trimmedLine === ':::pullquote') {
-      blocks.push({ id: 'temp_pq', type: 'pullquote', content: '' });
+    if (trimmedLine.startsWith(':::pullquote')) {
+      const authorMatch = trimmedLine.match(/\{#author-(.*?)\}/);
+      blocks.push({ 
+        id: 'temp_pq', 
+        type: 'pullquote', 
+        content: '',
+        author: authorMatch ? authorMatch[1] : undefined
+      });
       isInsideSpecialBlock = true;
       wasLastLineEmpty = false;
       return;
@@ -535,7 +562,9 @@ function blocksToMarkdown(blocks: Block[]): string {
   return blocks.map(b => {
     switch (b.type) {
       case 'heading': return `## ${b.content}`;
-      case 'pullquote': return `:::pullquote\n${b.content}\n:::`;
+      case 'pullquote': 
+        const authorSuffix = b.author ? `{#author-${b.author}}` : '';
+        return `:::pullquote${authorSuffix}\n${b.content}\n:::`;
       case 'info-box': 
         const titleSuffix = b.title ? `{#title-${b.title}}` : '';
         return `:::info-box${titleSuffix}\n${b.content}\n:::`;

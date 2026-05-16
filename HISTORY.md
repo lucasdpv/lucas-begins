@@ -10,6 +10,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 ### 🛠️ Block Editor: Logic & Persistence
 - **Component Integrity**: Refatoração do parser Markdown para respeitar a individualidade de blocos de texto consecutivos. Agora, componentes de texto separados no editor permanecem independentes após o preview.
 - **Enhanced Info Box**: Implementação de suporte a **títulos customizados** em boxes de informação. O cabeçalho preto agora é editável e permite personalização total por bloco.
+- **Author Citations**: Pullquotes agora suportam **citação de autores**. Foi adicionado um campo dedicado no editor que renderiza o nome do autor com alinhamento à direita e estética de revista editorial.
 - **Multi-line Consistency**: Estabilização do suporte a múltiplas linhas e listas (bullet points) dentro de boxes de informação e pullquotes, garantindo que a formatação não se perca ao alternar modos de edição.
 
 ### 🎨 Editorial Aesthetics & Alignment

@@ -280,6 +280,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
 
     // 3. Pull Quote (Olho)
     if (line.startsWith(':::pullquote')) {
+      const authorMatch = line.match(/\{#author-([^}]+)\}/);
+      const author = authorMatch ? authorMatch[1] : null;
+
       let pullquoteContent = "";
       i++;
       while (i < lines.length && !lines[i].startsWith(':::')) {
@@ -288,19 +291,32 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       }
       renderedLines.push(
         <blockquote key={i} className={cn(
-          "my-12 p-10 border-l-[16px] italic relative group overflow-hidden retro-card clear-both",
-          isDark ? "bg-purple-900/10 border-purple-500" : "bg-purple-50 border-purple-400 shadow-[8px_8px_0_rgba(0,0,0,1)]"
+          "my-8 p-6 md:p-8 border-l-[12px] italic relative group overflow-hidden retro-card clear-both",
+          isDark ? "bg-purple-900/10 border-purple-500" : "bg-purple-50 border-purple-400 shadow-[6px_6px_0_rgba(0,0,0,1)]"
         )}>
-          <div className="absolute top-2 left-4 text-8xl opacity-10 font-retro select-none">"</div>
+          <div className="absolute top-1 left-2 text-6xl opacity-10 font-retro select-none">"</div>
           <div className={cn(
-            "font-retro text-3xl md:text-5xl font-bold leading-tight relative z-10 tracking-tighter space-y-4",
+            "font-retro text-2xl md:text-4xl font-bold leading-tight relative z-10 tracking-tighter space-y-3",
             isDark ? "text-white" : "text-purple-900"
           )}>
             {pullquoteContent.trim().split('\n').map((line, idx) => (
               <p key={idx} dangerouslySetInnerHTML={{ __html: formatInline(line.trim()) }} />
             ))}
           </div>
-          <div className="absolute bottom-2 right-4 text-8xl opacity-10 font-retro rotate-180 select-none">"</div>
+          
+          {author && (
+            <div className={cn(
+              "mt-5 text-right relative z-10 animate-in slide-in-from-right-4 duration-700",
+              isDark ? "text-purple-400" : "text-purple-700"
+            )}>
+              <span className="inline-block w-6 h-0.5 bg-current vertical-middle mr-2 opacity-30" />
+              <cite className="font-retro text-xs md:text-sm uppercase tracking-widest not-italic font-bold">
+                {author}
+              </cite>
+            </div>
+          )}
+
+          <div className="absolute bottom-1 right-2 text-6xl opacity-10 font-retro rotate-180 select-none">"</div>
         </blockquote>
       );
       i++;
@@ -319,7 +335,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
         i++;
       }
       renderedLines.push(
-        <aside key={i} className="magazine-info-box my-12 font-medium leading-relaxed clear-both break-words">
+        <aside key={i} className="magazine-info-box my-8 font-medium leading-relaxed clear-both break-words">
           <div className="absolute -top-5 left-6 bg-black text-white px-4 py-1 font-retro text-xs font-bold uppercase border-2 border-white shadow-[3px_3px_0px_#6b21a8]">
             {customTitle}
           </div>
