@@ -37,26 +37,57 @@ export const PostService = {
    * Busca posts com paginacao.
    */
   async getPaginatedPosts(limitNumber: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null = null, category?: string): Promise<any> {
-    const constraints: any[] = [];
-    
-    if (category && category !== 'Todos' && category !== 'all') {
-      constraints.push(where("category", "==", category));
+    try {
+      // Se tiver categoria específica, fazemos busca index-free e ordenação client-side
+      if (category && category !== 'Todos' && category !== 'all') {
+        const categoriesToSearch = category.toLowerCase().includes("dossi")
+          ? ["Dossiê", "Dossiês", "dossie", "dossies"]
+          : [category];
+
+        const q = query(
+          collection(db, COLLECTIONS.POSTS),
+          where("category", "in", categoriesToSearch)
+        );
+        const snapshot = await getDocs(q);
+        const posts = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() } as Post))
+          .filter(p => !p.isDraft)
+          .sort((a, b) => {
+            const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+            const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+            return timeB - timeA;
+          });
+
+        return {
+          posts: posts,
+          lastDoc: null // Como já temos tudo em memória para a categoria, não precisamos de mais páginas
+        };
+      }
+
+      // Se for "Todos", usamos paginação por cursor nativa do Firestore (sem índice necessário)
+      const constraints: any[] = [
+        orderBy("createdAt", "desc"),
+        limit(limitNumber)
+      ];
+
+      if (lastDoc) {
+        constraints.push(startAfter(lastDoc));
+      }
+
+      const q = query(collection(db, COLLECTIONS.POSTS), ...constraints);
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Post))
+        .filter(p => !p.isDraft);
+      
+      return {
+        posts: posts,
+        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null
+      };
+    } catch (error) {
+      console.error("[PostService] Error in getPaginatedPosts:", error);
+      return { posts: [], lastDoc: null };
     }
-
-    constraints.push(orderBy("createdAt", "desc"));
-    constraints.push(limit(limitNumber));
-
-    if (lastDoc) {
-      constraints.push(startAfter(lastDoc));
-    }
-
-    const q = query(collection(db, COLLECTIONS.POSTS), ...constraints);
-    const snapshot = await getDocs(q);
-    
-    return {
-      posts: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post)),
-      lastDoc: snapshot.docs[snapshot.docs.length - 1] || null
-    };
   },
 
   /**
