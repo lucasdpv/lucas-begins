@@ -161,9 +161,20 @@ export default function PostComments({
                     <div className="font-retro font-bold text-sm md:text-base uppercase text-purple-400 tracking-wide truncate">
                       {comment.author}
                     </div>
-                    <span className="text-[9px] md:text-xs opacity-40 font-bold uppercase tracking-widest whitespace-nowrap">
-                      {formatDate(comment.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[9px] md:text-xs opacity-40 font-bold uppercase tracking-widest whitespace-nowrap">
+                        {formatDate(comment.createdAt)}
+                      </span>
+                      {(currentUser?.role === 'admin' || currentUser?.id === comment.authorId) && (
+                        <button
+                          onClick={() => onDeleteComment(comment.id)}
+                          className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                          title="Excluir Comentário"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
                   <p className={cn(
@@ -215,16 +226,7 @@ export default function PostComments({
                   </div>
                 </div>
 
-                {/* Excluir comentário */}
-                {(currentUser?.role === 'admin' || currentUser?.id === comment.authorId) && (
-                  <button
-                    onClick={() => onDeleteComment(comment.id)}
-                    className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
-                    title="Excluir Comentário"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+
               </div>
 
               {/* Form de Resposta Inline */}
@@ -335,9 +337,20 @@ export default function PostComments({
                             <div className="font-retro font-bold text-xs md:text-sm uppercase text-purple-300 tracking-wide truncate">
                               {reply.author}
                             </div>
-                            <span className="text-[8px] md:text-[10px] opacity-35 font-bold uppercase tracking-widest whitespace-nowrap font-mono">
-                              {formatDate(reply.createdAt)}
-                            </span>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="text-[8px] md:text-[10px] opacity-35 font-bold uppercase tracking-widest whitespace-nowrap font-mono">
+                                {formatDate(reply.createdAt)}
+                              </span>
+                              {(currentUser?.role === 'admin' || currentUser?.id === reply.authorId) && (
+                                <button
+                                  onClick={() => onDeleteReply(comment.id, reply.id)}
+                                  className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                  title="Excluir Resposta"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </div>
 
                           <p className={cn(
@@ -365,16 +378,7 @@ export default function PostComments({
                             </button>
                           </div>
 
-                          {/* Excluir Resposta */}
-                          {(currentUser?.role === 'admin' || currentUser?.id === reply.authorId) && (
-                            <button
-                              onClick={() => onDeleteReply(comment.id, reply.id)}
-                              className="absolute top-2 right-2 text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors"
-                              title="Excluir Resposta"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+
                         </div>
                       </div>
                     );
