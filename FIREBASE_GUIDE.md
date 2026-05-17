@@ -82,22 +82,44 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Regras de Segurança para Matérias (Posts)
+    // 📄 Coleção de Posts (com Subcoleção de Comentários):
     match /posts/{postId} {
-      allow read: if true; // Qualquer leitor pode ler artigos publicamente
-      allow write: if request.auth != null; // Admins e editores autenticados gravam
-      
-      // Regra Crucial: Permissões para a Subcoleção de Comentários
+      allow read: if true;
+      allow create, delete: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+      allow update: if request.auth != null;
+
+      // 💬 Subcoleção de Comentários e Respostas (Defuso de 1MB):
       match /comments/{commentId} {
-        allow read: if true; // Qualquer pessoa pode ver a área de comentários
-        allow write: if request.auth != null; // Apenas leitores autenticados comentam, respondem ou curtem
+        allow read: if true;
+        allow write: if request.auth != null;
       }
     }
-    
-    // Regras de Segurança para Perfis de Usuários
+
+    // 🏷️ Coleção de Categorias:
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // 👑 Coleção de Admins:
+    match /admins/{email} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // 👤 Coleção de Usuários:
     match /users/{userId} {
-      allow read: if true; // Perfis públicos são visíveis
-      allow write: if request.auth != null && (request.auth.uid == userId || request.auth.token.role == 'admin');
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 📩 Coleção de Mensagens (Inbox/Contato):
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
     }
   }
 }
