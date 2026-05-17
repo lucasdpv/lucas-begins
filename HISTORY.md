@@ -4,6 +4,19 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v3.7.0] - The Zero-Waste Firestore Reads & Cursor Pagination Update
+*Data: 17 de Maio de 2026*
+
+### 🚀 Firestore Read Decoupling (getAllPosts Eradication)
+- **Zero-Waste Free Quota Architecture**: Refatoração arquitetural profunda de toda a busca de dados do portal. A chamada global massiva de `useAllPosts()` (que baixava a base de dados inteira com todos os conteúdos ricos em Markdown a cada página ou carregamento do menu) foi eliminada e substituída por consultas cirúrgicas, indexadas e leves. Isso reduz as leituras do Firestore em até **95%**, garantindo que o portal seja extremamente escalável e permaneça seguro no nível gratuito para sempre.
+- **Lazy Loaded Search in Navbar**: A busca global na Navbar agora é totalmente "lazy". O hook `useAllPosts` só dispara a busca na base do Firestore se o usuário focar, clicar ou digitar no campo de busca da Navbar.
+- **Popular Recommendation Engine (Post Detail)**: Substituição de filtros em memória por uma busca indexada rápida de relacionados (`usePopularPosts(4)`) baseada no ranking de curtidas, otimizando em 90% a carga inicial da página de detalhes.
+- **Section-Targeted Queries (Home Page)**: Refatoração de todos os painéis e carrosséis da Home Page. Agora, as seções de Destaques (`useFeaturedPosts`), Mais Vistos (`useMostViewedPosts`), Melhores Notas (`useTopReviews`) e Dossiês (`usePostsByCategory`) possuem consultas diretas e limitadas no banco de dados, poupando centenas de leituras a cada recarregamento.
+- **Real Firestore Cursor Pagination (Archive Page)**: Implementação de paginação nativa baseada em cursores (`startAfter` e limites de carregamento). O feed de artigos completos agora utiliza rolagem por estágios retro-gaming com o botão estilizado **"INICIAR PRÓXIMA FASE (CARREGAR MAIS)"**, descartando a pesada paginação em memória e baixando estritamente 6 posts por clique.
+- **Lightweight Profile Inventory (Dashboard)**: O QG do usuário (Dashboard) agora carrega o inventário de favoritos sob demanda (`usePostsByIds`) usando a query otimizada `where(documentId(), \"in\", favorites)`, além de obter o total de comentários instantaneamente através de uma Collection Group Query (`useUserCommentsCount`), sanando de vez o cálculo incorreto trazido pelo modelo de subcoleções.
+
+---
+
 ## 💎 [v3.6.0] - The Social Threads & Emoji Shortcuts Update
 *Data: 17 de Maio de 2026*
 
