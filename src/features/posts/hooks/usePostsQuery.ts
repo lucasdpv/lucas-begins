@@ -334,7 +334,7 @@ export function useIncrementViewMutation() {
 }
 
 /**
- * Hook para Curtir/Descurtir um comentário.
+ * Hook para Curtir/Descurtir um comentário com Atualização Otimista (Optimistic Update).
  */
 export function useLikeCommentMutation() {
   const queryClient = useQueryClient();
@@ -343,16 +343,62 @@ export function useLikeCommentMutation() {
   return useMutation({
     mutationFn: ({ postId, commentId, userId }: { postId: string, commentId: string | number, userId: string }) => 
       PostService.toggleCommentLike(postId, commentId, userId),
+    
+    onMutate: async ({ postId, commentId, userId }) => {
+      // Cancela queries de detalhes do post para evitar que atualizações do servidor sobrescrevam nossa UI otimista
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+      await queryClient.cancelQueries({ queryKey: ['postBySlug'] });
+
+      // Salva snapshot dos estados anteriores
+      const previousPost = queryClient.getQueryData(postKeys.detail(postId));
+      const previousSlugPost = queryClient.getQueryData(['postBySlug']);
+
+      const updateCommentLikes = (old: any) => {
+        if (!old) return old;
+        const comments = old.comments ? [...old.comments] : [];
+        const index = comments.findIndex(c => String(c.id) === String(commentId));
+        if (index === -1) return old;
+
+        const comment = { ...comments[index] };
+        const likes = comment.likes ? [...comment.likes] : [];
+        const hasLiked = likes.includes(userId);
+
+        comment.likes = hasLiked
+          ? likes.filter(id => id !== userId)
+          : [...likes, userId];
+
+        comments[index] = comment;
+        return { ...old, comments };
+      };
+
+      // Atualiza caches de forma otimista
+      queryClient.setQueryData(postKeys.detail(postId), updateCommentLikes);
+      queryClient.setQueriesData({ queryKey: ['postBySlug'] }, updateCommentLikes);
+
+      return { previousPost, previousSlugPost };
+    },
+
+    onError: (err, variables, context) => {
+      // Se a mutação falhar, reverte para os snapshots anteriores salvos
+      if (context?.previousPost) {
+        queryClient.setQueryData(postKeys.detail(variables.postId), context.previousPost);
+      }
+      if (context?.previousSlugPost) {
+        queryClient.setQueryData(['postBySlug'], context.previousSlugPost);
+      }
+      showToast("Erro ao curtir comentário.", "error");
+    },
+
     onSuccess: (action, variables) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
       if (action === 'liked') {
         userService.addXP(variables.userId, 2);
       }
     },
-    onError: () => {
-      showToast("Erro ao curtir comentário.", "error");
+
+    onSettled: (data, error, variables) => {
+      // Invalida a query para sincronizar com o estado definitivo do banco de dados
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
     }
   });
 }
@@ -404,7 +450,7 @@ export function useDeleteReplyMutation() {
 }
 
 /**
- * Hook para Curtir/Descurtir uma resposta.
+ * Hook para Curtir/Descurtir uma resposta com Atualização Otimista (Optimistic Update).
  */
 export function useLikeReplyMutation() {
   const queryClient = useQueryClient();
@@ -413,14 +459,64 @@ export function useLikeReplyMutation() {
   return useMutation({
     mutationFn: ({ postId, commentId, replyId, userId }: { postId: string, commentId: string | number, replyId: string | number, userId: string }) => 
       PostService.toggleReplyLike(postId, commentId, replyId, userId),
+
+    onMutate: async ({ postId, commentId, replyId, userId }) => {
+      await queryClient.cancelQueries({ queryKey: postKeys.detail(postId) });
+      await queryClient.cancelQueries({ queryKey: ['postBySlug'] });
+
+      const previousPost = queryClient.getQueryData(postKeys.detail(postId));
+      const previousSlugPost = queryClient.getQueryData(['postBySlug']);
+
+      const updateReplyLikes = (old: any) => {
+        if (!old) return old;
+        const comments = old.comments ? [...old.comments] : [];
+        const cIndex = comments.findIndex(c => String(c.id) === String(commentId));
+        if (cIndex === -1) return old;
+
+        const comment = { ...comments[cIndex] };
+        const replies = comment.replies ? [...comment.replies] : [];
+        const rIndex = replies.findIndex(r => String(r.id) === String(replyId));
+        if (rIndex === -1) return old;
+
+        const reply = { ...replies[rIndex] };
+        const likes = reply.likes ? [...reply.likes] : [];
+        const hasLiked = likes.includes(userId);
+
+        reply.likes = hasLiked
+          ? likes.filter(id => id !== userId)
+          : [...likes, userId];
+
+        replies[rIndex] = reply;
+        comment.replies = replies;
+        comments[cIndex] = comment;
+        return { ...old, comments };
+      };
+
+      queryClient.setQueryData(postKeys.detail(postId), updateReplyLikes);
+      queryClient.setQueriesData({ queryKey: ['postBySlug'] }, updateReplyLikes);
+
+      return { previousPost, previousSlugPost };
+    },
+
+    onError: (err, variables, context) => {
+      if (context?.previousPost) {
+        queryClient.setQueryData(postKeys.detail(variables.postId), context.previousPost);
+      }
+      if (context?.previousSlugPost) {
+        queryClient.setQueryData(['postBySlug'], context.previousSlugPost);
+      }
+      showToast("Erro ao curtir resposta.", "error");
+    },
+
     onSuccess: (action, variables) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       if (action === 'liked') {
         userService.addXP(variables.userId, 2);
       }
     },
-    onError: () => {
-      showToast("Erro ao curtir resposta.", "error");
+
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
     }
   });
 }
