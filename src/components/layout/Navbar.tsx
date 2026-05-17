@@ -12,7 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../lib/utils";
 import { BRUTAL_DESIGN } from "../../constants";
-import { InstagramIcon, ThreadsIcon } from "../icons/SocialIcons";
+import { InstagramIcon, ThreadsIcon, XIcon } from "../icons/SocialIcons";
 
 // Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -181,6 +181,24 @@ export default function Navbar() {
 
             {/* Social Group (Desktop Only) */}
             <div className="hidden xl:flex items-center gap-3 pr-6 border-r-2 border-purple-500/10">
+                <a
+                  href="https://x.com/beginsproject"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-1 rounded-none border-2 group/social",
+                    isDark 
+                      ? "bg-white/5 border-white/10 hover:border-white hover:bg-white/10 shadow-[2px_2px_0px_rgba(255,255,255,0.1)]" 
+                      : "bg-black/5 border-black/10 hover:border-black hover:bg-black/10 shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
+                  )}
+                  title="X (Twitter)"
+                >
+                  <XIcon className={cn(
+                    "w-5 h-5 transition-all duration-300",
+                    isDark ? "text-gray-400 group-hover/social:text-white" : "text-gray-600 group-hover/social:text-black"
+                  )} />
+                </a>
+
                 <a
                   href="https://www.threads.com/@beginsproject"
                   target="_blank"

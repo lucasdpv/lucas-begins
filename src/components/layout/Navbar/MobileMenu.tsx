@@ -14,7 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, getPixelAvatar } from "../../../lib/utils";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
-import { InstagramIcon, ThreadsIcon } from "../../icons/SocialIcons";
+import { InstagramIcon, ThreadsIcon, XIcon } from "../../icons/SocialIcons";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -236,6 +236,18 @@ export default function MobileMenu({
               <p className="text-[10px] font-retro font-bold uppercase opacity-40 mb-4 tracking-[0.2em]">Siga-nos nas Redes</p>
               <div className="flex gap-4">
                 <a
+                  href="https://x.com/beginsproject"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
+                    isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
+                  )}
+                  title="X (Twitter)"
+                >
+                  <XIcon className="w-6 h-6" />
+                </a>
+                <a
                   href="https://www.threads.com/@beginsproject"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -243,6 +255,7 @@ export default function MobileMenu({
                     "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
                     isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
                   )}
+                  title="Threads"
                 >
                   <ThreadsIcon className="w-6 h-6" />
                 </a>
@@ -254,6 +267,7 @@ export default function MobileMenu({
                     "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
                     isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
                   )}
+                  title="Instagram"
                 >
                   <InstagramIcon className="w-6 h-6" />
                 </a>

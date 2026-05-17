@@ -32,6 +32,14 @@ export default function Footer() {
           {/* Sociais inline */}
           <div className="flex items-center gap-2">
             <a
+              href="https://x.com/beginsproject"
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
+              title="X (Twitter)"
+            >
+              <XIcon className="w-4 h-4" />
+            </a>
+            <a
               href="https://www.threads.com/@beginsproject"
               target="_blank" rel="noopener noreferrer"
               className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
@@ -97,6 +105,14 @@ export default function Footer() {
 
           {/* Sociais */}
           <div className="flex items-center gap-3 shrink-0">
+            <a
+              href="https://x.com/beginsproject"
+              target="_blank" rel="noopener noreferrer"
+              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-white" : "bg-white text-black hover:border-purple-600")}
+              title="X (Twitter)"
+            >
+              <XIcon className="w-4 h-4 shrink-0" />
+            </a>
             <a
               href="https://www.threads.com/@beginsproject"
               target="_blank" rel="noopener noreferrer"
