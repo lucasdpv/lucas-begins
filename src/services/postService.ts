@@ -504,6 +504,64 @@ export const PostService = {
   },
 
   /**
+   * Busca posts ordenados por visualizações descrescentemente (mais lidos).
+   */
+  async getMostViewedPosts(limitNumber: number = 5): Promise<Post[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        orderBy("views", "desc"),
+        limit(limitNumber)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      return posts.filter(p => !p.isDraft);
+    } catch (error) {
+      console.error("[PostService] Error fetching most viewed posts:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Busca reviews com maior pontuação (score desc).
+   */
+  async getTopReviews(limitNumber: number = 3): Promise<Post[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        orderBy("score", "desc"),
+        limit(limitNumber)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      return posts.filter(p => !p.isDraft);
+    } catch (error) {
+      console.error("[PostService] Error fetching top reviews:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Busca posts de uma categoria específica (ordenados por createdAt desc).
+   */
+  async getPostsByCategory(category: string, limitNumber: number = 3): Promise<Post[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        where("category", "==", category),
+        orderBy("createdAt", "desc"),
+        limit(limitNumber)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      return posts.filter(p => !p.isDraft);
+    } catch (error) {
+      console.error("[PostService] Error fetching posts by category:", error);
+      return [];
+    }
+  },
+
+  /**
    * Remove um post e todos os seus comentários associados.
    */
   async deletePost(postId: string): Promise<boolean> {

@@ -9,7 +9,14 @@ import PostSkeleton from "../features/posts/components/PostSkeleton";
 import CarouselSkeleton from "../features/posts/components/CarouselSkeleton";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { useAllPosts } from "../features/posts/hooks/usePostsQuery";
+import { 
+  useAllPosts, 
+  useFeaturedPosts, 
+  useMostViewedPosts, 
+  useTopReviews, 
+  usePostsByCategory, 
+  usePosts 
+} from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
@@ -21,14 +28,35 @@ const { BORDER, SHADOW_LG, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const { activeCategory, searchQuery } = useUIStore();
-  const { data: allPosts = [], isLoading: isLoadingPosts } = useAllPosts();
-  const posts = allPosts as Post[];
+
+  // 1. Destaques (Carrossel) - Puxa no máximo 5 posts do Firestore
+  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts();
+
+  // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
+  const { data: mostViewedPosts = [], isLoading: isLoadingMostViewed } = useMostViewedPosts(5);
+
+  // 3. Reviews (Top Scores) - Puxa no máximo 3 melhores notas
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = useTopReviews(3);
+
+  // 4. Dossiês - Puxa no máximo 3 posts da categoria
+  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3);
+
+  // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
+  const isSearching = searchQuery.trim() !== "";
+  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
+
+  // 6. Grid Principal Otimizado - Se não estiver buscando, usa a paginação nativa (leve!)
+  const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({ 
+    category: activeCategory 
+  });
+
+  const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeCategory, searchQuery]);
 
-  const { filteredPosts, featuredPosts, mostViewedPosts } = usePostsFilter(
+  const { filteredPosts } = usePostsFilter(
     posts,
     activeCategory,
     searchQuery
@@ -36,23 +64,10 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
-  // Grid shows 6 most recent posts in horizontal list
-  const gridPosts = filteredPosts.slice(0, 5);
+  // Grid exibe no máximo 5 itens
+  const gridPosts = isSearching ? filteredPosts.slice(0, 5) : paginatedPosts.slice(0, 5);
 
-  // Reviews for the bottom band
-  const reviewPosts = posts
-    .filter((p) => p.score && !p.isDraft)
-    .sort((a, b) => Number(b.score) - Number(a.score))
-    .slice(0, 3);
-
-  // Dossiês for the bottom band
-  const dossiePosts = posts
-    .filter((p) => {
-      const cat = p.category?.toLowerCase() || "";
-      const title = p.title?.toLowerCase() || "";
-      return (cat.includes("dossi") || title.includes("dossi")) && !p.isDraft;
-    })
-    .slice(0, 3);
+  const isLoadingPosts = isSearching ? isLoadingAll : (isLoadingFeatured || isLoadingPaginated);
 
   return (
     <div className="flex flex-col gap-12">

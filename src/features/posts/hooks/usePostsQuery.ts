@@ -96,6 +96,40 @@ export function usePopularPosts(count: number = 4) {
 }
 
 /**
+ * Hook para buscar posts mais lidos (views desc).
+ */
+export function useMostViewedPosts(count: number = 5) {
+  return useQuery({
+    queryKey: ['posts', 'most-viewed', count],
+    queryFn: () => PostService.getMostViewedPosts(count),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
+ * Hook para buscar as melhores reviews (score desc).
+ */
+export function useTopReviews(count: number = 3) {
+  return useQuery({
+    queryKey: ['posts', 'top-reviews', count],
+    queryFn: () => PostService.getTopReviews(count),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
+ * Hook para buscar posts de uma categoria específica (ordenados por createdAt desc).
+ */
+export function usePostsByCategory(category: string, count: number = 3) {
+  return useQuery({
+    queryKey: ['posts', 'by-category', category, count],
+    queryFn: () => PostService.getPostsByCategory(category, count),
+    enabled: !!category,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
  * Hook para buscar um único post por ID ou Slug.
  */
 export function usePost(idOrSlug: string, isSlug: boolean = false) {
