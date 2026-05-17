@@ -82,19 +82,21 @@
    ============================================================ */
 .magazine-float-left {
   float: left;
-  margin-right: 2.5rem;
+  margin-right: 2rem;
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
-  max-width: 45%;
+  max-width: 40%;
+  width: 38%;
   shape-outside: rect(0, 100%, 100%, 0);
 }
 
 .magazine-float-right {
   float: right;
-  margin-left: 2.5rem;
+  margin-left: 2rem;
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
-  max-width: 45%;
+  max-width: 40%;
+  width: 38%;
   shape-outside: rect(0, 100%, 100%, 0);
 }
 

@@ -94,8 +94,11 @@ function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wra
     );
   }
 
+  const isFloated = layout === 'left' || layout === 'right';
+
   const containerClass = cn(
-    "w-full rounded-none relative overflow-hidden flex items-center justify-center min-h-[200px] retro-card",
+    "w-full rounded-none relative overflow-hidden flex items-center justify-center retro-card",
+    isFloated ? "h-[280px] md:h-[320px]" : "min-h-[200px]",
     isDark ? "bg-gray-900" : "bg-snes-mid"
   );
 
@@ -116,7 +119,10 @@ function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wra
             loading="lazy"
             decoding="async"
             onError={() => setError(true)}
-            className="w-full h-auto object-cover max-h-[700px] pixelated"
+            className={cn(
+              "pixelated",
+              isFloated ? "w-full h-full object-cover" : "w-full h-auto object-cover max-h-[700px]"
+            )}
           />
         ) : (
           <div className="flex flex-col items-center justify-center p-10 text-center">
