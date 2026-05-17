@@ -32,6 +32,7 @@ import PostRelated from "../features/posts/components/PostDetail/PostRelated";
 import PostComments from "../features/posts/components/PostDetail/PostComments";
 
 import { Post } from "../features/posts/schemas";
+import { USER_ROLES } from "../constants";
 
 interface PostDetailPageProps {
   previewPost?: Post;
@@ -98,7 +99,11 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     );
   }
 
-  if (!post) {
+  const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
+  const isPostDraft = post?.isDraft;
+  const isPreview = !!previewPost;
+
+  if (!post || (isPostDraft && !isAdmin && !isPreview)) {
     return (
       <div className="animate-in fade-in max-w-5xl mx-auto py-20 text-center">
         <Helmet>

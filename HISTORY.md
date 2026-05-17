@@ -4,6 +4,17 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v3.5.0] - The Dynamic Post Visibility Update
+*Data: 17 de Maio de 2026*
+
+### ⚙️ Post Visibility Control
+- **Hide / Show Toggle**: Adicionada funcionalidade de ocultar/mostrar artigos diretamente no painel administrativo. Administradores agora contam com um botão visual de alternância (olho/olho riscado) na coluna de ações da listagem de posts.
+- **Visual Status Badges**: Introdução de um selo de status "Oculto" neo-brutalista e esmaecimento de linha para artigos ocultos/rascunhos na tabela administrativa, garantindo identificação instantânea do status do artigo.
+- **Direct Access Guard**: Bloqueio completo contra visualização direta de posts ocultos. Leitores comuns que tentarem acessar a URL/slug de um post oculto serão apresentados com a tela de erro "Post não encontrado", blindando o conteúdo em desenvolvimento.
+- **Clean Filters Integration**: Harmonização em todo o site (favoritos do dashboard, carrosséis, listagens e busca) para ignorar automaticamente posts ocultos, oferecendo uma experiência limpa para o leitor.
+
+---
+
 ## 💎 [v3.4.0] - The Editorial Flow & Data Integrity Update
 *Data: 16 de Maio de 2026*
 

@@ -7,7 +7,9 @@ import {
   Star, 
   Loader2, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { cn, formatDate } from "../../../lib/utils";
 import { Post } from "../../posts/schemas";
@@ -22,6 +24,7 @@ interface TabPostsProps {
   onEdit: (id: string) => void;
   onDelete: (id: string, title: string) => void;
   onToggleFeatured: (id: string, isFeatured: boolean) => void;
+  onToggleDraft?: (id: string, isDraft: boolean) => void;
   showToast: (msg: string, type?: any) => void;
 }
 
@@ -33,6 +36,7 @@ export default function TabPosts({
   onEdit,
   onDelete,
   onToggleFeatured,
+  onToggleDraft,
   showToast
 }: TabPostsProps) {
   // Estados de Filtro e Paginação internos
@@ -145,8 +149,23 @@ export default function TabPosts({
                     key={post.id}
                     className={cn(isDark ? "hover:bg-gray-700/50" : "hover:bg-snes-mid", "transition-colors text-xs md:text-sm")}
                   >
-                    <td className="px-4 md:px-6 py-3 md:py-4 font-bold max-w-[150px] md:max-w-[250px] truncate" title={post.title}>
-                      {post.title}
+                    <td className={cn(
+                      "px-4 md:px-6 py-3 md:py-4 font-bold max-w-[150px] md:max-w-[250px] truncate",
+                      post.isDraft && "opacity-60"
+                    )} title={post.title}>
+                      <div className="flex items-center gap-2">
+                        {post.isDraft && (
+                          <span className={cn(
+                            "px-2 py-0.5 text-[8px] font-retro font-bold uppercase border shrink-0",
+                            isDark 
+                              ? "bg-gray-800 border-gray-600 text-gray-400" 
+                              : "bg-gray-200 border-black text-gray-600"
+                          )}>
+                            Oculto
+                          </span>
+                        )}
+                        <span className="truncate">{post.title}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 hidden md:table-cell">
                       <span
@@ -181,6 +200,26 @@ export default function TabPosts({
                           >
                             <Star className={cn("w-3.5 h-3.5 md:w-4 md:h-4", post.isFeatured && "fill-yellow-500")} />
                           </button>
+                        <button
+                          onClick={() => {
+                            if (onToggleDraft) {
+                              onToggleDraft(post.id, !post.isDraft);
+                            }
+                          }}
+                          className={cn(
+                            "p-1.5 md:p-2 rounded-lg transition-all active:scale-90",
+                            !post.isDraft
+                              ? "bg-purple-500/20 text-purple-500 border border-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.3)]"
+                              : "bg-gray-500/10 text-gray-400 border border-gray-500/30 hover:border-purple-500/50"
+                          )}
+                          title={post.isDraft ? "Tornar Visível (Publicar)" : "Ocultar Artigo"}
+                        >
+                          {post.isDraft ? (
+                            <EyeOff className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                          )}
+                        </button>
                         <button
                           onClick={() => onEdit(post.id)}
                           className="p-1.5 md:p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-500 rounded-lg transition-colors retro-button"

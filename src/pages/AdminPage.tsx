@@ -126,6 +126,7 @@ export default function AdminPage() {
             onEdit={(id) => navigate(`/editor/${id}`)}
             onDelete={(id, title) => setDeleteModal({ isOpen: true, id, type: 'post', title })}
             onToggleFeatured={(id, isFeatured) => updatePostMutation.mutate({ id, data: { isFeatured } })}
+            onToggleDraft={(id, isDraft) => updatePostMutation.mutate({ id, data: { isDraft } })}
             showToast={showToast}
           />
         )}

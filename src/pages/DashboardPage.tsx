@@ -77,8 +77,8 @@ export default function DashboardPage() {
     );
   }
 
-  // Filtra os posts favoritos
-  const favoritePosts = allPosts.filter(post => profile?.favorites?.includes(post.id));
+  // Filtra os posts favoritos (garante que rascunhos/ocultos não sejam exibidos no inventário)
+  const favoritePosts = allPosts.filter(post => !post.isDraft && profile?.favorites?.includes(post.id));
 
   // Conta total de comentários do usuário
   const totalComments = allPosts.reduce((acc, post) => {
