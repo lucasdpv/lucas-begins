@@ -13,7 +13,7 @@ export default function PostVerdict({ post, isDark }: PostVerdictProps) {
 
   return (
     <div className={cn(
-      "border-4 border-yellow-400 shadow-[6px_6px_0px_rgba(0,0,0,1)] overflow-hidden",
+      "border-4 border-yellow-400 shadow-[6px_6px_0px_rgba(0,0,0,1)] overflow-hidden clear-both",
       isDark ? "bg-gray-900" : "bg-snes-surface"
     )}>
       {/* Header da seção */}

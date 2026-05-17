@@ -149,7 +149,7 @@ function ArticleVideo({ url, isDark }: ArticleVideoProps) {
 
   return (
     <div className={cn(
-      "my-14 w-full aspect-video rounded-none overflow-hidden flex items-center justify-center bg-black relative retro-card"
+      "my-14 w-full aspect-video rounded-none overflow-hidden flex items-center justify-center bg-black relative retro-card clear-both"
     )}>
       {videoId ? (
         <iframe
@@ -263,7 +263,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
     // 1. Heading
     if (line.startsWith('## ')) {
       renderedLines.push(
-        <h2 key={i} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}
+        <h2 key={i} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro clear-both", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}
             dangerouslySetInnerHTML={{ __html: formatInline(line.slice(3).trim()) }}
         />
       );
@@ -471,5 +471,10 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
     i++;
   }
 
-  return <>{renderedLines}</>;
+  return (
+    <>
+      {renderedLines}
+      <div className="clear-both" />
+    </>
+  );
 }

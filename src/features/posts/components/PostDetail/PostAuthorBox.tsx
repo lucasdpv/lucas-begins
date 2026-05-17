@@ -11,7 +11,7 @@ export default function PostAuthorBox({ author, isDark }: PostAuthorBoxProps) {
 
   return (
     <section className={cn(
-      "border-2 overflow-hidden group",
+      "border-2 overflow-hidden group clear-both",
       isDark ? "bg-gray-800/40 border-purple-500/20" : "bg-snes-input border-snes-dark/10"
     )}>
       {/* Label topo */}
