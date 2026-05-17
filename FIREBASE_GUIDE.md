@@ -75,16 +75,29 @@ export const storage = getStorage(app);
 
 ## 4. Regras de Segurança (Firestore Rules)
 
-No Console do Firebase, você deve configurar quem tem permissão para ler ou escrever dados. Na aba **Firestore > Rules**, você pode definir permissões granulares:
+No Console do Firebase, você deve configurar quem tem permissão para ler ou escrever dados. Na aba **Firestore > Rules**, publique as seguintes regras para dar suporte seguro à nova arquitetura de comentários e posts:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Exemplo: Apenas usuários autenticados podem gravar dados
-    match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    
+    // Regras de Segurança para Matérias (Posts)
+    match /posts/{postId} {
+      allow read: if true; // Qualquer leitor pode ler artigos publicamente
+      allow write: if request.auth != null; // Admins e editores autenticados gravam
+      
+      // Regra Crucial: Permissões para a Subcoleção de Comentários
+      match /comments/{commentId} {
+        allow read: if true; // Qualquer pessoa pode ver a área de comentários
+        allow write: if request.auth != null; // Apenas leitores autenticados comentam, respondem ou curtem
+      }
+    }
+    
+    // Regras de Segurança para Perfis de Usuários
+    match /users/{userId} {
+      allow read: if true; // Perfis públicos são visíveis
+      allow write: if request.auth != null && (request.auth.uid == userId || request.auth.token.role == 'admin');
     }
   }
 }
