@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gamepad2, ArrowLeft, ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
+import { Gamepad2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import PostCard from "../features/posts/components/PostCard";
 import PostSkeleton from "../features/posts/components/PostSkeleton";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { useAllPosts } from "../features/posts/hooks/usePostsQuery";
+import { useAllPosts, usePosts } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
@@ -16,34 +16,34 @@ import { Post } from "../features/posts/schemas";
 export default function ArchivePage() {
   const { isDark } = useThemeStore();
   const { activeCategory, searchQuery } = useUIStore();
-  const { data: allPosts = [], isLoading } = useAllPosts();
-  const posts = allPosts as Post[];
 
-  // Estados de Paginação
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
+  const isSearching = searchQuery.trim() !== "";
 
+  // 1. Busca Local Lazy (apenas quando há termo na pesquisa rápida)
+  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
+
+  // 2. Paginação Baseada em Cursores Firestore (navegação por fases)
+  const {
+    posts: paginatedPosts = [],
+    isLoading: isLoadingPaginated,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage
+  } = usePosts({ category: activeCategory });
+
+  // Seleciona o set de posts ativo
+  const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+
+  // Filtra em memória se estiver pesquisando
   const { filteredPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
-  // Resetar para página 1 quando filtros mudarem
+  const currentPosts = isSearching ? filteredPosts : paginatedPosts;
+  const isLoading = isSearching ? isLoadingAll : isLoadingPaginated;
+
+  // Reseta o scroll ao mudar a categoria
   useEffect(() => {
-    setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [activeCategory, searchQuery, postsPerPage]);
-
-  // Lógica de Paginação
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = useMemo(() => 
-    filteredPosts.slice(indexOfFirstPost, indexOfLastPost),
-    [filteredPosts, indexOfFirstPost, indexOfLastPost]
-  );
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, [activeCategory, searchQuery]);
 
   return (
     <div className="flex flex-col gap-10">
@@ -65,7 +65,7 @@ export default function ArchivePage() {
         Voltar
       </Link>
 
-      {/* Header + Seletor de Quantidade */}
+      {/* Header */}
       <header className={cn("pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6", isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark")}>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
@@ -76,32 +76,11 @@ export default function ArchivePage() {
           </div>
           {!isLoading && (
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 pl-5">
-              {filteredPosts.length} publicaç{filteredPosts.length !== 1 ? "ões" : "ão"} encontrada{filteredPosts.length !== 1 ? "s" : ""}
+              {isSearching ? `${filteredPosts.length} publicações encontradas` : `${paginatedPosts.length} posts carregados nesta fase`}
               {activeCategory !== "Todos" && ` · ${activeCategory}`}
               {searchQuery && ` · "${searchQuery}"`}
             </p>
           )}
-        </div>
-
-        {/* Seletor de Posts por Página */}
-        <div className="flex items-center gap-3">
-          <span className={cn("text-[9px] font-black uppercase tracking-widest opacity-50", isDark ? "text-white" : "text-black")}>Visualizar:</span>
-          <div className={cn("flex border-2", isDark ? "border-purple-500/30" : "border-snes-dark")}>
-            {[6, 12, 24].map((num) => (
-              <button
-                key={num}
-                onClick={() => setPostsPerPage(num)}
-                className={cn(
-                  "px-3 py-1.5 font-retro text-[10px] font-bold transition-all",
-                  postsPerPage === num
-                    ? (isDark ? "bg-purple-600 text-white" : "bg-purple-600 text-white")
-                    : (isDark ? "bg-gray-800 text-gray-400 hover:text-white" : "bg-white text-gray-600 hover:bg-gray-50")
-                )}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
         </div>
       </header>
 
@@ -114,7 +93,7 @@ export default function ArchivePage() {
         <div className="flex flex-col gap-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
-              {currentPosts.map((post, i) => (
+              {currentPosts.map((post) => (
                 <motion.div
                   key={post.id}
                   layout
@@ -130,53 +109,20 @@ export default function ArchivePage() {
             </AnimatePresence>
           </div>
 
-          {/* Paginação Retro */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
+          {/* Botão Retro de Carregar Mais (Cursor Paginação) */}
+          {!isSearching && hasNextPage && (
+            <div className="flex justify-center mt-6">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
                 className={cn(
-                  "p-3 border-2 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed",
-                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-white border-snes-dark text-snes-accent shadow-[4px_4px_0px_rgba(0,0,0,1)]"
+                  "font-retro text-xs font-bold uppercase tracking-widest px-8 py-4 border-4 transition-all active:scale-95 disabled:opacity-50",
+                  isDark 
+                    ? "bg-purple-600 border-purple-400 text-white shadow-[4px_4px_0_rgba(168,85,247,0.4)] hover:bg-purple-500" 
+                    : "bg-purple-500 border-black text-white shadow-[4px_4px_0_rgba(0,0,0,1)] hover:bg-purple-600 hover:shadow-[6px_6px_0_rgba(0,0,0,1)]"
                 )}
               >
-                <ChevronLeft size={20} />
-              </button>
-
-              <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(p => p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1))
-                  .map((p, i, arr) => {
-                    const showEllipsis = i > 0 && p !== arr[i - 1] + 1;
-                    return (
-                      <React.Fragment key={p}>
-                        {showEllipsis && <span className="opacity-30">...</span>}
-                        <button
-                          onClick={() => handlePageChange(p)}
-                          className={cn(
-                            "w-10 h-10 font-retro font-bold text-sm border-2 transition-all",
-                            currentPage === p
-                              ? (isDark ? "bg-purple-600 border-white text-white" : "bg-purple-600 border-black text-white shadow-[2px_2px_0px_rgba(0,0,0,1)]")
-                              : (isDark ? "bg-gray-800 border-purple-500/30 text-gray-400 hover:text-white" : "bg-white border-snes-dark text-gray-600 hover:bg-gray-50 shadow-[2px_2px_0px_rgba(0,0,0,1)]")
-                          )}
-                        >
-                          {p}
-                        </button>
-                      </React.Fragment>
-                    );
-                  })}
-              </div>
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={cn(
-                  "p-3 border-2 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed",
-                  isDark ? "bg-gray-800 border-purple-500 text-purple-400" : "bg-white border-snes-dark text-snes-accent shadow-[4px_4px_0px_rgba(0,0,0,1)]"
-                )}
-              >
-                <ChevronRight size={20} />
+                {isFetchingNextPage ? "CARREGANDO DADOS..." : "INICIAR PRÓXIMA FASE (CARREGAR MAIS)"}
               </button>
             </div>
           )}
@@ -191,4 +137,3 @@ export default function ArchivePage() {
     </div>
   );
 }
-
