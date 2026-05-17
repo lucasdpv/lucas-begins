@@ -97,7 +97,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     }
   }, [post?.id, previewPost, incrementViewMutation, currentUser?.id, authLoading]);
 
-  if ((isLoadingPosts || isFetchingLocal) && !post) {
+  if ((isLoadingPopular || isFetchingLocal) && !post) {
     return (
       <div className="py-20">
         <PostDetailSkeleton isDark={isDark} />

@@ -562,6 +562,43 @@ export const PostService = {
   },
 
   /**
+   * Busca múltiplos posts por uma lista de IDs (usado no inventário de favoritos).
+   */
+  async getPostsByIds(ids: string[]): Promise<Post[]> {
+    if (!ids || ids.length === 0) return [];
+    try {
+      // O Firestore limita queries 'in' a no máximo 30 elementos
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        where(documentId(), "in", ids.slice(0, 30))
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      return posts.filter(p => !p.isDraft);
+    } catch (error) {
+      console.error("[PostService] Error in getPostsByIds:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Conta a quantidade total de comentários feitos por um usuário usando Collection Group Query.
+   */
+  async getUserCommentsCount(userId: string): Promise<number> {
+    try {
+      const q = query(
+        collectionGroup(db, "comments"),
+        where("authorId", "==", userId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.size;
+    } catch (error) {
+      console.error("[PostService] Error in getUserCommentsCount:", error);
+      return 0;
+    }
+  },
+
+  /**
    * Remove um post e todos os seus comentários associados.
    */
   async deletePost(postId: string): Promise<boolean> {

@@ -130,6 +130,30 @@ export function usePostsByCategory(category: string, count: number = 3) {
 }
 
 /**
+ * Hook para buscar múltiplos posts por IDs (usado nos favoritos).
+ */
+export function usePostsByIds(ids: string[]) {
+  return useQuery({
+    queryKey: ['posts', 'by-ids', ids],
+    queryFn: () => PostService.getPostsByIds(ids),
+    enabled: !!ids && ids.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
+ * Hook para buscar a quantidade de comentários de um usuário no blog.
+ */
+export function useUserCommentsCount(userId: string) {
+  return useQuery({
+    queryKey: ['user-comments-count', userId],
+    queryFn: () => PostService.getUserCommentsCount(userId),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
  * Hook para buscar um único post por ID ou Slug.
  */
 export function usePost(idOrSlug: string, isSlug: boolean = false) {

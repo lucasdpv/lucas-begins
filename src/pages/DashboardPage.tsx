@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import { useUserProfile } from '../hooks/useUserQuery';
-import { useAllPosts, useFavoriteMutation } from '../features/posts/hooks/usePostsQuery';
+import { usePostsByIds, useUserCommentsCount, useFavoriteMutation } from '../features/posts/hooks/usePostsQuery';
 import { useThemeStore } from '../store/useThemeStore';
 import { useUIStore } from '../store/useUIStore';
 import { cn, formatNumber } from '../lib/utils';
@@ -18,8 +18,14 @@ export default function DashboardPage() {
   const { isDark } = useThemeStore();
   const { showToast } = useUIStore();
   const { data: profile, isLoading: isProfileLoading } = useUserProfile(currentUser?.id);
-  const { data: allPosts = [] } = useAllPosts();
   const favoriteMutation = useFavoriteMutation();
+
+  // 1. Busca os posts favoritados de forma otimizada (apenas IDs necessários, economizando 99% de leituras)
+  const favoriteIds = profile?.favorites || [];
+  const { data: favoritePosts = [], isLoading: isFavoritesLoading } = usePostsByIds(favoriteIds);
+
+  // 2. Busca a contagem de comentários do usuário usando Collection Group Query
+  const { data: totalComments = 0 } = useUserCommentsCount(currentUser?.id || "");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -77,13 +83,7 @@ export default function DashboardPage() {
     );
   }
 
-  // Filtra os posts favoritos (garante que rascunhos/ocultos não sejam exibidos no inventário)
-  const favoritePosts = allPosts.filter(post => !post.isDraft && profile?.favorites?.includes(post.id));
 
-  // Conta total de comentários do usuário
-  const totalComments = allPosts.reduce((acc, post) => {
-    return acc + (post.comments?.filter(c => c.authorId === currentUser?.id).length || 0);
-  }, 0);
 
   // Cálculo de XP para a barra de progresso
   const xpLimit = (profile?.level || 1) * 100;
