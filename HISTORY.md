@@ -13,6 +13,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Reply Likes & Moderation**: Adicionada capacidade de curtir respostas específicas e exclusão de respostas pelos respectivos autores ou administradores do portal.
 - **Emoji Quick Shortcuts Dock**: Inserção de uma barra horizontal de atalhos rápidos de emojis retro-gaming (👾, 🎮, 🏆, 🔥, etc.) tanto no campo principal de comentário quanto no formulário inline de resposta, permitindo inserção rápida em um único toque (ideal para celulares).
 - **Social Gamification Integration**: Sincronização automática com o sistema de XP. Responder a um comentário concede **+10 XP** ao usuário, e curtir posts/respostas concede **+2 XP**, impulsionando a participação ativa da comunidade.
+- **Bomba-Relógio de 1MB Defusada (Firestore Subcollections)**: Refatoração completa da persistência de comentários. Em vez de salvar comentários em uma array aninhada dentro do documento do post (que correria o risco de estourar o limite de 1MB por documento do Firestore), as interações agora são armazenadas de forma totalmente escalável em uma subcoleção isolada `/posts/{postId}/comments/{commentId}`. Isso reduz consideravelmente o tamanho dos posts retornados nas listagens gerais, otimiza o consumo de banda de rede e torna o portal infinitamente escalável.
 
 ---
 

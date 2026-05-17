@@ -12,6 +12,7 @@ import {
   startAfter,
   serverTimestamp,
   getDoc,
+  setDoc,
   increment,
   where,
   QueryDocumentSnapshot,
@@ -112,33 +113,59 @@ export const PostService = {
    * Busca um post especifico.
    */
   async getPostById(postId: string): Promise<Post | null> {
-    const postRef = doc(db, COLLECTIONS.POSTS, postId);
-    const snap = await getDoc(postRef);
-    if (!snap.exists()) return null;
-    
-    const data = { id: snap.id, ...snap.data() };
-    const result = PostSchema.safeParse(data);
-    if (!result.success) {
-      console.warn(`[PostService] Validation failed for post ${postId}, using raw data.`);
+    try {
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const snap = await getDoc(postRef);
+      if (!snap.exists()) return null;
+      
+      // Busca comentários da subcoleção de forma ordenada
+      const commentsQ = query(
+        collection(db, COLLECTIONS.POSTS, postId, "comments"),
+        orderBy("createdAt", "desc")
+      );
+      const commentsSnap = await getDocs(commentsQ);
+      const comments = commentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const data = { id: snap.id, ...snap.data(), comments };
+      const result = PostSchema.safeParse(data);
+      if (!result.success) {
+        console.warn(`[PostService] Validation failed for post ${postId}, using raw data.`);
+      }
+      return data as Post;
+    } catch (error) {
+      console.error("[PostService] Error in getPostById:", error);
+      return null;
     }
-    return data as Post;
   },
 
   /**
    * Busca um post especifico pelo Slug (URL amigavel).
    */
   async getPostBySlug(slug: string): Promise<Post | null> {
-    const q = query(collection(db, COLLECTIONS.POSTS), where("slug", "==", slug), limit(1));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
-    const postDoc = snapshot.docs[0];
-    
-    const data = { id: postDoc.id, ...postDoc.data() };
-    const result = PostSchema.safeParse(data);
-    if (!result.success) {
-      console.warn(`[PostService] Validation failed for slug ${slug}, using raw data.`);
+    try {
+      const q = query(collection(db, COLLECTIONS.POSTS), where("slug", "==", slug), limit(1));
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return null;
+      const postDoc = snapshot.docs[0];
+      
+      // Busca comentários da subcoleção de forma ordenada
+      const commentsQ = query(
+        collection(db, COLLECTIONS.POSTS, postDoc.id, "comments"),
+        orderBy("createdAt", "desc")
+      );
+      const commentsSnap = await getDocs(commentsQ);
+      const comments = commentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const data = { id: postDoc.id, ...postDoc.data(), comments };
+      const result = PostSchema.safeParse(data);
+      if (!result.success) {
+        console.warn(`[PostService] Validation failed for slug ${slug}, using raw data.`);
+      }
+      return data as Post;
+    } catch (error) {
+      console.error("[PostService] Error in getPostBySlug:", error);
+      return null;
     }
-    return data as Post;
   },
 
   /**
@@ -268,15 +295,19 @@ export const PostService = {
   },
 
   /**
-   * Adiciona um comentario.
+   * Adiciona um comentario na subcoleção do post.
    */
   async addComment(postId: string, comment: Partial<Comment>): Promise<void> {
     try {
-      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const commentsColl = collection(db, COLLECTIONS.POSTS, postId, "comments");
+      const newCommentDoc = doc(commentsColl);
       
-      await updateDoc(postRef, {
-        comments: arrayUnion({ ...comment, id: Date.now() } as any),
-        updatedAt: serverTimestamp()
+      await setDoc(newCommentDoc, {
+        ...comment,
+        id: newCommentDoc.id,
+        likes: [],
+        replies: [],
+        createdAt: new Date().toISOString()
       });
     } catch (error) {
       errorService.handle(error, "ao adicionar comentario");
@@ -285,27 +316,12 @@ export const PostService = {
   },
 
   /**
-   * Remove um comentario.
+   * Remove um comentario da subcoleção.
    */
   async deleteComment(postId: string, commentId: string | number): Promise<void> {
     try {
-      await runTransaction(db, async (transaction) => {
-        const postRef = doc(db, COLLECTIONS.POSTS, postId);
-        const postSnap = await transaction.get(postRef);
-        
-        if (!postSnap.exists()) return;
-
-        const data = postSnap.data() as Post;
-        const comments = data.comments || [];
-        const commentToRemove = comments.find(c => c.id === commentId);
-
-        if (commentToRemove) {
-          transaction.update(postRef, {
-            comments: arrayRemove(commentToRemove),
-            updatedAt: serverTimestamp()
-          });
-        }
-      });
+      const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
+      await deleteDoc(commentRef);
     } catch (error) {
       errorService.handle(error, "ao remover comentario");
       throw error;
@@ -359,36 +375,23 @@ export const PostService = {
   },
 
   /**
-   * Alterna o like de um usuário em um comentário específico do post.
+   * Alterna o like de um usuário em um comentário específico na subcoleção.
    */
   async toggleCommentLike(postId: string, commentId: string | number, userId: string): Promise<'liked' | 'unliked' | null> {
     try {
-      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
       
       return await runTransaction(db, async (transaction) => {
-        const postSnap = await transaction.get(postRef);
-        if (!postSnap.exists()) return null;
+        const snap = await transaction.get(commentRef);
+        if (!snap.exists()) return null;
 
-        const data = postSnap.data() as Post;
-        const comments = data.comments ? [...data.comments] : [];
-        const comment = comments.find(c => String(c.id) === String(commentId));
-
-        if (!comment) return null;
-
-        if (!comment.likes) {
-          (comment as any).likes = [];
-        }
-
-        const hasLiked = (comment.likes || []).includes(userId);
+        const data = snap.data();
+        const likes = data.likes || [];
+        const hasLiked = likes.includes(userId);
         const action: 'liked' | 'unliked' = hasLiked ? 'unliked' : 'liked';
 
-        (comment as any).likes = hasLiked 
-          ? (comment.likes || []).filter(id => id !== userId) 
-          : [...(comment.likes || []), userId];
-
-        transaction.update(postRef, {
-          comments,
-          updatedAt: serverTimestamp()
+        transaction.update(commentRef, {
+          likes: hasLiked ? arrayRemove(userId) : arrayUnion(userId)
         });
 
         return action;
@@ -400,36 +403,24 @@ export const PostService = {
   },
 
   /**
-   * Adiciona uma resposta (reply) a um comentário específico.
+   * Adiciona uma resposta (reply) a um comentário específico na subcoleção.
    */
   async addCommentReply(postId: string, commentId: string | number, reply: any): Promise<void> {
     try {
-      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
       
       await runTransaction(db, async (transaction) => {
-        const postSnap = await transaction.get(postRef);
-        if (!postSnap.exists()) return;
+        const snap = await transaction.get(commentRef);
+        if (!snap.exists()) return;
 
-        const data = postSnap.data() as Post;
-        const comments = data.comments ? [...data.comments] : [];
-        const comment = comments.find(c => String(c.id) === String(commentId));
-
-        if (!comment) return;
-
-        if (!(comment as any).replies) {
-          (comment as any).replies = [];
-        }
-
-        (comment as any).replies.push({
+        const replies = snap.data().replies ? [...snap.data().replies] : [];
+        replies.push({
           ...reply,
           id: Date.now(),
           likes: []
         });
 
-        transaction.update(postRef, {
-          comments,
-          updatedAt: serverTimestamp()
-        });
+        transaction.update(commentRef, { replies });
       });
     } catch (error) {
       errorService.handle(error, "ao adicionar resposta ao comentário");
@@ -438,28 +429,18 @@ export const PostService = {
   },
 
   /**
-   * Remove uma resposta (reply) de um comentário específico.
+   * Remove uma resposta (reply) de um comentário específico na subcoleção.
    */
   async deleteCommentReply(postId: string, commentId: string | number, replyId: string | number): Promise<void> {
     try {
-      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
       
       await runTransaction(db, async (transaction) => {
-        const postSnap = await transaction.get(postRef);
-        if (!postSnap.exists()) return;
+        const snap = await transaction.get(commentRef);
+        if (!snap.exists()) return;
 
-        const data = postSnap.data() as Post;
-        const comments = data.comments ? [...data.comments] : [];
-        const comment = comments.find(c => String(c.id) === String(commentId));
-
-        if (!comment || !(comment as any).replies) return;
-
-        (comment as any).replies = (comment as any).replies.filter((r: any) => String(r.id) !== String(replyId));
-
-        transaction.update(postRef, {
-          comments,
-          updatedAt: serverTimestamp()
-        });
+        const replies = (snap.data().replies || []).filter((r: any) => String(r.id) !== String(replyId));
+        transaction.update(commentRef, { replies });
       });
     } catch (error) {
       errorService.handle(error, "ao deletar resposta do comentário");
@@ -468,23 +449,18 @@ export const PostService = {
   },
 
   /**
-   * Alterna o like em uma resposta (reply).
+   * Alterna o like em uma resposta (reply) dentro de um comentário na subcoleção.
    */
   async toggleReplyLike(postId: string, commentId: string | number, replyId: string | number, userId: string): Promise<'liked' | 'unliked' | null> {
     try {
-      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
       
       return await runTransaction(db, async (transaction) => {
-        const postSnap = await transaction.get(postRef);
-        if (!postSnap.exists()) return null;
+        const snap = await transaction.get(commentRef);
+        if (!snap.exists()) return null;
 
-        const data = postSnap.data() as Post;
-        const comments = data.comments ? [...data.comments] : [];
-        const comment = comments.find(c => String(c.id) === String(commentId));
-
-        if (!comment || !(comment as any).replies) return null;
-
-        const reply = (comment as any).replies.find((r: any) => String(r.id) === String(replyId));
+        const replies = [...(snap.data().replies || [])];
+        const reply = replies.find((r: any) => String(r.id) === String(replyId));
         if (!reply) return null;
 
         if (!reply.likes) {
@@ -498,10 +474,7 @@ export const PostService = {
           ? reply.likes.filter((id: string) => id !== userId) 
           : [...reply.likes, userId];
 
-        transaction.update(postRef, {
-          comments,
-          updatedAt: serverTimestamp()
-        });
+        transaction.update(commentRef, { replies });
 
         return action;
       });
@@ -512,10 +485,24 @@ export const PostService = {
   },
 
   /**
-   * Remove um post.
+   * Remove um post e todos os seus comentários associados.
    */
   async deletePost(postId: string): Promise<boolean> {
-    await deleteDoc(doc(db, COLLECTIONS.POSTS, postId));
-    return true;
+    try {
+      const commentsQ = query(collection(db, COLLECTIONS.POSTS, postId, "comments"));
+      const commentsSnap = await getDocs(commentsQ);
+      
+      const batch = writeBatch(db);
+      commentsSnap.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
+      await deleteDoc(doc(db, COLLECTIONS.POSTS, postId));
+      return true;
+    } catch (error) {
+      console.error("[PostService] Error in deletePost:", error);
+      throw error;
+    }
   }
 };
