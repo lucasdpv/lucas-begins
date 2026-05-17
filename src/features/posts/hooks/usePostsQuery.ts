@@ -22,12 +22,14 @@ export const postKeys = {
 
 /**
  * Hook para buscar todos os posts (usado no Admin e componentes simples).
+ * Suporta parâmetro enabled para Lazy Loading.
  */
-export function useAllPosts() {
+export function useAllPosts(enabled = true) {
   return useQuery({
     queryKey: postKeys.all,
     queryFn: () => PostService.getAllPosts(),
     staleTime: 1000 * 60 * 5,
+    enabled,
   });
 }
 

@@ -40,14 +40,8 @@ export default function Navbar() {
   const { currentUser, handleLogout } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { data: categories = [] } = useCategories();
-  const { data: allPosts = [] } = useAllPosts();
-
-  // Filtra apenas categorias que possuem pelo menos um post publicado
-  const activeCategories = React.useMemo(() => {
-    return categories.filter(cat => 
-      allPosts.some(post => post.category === cat && !post.isDraft)
-    );
-  }, [categories, allPosts]);
+  // Estado de foco para lazy load da busca
+  const [isSearchFocused, setIsSearchFocused] = React.useState(false);
 
   const {
     isMobileMenuOpen,
@@ -63,6 +57,13 @@ export default function Navbar() {
     handleCancelSearch,
     handleCategorySelect
   } = useNavbar();
+
+  // Só carrega a base de posts se a busca for aberta, focada ou houver termo digitado
+  const shouldLoadPosts = isSearchExpanded || searchQuery.trim() !== "" || isSearchFocused;
+  const { data: allPosts = [] } = useAllPosts(shouldLoadPosts);
+
+  // Exibe as categorias ativas de forma imediata (0ms de atraso e zero leituras desnecessárias no Firestore)
+  const activeCategories = categories;
 
   return (
     <>
@@ -127,6 +128,7 @@ export default function Navbar() {
                 placeholder="EXECUTAR BUSCA NO SISTEMA..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
                 className={cn(
                   "w-full bg-transparent border-none font-retro font-bold text-[10px] outline-none uppercase tracking-[0.2em]",
                   isDark ? "text-white placeholder:text-white/30" : "text-black placeholder:text-black/50"
@@ -157,6 +159,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => handleSearch(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && setIsSearchExpanded(false)}
+                      onFocus={() => setIsSearchFocused(true)}
                       autoFocus
                       className={cn(
                         "w-full pl-12 pr-12 py-3 rounded-none border-2 font-retro font-bold outline-none text-sm transition-all",
