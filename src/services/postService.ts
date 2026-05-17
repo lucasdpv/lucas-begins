@@ -63,14 +63,27 @@ export const PostService = {
    * Busca posts em destaque (isFeatured).
    */
   async getFeaturedPosts(): Promise<Post[]> {
-    const q = query(
-      collection(db, COLLECTIONS.POSTS), 
-      where("isFeatured", "==", true),
-      orderBy("createdAt", "desc"),
-      limit(5)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.POSTS), 
+        where("isFeatured", "==", true)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      
+      // Ordena por data no client-side para evitar a necessidade de índice composto
+      return posts
+        .filter(p => !p.isDraft)
+        .sort((a, b) => {
+          const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          return timeB - timeA;
+        })
+        .slice(0, 5);
+    } catch (error) {
+      console.error("[PostService] Error in getFeaturedPosts:", error);
+      return [];
+    }
   },
 
   /**
@@ -118,12 +131,14 @@ export const PostService = {
     try {
       const q = query(
         collection(db, COLLECTIONS.POSTS),
-        where("isDraft", "==", false),
         orderBy("likes", "desc"),
-        limit(limitNumber)
+        limit(limitNumber + 5)
       );
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      
+      // Filtra rascunhos no client-side para evitar a necessidade de índice composto com where('isDraft')
+      return posts.filter(p => !p.isDraft).slice(0, limitNumber);
     } catch (error) {
       console.error("[PostService] Error fetching popular posts:", error);
       return [];
@@ -550,13 +565,20 @@ export const PostService = {
     try {
       const q = query(
         collection(db, COLLECTIONS.POSTS),
-        where("category", "==", category),
-        orderBy("createdAt", "desc"),
-        limit(limitNumber)
+        where("category", "==", category)
       );
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
-      return posts.filter(p => !p.isDraft);
+      
+      // Ordena por data no client-side para evitar a necessidade de índice composto com where('category')
+      return posts
+        .filter(p => !p.isDraft)
+        .sort((a, b) => {
+          const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          return timeB - timeA;
+        })
+        .slice(0, limitNumber);
     } catch (error) {
       console.error("[PostService] Error fetching posts by category:", error);
       return [];
