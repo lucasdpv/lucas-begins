@@ -558,21 +558,28 @@ export const PostService = {
     }
   },
 
-  /**
-   * Busca posts de uma categoria específica (ordenados por createdAt desc).
-   */
   async getPostsByCategory(category: string, limitNumber: number = 3): Promise<Post[]> {
     try {
+      // Para Dossiê, busca tanto singular quanto plural com e sem acento no banco
+      const categoriesToSearch = category.toLowerCase().includes("dossi")
+        ? ["Dossiê", "Dossiês", "dossie", "dossies"]
+        : [category];
+
       const q = query(
         collection(db, COLLECTIONS.POSTS),
-        where("category", "==", category)
+        where("category", "in", categoriesToSearch)
       );
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
       
-      // Ordena por data no client-side para evitar a necessidade de índice composto com where('category')
+      // Ordena por data no client-side e aplica filtro flexível idêntico ao original (categoria ou título com 'dossi')
       return posts
-        .filter(p => !p.isDraft)
+        .filter(p => {
+          if (p.isDraft) return false;
+          const cat = p.category?.toLowerCase() || "";
+          const title = p.title?.toLowerCase() || "";
+          return cat.includes("dossi") || title.includes("dossi") || cat === category.toLowerCase();
+        })
         .sort((a, b) => {
           const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
           const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
