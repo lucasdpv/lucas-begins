@@ -110,6 +110,25 @@ export const PostService = {
   },
 
   /**
+   * Busca posts populares (ordenados por likes, ignorando rascunhos) limitando a quantidade.
+   */
+  async getPopularPosts(limitNumber: number = 4): Promise<Post[]> {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        where("isDraft", "==", false),
+        orderBy("likes", "desc"),
+        limit(limitNumber)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+    } catch (error) {
+      console.error("[PostService] Error fetching popular posts:", error);
+      return [];
+    }
+  },
+
+  /**
    * Busca um post especifico.
    */
   async getPostById(postId: string): Promise<Post | null> {

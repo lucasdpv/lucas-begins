@@ -13,7 +13,7 @@ import {
   useLikeMutation, 
   useCommentMutation, 
   useIncrementViewMutation, 
-  useAllPosts, 
+  usePopularPosts, 
   useFavoriteMutation, 
   useDeleteCommentMutation,
   useLikeCommentMutation,
@@ -50,7 +50,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
   
-  const { data: posts = [], isLoading: isLoadingPosts } = useAllPosts();
+  const { data: popularPosts = [], isLoading: isLoadingPopular } = usePopularPosts(4);
 
   const likeMutation = useLikeMutation();
   const commentMutation = useCommentMutation();
@@ -66,10 +66,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true);
   const { data: postById, isLoading: isLoadingId } = usePost(slug || "", false);
   
-  const post = previewPost || 
-               (posts as Post[]).find((p) => String(p.slug) === String(slug) || String(p.id) === String(slug)) || 
-               postBySlug || 
-               postById;
+  const post = previewPost || postBySlug || postById;
 
   const isFetchingLocal = isLoadingSlug || isLoadingId;
 
@@ -236,7 +233,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
         )}
 
         <PostRelated 
-          posts={posts as Post[]} 
+          posts={popularPosts as Post[]} 
           currentPostId={post.id} 
           isDark={isDark} 
           isPreview={!!previewPost}

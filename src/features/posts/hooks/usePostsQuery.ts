@@ -85,6 +85,17 @@ export function useLatestPosts(count: number = 5) {
 }
 
 /**
+ * Hook para buscar posts populares por likes.
+ */
+export function usePopularPosts(count: number = 4) {
+  return useQuery({
+    queryKey: ['posts', 'popular', count],
+    queryFn: () => PostService.getPopularPosts(count),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/**
  * Hook para buscar um único post por ID ou Slug.
  */
 export function usePost(idOrSlug: string, isSlug: boolean = false) {
