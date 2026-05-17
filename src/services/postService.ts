@@ -359,6 +359,159 @@ export const PostService = {
   },
 
   /**
+   * Alterna o like de um usuário em um comentário específico do post.
+   */
+  async toggleCommentLike(postId: string, commentId: string | number, userId: string): Promise<'liked' | 'unliked' | null> {
+    try {
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      
+      return await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return null;
+
+        const data = postSnap.data() as Post;
+        const comments = data.comments ? [...data.comments] : [];
+        const comment = comments.find(c => String(c.id) === String(commentId));
+
+        if (!comment) return null;
+
+        if (!comment.likes) {
+          (comment as any).likes = [];
+        }
+
+        const hasLiked = (comment.likes || []).includes(userId);
+        const action: 'liked' | 'unliked' = hasLiked ? 'unliked' : 'liked';
+
+        (comment as any).likes = hasLiked 
+          ? (comment.likes || []).filter(id => id !== userId) 
+          : [...(comment.likes || []), userId];
+
+        transaction.update(postRef, {
+          comments,
+          updatedAt: serverTimestamp()
+        });
+
+        return action;
+      });
+    } catch (error) {
+      errorService.handle(error, "ao fazer toggle de like no comentário");
+      return null;
+    }
+  },
+
+  /**
+   * Adiciona uma resposta (reply) a um comentário específico.
+   */
+  async addCommentReply(postId: string, commentId: string | number, reply: any): Promise<void> {
+    try {
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      
+      await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return;
+
+        const data = postSnap.data() as Post;
+        const comments = data.comments ? [...data.comments] : [];
+        const comment = comments.find(c => String(c.id) === String(commentId));
+
+        if (!comment) return;
+
+        if (!(comment as any).replies) {
+          (comment as any).replies = [];
+        }
+
+        (comment as any).replies.push({
+          ...reply,
+          id: Date.now(),
+          likes: []
+        });
+
+        transaction.update(postRef, {
+          comments,
+          updatedAt: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      errorService.handle(error, "ao adicionar resposta ao comentário");
+      throw error;
+    }
+  },
+
+  /**
+   * Remove uma resposta (reply) de um comentário específico.
+   */
+  async deleteCommentReply(postId: string, commentId: string | number, replyId: string | number): Promise<void> {
+    try {
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      
+      await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return;
+
+        const data = postSnap.data() as Post;
+        const comments = data.comments ? [...data.comments] : [];
+        const comment = comments.find(c => String(c.id) === String(commentId));
+
+        if (!comment || !(comment as any).replies) return;
+
+        (comment as any).replies = (comment as any).replies.filter((r: any) => String(r.id) !== String(replyId));
+
+        transaction.update(postRef, {
+          comments,
+          updatedAt: serverTimestamp()
+        });
+      });
+    } catch (error) {
+      errorService.handle(error, "ao deletar resposta do comentário");
+      throw error;
+    }
+  },
+
+  /**
+   * Alterna o like em uma resposta (reply).
+   */
+  async toggleReplyLike(postId: string, commentId: string | number, replyId: string | number, userId: string): Promise<'liked' | 'unliked' | null> {
+    try {
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      
+      return await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return null;
+
+        const data = postSnap.data() as Post;
+        const comments = data.comments ? [...data.comments] : [];
+        const comment = comments.find(c => String(c.id) === String(commentId));
+
+        if (!comment || !(comment as any).replies) return null;
+
+        const reply = (comment as any).replies.find((r: any) => String(r.id) === String(replyId));
+        if (!reply) return null;
+
+        if (!reply.likes) {
+          reply.likes = [];
+        }
+
+        const hasLiked = reply.likes.includes(userId);
+        const action: 'liked' | 'unliked' = hasLiked ? 'unliked' : 'liked';
+
+        reply.likes = hasLiked 
+          ? reply.likes.filter((id: string) => id !== userId) 
+          : [...reply.likes, userId];
+
+        transaction.update(postRef, {
+          comments,
+          updatedAt: serverTimestamp()
+        });
+
+        return action;
+      });
+    } catch (error) {
+      errorService.handle(error, "ao fazer toggle de like na resposta");
+      return null;
+    }
+  },
+
+  /**
    * Remove um post.
    */
   async deletePost(postId: string): Promise<boolean> {

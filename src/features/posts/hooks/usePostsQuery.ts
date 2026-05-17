@@ -332,3 +332,95 @@ export function useIncrementViewMutation() {
     }
   });
 }
+
+/**
+ * Hook para Curtir/Descurtir um comentário.
+ */
+export function useLikeCommentMutation() {
+  const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: ({ postId, commentId, userId }: { postId: string, commentId: string | number, userId: string }) => 
+      PostService.toggleCommentLike(postId, commentId, userId),
+    onSuccess: (action, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      if (action === 'liked') {
+        userService.addXP(variables.userId, 2);
+      }
+    },
+    onError: () => {
+      showToast("Erro ao curtir comentário.", "error");
+    }
+  });
+}
+
+/**
+ * Hook para responder a um comentário.
+ */
+export function useReplyCommentMutation() {
+  const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: ({ postId, commentId, reply }: { postId: string, commentId: string | number, reply: any }) => 
+      PostService.addCommentReply(postId, commentId, reply),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      if (variables.reply.authorId) {
+        userService.addXP(variables.reply.authorId, 10);
+        queryClient.invalidateQueries({ queryKey: ['userProfile', variables.reply.authorId] });
+      }
+      showToast("Resposta enviada! 💬");
+    },
+    onError: () => {
+      showToast("Erro ao enviar resposta.", "error");
+    }
+  });
+}
+
+/**
+ * Hook para deletar uma resposta.
+ */
+export function useDeleteReplyMutation() {
+  const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: ({ postId, commentId, replyId }: { postId: string, commentId: string | number, replyId: string | number }) => 
+      PostService.deleteCommentReply(postId, commentId, replyId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      showToast("Resposta removida.");
+    },
+    onError: () => {
+      showToast("Erro ao remover resposta.", "error");
+    }
+  });
+}
+
+/**
+ * Hook para Curtir/Descurtir uma resposta.
+ */
+export function useLikeReplyMutation() {
+  const queryClient = useQueryClient();
+  const { showToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: ({ postId, commentId, replyId, userId }: { postId: string, commentId: string | number, replyId: string | number, userId: string }) => 
+      PostService.toggleReplyLike(postId, commentId, replyId, userId),
+    onSuccess: (action, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      if (action === 'liked') {
+        userService.addXP(variables.userId, 2);
+      }
+    },
+    onError: () => {
+      showToast("Erro ao curtir resposta.", "error");
+    }
+  });
+}

@@ -4,6 +4,18 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v3.6.0] - The Social Threads & Emoji Shortcuts Update
+*Data: 17 de Maio de 2026*
+
+### 💬 Social Comment System (Likes & Nested Threads)
+- **Comment Likes & Heart Reactions**: Usuários logados agora podem curtir e descurtir comentários individuais com botões animados de Coração (Heart), exibindo o contador de curtidas em tempo real.
+- **Threaded Nested Replies**: Implementação de sistema de respostas encadeadas (threads) de nível único de profundidade. As respostas são renderizadas de forma recuada com linhas conectoras verticais pontilhadas retro, garantindo uma estética arcade limpa e legível.
+- **Reply Likes & Moderation**: Adicionada capacidade de curtir respostas específicas e exclusão de respostas pelos respectivos autores ou administradores do portal.
+- **Emoji Quick Shortcuts Dock**: Inserção de uma barra horizontal de atalhos rápidos de emojis retro-gaming (👾, 🎮, 🏆, 🔥, etc.) tanto no campo principal de comentário quanto no formulário inline de resposta, permitindo inserção rápida em um único toque (ideal para celulares).
+- **Social Gamification Integration**: Sincronização automática com o sistema de XP. Responder a um comentário concede **+10 XP** ao usuário, e curtir posts/respostas concede **+2 XP**, impulsionando a participação ativa da comunidade.
+
+---
+
 ## 💎 [v3.5.0] - The Dynamic Post Visibility Update
 *Data: 17 de Maio de 2026*
 

@@ -12,6 +12,19 @@ export const AuthorSchema = z.object({
 
 export type Author = z.infer<typeof AuthorSchema>;
 
+export const ReplySchema = z.object({
+  id: z.union([z.string(), z.number()]).catch(() => Date.now()),
+  authorId: z.string().catch('unknown'),
+  author: z.string().catch('Anônimo'),
+  authorAvatar: z.string().optional().nullable(),
+  authorLevel: z.number().optional().nullable().catch(1),
+  text: z.string().catch(''),
+  createdAt: z.any().optional(),
+  likes: z.array(z.string()).catch([]),
+}).catch({ id: Date.now(), authorId: 'unknown', author: 'Anônimo', text: '', authorLevel: 1, likes: [] });
+
+export type Reply = z.infer<typeof ReplySchema>;
+
 export const CommentSchema = z.object({
   id: z.union([z.string(), z.number()]).catch(() => Date.now()),
   authorId: z.string().catch('unknown'),
@@ -20,7 +33,9 @@ export const CommentSchema = z.object({
   authorLevel: z.number().optional().nullable().catch(1),
   text: z.string().catch(''),
   createdAt: z.any().optional(),
-}).catch({ id: Date.now(), authorId: 'unknown', author: 'Anônimo', text: '', authorLevel: 1 });
+  likes: z.array(z.string()).catch([]),
+  replies: z.array(ReplySchema).catch([]),
+}).catch({ id: Date.now(), authorId: 'unknown', author: 'Anônimo', text: '', authorLevel: 1, likes: [], replies: [] });
 
 export type Comment = z.infer<typeof CommentSchema>;
 

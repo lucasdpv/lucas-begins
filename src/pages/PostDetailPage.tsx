@@ -15,7 +15,11 @@ import {
   useIncrementViewMutation, 
   useAllPosts, 
   useFavoriteMutation, 
-  useDeleteCommentMutation 
+  useDeleteCommentMutation,
+  useLikeCommentMutation,
+  useReplyCommentMutation,
+  useDeleteReplyMutation,
+  useLikeReplyMutation
 } from "../features/posts/hooks/usePostsQuery";
 import { useImageFallback } from "../hooks/useImageFallback";
 import { useUserProfile } from "../hooks/useUserQuery";
@@ -53,6 +57,11 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const favoriteMutation = useFavoriteMutation();
   const deleteCommentMutation = useDeleteCommentMutation();
   const incrementViewMutation = useIncrementViewMutation();
+
+  const likeCommentMutation = useLikeCommentMutation();
+  const replyCommentMutation = useReplyCommentMutation();
+  const deleteReplyMutation = useDeleteReplyMutation();
+  const likeReplyMutation = useLikeReplyMutation();
 
   const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true);
   const { data: postById, isLoading: isLoadingId } = usePost(slug || "", false);
@@ -248,6 +257,37 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           visibleComments={visibleComments}
           onLoadMore={() => setVisibleComments(prev => prev + COMMENTS_PER_PAGE)}
           isPreview={!!previewPost}
+          onLikeComment={(commentId) => {
+            if (currentUser) {
+              likeCommentMutation.mutate({ postId: post.id, commentId, userId: currentUser.id });
+            }
+          }}
+          onSubmitReply={(commentId, text) => {
+            if (currentUser) {
+              replyCommentMutation.mutate({ 
+                postId: post.id, 
+                commentId, 
+                reply: { 
+                  text, 
+                  author: currentUser.name, 
+                  authorAvatar: currentUser.avatar, 
+                  authorId: currentUser.id, 
+                  authorLevel: currentUser.level || 1, 
+                  createdAt: new Date().toISOString() 
+                } 
+              });
+            }
+          }}
+          onDeleteReply={(commentId, replyId) => {
+            if (window.confirm("Deseja realmente excluir esta resposta?")) {
+              deleteReplyMutation.mutate({ postId: post.id, commentId, replyId });
+            }
+          }}
+          onLikeReply={(commentId, replyId) => {
+            if (currentUser) {
+              likeReplyMutation.mutate({ postId: post.id, commentId, replyId, userId: currentUser.id });
+            }
+          }}
         />
       </div>
 
