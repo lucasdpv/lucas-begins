@@ -20,7 +20,9 @@ import {
   arrayUnion,
   arrayRemove,
   runTransaction,
-  writeBatch
+  writeBatch,
+  collectionGroup,
+  documentId
 } from 'firebase/firestore';
 import { slugify } from '../lib/utils';
 import { Post, Comment, PostSchema } from '../features/posts/schemas';
