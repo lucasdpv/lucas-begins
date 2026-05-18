@@ -170,7 +170,7 @@ export default function DebugPage() {
             </div>
             <div>
               <h3 className="font-bold text-yellow-400 mb-2">❌ Se falhar "Teste Curtida":</h3>
-              <p>Você não tem permissão para atualizar posts. Verifique rules para `posts/{docId}`</p>
+              <p>Você não tem permissão para atualizar posts. Verifique rules para posts/docId</p>
             </div>
             <div>
               <h3 className="font-bold text-green-400 mb-2">✅ Se todos passarem:</h3>

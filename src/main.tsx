@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import App from './App'
 import ErrorBoundary from './components/layout/ErrorBoundary'
 import { AuthProvider } from './context/AuthProvider'
+import { TranslationProvider } from './context/TranslationContext'
 import ScrollToTop from './components/layout/ScrollToTop'
 import './index.css'
 
@@ -25,10 +26,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <QueryClientProvider client={queryClient}>
         <HelmetProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <ScrollToTop />
-              <App />
-            </BrowserRouter>
+            <TranslationProvider>
+              <BrowserRouter>
+                <ScrollToTop />
+                <App />
+              </BrowserRouter>
+            </TranslationProvider>
           </AuthProvider>
         </HelmetProvider>
         <ReactQueryDevtools initialIsOpen={false} />

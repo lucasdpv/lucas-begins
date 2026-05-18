@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn, getPixelAvatar } from "../../../lib/utils";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
 import { InstagramIcon, ThreadsIcon, XIcon } from "../../icons/SocialIcons";
+import LanguageSelector from "../../ui/LanguageSelector";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -163,29 +164,7 @@ export default function MobileMenu({
               </button>
             )}
 
-            <nav className="flex flex-col gap-3">
-              <Link
-                to="/about"
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
-                  isDark ? "text-gray-300" : "text-gray-700"
-                )}
-              >
-                <Zap size={24} className="text-purple-500" /> Sobre Nós
-              </Link>
-              <Link
-                to="/contact"
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
-                  isDark ? "text-gray-300" : "text-gray-700"
-                )}
-              >
-                <Star size={24} className="text-yellow-500" /> Contatos
-              </Link>
-            </nav>
-
+            {/* 1. Categorias Section (Primary Navigation) */}
             <div className="flex flex-col">
               <button
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
@@ -231,21 +210,50 @@ export default function MobileMenu({
               </AnimatePresence>
             </div>
 
+            {/* 2. Secondary editorial pages */}
+            <nav className="flex flex-col gap-3">
+              <Link
+                to="/about"
+                onClick={onClose}
+                className={cn(
+                  "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
+                  isDark ? "text-gray-300" : "text-gray-700"
+                )}
+              >
+                <Zap size={24} className="text-purple-500" /> Sobre Nós
+              </Link>
+              <Link
+                to="/contact"
+                onClick={onClose}
+                className={cn(
+                  "flex items-center gap-5 p-5 rounded-2xl font-retro font-bold uppercase text-lg transition-all border-2 border-transparent hover:border-purple-500/30 hover:bg-purple-600/10",
+                  isDark ? "text-gray-300" : "text-gray-700"
+                )}
+              >
+                <Star size={24} className="text-yellow-500" /> Contatos
+              </Link>
+            </nav>
+
+            {/* 3. Idioma do Sistema (System Utilities) */}
+            <div className="py-4 border-t border-b border-purple-500/10">
+              <LanguageSelector isMobileLayout={true} onLanguageChange={onClose} />
+            </div>
+
             {/* Social Links (Mobile Footer) */}
             <div className="mt-auto pt-8 border-t border-white/10">
               <p className="text-[10px] font-retro font-bold uppercase opacity-40 mb-4 tracking-[0.2em]">Siga-nos nas Redes</p>
               <div className="flex gap-4">
                 <a
-                  href="https://x.com/beginsproject"
+                  href="https://www.instagram.com/beginsproject/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
                     "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
                     isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
                   )}
-                  title="X (Twitter)"
+                  title="Instagram"
                 >
-                  <XIcon className="w-6 h-6" />
+                  <InstagramIcon className="w-6 h-6" />
                 </a>
                 <a
                   href="https://www.threads.com/@beginsproject"
@@ -260,16 +268,16 @@ export default function MobileMenu({
                   <ThreadsIcon className="w-6 h-6" />
                 </a>
                 <a
-                  href="https://www.instagram.com/beginsproject/"
+                  href="https://x.com/beginsproject"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
                     "flex-1 flex items-center justify-center py-4 rounded-xl border-2 transition-all active:scale-95",
                     isDark ? "bg-gray-900 border-purple-500/30 text-white" : "bg-gray-50 border-purple-500/20 text-black"
                   )}
-                  title="Instagram"
+                  title="X (Twitter)"
                 >
-                  <InstagramIcon className="w-6 h-6" />
+                  <XIcon className="w-6 h-6" />
                 </a>
               </div>
             </div>

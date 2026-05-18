@@ -46,7 +46,7 @@ export default function NavUserMenu({
           title="Painel Administrativo"
         >
           <ShieldCheck size={18} className="transition-transform group-hover:scale-110 shrink-0" />
-          <span className="hidden lg:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Painel</span>
+          <span className="hidden 2xl:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Painel</span>
         </Link>
       )}
 
@@ -70,7 +70,7 @@ export default function NavUserMenu({
           />
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
         </div>
-        <span className="hidden lg:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Meu QG</span>
+        <span className="hidden 2xl:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Meu QG</span>
       </Link>
       
       {/* Divider */}

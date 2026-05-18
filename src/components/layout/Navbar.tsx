@@ -27,6 +27,7 @@ import { useNavbar } from "./Navbar/useNavbar";
 import NavCategoryMenu from "./Navbar/NavCategoryMenu";
 import NavUserMenu from "./Navbar/NavUserMenu";
 import MobileMenu from "./Navbar/MobileMenu";
+import LanguageSelector from "../ui/LanguageSelector";
 
 export default function Navbar() {
   const {
@@ -179,65 +180,12 @@ export default function Navbar() {
               )}
             </AnimatePresence>
 
-            {/* Social Group (Desktop Only) */}
-            <div className="hidden xl:flex items-center gap-3 pr-6 border-r-2 border-purple-500/10">
-                <a
-                  href="https://x.com/beginsproject"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-1 rounded-none border-2 group/social",
-                    isDark 
-                      ? "bg-white/5 border-white/10 hover:border-white hover:bg-white/10 shadow-[2px_2px_0px_rgba(255,255,255,0.1)]" 
-                      : "bg-black/5 border-black/10 hover:border-black hover:bg-black/10 shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
-                  )}
-                  title="X (Twitter)"
-                >
-                  <XIcon className={cn(
-                    "w-5 h-5 transition-all duration-300",
-                    isDark ? "text-gray-400 group-hover/social:text-white" : "text-gray-600 group-hover/social:text-black"
-                  )} />
-                </a>
 
-                <a
-                  href="https://www.threads.com/@beginsproject"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-1 rounded-none border-2 group/social",
-                    isDark 
-                      ? "bg-white/5 border-white/10 hover:border-white hover:bg-white/10 shadow-[2px_2px_0px_rgba(255,255,255,0.1)]" 
-                      : "bg-black/5 border-black/10 hover:border-black hover:bg-black/10 shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
-                  )}
-                  title="Threads"
-                >
-                  <ThreadsIcon className={cn(
-                    "w-5 h-5 transition-all duration-300",
-                    isDark ? "text-gray-400 group-hover/social:text-white" : "text-gray-600 group-hover/social:text-black"
-                  )} />
-                </a>
-                
-                <a
-                  href="https://www.instagram.com/beginsproject"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-1 rounded-none border-2 group/social",
-                    isDark 
-                      ? "bg-pink-500/5 border-pink-500/20 hover:border-pink-500 hover:bg-pink-500/10 shadow-[2px_2px_0px_rgba(228,64,95,0.1)]" 
-                      : "bg-pink-500/5 border-pink-500/20 hover:border-pink-500 hover:bg-pink-500/10 shadow-[2px_2px_0px_rgba(228,64,95,0.1)]"
-                  )}
-                  title="Instagram"
-                >
-                  <InstagramIcon className={cn(
-                    "w-5 h-5 transition-all duration-300",
-                    isDark ? "text-pink-500/40 group-hover/social:text-pink-500" : "text-pink-600/60 group-hover/social:text-pink-600"
-                  )} />
-                </a>
-            </div>
 
             {/* Core Tools (Desktop Only) */}
             <div className="hidden xl:flex items-center gap-3">
+              <LanguageSelector />
+
               <button 
                 onClick={toggleTheme} 
                 className={cn(

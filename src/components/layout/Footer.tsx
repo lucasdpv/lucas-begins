@@ -32,12 +32,12 @@ export default function Footer() {
           {/* Sociais inline */}
           <div className="flex items-center gap-2">
             <a
-              href="https://x.com/beginsproject"
+              href="https://www.instagram.com/beginsproject/"
               target="_blank" rel="noopener noreferrer"
               className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
-              title="X (Twitter)"
+              title="Instagram"
             >
-              <XIcon className="w-4 h-4" />
+              <InstagramIcon className="w-4 h-4" />
             </a>
             <a
               href="https://www.threads.com/@beginsproject"
@@ -48,12 +48,12 @@ export default function Footer() {
               <ThreadsIcon className="w-4 h-4" />
             </a>
             <a
-              href="https://www.instagram.com/beginsproject/"
+              href="https://x.com/beginsproject"
               target="_blank" rel="noopener noreferrer"
               className={cn("p-2.5 rounded-lg retro-button border-black transition-all", isDark ? "bg-gray-800 text-white border-purple-500" : "bg-white text-black")}
-              title="Instagram"
+              title="X (Twitter)"
             >
-              <InstagramIcon className="w-4 h-4" />
+              <XIcon className="w-4 h-4" />
             </a>
           </div>
         </div>
@@ -106,12 +106,12 @@ export default function Footer() {
           {/* Sociais */}
           <div className="flex items-center gap-3 shrink-0">
             <a
-              href="https://x.com/beginsproject"
+              href="https://www.instagram.com/beginsproject"
               target="_blank" rel="noopener noreferrer"
-              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-white" : "bg-white text-black hover:border-purple-600")}
-              title="X (Twitter)"
+              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-pink-500" : "bg-white text-black hover:border-pink-600")}
+              title="Instagram"
             >
-              <XIcon className="w-4 h-4 shrink-0" />
+              <InstagramIcon className="w-4 h-4 shrink-0" />
             </a>
             <a
               href="https://www.threads.com/@beginsproject"
@@ -122,12 +122,12 @@ export default function Footer() {
               <ThreadsIcon className="w-4 h-4 shrink-0" />
             </a>
             <a
-              href="https://www.instagram.com/beginsproject"
+              href="https://x.com/beginsproject"
               target="_blank" rel="noopener noreferrer"
-              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-pink-500" : "bg-white text-black hover:border-pink-600")}
-              title="Instagram"
+              className={cn("p-2.5 rounded-xl retro-button border-black transition-all hover:scale-110", isDark ? "bg-gray-800 text-white border-purple-500 hover:border-white" : "bg-white text-black hover:border-purple-600")}
+              title="X (Twitter)"
             >
-              <InstagramIcon className="w-4 h-4 shrink-0" />
+              <XIcon className="w-4 h-4 shrink-0" />
             </a>
           </div>
         </div>
