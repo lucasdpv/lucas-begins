@@ -15,6 +15,7 @@ export default function AboutPage() {
     <div className="min-h-[85vh] flex items-start justify-center py-12 md:py-20 px-4 relative overflow-hidden">
       <Helmet>
         <title>A História | BeginsProject</title>
+        <link rel="canonical" href="https://lucasbegins.com.br/about" />
         <meta name="description" content="Conheça a história e os bastidores do BeginsProject (Lucas Begins), um portal dedicado à nostalgia gamer, reviews de jogos retro e à preservação da história dos videogames." />
         <meta name="keywords" content="BeginsProject, Lucas Begins, História do Portal, Sobre o Blog, Lucas Vieira, Retro Gaming Blog, Nostalgia Gamer, Preservação de Games" />
       </Helmet>

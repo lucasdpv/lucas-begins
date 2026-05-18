@@ -16,6 +16,7 @@ export default function PrivacyPolicyPage() {
     <div className={cn("max-w-4xl mx-auto space-y-12 animate-fade-in", isDark ? "text-gray-300" : "text-gray-700")}>
       <Helmet>
         <title>Política de Privacidade | BeginsProject</title>
+        <link rel="canonical" href="https://lucasbegins.com.br/privacy" />
         <meta name="description" content="Política de Privacidade do portal BeginsProject." />
       </Helmet>
 

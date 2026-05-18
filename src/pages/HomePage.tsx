@@ -74,30 +74,30 @@ export default function HomePage() {
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
-        <link rel="canonical" href="https://www.lucasbegins.com.br/" />
+        <link rel="canonical" href="https://lucasbegins.com.br/" />
         <meta
           name="description"
           content="Bem-vindo ao BeginsProject. Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
         />
         <meta name="keywords" content="BeginsProject, Lucas Begins, Projeto Begins, Lucas Begins Blog, Revista Retro, Games Retro, Cultura Pop, Reviews de Jogos" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.lucasbegins.com.br/" />
+        <meta property="og:url" content="https://lucasbegins.com.br/" />
         <meta property="og:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
-        <meta property="og:image" content="https://www.lucasbegins.com.br/og-image.png" />
+        <meta property="og:image" content="https://lucasbegins.com.br/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="BeginsProject | Portal de Games e Cultura Pop" />
         <meta name="twitter:description" content="Reviews, nostalgia e cultura gamer brasileira." />
-        <meta name="twitter:image" content="https://www.lucasbegins.com.br/og-image.png" />
+        <meta name="twitter:image" content="https://lucasbegins.com.br/og-image.png" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "BeginsProject",
-            url: "https://www.lucasbegins.com.br/",
+            url: "https://lucasbegins.com.br/",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://www.lucasbegins.com.br/?q={search_term_string}",
+              target: "https://lucasbegins.com.br/?q={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           })}

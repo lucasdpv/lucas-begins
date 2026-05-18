@@ -71,6 +71,7 @@ export default function ContactPage() {
     <div className="min-h-[85vh] py-12 px-4 relative overflow-hidden flex flex-col items-center">
       <Helmet>
         <title>Quest Log: Contato | BeginsProject</title>
+        <link rel="canonical" href="https://lucasbegins.com.br/contact" />
         <meta name="description" content="Fale com o Player 1 do BeginsProject." />
       </Helmet>
 

@@ -49,6 +49,7 @@ export default function ArchivePage() {
     <div className="flex flex-col gap-10">
       <Helmet>
         <title>Todos os Artigos | BeginsProject</title>
+        <link rel="canonical" href="https://lucasbegins.com.br/archive" />
         <meta name="description" content="Arquivo completo de artigos, reviews e notícias do portal BeginsProject. Tudo sobre a cultura retro em um só lugar." />
         <meta name="keywords" content="BeginsProject, Lucas Begins, Arquivo de Posts, Reviews de Games Retro, Notícias Retro Gaming" />
       </Helmet>
