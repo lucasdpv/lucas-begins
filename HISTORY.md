@@ -4,6 +4,28 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🌎 [v3.8.0] - The Premium Translation System & Mobile UX Update
+*Data: 18 de Maio de 2026*
+
+### 🌎 Dynamic Page Translation Engine
+- **Hybrid Context Provider (`TranslationContext.tsx`)**: Injeção e encapsulamento dinâmico e assíncrono da API do Google Translate em segundo plano. Permite tradução em tempo real de toda a página (incluindo artigos do Firebase Markdown e comentários de leitores) sem travar a performance inicial do portal.
+- **LocalStorage & Cookie Sync**: Sincronização automática das escolhas de idioma salvas no `localStorage` e nos cookies nativos `googtrans` (`/pt/en`, `/pt/es`, etc.) para garantir transições suaves entre rotas no React SPA sem perder a tradução ativa.
+- **Resets e Overrides Estritos (`index.css`)**: Injeção de resets globais robustos com seletores curinga (`[class*="VIpgJd-ZVi9od"]` e `.skiptranslate`) para ocultar por completo as barras azuis nativas, tooltips, popups e o balão flutuante azul "G" do Google Translate, garantindo uma revista digital visualmente limpa.
+
+### 🎮 Custom Language Selector Component (`LanguageSelector.tsx`)
+- **Retro Gaming Badges**: Desenvolvimento de uma identidade visual premium inspirada em consoles de videogame antigos. Os idiomas são indicados por lindas tags com estilo de console (ex: `[PT]`, `[EN]`), contornando a limitação nativa do Windows que falha na renderização de emojis de bandeiras (substituindo-os por letras encavaladas como `BR PT`).
+- **Pixel-Perfect Alignment**: O gatilho do dropdown no desktop utiliza um ícone vetorial de Globo (`Globe` de 18px) e compartilha das mesmas classes de padding, bordas e física de mola do Framer Motion (`AnimatePresence`) que o botão de troca de tema (Sol/Lua), mantendo a proporção geométrica da barra de ferramentas.
+- **Recursive Translation Block (`notranslate`)**: Inclusão de atributos `className="notranslate" translate="no"` nos contêineres do seletor de idiomas para blindar as siglas de siglas traduzidas erroneamente pelo motor do Google (impedindo que `ja` vire "já/already" ou `de` vire "of").
+
+### 📱 Mobile Drawer UX & Social Rhythm Optimization
+- **Smart Mobile Layout Reordering (`MobileMenu.tsx`)**: Reorganização estrutural completa da gaveta lateral mobile para priorizar a descoberta de conteúdo. O menu expansível de **Categorias** foi movido do rodapé para o topo (logo abaixo do perfil do usuário), enquanto as páginas secundárias "Sobre Nós" e "Idioma" foram alocadas na base como utilitários secundários.
+- **Consistent Social Order**: Reordenação global dos ícones sociais em todo o site (Navbar mobile, rodapé desktop, rodapé mobile e drawer lateral) para seguir estritamente a sequência de marca solicitada: **Instagram, Threads e depois o X (Twitter)**.
+
+### 🔧 TypeScript & Integrity
+- **Debug Page Build Fix (`DebugPage.tsx`)**: Correção do escapamento de string para a rota `{docId}` literal na visualização de rascunhos de posts, zerando quaisquer warnings ou erros no compilador de tipos do portal (`npx tsc --noEmit` completado com 0 erros).
+
+---
+
 ## 💎 [v3.7.0] - The Zero-Waste Firestore Reads & Cursor Pagination Update
 *Data: 17 de Maio de 2026*
 
