@@ -6,19 +6,32 @@ import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "../context/TranslationContext";
+
+const DIALOGUE_TRANSLATIONS: Record<string, string> = {
+  pt: "Fala galera!!! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova fase? Envie sua mensagem abaixo e eu responderei em breve! 🎮",
+  en: "Hey guys!!! I'm Lucas, the Player 1 of this portal. Did you find a bug or want to propose a new stage? Send your message below and I will reply soon! 🎮",
+  es: "¡Hola a todos!!! Soy Lucas, el Player 1 de este portal. ¿Encontraste un error o quieres proponer una nueva fase? ¡Envía tu mensagem abajo y te responderé pronto! 🎮",
+  fr: "Salut tout le monde!!! Je suis Lucas, le Player 1 de ce portail. Vous avez trouvé un bug ou vous voulez proposer un nouveau niveau ? Envoyez votre message ci-dessous et je vous répondrai bientôt ! 🎮",
+  de: "Hallo Leute!!! Ich bin Lucas, der Player 1 dieses Portals. Habt ihr einen Bug gefunden oder wollt ihr ein neues Level vorschlagen? Sendet eure Nachricht unten und ich werde bald antworten! 🎮",
+  ja: "やあ、みんな！！！僕はルーカス、このポータルのプレイヤー1だよ。バグを見つけたか、新しいステージを提案したい？下にメッセージを送ね。すぐに返信するよ！🎮"
+};
 
 export default function ContactPage() {
   const { isDark } = useThemeStore();
   const { showToast } = useUIStore();
+  const { language } = useTranslation();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dialogText, setDialogText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
-  const fullText = "Fala galera!!! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova fase? Envie sua mensagem abaixo e eu responderei em breve! 🎮";
+  const fullText = DIALOGUE_TRANSLATIONS[language] || DIALOGUE_TRANSLATIONS.pt;
 
   useEffect(() => {
     let i = 0;
+    setIsTyping(true);
+    setDialogText("");
     const interval = setInterval(() => {
       setDialogText(fullText.slice(0, i));
       i++;
@@ -28,7 +41,7 @@ export default function ContactPage() {
       }
     }, 30);
     return () => clearInterval(interval);
-  }, []);
+  }, [fullText]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -100,7 +113,10 @@ export default function ContactPage() {
           </div>
 
           {/* Dialogue Text */}
-          <div className="flex-1 bg-black/40 border-4 border-black/20 p-4 md:p-6 relative min-h-[120px]">
+          <div 
+            className="flex-1 bg-black/40 border-4 border-black/20 p-4 md:p-6 relative min-h-[120px] notranslate"
+            translate="no"
+          >
             <p className="font-retro text-sm md:text-lg text-white leading-relaxed tracking-wide">
               {dialogText}
               {isTyping && <span className="inline-block w-2 h-4 bg-white animate-pulse ml-1" />}
