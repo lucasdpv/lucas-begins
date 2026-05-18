@@ -109,7 +109,7 @@ export default function Navbar() {
           </div>
 
           {/* Centro: Command Bar (The Search Centerpiece) */}
-          <div className="hidden xl:flex flex-1 justify-center px-8">
+          <div className="hidden xl:flex flex-1 justify-center">
             <div className={cn(
               "flex items-center px-4 h-10 w-full max-w-2xl rounded-none border-2 transition-all duration-500 group/search relative overflow-hidden",
               isDark 
