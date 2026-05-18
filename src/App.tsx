@@ -118,6 +118,7 @@ export default function App() {
 
         <Footer />
         <BackToTop />
+        {/* Overlays globais */}
         <CookieConsent />
         {isLoginModalOpen && <LoginModal />}
       </div>
