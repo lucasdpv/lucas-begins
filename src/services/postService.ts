@@ -556,11 +556,14 @@ export const PostService = {
    */
   async getMostViewedPosts(limitNumber: number = 5): Promise<Post[]> {
     try {
-      const posts = await this.getAllPosts();
-      return posts
-        .filter(p => !p.isDraft)
-        .sort((a, b) => (b.views || 0) - (a.views || 0))
-        .slice(0, limitNumber);
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        orderBy("views", "desc"),
+        limit(limitNumber + 5)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      return posts.filter(p => !p.isDraft).slice(0, limitNumber);
     } catch (error) {
       console.error("[PostService] Error fetching most viewed posts:", error);
       return [];
@@ -572,7 +575,14 @@ export const PostService = {
    */
   async getTopReviews(limitNumber: number = 3): Promise<Post[]> {
     try {
-      const posts = await this.getAllPosts();
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        orderBy("score", "desc"),
+        limit(limitNumber + 10)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+      
       return posts
         .filter(p => {
           if (p.isDraft) return false;
@@ -596,18 +606,24 @@ export const PostService = {
 
   async getPostsByCategory(category: string, limitNumber: number = 3): Promise<Post[]> {
     try {
-      const posts = await this.getAllPosts();
+      const categoriesToSearch = category.toLowerCase().includes("dossi")
+        ? ["Dossiê", "Dossiês", "dossie", "dossies"]
+        : [category];
+
+      const q = query(
+        collection(db, COLLECTIONS.POSTS),
+        where("category", "in", categoriesToSearch),
+        limit(limitNumber + 5)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+
       return posts
-        .filter(p => {
-          if (p.isDraft) return false;
-          const cat = p.category?.toLowerCase() || "";
-          const title = p.title?.toLowerCase() || "";
-          
-          if (category.toLowerCase().includes("dossi")) {
-            return cat.includes("dossi") || title.includes("dossi");
-          }
-          
-          return cat === category.toLowerCase();
+        .filter(p => !p.isDraft)
+        .sort((a, b) => {
+          const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          return timeB - timeA;
         })
         .slice(0, limitNumber);
     } catch (error) {

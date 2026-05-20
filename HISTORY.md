@@ -4,6 +4,17 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## ⚡ [v3.9.0] - The Zero-Waste Query Engine & Fuzzy Search Update
+*Data: 20 de Maio de 2026*
+
+### ⚡ Otimização do Mecanismo de Consulta (Firestore)
+- **Consultas Cirúrgicas e Limitadas**: Refatoração das funções `getMostViewedPosts`, `getTopReviews` e `getPostsByCategory` no [postService.ts](file:///c:/Users/Lucas Vieira/Documents/Projetos/lucas-begins/src/services/postService.ts) para realizar consultas diretas no Firestore com cláusulas `orderBy`, `where` e `limit`, reduzindo drasticamente o consumo de banda de rede e as cotas de leitura de documentos no banco.
+
+### 🔍 Busca Aproximada com Fuse.js
+- **Tolerância a Erros e Acentuação**: Integração da biblioteca `fuse.js` no hook [usePostsFilter.ts](file:///c:/Users/Lucas Vieira/Documents/Projetos/lucas-begins/src/hooks/usePostsFilter.ts) para habilitar pesquisa inteligente. O motor agora faz correspondência difusa aproximada com base em pesos nos campos `title` (peso 0.7), `excerpt` (peso 0.3), `category` (peso 0.2) e `tags` (peso 0.2), lidando de forma transparente com erros de digitação (ex: "zleda" -> "zelda") e ausência de acentos (ex: "dossie" -> "dossiê").
+
+---
+
 ## 🌎 [v3.8.0] - The Premium Translation System & Mobile UX Update
 *Data: 18 de Maio de 2026*
 
