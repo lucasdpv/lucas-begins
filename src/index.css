@@ -53,9 +53,8 @@
    Drop-cap estilo revista (primeiro parágrafo do artigo)
    ============================================================ */
 .magazine-article {
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
+  text-align: left;
+  hyphens: none;
 }
 
 .magazine-article::first-letter {
@@ -72,9 +71,8 @@
 }
 
 .article-paragraph {
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
+  text-align: left;
+  hyphens: none;
 }
 
 /* ============================================================

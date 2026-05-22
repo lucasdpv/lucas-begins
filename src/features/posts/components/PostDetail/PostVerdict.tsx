@@ -12,45 +12,47 @@ export default function PostVerdict({ post, isDark }: PostVerdictProps) {
   if (!post.score) return null;
 
   return (
-    <div className={cn(
-      "border-4 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] overflow-hidden clear-both",
-      isDark ? "bg-gray-900" : "bg-snes-surface"
+    <section className={cn(
+      "border-2 overflow-hidden group clear-both",
+      isDark ? "bg-gray-800/40 border-yellow-500/20" : "bg-snes-input border-snes-dark/10"
     )}>
-      {/* Header da seção */}
-      <div className="bg-yellow-400 px-5 py-2.5 flex items-center gap-3 border-b-4 border-black">
-        <Star className="w-5 h-5 text-black" fill="currentColor" />
-        <span className="font-retro font-black text-xs md:text-sm uppercase tracking-widest text-black">
+      {/* Label topo */}
+      <div className={cn(
+        "px-5 py-2 border-b-2 flex items-center gap-2",
+        isDark ? "border-yellow-500/20 bg-yellow-500/5" : "border-snes-dark/10 bg-yellow-50"
+      )}>
+        <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
+        <span className="font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest text-yellow-500">
           Veredito da Redação
         </span>
       </div>
 
-      {/* Corpo: nota + texto */}
-      <div className="flex items-stretch">
-        {/* Nota */}
-        <div className="flex flex-col items-center justify-center px-6 md:px-10 py-6 bg-yellow-400 border-r-4 border-black shrink-0">
-          <span className="font-retro font-black text-[9px] md:text-[10px] uppercase text-yellow-400 bg-black px-2 py-0.5 rounded-none tracking-widest shadow-[2px_2px_0px_rgba(0,0,0,0.15)] select-none">
-            SCORE
-          </span>
-          <div className="flex items-baseline gap-0.5 mt-2.5">
-            <span className="font-retro font-black text-5xl md:text-7xl leading-none text-black tracking-tighter">
+      {/* Conteúdo */}
+      <div className="flex items-center gap-5 md:gap-8 p-5 md:p-7">
+        <div className="relative shrink-0">
+          <div className={cn(
+            "w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-2 group-hover:rotate-0 transition-transform flex flex-col items-center justify-center select-none",
+            isDark
+              ? "border-yellow-500 bg-yellow-500/10 text-yellow-400"
+              : "border-yellow-600 bg-yellow-50 text-yellow-600"
+          )}>
+            <span className="font-retro font-black text-2xl md:text-4xl leading-none">
               {post.score}
             </span>
-            <span className="font-retro font-black text-base md:text-xl text-black/95 select-none">
-              /10
-            </span>
+          </div>
+          <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black px-2 py-0.5 rounded-lg border-2 border-black font-retro font-bold text-[10px] shadow-[2px_2px_0px_rgba(0,0,0,1)] z-10">
+            /10
           </div>
         </div>
-
-        {/* Texto do veredito */}
-        <div className={cn("flex items-center px-6 md:px-10 py-5 flex-1", isDark ? "bg-yellow-500/5" : "bg-yellow-500/10")}>
+        <div className="flex-1 min-w-0">
           <p className={cn(
-            "font-retro font-black text-sm md:text-lg uppercase tracking-wide leading-relaxed",
-            isDark ? "text-yellow-300 text-glow-retro" : "text-black"
+            "text-sm md:text-base font-medium leading-snug italic",
+            isDark ? "text-gray-400" : "text-gray-600"
           )}>
-            {post.verdict}
+            "{post.verdict}"
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -4,6 +4,18 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.9.1] - UI Harmonics & Mobile Layout Polish
+*Data: 22 de Maio de 2026*
+
+### 🎨 Visual & Spacing Refinements (Post Details & Hero)
+- **Author-Style Post Verdict**: Redesigned the post verdict review box (`PostVerdict.tsx`) to match the exact visual style of the "Escrito por" box (Author Box). The score rating is now contained in a responsive tilted card (`-rotate-2 group-hover:rotate-0`) with thick borders, a solid neo-brutalist shadow (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`), and a `/10` tag matching the author level badge.
+- **Header Clean-up**: Removed the unnecessary "Redação Begins" secondary title and star icon from the verdict card to offer a cleaner quote aesthetic.
+- **Text Readability (Rivers of Space Defused)**: Removed `text-align: justify` and auto-hyphenation from article paragraphs globally (`index.css`), replacing them with standard left alignment. This completely eliminates empty justification gaps ("buracos") and awkward word breaks (like "es-condia") when text wraps next to floated elements.
+- **Unconstrained Floated Images**: Updated image wrapping inside `ArticleRenderer.tsx` to prevent stretch/aspect-ratio distortions of floated images, changing the container from flex-layout to standard block layout on floated layouts.
+- **Mobile Hero Tuning**: Restructured the mobile hero layout (`PostHero.tsx`) to place the category and score badges side-by-side in a single row instead of stacking them, freeing up vertical space. Adjusted title line-height to `leading-snug` and tracking to `tracking-tight` on mobile to prevent overlapping and text squishing.
+
+---
+
 ## ⚡ [v3.9.0] - The Zero-Waste Query Engine & Fuzzy Search Update
 *Data: 20 de Maio de 2026*
 
