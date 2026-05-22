@@ -4,6 +4,14 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.9.3] - Post Hero Score Badge Styling Fix
+*Data: 22 de Maio de 2026*
+
+### 🎨 Visual & Spacing Refinements
+- **Square Score Badge in Post Hero**: Replaced the custom rounded score `div` in the article header hero (`PostHero.tsx`) with the official `ScoreBadge` component. This removes the rounded corners, rendering a straight-edged (rounded-none), neo-brutalist rating badge that perfectly matches the styling of `CategoryBadge`.
+
+---
+
 ## 🎨 [v3.9.2] - Carousel Score Alignment Polish
 *Data: 22 de Maio de 2026*
 

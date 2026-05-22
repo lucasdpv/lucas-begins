@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../../../lib/utils";
-import { CategoryBadge } from "../../../../components/ui/Badge";
+import { CategoryBadge, ScoreBadge } from "../../../../components/ui/Badge";
 import { Post } from "../../schemas";
 
 interface PostHeroProps {
@@ -38,9 +38,7 @@ export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
             {post.category}
           </CategoryBadge>
           {post.score && (
-            <div className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl font-retro font-bold border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] text-sm">
-               ★ {post.score}
-            </div>
+            <ScoreBadge score={post.score} size="md" className="shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black shrink-0" />
           )}
         </div>
         <h1 className="font-retro font-bold text-2xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">
