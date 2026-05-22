@@ -4,6 +4,14 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.9.2] - Carousel Score Alignment Polish
+*Data: 22 de Maio de 2026*
+
+### 🎨 Visual & Spacing Refinements
+- **Carousel Badge Pairing**: Repositioned the review score badge (`ScoreBadge`) in the main carousel (`Carousel.tsx`) to sit directly next to the category badge (`CategoryBadge`) above the post title on both mobile and desktop. This aligns the layout with modern editorial styles, solves stats row clutter, and ensures perfect symmetry for ratings.
+
+---
+
 ## 🎨 [v3.9.1] - UI Harmonics & Mobile Layout Polish
 *Data: 22 de Maio de 2026*
 
