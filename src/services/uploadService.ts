@@ -15,25 +15,29 @@ export const uploadFile = async (
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   let fileToUpload: File | Blob = file;
+  let finalPath = path;
 
-  // Se for uma imagem, tenta comprimir
+  // Se for uma imagem, tenta comprimir e converter para WebP
   if (file.type.startsWith('image/')) {
     try {
       const options = {
         maxSizeMB: 0.8, // Tenta manter abaixo de 800KB
         maxWidthOrHeight: 1920, // Full HD max
         useWebWorker: true,
-        initialQuality: 0.8 // 80% de qualidade
+        initialQuality: 0.8, // 80% de qualidade
+        fileType: 'image/webp' as any // Força saída em WebP para melhor performance e tamanho
       };
       
       fileToUpload = await imageCompression(file, options);
+      // Substitui a extensão original do caminho por .webp
+      finalPath = path.replace(/\.[^/.]+$/, "") + ".webp";
     } catch (error) {
       console.warn("Falha na compressão, enviando original...", error);
     }
   }
 
   return new Promise((resolve, reject) => {
-    const storageRef = ref(storage, path);
+    const storageRef = ref(storage, finalPath);
     const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
 
     uploadTask.on(

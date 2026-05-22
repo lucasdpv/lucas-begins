@@ -7,6 +7,24 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#9333ea" />
 
+    <!-- Script de recuperação automática contra tela branca (erros de carregamento de assets) -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          const url = e.target.src || e.target.href;
+          if (url && (url.includes('/assets/') || url.includes('/src/'))) {
+            console.warn('Erro ao carregar recurso crítico:', url);
+            const lastReload = localStorage.getItem('last_asset_reload');
+            const now = Date.now();
+            if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+              localStorage.setItem('last_asset_reload', now.toString());
+              window.location.reload();
+            }
+          }
+        }
+      }, true);
+    </script>
+
     <!-- Font Optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

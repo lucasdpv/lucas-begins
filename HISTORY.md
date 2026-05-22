@@ -4,6 +4,20 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## ⚡ [v3.9.4] - Service Worker & Image Load Optimization Update
+*Data: 22 de Maio de 2026*
+
+### ⚡ Performance & Cache Optimization (PWA & Service Worker)
+- **Automatic Blank Screen Recovery**: Adicionado um script de auto-recuperação inline no `<head>` do `index.html` que captura falhas de carregamento de recursos críticos (como assets do Vite retornando 404 durante novos deploys) e recarrega a página automaticamente (com limite de recarregamento a cada 10 segundos para evitar loops infinitos).
+- **Network-First para Navegação (HTML)**: Alterada a estratégia de cache do Service Worker para o `/` e `index.html` de *Stale-While-Revalidate* para *Network-First*. Isso garante que usuários online sempre recebam a última versão do HTML apontando para os assets corretos, eliminando por completo o bug da "tela branca" após novos deploys.
+- **Cache-First para Assets Estáticos**: Otimizada a estratégia de cache de arquivos na pasta `/assets/` para usar *Cache-First*, já que os arquivos compilados pelo Vite contêm hashes únicos e são imutáveis.
+- **Cache de Imagens do Firebase Storage**: Configurado cache dedicado e persistente para o domínio `firebasestorage.googleapis.com` com estratégia *Cache-First*. Isso traz carregamento instantâneo de imagens de posts após a primeira visita e suporte offline para mídia do blog, mantendo o cache intacto mesmo após atualizações do app.
+
+### 🖼️ Media & Upload Optimizations
+- **Conversão Automática para WebP no Upload**: O `uploadService.ts` agora força a compressão de qualquer imagem enviada para o formato WebP (`fileType: 'image/webp'`) e altera consistentemente a extensão do arquivo para `.webp`. Isso reduz o consumo de banda, economiza espaço no Firebase Storage e acelera o carregamento das páginas.
+
+---
+
 ## 🎨 [v3.9.3] - Post Hero Score Badge Styling Fix
 *Data: 22 de Maio de 2026*
 
