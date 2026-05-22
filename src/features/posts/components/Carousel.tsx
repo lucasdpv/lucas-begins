@@ -107,7 +107,7 @@ export default function Carousel({ posts }: CarouselProps) {
         
         {/* Content Container */}
         <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
-          <div className="max-w-[75%] md:max-w-3xl text-center md:text-left flex flex-col items-center md:items-start">
+          <div className="max-w-[90%] md:max-w-3xl text-center md:text-left flex flex-col items-center md:items-start">
             <div className="mb-4">
               <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
             </div>
@@ -116,18 +116,26 @@ export default function Carousel({ posts }: CarouselProps) {
               {currentPost.title}
             </h2>
             
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              {currentPost.score && <ScoreBadge score={currentPost.score} size="sm" />}
-              <span className="h-0.5 w-0.5 rounded-full bg-white/30 hidden md:block" />
-              <div className="flex items-center gap-3 text-[10px] md:text-xs font-bold uppercase tracking-wide text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                 <span className="flex items-center gap-1">
-                   <Heart className="w-3 h-3 text-red-400" fill="currentColor" />
-                   {formatNumber(currentPost.likes || 0)}
-                 </span>
-                 <span className="flex items-center gap-1">
-                   <Clock className="w-3 h-3 text-purple-300" />
-                   {calculateReadingTime(currentPost.content || "")}
-                 </span>
+            <div className="flex flex-row flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+              {currentPost.score && (
+                <>
+                  <ScoreBadge score={currentPost.score} size="sm" className="translate-y-[-1px] shrink-0" />
+                  <span className="h-4 w-px bg-white/20 hidden md:block shrink-0" />
+                </>
+              )}
+              
+              <div className="flex items-center gap-3 text-[10px] md:text-xs font-bold uppercase tracking-wider text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                <span className="flex items-center gap-1">
+                  <Heart className="w-3.5 h-3.5 text-red-400 shrink-0" fill="currentColor" />
+                  {formatNumber(currentPost.likes || 0)}
+                </span>
+                
+                <span className="h-1 w-1 rounded-full bg-white/30 shrink-0" />
+                
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-purple-300 shrink-0" />
+                  {calculateReadingTime(currentPost.content || "")}
+                </span>
               </div>
             </div>
           </div>
