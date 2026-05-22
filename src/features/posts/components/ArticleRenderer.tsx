@@ -98,7 +98,7 @@ function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wra
 
   const containerClass = cn(
     "w-full rounded-none relative overflow-hidden retro-card",
-    isFloated ? "block" : "min-h-[200px] flex items-center justify-center",
+    isFloated ? "block max-h-[250px] sm:max-h-[300px] md:max-h-[350px]" : "min-h-[200px] flex items-center justify-center",
     isDark ? "bg-gray-900" : "bg-snes-mid"
   );
 
@@ -121,7 +121,7 @@ function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wra
             onError={() => setError(true)}
             className={cn(
               "pixelated w-full",
-              isFloated ? "h-auto block object-contain" : "h-auto object-cover max-h-[700px]"
+              isFloated ? "h-[250px] sm:h-[300px] md:h-[350px] block object-cover" : "h-auto object-cover max-h-[700px]"
             )}
           />
         ) : (

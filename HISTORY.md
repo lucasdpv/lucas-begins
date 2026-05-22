@@ -12,6 +12,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Header Clean-up**: Removed the unnecessary "Redação Begins" secondary title and star icon from the verdict card to offer a cleaner quote aesthetic.
 - **Text Readability (Rivers of Space Defused)**: Removed `text-align: justify` and auto-hyphenation from article paragraphs globally (`index.css`), replacing them with standard left alignment. This completely eliminates empty justification gaps ("buracos") and awkward word breaks (like "es-condia") when text wraps next to floated elements.
 - **Unconstrained Floated Images**: Updated image wrapping inside `ArticleRenderer.tsx` to prevent stretch/aspect-ratio distortions of floated images, changing the container from flex-layout to standard block layout on floated layouts.
+- **Proportional Floated Layout**: Set maximum height limit (`max-h-[250px]` on mobile, `max-h-[350px]` on desktop) and `object-cover` styling on floated images next to text. This guarantees perfect image proportions without clipping distortions and prevents empty space gaps ("buracos") underneath short paragraphs.
 - **Mobile Hero Tuning**: Restructured the mobile hero layout (`PostHero.tsx`) to place the category and score badges side-by-side in a single row instead of stacking them, freeing up vertical space. Adjusted title line-height to `leading-snug` and tracking to `tracking-tight` on mobile to prevent overlapping and text squishing.
 
 ---
