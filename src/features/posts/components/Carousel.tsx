@@ -106,15 +106,21 @@ export default function Carousel({ posts }: CarouselProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/70 to-transparent pointer-events-none z-[5]" />
         
         {/* Content Container */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
-          <div className="max-w-[75%] md:max-w-3xl text-center md:text-left flex flex-col items-center md:items-start">
-            <div className="mb-4">
+        <div className="absolute bottom-0 left-0 right-0 p-4 pb-20 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
+          <div className="max-w-[90%] md:max-w-2xl bg-gray-950/90 backdrop-blur-md border-2 border-purple-500/40 p-5 md:p-7 shadow-[6px_6px_0px_rgba(0,0,0,1)] text-center md:text-left flex flex-col items-center md:items-start transition-all duration-300 group-hover/carousel:border-purple-500 group-hover/carousel:shadow-[6px_6px_0px_rgba(168,85,247,0.5)]">
+            <div className="mb-3">
               <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
             </div>
             
-            <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-6">
+            <h2 className="font-retro font-bold text-lg md:text-2xl lg:text-3xl leading-tight text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-3">
               {currentPost.title}
             </h2>
+
+            {currentPost.excerpt && (
+              <p className="text-gray-300 text-xs md:text-sm font-medium leading-relaxed mb-4 line-clamp-2 hidden md:block">
+                {currentPost.excerpt}
+              </p>
+            )}
             
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {currentPost.score && <ScoreBadge score={currentPost.score} size="sm" />}
