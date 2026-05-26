@@ -114,7 +114,7 @@ export default function AboutPage() {
             {/* --- BIO BODY: Full Width Content (Post Behavior) --- */}
             <div className="space-y-6 text-base md:text-xl font-medium leading-loose text-left">
               <p>
-                Fala galera!!! O <strong>BeginsProject</strong> nasceu de uma vontade antiga de criar um cantinho na internet
+                Fala galera!!! O <strong className="notranslate" translate="no">BeginsProject</strong> nasceu de uma vontade antiga de criar um cantinho na internet
                 para documentar uma vida dedicada aos games e compartilhar a alegria de dividir grandes momentos através de um controle.
                 Minha jornada começou com o som icônico de um console ligando na sala de casa, e desde então, os videogames deixaram de ser
                 apenas pixels na tela para se tornarem um lugar onde fiz amizades e vivi histórias inesquecíveis.
@@ -130,7 +130,7 @@ export default function AboutPage() {
                 isDark ? "bg-purple-900/10 border-purple-600 shadow-[4px_4px_0_rgba(168,85,247,0.4)]" : "bg-purple-50 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]"
               )}>
                 <p className="italic font-bold text-lg md:text-2xl text-center">
-                  "O BeginsProject nasceu para ser o nosso ponto de encontro — um lugar leve para trocar uma ideia,
+                  "O <span className="notranslate" translate="no">BeginsProject</span> nasceu para ser o nosso ponto de encontro — um lugar leve para trocar uma ideia,
                   relembrar os clássicos e compartilhar a alegria de ser gamer com quem entende do assunto."
                 </p>
               </div>

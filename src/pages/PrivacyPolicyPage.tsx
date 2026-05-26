@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
       >
         <section className="space-y-4">
           <h2 className={cn("font-retro text-2xl font-bold uppercase", isDark ? "text-white" : "text-black")}>1. Coleta de Informações</h2>
-          <p>O <strong>BeginsProject</strong> coleta informações para fornecer uma experiência melhor a todos os nossos usuários. As informações coletadas incluem dados fornecidos ativamente por você (como nome e email durante o cadastro) e dados coletados automaticamente (como cookies de navegação e endereço IP).</p>
+          <p>O <strong className="notranslate" translate="no">BeginsProject</strong> coleta informações para fornecer uma experiência melhor a todos os nossos usuários. As informações coletadas incluem dados fornecidos ativamente por você (como nome e email durante o cadastro) e dados coletados automaticamente (como cookies de navegação e endereço IP).</p>
         </section>
 
         <section className="space-y-4">

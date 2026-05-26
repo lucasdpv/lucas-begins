@@ -88,9 +88,9 @@ export default function Navbar() {
                   <div className="absolute -inset-1 bg-purple-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <h1 className={cn(
-                  "font-retro font-bold text-xl md:text-2xl tracking-tighter uppercase transition-all",
+                  "font-retro font-bold text-xl md:text-2xl tracking-tighter uppercase transition-all notranslate",
                   isDark ? "text-white text-glow" : "text-gray-900"
-                )}>
+                )} translate="no">
                   Begins<span className="text-purple-500 inline-block animate-glitch drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]">Project</span>
                 </h1>
               </Link>
