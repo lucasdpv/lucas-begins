@@ -30,6 +30,10 @@ interface Block {
   wrapType?: 'silhouette' | 'circle' | 'diagonal';
   wrapIntensity?: number; 
   wrapDirection?: 'up' | 'down';
+  aspect?: 'original' | '1:1' | '16:9' | '4:5';
+  frameStyle?: 'normal' | 'crt' | 'sticker' | 'none';
+  scanlines?: boolean;
+  originalUrl?: string;
 }
 
 interface BlockEditorProps {
@@ -247,10 +251,11 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
             {block.type === 'image' && (
               <>
               <div className="space-y-8">
-                <div className="bg-black/30 p-6 rounded-3xl border border-white/10 space-y-8">
+                <div className="bg-black/5 dark:bg-black/30 p-6 rounded-3xl border border-purple-950/10 dark:border-white/10 space-y-8">
+                  {/* Alinhamento Editorial */}
                   <div className="flex flex-col gap-4">
-                    <span className="text-xs font-retro font-bold uppercase text-purple-400 tracking-widest">Alinhamento Editorial</span>
-                    <div className="grid grid-cols-3 p-1.5 rounded-2xl bg-black/40 border border-white/10">
+                    <span className="text-xs font-retro font-bold uppercase text-purple-700 dark:text-purple-400 tracking-widest">Alinhamento Editorial</span>
+                    <div className="grid grid-cols-3 p-1.5 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/5 dark:border-white/10">
                       {[
                         { id: 'full', label: 'Centralizado' },
                         { id: 'left', label: 'Esquerda (Wrap)' },
@@ -262,7 +267,9 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
                           onClick={() => updateBlock(block.id, { layout: l.id as any })}
                           className={cn(
                             "py-4 text-[11px] font-retro font-bold uppercase rounded-xl transition-all", 
-                            (block.layout || 'full') === l.id ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]" : "text-gray-500 hover:text-gray-300"
+                            (block.layout || 'full') === l.id 
+                              ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
+                              : "text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-gray-200"
                           )}
                         >
                           {l.label}
@@ -270,30 +277,119 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
                       ))}
                     </div>
                   </div>
-                  
+
+                  {/* Formato / Proporção */}
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-retro font-bold uppercase text-purple-700 dark:text-purple-400 tracking-widest">Formato / Proporção</span>
+                    <div className="grid grid-cols-4 p-1.5 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/5 dark:border-white/10">
+                      {[
+                        { id: 'original', label: 'Original' },
+                        { id: '1:1', label: '1:1 (Quad)' },
+                        { id: '16:9', label: '16:9 (Ret)' },
+                        { id: '4:5', label: '4:5 (Vert)' }
+                      ].map((a) => (
+                        <button 
+                          key={a.id}
+                          type="button"
+                          onClick={() => updateBlock(block.id, { aspect: a.id as any })}
+                          className={cn(
+                            "py-4 text-[10px] font-retro font-bold uppercase rounded-xl transition-all", 
+                            (block.aspect || 'original') === a.id 
+                              ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
+                              : "text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-gray-200"
+                          )}
+                        >
+                          {a.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Estilo da Moldura */}
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-retro font-bold uppercase text-purple-700 dark:text-purple-400 tracking-widest">Estilo da Moldura</span>
+                    <div className="grid grid-cols-4 p-1.5 rounded-2xl bg-black/5 dark:bg-black/40 border border-black/5 dark:border-white/10">
+                      {[
+                        { id: 'normal', label: 'Normal' },
+                        { id: 'crt', label: 'CRT Retro' },
+                        { id: 'sticker', label: 'Adesivo' },
+                        { id: 'none', label: 'Sem Moldura' }
+                      ].map((f) => (
+                        <button 
+                          key={f.id}
+                          type="button"
+                          onClick={() => updateBlock(block.id, { frameStyle: f.id as any })}
+                          className={cn(
+                            "py-4 text-[10px] font-retro font-bold uppercase rounded-xl transition-all", 
+                            (block.frameStyle || 'normal') === f.id 
+                              ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]" 
+                              : "text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-gray-200"
+                          )}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Efeito Scanlines */}
+                  <div className="pt-2">
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                      <input 
+                        type="checkbox"
+                        checked={block.scanlines !== false}
+                        onChange={(e) => updateBlock(block.id, { scanlines: e.target.checked })}
+                        className="hidden"
+                      />
+                      <div className={cn(
+                        "w-6 h-6 border-2 flex items-center justify-center transition-all",
+                        block.scanlines !== false
+                          ? "bg-purple-600 border-purple-400 text-white shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                          : "bg-black/5 dark:bg-black/30 border-purple-600/40 dark:border-white/10 text-transparent"
+                      )}>
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                          <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
+                        </svg>
+                      </div>
+                      <span className="text-[11px] font-retro font-bold uppercase text-purple-700 dark:text-purple-400 tracking-wider">
+                        Efeito Scanlines (CRT Overlay)
+                      </span>
+                    </label>
                   </div>
                 </div>
+              </div>
 
-                <div className={cn(
-                  "transition-all duration-500 border-4 border-dashed border-white/5 rounded-3xl p-4 bg-black/20",
-                  block.layout === 'left' && "w-1/2 float-left mr-8",
-                  block.layout === 'right' && "w-1/2 float-right ml-8"
-                )}>
-                  <ImageUpload 
-                    label="Upload da Imagem"
-                    initialValue={block.url || ""}
-                    onUploadComplete={(url) => updateBlock(block.id, { url })}
-                    folder="posts/content"
-                    aspect={ (block.layout === 'full' || !block.layout) ? 16/9 : 1 }
-                  />
-                  <input 
-                    type="text"
-                    value={block.content}
-                    onChange={(e) => updateBlock(block.id, { content: e.target.value })}
-                    placeholder="Adicione uma legenda aqui..."
-                    className="w-full bg-transparent outline-none text-sm italic opacity-50 mt-4 text-center"
-                  />
-                </div>
+              <div className={cn(
+                "transition-all duration-500 border-4 border-dashed border-white/5 rounded-3xl p-4 bg-black/20",
+                block.layout === 'left' && "w-1/2 float-left mr-8",
+                block.layout === 'right' && "w-1/2 float-right ml-8"
+              )}>
+                <ImageUpload 
+                  label="Upload da Imagem"
+                  initialValue={block.url || ""}
+                  originalUrl={block.originalUrl || ""}
+                  onUploadComplete={(url, aspect, originalUrl) => {
+                    const updates: Partial<Block> = { url };
+                    if (aspect) updates.aspect = aspect;
+                    if (originalUrl !== undefined) updates.originalUrl = originalUrl;
+                    updateBlock(block.id, updates);
+                  }}
+                  folder="posts/content"
+                  aspect={
+                    block.aspect === '1:1' ? 1 :
+                    block.aspect === '16:9' ? 16/9 :
+                    block.aspect === '4:5' ? 4/5 :
+                    'original'
+                  }
+                />
+                <input 
+                  type="text"
+                  value={block.content}
+                  onChange={(e) => updateBlock(block.id, { content: e.target.value })}
+                  placeholder="Adicione uma legenda aqui..."
+                  className="w-full bg-transparent outline-none text-sm italic opacity-50 mt-4 text-center"
+                />
+              </div>
               </>
             )}
 
@@ -509,6 +605,10 @@ function parseMarkdownToBlocks(markdown: string): Block[] {
         const wrapMatch = line.match(/\{#wrap-(silhouette|circle|diagonal)\}/);
         const intensityMatch = line.match(/\{#intensity-(\d+)\}/);
         const directionMatch = line.match(/\{#direction-(up|down)\}/);
+        const aspectMatch = line.match(/\{#aspect-(original|1:1|16:9|4:5)\}/);
+        const frameMatch = line.match(/\{#frame-(normal|crt|sticker|none)\}/);
+        const scanlinesMatch = line.includes('{#scanlines-false}');
+        const originalMatch = line.match(/\{#original-(.+?)\}/);
         
         blocks.push({ 
           id: Math.random().toString(), 
@@ -519,7 +619,11 @@ function parseMarkdownToBlocks(markdown: string): Block[] {
           useShape: shapeMatch,
           wrapType: (wrapMatch?.[1] as any) || 'silhouette',
           wrapIntensity: intensityMatch ? parseInt(intensityMatch[1]) : 50,
-          wrapDirection: (directionMatch?.[1] as any) || 'up'
+          wrapDirection: (directionMatch?.[1] as any) || 'up',
+          aspect: (aspectMatch?.[1] as any) || 'original',
+          frameStyle: (frameMatch?.[1] as any) || 'normal',
+          scanlines: !scanlinesMatch,
+          originalUrl: originalMatch?.[1] || undefined
         });
       }
       isInsideSpecialBlock = false;
@@ -574,7 +678,11 @@ function blocksToMarkdown(blocks: Block[]): string {
         const wrapSuffix = b.wrapType ? `{#wrap-${b.wrapType}}` : '';
         const intensitySuffix = b.wrapIntensity !== undefined ? `{#intensity-${b.wrapIntensity}}` : '';
         const directionSuffix = b.wrapDirection ? `{#direction-${b.wrapDirection}}` : '';
-        return `![${b.content || ''}](${b.url})${layoutSuffix}${shapeSuffix}${wrapSuffix}${intensitySuffix}${directionSuffix}`;
+        const aspectSuffix = b.aspect && b.aspect !== 'original' ? `{#aspect-${b.aspect}}` : '';
+        const frameSuffix = b.frameStyle && b.frameStyle !== 'normal' ? `{#frame-${b.frameStyle}}` : '';
+        const scanlinesSuffix = b.scanlines === false ? `{#scanlines-false}` : '';
+        const originalSuffix = b.originalUrl ? `{#original-${b.originalUrl}}` : '';
+        return `![${b.content || ''}](${b.url})${layoutSuffix}${shapeSuffix}${wrapSuffix}${intensitySuffix}${directionSuffix}${aspectSuffix}${frameSuffix}${scanlinesSuffix}${originalSuffix}`;
       case 'text':
         return b.content;
       case 'video': return `@[youtube](${b.url})`;

@@ -1,18 +1,19 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Upload, X, CheckCircle, Loader2, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
-import { uploadFile } from '../../services/uploadService';
+import { Camera, Upload, X, CheckCircle, Loader2, Link as LinkIcon, Image as ImageIcon, Crop } from 'lucide-react';
+import { uploadFile, cacheOriginalImage, getCachedOriginalImage } from '../../services/uploadService';
 import { cn } from '../../lib/utils';
 import { useThemeStore } from '../../store/useThemeStore';
 
 import ImageCropper from './ImageCropper';
 import imageCompression from 'browser-image-compression';
 interface ImageUploadProps {
-  onUploadComplete: (url: string) => void;
+  onUploadComplete: (url: string, aspect?: 'original' | '1:1' | '16:9' | '4:5', originalUrl?: string) => void;
   initialValue?: string;
+  originalUrl?: string;
   folder?: string;
   label?: string;
   className?: string;
-  aspect?: number;
+  aspect?: number | 'original' | '1:1' | '16:9' | '4:5';
   circular?: boolean;
 }
 
@@ -21,10 +22,11 @@ type UploadMode = 'file' | 'url';
 export default function ImageUpload({ 
   onUploadComplete, 
   initialValue = "", 
+  originalUrl: initialOriginalUrl = "",
   folder = "uploads",
   label = "Imagem de Capa",
   className,
-  aspect = 1,
+  aspect = 'original',
   circular = false
 }: ImageUploadProps) {
   const { isDark } = useThemeStore();
@@ -35,9 +37,24 @@ export default function ImageUpload({
   const [dragActive, setDragActive] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [originalUrl, setOriginalUrl] = useState<string>(initialOriginalUrl);
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
+
+  React.useEffect(() => {
+    setOriginalUrl(initialOriginalUrl);
+  }, [initialOriginalUrl]);
+
+  const aspectClass = 
+    circular ? "aspect-square w-full" :
+    aspect === '1:1' ? "aspect-square w-full" :
+    aspect === '16:9' ? "aspect-video w-full" :
+    aspect === '4:5' ? "aspect-[4/5] w-full" :
+    "aspect-auto min-h-[160px] w-full";
 
   const handleFileSelection = (file: File) => {
     if (!file) return;
+    setOriginalFile(file);
+    setOriginalUrl("");
     const reader = new FileReader();
     reader.onload = () => {
       setImageToCrop(reader.result as string);
@@ -45,12 +62,33 @@ export default function ImageUpload({
     reader.readAsDataURL(file);
   };
 
-  const handleCroppedImage = async (blob: Blob) => {
+  const handleCroppedImage = async (blob: Blob, chosenAspect: 'original' | '1:1' | '16:9' | '4:5') => {
     setImageToCrop(null);
     setIsUploading(true);
     setProgress(0);
 
     try {
+      let currentOriginalUrl = originalUrl;
+
+      // Upload original file if a new local file is selected
+      if (originalFile) {
+        const originalFileName = `${Date.now()}-original.webp`;
+        const originalOptions = {
+          maxSizeMB: 3,
+          maxWidthOrHeight: 2560,
+          useWebWorker: true,
+          initialQuality: 0.9,
+          fileType: 'image/webp' as any
+        };
+        const compressedOriginal = await imageCompression(originalFile, originalOptions);
+        
+        currentOriginalUrl = await uploadFile(compressedOriginal, `${folder}/${originalFileName}`, () => {});
+        // Cache the original file blob in IndexedDB under the uploaded URL
+        await cacheOriginalImage(currentOriginalUrl, originalFile);
+        setOriginalUrl(currentOriginalUrl);
+        setOriginalFile(null);
+      }
+
       // Opções de compressão - WebP suporta transparência e compressão alta
       const options = {
         maxSizeMB: 1,
@@ -72,7 +110,7 @@ export default function ImageUpload({
         setProgress(Math.round(p));
       });
       
-      onUploadComplete(downloadUrl);
+      onUploadComplete(downloadUrl, chosenAspect, currentOriginalUrl);
       setPreview(downloadUrl);
     } catch (error) {
       console.error("Upload/Compression failed", error);
@@ -104,7 +142,9 @@ export default function ImageUpload({
   const removeImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setPreview("");
-    onUploadComplete("");
+    setOriginalUrl("");
+    setOriginalFile(null);
+    onUploadComplete("", undefined, "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -114,7 +154,13 @@ export default function ImageUpload({
       {imageToCrop && (
         <ImageCropper 
           image={imageToCrop}
-          aspect={aspect}
+          aspect={
+            aspect === 1 ? '1:1' :
+            aspect === 16/9 ? '16:9' :
+            aspect === 4/5 ? '4:5' :
+            (aspect === 'original' || aspect === '1:1' || aspect === '16:9' || aspect === '4:5') ? aspect :
+            'original'
+          }
           circular={circular}
           onCropComplete={handleCroppedImage}
           onCancel={() => setImageToCrop(null)}
@@ -156,7 +202,8 @@ export default function ImageUpload({
         onDrop={handleDrop}
         onClick={() => mode === 'file' && !isUploading && fileInputRef.current?.click()}
         className={cn(
-          "relative group transition-all duration-300 border-2 rounded-xl min-h-[160px] flex flex-col items-center justify-center overflow-hidden",
+          "relative group transition-all duration-300 border-2 rounded-xl flex flex-col items-center justify-center overflow-hidden",
+          aspectClass,
           isDark ? "bg-gray-900/50 border-gray-700" : "bg-snes-input border-snes-dark",
           mode === 'file' && "cursor-pointer hover:border-purple-500",
           dragActive && "border-purple-500 bg-purple-500/10 scale-[1.01]",
@@ -176,6 +223,24 @@ export default function ImageUpload({
                   <div className="bg-purple-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg text-white">
                     <Upload className="w-5 h-5" />
                   </div>
+                  <button 
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      let targetImage = originalUrl || preview;
+                      if (originalUrl) {
+                        const cachedBlob = await getCachedOriginalImage(originalUrl);
+                        if (cachedBlob) {
+                          targetImage = URL.createObjectURL(cachedBlob);
+                        }
+                      }
+                      setImageToCrop(targetImage);
+                    }} 
+                    className="bg-blue-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-blue-700 transition-colors text-white"
+                    title="Ajustar Recorte"
+                  >
+                    <Crop className="w-5 h-5" />
+                  </button>
                   <button 
                     type="button"
                     onClick={removeImage} 

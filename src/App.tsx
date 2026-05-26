@@ -44,6 +44,8 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
+      root.classList.add('dark');
+      root.classList.remove('light');
       root.style.setProperty('--retro-border-color', '#a855f7');
       root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #000000');
       root.style.setProperty('--retro-button-border', '#c084fc');
@@ -52,6 +54,8 @@ export default function App() {
       root.style.setProperty('--magazine-drop-cap-color', '#c084fc');
       root.style.setProperty('--magazine-drop-cap-shadow', '4px 4px 0px #000000');
     } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
       root.style.setProperty('--retro-border-color', '#4f43ae');
       root.style.setProperty('--retro-card-shadow', '6px 6px 0px 0px #211a21');
       root.style.setProperty('--retro-button-border', '#4f43ae');

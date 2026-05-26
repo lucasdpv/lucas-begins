@@ -116,7 +116,9 @@ export default function PostEditorPage() {
 
   const inputClass = cn(
     "w-full p-3.5 rounded-xl outline-none border-2 font-medium transition-all focus:border-purple-500",
-    isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
+    isDark 
+      ? "bg-gray-900 border-gray-700 text-white placeholder:text-gray-500" 
+      : "bg-purple-50/50 border-snes-dark/40 text-snes-accent placeholder:text-gray-500/70 focus:bg-white focus:border-purple-600"
   );
 
   const previewPost = {
@@ -315,7 +317,10 @@ export default function PostEditorPage() {
                   <Star className={cn("w-4 h-4", formData.isFeatured && "fill-yellow-500 text-yellow-500")} />
                   Destacar no Carrossel da Home
                 </div>
-                <span className="block text-[10px] opacity-60 font-medium normal-case mt-1 tracking-normal">
+                <span className={cn(
+                  "block text-[10px] font-medium normal-case mt-1 tracking-normal",
+                  isDark ? "text-slate-400" : "text-gray-600"
+                )}>
                   {(posts as Post[]).filter(p => p.isFeatured && String(p.id) !== String(id)).length >= 5 && !formData.isFeatured
                     ? "Limite de 5 artigos atingido. Remova um destaque no Painel Admin para liberar esta vaga."
                     : "Este artigo será exibido com destaque no carrossel da página inicial."}
@@ -338,7 +343,10 @@ export default function PostEditorPage() {
               />
               <label htmlFor="showAuthorBox" className="font-retro font-bold uppercase text-sm cursor-pointer select-none flex-1">
                 Exibir Caixa de Autor ("Sobre o Autor") no final da matéria
-                <span className="block text-[10px] opacity-60 font-medium normal-case mt-1 tracking-normal">
+                <span className={cn(
+                  "block text-[10px] font-medium normal-case mt-1 tracking-normal",
+                  isDark ? "text-slate-400" : "text-gray-600"
+                )}>
                   Se desativado, sua foto e bio não aparecerão nesta matéria específica.
                 </span>
               </label>
@@ -392,13 +400,13 @@ export default function PostEditorPage() {
         </form>
       ) : (
         /* Aba: Preview */
-        <div className={cn("border-4 border-dashed p-4 md:p-8 rounded-3xl relative mt-8", isDark ? "border-purple-500/50 bg-gray-900/50" : "border-snes-dark/20 bg-snes-input")}>
-          <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase retro-card border-black">
+        <div className={cn("border-4 border-dashed pt-14 pb-4 px-4 md:p-8 rounded-3xl relative mt-8", isDark ? "border-purple-500/50 bg-gray-900/50" : "border-snes-dark/20 bg-snes-input")}>
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-purple-600 text-white px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-retro text-xs md:text-sm font-bold uppercase retro-card border-black whitespace-nowrap z-10">
             Modo de Pré-Visualização
           </div>
           <PostDetailPage previewPost={previewPost} />
           <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-t-4 border-dashed border-purple-500/50 pt-10 relative">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-6 py-2 rounded-xl font-retro text-sm font-bold uppercase border-2 border-black z-10">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-black px-4 md:px-6 py-1.5 md:py-2 rounded-xl font-retro text-xs md:text-sm font-bold uppercase border-2 border-black z-10 whitespace-nowrap">
               Ação de Teste
             </div>
 

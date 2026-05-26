@@ -12,6 +12,10 @@
       "destination": "/api/og?slug=:slug"
     },
     {
+      "source": "/firebase-storage/(.*)",
+      "destination": "https://firebasestorage.googleapis.com/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

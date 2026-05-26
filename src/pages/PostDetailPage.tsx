@@ -167,11 +167,18 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
       {/* Voltar */}
       <button
-        onClick={() => navigate("/")}
+        onClick={() => {
+          if (previewPost) return;
+          navigate("/");
+        }}
         className={cn(
-          "mb-8 flex items-center gap-2 font-retro text-sm font-bold uppercase tracking-wider hover:text-purple-500 transition-colors group",
+          "mb-8 flex items-center gap-2 font-retro text-sm font-bold uppercase tracking-wider transition-colors group",
+          previewPost 
+            ? "opacity-60 cursor-not-allowed" 
+            : "hover:text-purple-500",
           isDark ? "text-gray-400" : "text-gray-600"
         )}
+        disabled={!!previewPost}
       >
         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
         Voltar à Seleção

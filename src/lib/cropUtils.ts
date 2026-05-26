@@ -42,11 +42,34 @@ export const getCroppedImg = async (
   });
 };
 
+export const getProxiedUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('https://firebasestorage.googleapis.com')) {
+    return url.replace('https://firebasestorage.googleapis.com', '/firebase-storage');
+  }
+  return url;
+};
+
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
     image.addEventListener('load', () => resolve(image));
     image.addEventListener('error', (error) => reject(error));
     image.setAttribute('crossOrigin', 'anonymous');
-    image.src = url;
+    
+    const proxiedUrl = getProxiedUrl(url);
+    
+    // Add cache-buster to prevent browser CORS cache issues with already loaded images
+    if (proxiedUrl.startsWith('http') || proxiedUrl.startsWith('/firebase-storage')) {
+      try {
+        const base = proxiedUrl.startsWith('/') ? window.location.origin : undefined;
+        const urlObj = new URL(proxiedUrl, base);
+        urlObj.searchParams.set('nocache', Date.now().toString());
+        image.src = urlObj.toString();
+      } catch {
+        image.src = proxiedUrl;
+      }
+    } else {
+      image.src = proxiedUrl;
+    }
   });
