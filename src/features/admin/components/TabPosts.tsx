@@ -147,7 +147,7 @@ export default function TabPosts({
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   className={cn(
-                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none max-h-60 overflow-y-auto retro-scrollbar",
+                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none overflow-hidden",
                     isDark 
                       ? "bg-gray-900 border-purple-500/70 shadow-[6px_6px_0px_rgba(0,0,0,0.4)]" 
                       : "bg-white border-purple-500/50 shadow-[6px_6px_0px_rgba(0,0,0,0.15)]"
@@ -156,7 +156,7 @@ export default function TabPosts({
                   {/* Padrão de scanlines sutil */}
                   <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
                   
-                  <div className="relative flex flex-col gap-1 py-1 font-retro">
+                  <div className="max-h-60 overflow-y-auto retro-scrollbar pr-1 relative flex flex-col gap-1 py-1 font-retro">
                     <button
                       type="button"
                       onClick={() => {
