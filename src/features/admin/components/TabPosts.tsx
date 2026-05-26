@@ -147,7 +147,7 @@ export default function TabPosts({
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   className={cn(
-                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none overflow-hidden max-h-60 overflow-y-auto",
+                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none max-h-60 overflow-y-auto retro-scrollbar",
                     isDark 
                       ? "bg-gray-900 border-purple-500/70 shadow-[6px_6px_0px_rgba(0,0,0,0.4)]" 
                       : "bg-white border-purple-500/50 shadow-[6px_6px_0px_rgba(0,0,0,0.15)]"

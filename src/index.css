@@ -342,3 +342,29 @@ div.skiptranslate,
   display: none !important;
 }
 
+/* Scrollbar Retro Fina para Dropdowns e pequenos painéis */
+.retro-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.retro-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+.light .retro-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+.retro-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a4176;
+  border: 1px solid theme('colors.purple.500');
+  border-radius: 0px;
+}
+.retro-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.purple.500');
+}
+.light .retro-scrollbar::-webkit-scrollbar-thumb {
+  background: #c2c2c2;
+  border: 1px solid #9333ea;
+}
+.light .retro-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9333ea;
+}
+
