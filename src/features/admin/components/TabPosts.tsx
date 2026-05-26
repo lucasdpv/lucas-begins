@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Search, 
   Filter, 
@@ -9,8 +9,10 @@ import {
   ChevronLeft, 
   ChevronRight,
   Eye,
-  EyeOff
+  EyeOff,
+  ChevronDown
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn, formatDate } from "../../../lib/utils";
 import { Post } from "../../posts/schemas";
 
@@ -44,6 +46,27 @@ export default function TabPosts({
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterFeatured, setFilterFeatured] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Estados de controle dos dropdowns customizados
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isFeaturedDropdownOpen, setIsFeaturedDropdownOpen] = useState(false);
+
+  const categoryRef = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
+
+  // Fechar dropdowns ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+      if (featuredRef.current && !featuredRef.current.contains(event.target as Node)) {
+        setIsFeaturedDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Lógica de Filtragem
   const filteredPosts = posts.filter(post => {
@@ -93,43 +116,161 @@ export default function TabPosts({
             />
           </div>
 
-          {/* Filtro de Categoria */}
-          <div className="relative w-full md:w-auto group">
-            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500 group-focus-within:text-purple-500" />
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
+          {/* Filtro de Categoria Customizado */}
+          <div className="relative w-full md:w-auto" ref={categoryRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsCategoryDropdownOpen(!isCategoryDropdownOpen);
+                setIsFeaturedDropdownOpen(false);
+              }}
               className={cn(
-                "w-full pl-10 pr-8 py-2.5 md:py-3 rounded-xl border-2 outline-none font-bold uppercase text-[10px] md:text-xs font-retro appearance-none cursor-pointer transition-all",
+                "w-full md:w-auto pl-10 pr-10 py-2.5 md:py-3 rounded-xl border-2 outline-none font-bold uppercase text-[10px] md:text-xs font-retro flex items-center justify-between gap-2 transition-all relative select-none cursor-pointer",
                 isDark 
-                  ? "bg-gray-800 border-gray-700 text-gray-300 focus:border-purple-500" 
-                  : "bg-white border-gray-200 text-gray-600 focus:border-purple-500"
+                  ? "bg-gray-800 border-gray-700 text-gray-300 hover:border-purple-500" 
+                  : "bg-white border-gray-200 text-gray-600 hover:border-purple-500",
+                isCategoryDropdownOpen && "border-purple-500 ring-2 ring-purple-500/20"
               )}
             >
-              <option value="all">TODAS CATEGORIAS</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat.toUpperCase()}</option>
-              ))}
-            </select>
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500" />
+              <span>
+                {filterCategory === "all" ? "TODAS CATEGORIAS" : filterCategory}
+              </span>
+              <ChevronDown className={cn("w-3 h-3 text-gray-500 transition-transform duration-200", isCategoryDropdownOpen && "rotate-180")} />
+            </button>
+
+            <AnimatePresence>
+              {isCategoryDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className={cn(
+                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none overflow-hidden max-h-60 overflow-y-auto",
+                    isDark 
+                      ? "bg-gray-900 border-purple-500/70 shadow-[6px_6px_0px_rgba(0,0,0,0.4)]" 
+                      : "bg-white border-purple-500/50 shadow-[6px_6px_0px_rgba(0,0,0,0.15)]"
+                  )}
+                >
+                  {/* Padrão de scanlines sutil */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
+                  
+                  <div className="relative flex flex-col gap-1 py-1 font-retro">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilterCategory("all");
+                        setIsCategoryDropdownOpen(false);
+                      }}
+                      className={cn(
+                        "w-full text-left px-3 py-2 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
+                        filterCategory === "all"
+                          ? "bg-purple-600 text-white"
+                          : isDark ? "text-gray-300 hover:bg-gray-800 hover:text-white" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
+                      )}
+                    >
+                      TODAS CATEGORIAS
+                    </button>
+                    {categories.map((cat) => {
+                      const isSelected = filterCategory === cat;
+                      return (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => {
+                            setFilterCategory(cat);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-left px-3 py-2 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
+                            isSelected
+                              ? "bg-purple-600 text-white"
+                              : isDark ? "text-gray-300 hover:bg-gray-800 hover:text-white" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
+                          )}
+                        >
+                          {cat}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Filtro de Destaques (Carrossel) */}
-          <div className="relative w-full md:w-auto group">
-            <Star className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500 group-focus-within:text-purple-500" />
-            <select
-              value={filterFeatured}
-              onChange={(e) => setFilterFeatured(e.target.value)}
+          {/* Filtro de Destaques Customizado */}
+          <div className="relative w-full md:w-auto" ref={featuredRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsFeaturedDropdownOpen(!isFeaturedDropdownOpen);
+                setIsCategoryDropdownOpen(false);
+              }}
               className={cn(
-                "w-full pl-10 pr-8 py-2.5 md:py-3 rounded-xl border-2 outline-none font-bold uppercase text-[10px] md:text-xs font-retro appearance-none cursor-pointer transition-all",
+                "w-full md:w-auto pl-10 pr-10 py-2.5 md:py-3 rounded-xl border-2 outline-none font-bold uppercase text-[10px] md:text-xs font-retro flex items-center justify-between gap-2 transition-all relative select-none cursor-pointer",
                 isDark 
-                  ? "bg-gray-800 border-gray-700 text-gray-300 focus:border-purple-500" 
-                  : "bg-white border-gray-200 text-gray-600 focus:border-purple-500"
+                  ? "bg-gray-800 border-gray-700 text-gray-300 hover:border-purple-500" 
+                  : "bg-white border-gray-200 text-gray-600 hover:border-purple-500",
+                isFeaturedDropdownOpen && "border-purple-500 ring-2 ring-purple-500/20"
               )}
             >
-              <option value="all">TODOS OS ARTIGOS</option>
-              <option value="featured">APENAS CARROSSEL</option>
-              <option value="not_featured">FORA DO CARROSSEL</option>
-            </select>
+              <Star className={cn("absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 transition-colors", filterFeatured === "featured" ? "text-yellow-500 fill-yellow-500" : "text-gray-500")} />
+              <span>
+                {filterFeatured === "all" && "TODOS OS ARTIGOS"}
+                {filterFeatured === "featured" && "APENAS CARROSSEL"}
+                {filterFeatured === "not_featured" && "FORA DO CARROSSEL"}
+              </span>
+              <ChevronDown className={cn("w-3 h-3 text-gray-500 transition-transform duration-200", isFeaturedDropdownOpen && "rotate-180")} />
+            </button>
+
+            <AnimatePresence>
+              {isFeaturedDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className={cn(
+                    "absolute left-0 z-[100] mt-2 w-full md:w-56 rounded-xl border-2 p-1 focus:outline-none overflow-hidden",
+                    isDark 
+                      ? "bg-gray-900 border-purple-500/70 shadow-[6px_6px_0px_rgba(0,0,0,0.4)]" 
+                      : "bg-white border-purple-500/50 shadow-[6px_6px_0px_rgba(0,0,0,0.15)]"
+                  )}
+                >
+                  {/* Padrão de scanlines sutil */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
+
+                  <div className="relative flex flex-col gap-1 py-1 font-retro">
+                    {[
+                      { value: "all", label: "TODOS OS ARTIGOS" },
+                      { value: "featured", label: "APENAS CARROSSEL" },
+                      { value: "not_featured", label: "FORA DO CARROSSEL" }
+                    ].map((opt) => {
+                      const isSelected = filterFeatured === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setFilterFeatured(opt.value);
+                            setIsFeaturedDropdownOpen(false);
+                          }}
+                          className={cn(
+                            "w-full text-left px-3 py-2 text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-lg transition-all",
+                            isSelected
+                              ? "bg-purple-600 text-white"
+                              : isDark ? "text-gray-300 hover:bg-gray-800 hover:text-white" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
