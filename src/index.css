@@ -355,7 +355,7 @@ div.skiptranslate,
 .retro-scrollbar::-webkit-scrollbar-thumb {
   background: #4a4176;
   border: 1px solid theme('colors.purple.500');
-  border-radius: 0px;
+  border-radius: 9999px;
 }
 .retro-scrollbar::-webkit-scrollbar-thumb:hover {
   background: theme('colors.purple.500');
@@ -363,6 +363,7 @@ div.skiptranslate,
 .light .retro-scrollbar::-webkit-scrollbar-thumb {
   background: #c2c2c2;
   border: 1px solid #9333ea;
+  border-radius: 9999px;
 }
 .light .retro-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #9333ea;
