@@ -19,7 +19,6 @@ import TabPosts from "../features/admin/components/TabPosts";
 import TabCategories from "../features/admin/components/TabCategories";
 import TabProfile from "../features/admin/components/TabProfile";
 import TabInbox from "../features/admin/components/TabInbox";
-import TabTools from "../features/admin/components/TabTools";
 import DeleteModal from "../features/admin/components/DeleteModal";
 
 export default function AdminPage() {
@@ -45,10 +44,6 @@ export default function AdminPage() {
     confirmDelete,
     handleReply,
     handleAddCategory,
-    handleResetViews,
-    handleResetAllMetrics,
-    isResettingViews,
-    isResettingAll,
     profileData,
     onUpdateProfile,
     currentUser
@@ -66,8 +61,16 @@ export default function AdminPage() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header Superior */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-8 mb-8 md:mb-12">
-          <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-8 mb-8 md:mb-12 mt-6 md:mt-8">
+          <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto relative">
+            {/* Badge de Admin absoluto flutuando acima, alinhado exatamente com o início do texto do título */}
+            <div className="absolute -top-7 md:-top-9 left-[60px] md:left-[80px] flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 md:px-4 py-1 bg-purple-600/10 border border-purple-500/30 rounded-full">
+                <Settings size={12} className="text-purple-500 animate-spin-slow" />
+                <span className="font-retro text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-purple-500">Admin Mode Active</span>
+              </div>
+            </div>
+
             <button
               onClick={() => navigate("/")}
               className={cn(
@@ -77,17 +80,9 @@ export default function AdminPage() {
             >
               <ArrowLeft size={20} className="md:size-6 group-hover:-translate-x-1 transition-transform" />
             </button>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1 md:mb-2">
-                <div className="flex items-center gap-2 px-3 md:px-4 py-1 bg-purple-600/10 border border-purple-500/30 rounded-full">
-                  <Settings size={12} className="text-purple-500 animate-spin-slow" />
-                  <span className="font-retro text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-purple-500">Admin Mode Active</span>
-                </div>
-              </div>
-              <h1 className="font-retro font-bold text-2xl md:text-6xl uppercase tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                Painel de <span className="text-purple-500">Controle</span>
-              </h1>
-            </div>
+            <h1 className="font-retro font-bold text-2xl md:text-6xl uppercase tracking-tighter drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+              Painel de <span className="text-purple-500">Controle</span>
+            </h1>
           </div>
 
           <button
@@ -162,15 +157,6 @@ export default function AdminPage() {
           />
         )}
 
-        {adminTab === "tools" && (
-          <TabTools 
-            onResetViews={handleResetViews}
-            onResetAllMetrics={handleResetAllMetrics}
-            isResettingViews={isResettingViews}
-            isResettingAll={isResettingAll}
-            isDark={isDark}
-          />
-        )}
 
         {/* Modal de Exclusão Único */}
         <DeleteModal 

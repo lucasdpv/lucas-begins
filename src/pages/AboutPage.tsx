@@ -76,7 +76,10 @@ export default function AboutPage() {
                   <h3 className="font-bold font-retro text-3xl md:text-6xl uppercase mb-2 text-purple-500 leading-none drop-shadow-[3px_3px_0px_rgba(0,0,0,1)]">
                     Lucas Vieira
                   </h3>
-                  <p className="text-xs md:text-base font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-60 mb-8 md:mb-12">
+                  <p className={cn(
+                    "text-xs md:text-base font-bold uppercase tracking-[0.2em] md:tracking-[0.4em] mb-8 md:mb-12",
+                    isDark ? "text-slate-400" : "text-gray-600"
+                  )}>
                     A.K.A. Lucas Begins 🎮🦇
                   </p>
                 </div>
@@ -87,22 +90,22 @@ export default function AboutPage() {
                     "p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-1",
                     isDark ? "bg-purple-900/20" : "bg-purple-50"
                   )}>
-                    <span className="text-[10px] font-retro opacity-50 uppercase tracking-tighter">Classe</span>
-                    <span className="text-xs md:text-sm font-black uppercase text-purple-400">Loot Hunter</span>
+                    <span className={cn("text-[10px] font-retro uppercase tracking-tighter", isDark ? "text-purple-400/60" : "text-purple-900/60")}>Classe</span>
+                    <span className="text-xs md:text-sm font-black uppercase text-purple-700 dark:text-purple-400">Loot Hunter</span>
                   </div>
                   <div className={cn(
                     "p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-1",
                     isDark ? "bg-blue-900/20" : "bg-blue-50"
                   )}>
-                    <span className="text-[10px] font-retro opacity-50 uppercase tracking-tighter">Main</span>
-                    <span className="text-xs md:text-sm font-black uppercase text-blue-400">PlayStation</span>
+                    <span className={cn("text-[10px] font-retro uppercase tracking-tighter", isDark ? "text-blue-400/60" : "text-blue-900/60")}>Main</span>
+                    <span className="text-xs md:text-sm font-black uppercase text-blue-700 dark:text-blue-400">PlayStation</span>
                   </div>
                   <div className={cn(
                     "p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col gap-1",
                     isDark ? "bg-green-900/20" : "bg-green-50"
                   )}>
-                    <span className="text-[10px] font-retro opacity-50 uppercase tracking-tighter">Status</span>
-                    <span className="text-xs md:text-sm font-black uppercase text-green-500 animate-pulse">Online Now</span>
+                    <span className={cn("text-[10px] font-retro uppercase tracking-tighter", isDark ? "text-green-400/60" : "text-green-900/60")}>Status</span>
+                    <span className="text-xs md:text-sm font-black uppercase text-green-700 dark:text-green-500 animate-pulse">Online Now</span>
                   </div>
                 </div>
               </div>
@@ -111,7 +114,7 @@ export default function AboutPage() {
             {/* --- BIO BODY: Full Width Content (Post Behavior) --- */}
             <div className="space-y-6 text-base md:text-xl font-medium leading-loose text-left">
               <p>
-                Fala galera!!! O <strong>BeginsProject</strong> nasceu de uma vontade antiga de criar um cantinho na internet
+                Fala galera!!! O <strong className="notranslate" translate="no">BeginsProject</strong> nasceu de uma vontade antiga de criar um cantinho na internet
                 para documentar uma vida dedicada aos games e compartilhar a alegria de dividir grandes momentos através de um controle.
                 Minha jornada começou com o som icônico de um console ligando na sala de casa, e desde então, os videogames deixaram de ser
                 apenas pixels na tela para se tornarem um lugar onde fiz amizades e vivi histórias inesquecíveis.
@@ -127,7 +130,7 @@ export default function AboutPage() {
                 isDark ? "bg-purple-900/10 border-purple-600 shadow-[4px_4px_0_rgba(168,85,247,0.4)]" : "bg-purple-50 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]"
               )}>
                 <p className="italic font-bold text-lg md:text-2xl text-center">
-                  "O BeginsProject nasceu para ser o nosso ponto de encontro — um lugar leve para trocar uma ideia,
+                  "O <span className="notranslate" translate="no">BeginsProject</span> nasceu para ser o nosso ponto de encontro — um lugar leve para trocar uma ideia,
                   relembrar os clássicos e compartilhar a alegria de ser gamer com quem entende do assunto."
                 </p>
               </div>
@@ -137,7 +140,7 @@ export default function AboutPage() {
                 Seja você um veterano das locadoras ou alguém que acabou de apertar o 'Start', você é muito bem-vindo por aqui.
               </p>
               
-              <p className="text-xs md:text-sm opacity-60 italic border-l-4 border-purple-500 pl-4 md:pl-6 py-2">
+              <p className={cn("text-xs md:text-sm italic border-l-4 border-purple-500 pl-4 md:pl-6 py-2", isDark ? "text-slate-400" : "text-slate-700")}>
                 O apelido Lucas Begins nasceu de uma admiração por recomeços e grandes histórias.
                 Para mim, cada vez que ligamos um console, é um novo começo. 🎮✨
               </p>

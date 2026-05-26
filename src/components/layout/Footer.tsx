@@ -24,7 +24,7 @@ export default function Footer() {
         <div className="flex items-center justify-between mb-4">
           <Link to="/" className="flex items-center gap-2 cursor-pointer w-fit">
             <Gamepad2 className={cn("w-6 h-6 shrink-0", isDark ? "text-purple-400" : "text-purple-600")} />
-            <span className="font-retro font-bold text-xl tracking-wider uppercase">
+            <span className="font-retro font-bold text-xl tracking-wider uppercase notranslate" translate="no">
               <span className={isDark ? "text-white" : "text-black"}>Begins</span>
               <span className={isDark ? "text-purple-400" : "text-purple-600"}>Project</span>
             </span>
@@ -79,7 +79,7 @@ export default function Footer() {
         {/* Marca */}
         <Link to="/" className="flex items-center gap-2 group cursor-pointer shrink-0">
           <Gamepad2 className={cn("w-7 h-7 shrink-0 hover:rotate-12 transition-transform", isDark ? "text-purple-400" : "text-purple-600")} />
-          <h2 className="font-retro font-bold text-2xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">
+          <h2 className="font-retro font-bold text-2xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)] notranslate" translate="no">
             <span className={isDark ? "text-white" : "text-black"}>Begins</span>
             <span className={isDark ? "text-purple-400" : "text-purple-600"}>Project</span>
           </h2>
@@ -140,7 +140,7 @@ export default function Footer() {
           isDark ? "border-gray-800 text-gray-500" : "border-gray-300 text-gray-500"
         )}
       >
-        <p className="opacity-70">© {new Date().getFullYear()} BeginsProject</p>
+        <p className="opacity-70 notranslate" translate="no">© {new Date().getFullYear()} BeginsProject</p>
         
         <span className="opacity-20 hidden md:inline">|</span>
         <span className="opacity-40 hidden md:inline">Insert Coin to Continue.</span>

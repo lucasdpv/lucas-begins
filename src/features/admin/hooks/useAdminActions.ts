@@ -5,8 +5,6 @@ import { useDeletePostMutation, useUpdatePostMutation } from "../../posts/hooks/
 import { useAddCategoryMutation, useDeleteCategoryMutation } from "../../posts/hooks/useCategoriesQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { contactService } from "../../../services/contactService";
-import { PostService } from "../../../services/postService";
-import { errorService } from "../../../services/errorService";
 import { Post } from "../../posts/schemas";
 import { AdminTab } from "../components/AdminTabs";
 
@@ -32,8 +30,6 @@ export function useAdminActions(posts: Post[]) {
   const [adminTab, setAdminTab] = useState<AdminTab>("posts");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isResettingViews, setIsResettingViews] = useState(false);
-  const [isResettingAll, setIsResettingAll] = useState(false);
   
   const [deleteModal, setDeleteModal] = useState<{ 
     isOpen: boolean; 
@@ -134,31 +130,7 @@ export function useAdminActions(posts: Post[]) {
     }
   };
 
-  const handleResetViews = async () => {
-    if (!window.confirm("Isso vai resetar as visualizações de TODOS os posts para valores realistas. Confirmar?")) return;
-    setIsResettingViews(true);
-    try {
-      await PostService.normalizeAllPostViews();
-      showToast("Visualizações normalizadas com sucesso!");
-    } catch (error: any) {
-      errorService.handle(error, "ao normalizar views");
-    } finally {
-      setIsResettingViews(false);
-    }
-  };
 
-  const handleResetAllMetrics = async () => {
-    if (!window.confirm("ATENÇÃO: Isso vai ZERAR todas as curtidas e visualizações de TODOS os posts. Deseja continuar?")) return;
-    setIsResettingAll(true);
-    try {
-      await PostService.resetAllMetrics();
-      showToast("Engajamento zerado com sucesso! 🧹");
-    } catch (error: any) {
-      errorService.handle(error, "ao zerar métricas");
-    } finally {
-      setIsResettingAll(false);
-    }
-  };
 
   const onUpdateProfile = async (data: any) => {
     try {
@@ -181,10 +153,6 @@ export function useAdminActions(posts: Post[]) {
     confirmDelete,
     handleReply,
     handleAddCategory,
-    handleResetViews,
-    handleResetAllMetrics,
-    isResettingViews,
-    isResettingAll,
     profileData,
     onUpdateProfile,
     currentUser

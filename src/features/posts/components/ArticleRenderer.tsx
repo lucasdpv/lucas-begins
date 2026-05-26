@@ -12,13 +12,41 @@ interface ArticleImageProps {
   wrapType?: 'silhouette' | 'circle' | 'diagonal';
   wrapIntensity?: number;
   wrapDirection?: 'up' | 'down';
+  aspect?: 'original' | '1:1' | '16:9' | '4:5';
+  frameStyle?: 'normal' | 'crt' | 'sticker' | 'none';
+  scanlines?: boolean;
 }
 
 /**
  * Sub-componente para renderizar imagens com tratamento de erro gamificado.
  */
-function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wrapType = 'silhouette', wrapIntensity = 50, wrapDirection = 'up' }: ArticleImageProps) {
+function ArticleImage({ 
+  src, 
+  alt, 
+  isDark, 
+  layout = 'full', 
+  useShape = false, 
+  wrapType = 'silhouette', 
+  wrapIntensity = 50, 
+  wrapDirection = 'up',
+  aspect = 'original',
+  frameStyle = 'normal',
+  scanlines = true
+}: ArticleImageProps) {
   const [error, setError] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [naturalAspect, setNaturalAspect] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (!isZoomed) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsZoomed(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isZoomed]);
 
   // MODO RECORTE (MAGAZINE STYLE)
   if (useShape && !error) {
@@ -96,45 +124,167 @@ function ArticleImage({ src, alt, isDark, layout = 'full', useShape = false, wra
 
   const isFloated = layout === 'left' || layout === 'right';
 
-  const containerClass = cn(
-    "w-full rounded-none relative overflow-hidden retro-card block",
-    isDark ? "bg-gray-900" : "bg-snes-mid"
-  );
+  const getContainerClass = () => {
+    let widthClass = "w-full";
+    if (aspect === 'original') {
+      if (naturalAspect !== null && naturalAspect < 1.2) {
+        widthClass = "w-fit max-w-full";
+      }
+    }
+
+    const base = cn("relative overflow-hidden block mx-auto", widthClass);
+    
+    if (frameStyle === 'none') {
+      return base;
+    }
+    
+    if (frameStyle === 'crt') {
+      return cn(
+        base,
+        "rounded-none border-4 md:border-8 border-gray-800 bg-black shadow-[0_0_25px_rgba(168,85,247,0.35)]"
+      );
+    }
+    
+    if (frameStyle === 'sticker') {
+      return cn(
+        base,
+        "rounded-none border-[6px] md:border-[8px] border-white shadow-[6px_6px_0px_#000000] bg-white"
+      );
+    }
+    
+    // Default / normal
+    return cn(
+      base,
+      "rounded-none retro-card",
+      isDark ? "bg-gray-900" : "bg-snes-mid"
+    );
+  };
+
+  const containerClass = getContainerClass();
+
+  const aspectStyle = aspect && aspect !== 'original' ? {
+    aspectRatio: aspect.replace(':', '/'),
+    objectFit: 'cover' as const
+  } : {};
+
+  const getFigureClass = () => {
+    let figureWidth = "w-full my-14";
+    if (aspect === '1:1') {
+      figureWidth = "max-w-lg md:max-w-xl mx-auto w-full my-12";
+    } else if (aspect === '4:5') {
+      figureWidth = "max-w-sm md:max-w-md mx-auto w-full my-12";
+    } else if (aspect === 'original') {
+      if (naturalAspect !== null && naturalAspect < 1.2) {
+        figureWidth = "max-w-xs md:max-w-sm mx-auto w-full my-12";
+      }
+    }
+
+    return cn(
+      "animate-in fade-in duration-700 relative group cursor-zoom-in",
+      layout === 'left' && "magazine-float-left my-8",
+      layout === 'right' && "magazine-float-right my-8",
+      layout === 'full' && figureWidth
+    );
+  };
 
   return (
-    <figure 
-      className={cn(
-        "my-8 animate-in fade-in duration-700 relative group",
-        layout === 'left' && "magazine-float-left",
-        layout === 'right' && "magazine-float-right",
-        layout === 'full' && "w-full my-14"
-      )}
-    >
-      <div className={containerClass}>
-        {!error ? (
-          <img
-            src={src}
-            alt={alt}
-            loading="lazy"
-            decoding="async"
-            onError={() => setError(true)}
-            className="pixelated w-full h-auto block"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center p-10 text-center">
-            <div className="text-red-500 font-retro text-xl mb-4 animate-pulse bg-black/40 px-4 py-2 rounded border-2 border-red-500">
-              ⚠️ RENDER_FAILED_0x77
+    <>
+      <figure 
+        className={getFigureClass()}
+        onClick={() => !error && setIsZoomed(true)}
+      >
+        <div className={containerClass}>
+          {!error ? (
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              decoding="async"
+              onLoad={(e) => {
+                const { naturalWidth, naturalHeight } = e.currentTarget;
+                if (naturalWidth && naturalHeight) {
+                  setNaturalAspect(naturalWidth / naturalHeight);
+                }
+              }}
+              onError={() => setError(true)}
+              style={aspectStyle}
+              className={cn(
+                "pixelated block mx-auto",
+                aspect === 'original' 
+                  ? (naturalAspect !== null && naturalAspect < 1.2)
+                    ? "w-auto max-w-full h-auto max-h-[450px] md:max-h-[550px] object-contain" 
+                    : "w-full h-auto max-h-[500px] md:max-h-[600px] object-contain"
+                  : "w-full h-full object-cover"
+              )}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-10 text-center">
+              <div className="text-red-500 font-retro text-xl mb-4 animate-pulse bg-black/40 px-4 py-2 rounded border-2 border-red-500">
+                ⚠️ RENDER_FAILED_0x77
+              </div>
             </div>
-          </div>
+          )}
+          
+          {/* Scanlines overlays based on scanlines checkbox state */}
+          {scanlines !== false && !error && (
+            <div className={cn(
+              "absolute inset-0 scanline-overlay pointer-events-none z-10",
+              frameStyle === 'crt' ? "opacity-40" : "opacity-20"
+            )} />
+          )}
+          {frameStyle === 'crt' && !error && (
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] z-10" />
+          )}
+        </div>
+        {alt && !error && (
+          <figcaption className={cn("text-center text-[10px] mt-2 font-retro font-bold tracking-widest uppercase", isDark ? "text-purple-400" : "text-purple-600")}>
+            ▲ {alt}
+          </figcaption>
         )}
-        <div className="absolute inset-0 scanline-overlay opacity-20 pointer-events-none" />
-      </div>
-      {alt && !error && (
-        <figcaption className={cn("text-center text-[10px] mt-2 font-retro font-bold tracking-widest uppercase", isDark ? "text-purple-400" : "text-purple-600")}>
-          ▲ {alt}
-        </figcaption>
+      </figure>
+
+      {/* Retro CRT Zoom Lightbox */}
+      {isZoomed && (
+        <div 
+          onClick={() => setIsZoomed(false)}
+          className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md cursor-zoom-out p-4 animate-in fade-in duration-300"
+        >
+          {/* Close button in top-right */}
+          <button 
+            type="button" 
+            onClick={() => setIsZoomed(false)}
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/40 border-2 border-white/20 px-4 py-2 rounded-xl transition-all font-retro uppercase tracking-widest text-xs font-bold"
+          >
+            ✕ FECHAR [ESC]
+          </button>
+          
+          {/* CRT scanline overlay on lightbox */}
+          {scanlines !== false && (
+            <div className="absolute inset-0 scanline-overlay opacity-15 pointer-events-none z-10" />
+          )}
+          
+          {/* Image Container with glow */}
+          <div 
+            className="relative max-w-full max-h-[80vh] flex items-center justify-center p-2 bg-black/40 border-4 border-purple-500 shadow-[0_0_40px_rgba(168,85,247,0.5)]"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image container
+          >
+            <img 
+              src={src} 
+              alt={alt} 
+              className="pixelated max-w-full max-h-[75vh] object-contain block"
+            />
+          </div>
+          
+          {alt && (
+            <div className="mt-6 text-center max-w-xl px-4 z-20">
+              <span className="inline-block bg-purple-600 text-white font-retro font-bold text-xs px-3 py-1.5 border-2 border-black shadow-[3px_3px_0px_#000] uppercase tracking-widest">
+                ▲ {alt}
+              </span>
+            </div>
+          )}
+        </div>
       )}
-    </figure>
+    </>
   );
 }
 
@@ -430,6 +580,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       const wrapMatch = line.match(/\{#wrap-(silhouette|circle|diagonal)\}/);
       const intensityMatch = line.match(/\{#intensity-(\d+)\}/);
       const directionMatch = line.match(/\{#direction-(up|down)\}/);
+      const aspectMatch = line.match(/\{#aspect-(original|1:1|16:9|4:5)\}/);
+      const frameMatch = line.match(/\{#frame-(normal|crt|sticker|none)\}/);
+      const scanlinesMatch = line.includes('{#scanlines-false}');
       
       renderedLines.push(
         <ArticleImage 
@@ -442,6 +595,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
           wrapType={(wrapMatch?.[1] as any) || 'silhouette'}
           wrapIntensity={intensityMatch ? parseInt(intensityMatch[1]) : 50}
           wrapDirection={(directionMatch?.[1] as any) || 'up'}
+          aspect={(aspectMatch?.[1] as any) || 'original'}
+          frameStyle={(frameMatch?.[1] as any) || 'normal'}
+          scanlines={!scanlinesMatch}
         />
       );
       i++;
