@@ -42,13 +42,22 @@ export default function TabPosts({
   // Estados de Filtro e Paginação internos
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [filterFeatured, setFilterFeatured] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Lógica de Filtragem
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === "all" || post.category === filterCategory;
-    return matchesSearch && matchesCategory;
+    
+    let matchesFeatured = true;
+    if (filterFeatured === "featured") {
+      matchesFeatured = post.isFeatured === true;
+    } else if (filterFeatured === "not_featured") {
+      matchesFeatured = !post.isFeatured;
+    }
+    
+    return matchesSearch && matchesCategory && matchesFeatured;
   });
 
   // Lógica de Paginação
@@ -60,7 +69,7 @@ export default function TabPosts({
   // Resetar página quando filtrar
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterCategory]);
+  }, [searchTerm, filterCategory, filterFeatured]);
 
   return (
     <div className="space-y-6">
@@ -101,6 +110,25 @@ export default function TabPosts({
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat.toUpperCase()}</option>
               ))}
+            </select>
+          </div>
+
+          {/* Filtro de Destaques (Carrossel) */}
+          <div className="relative w-full md:w-auto group">
+            <Star className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500 group-focus-within:text-purple-500" />
+            <select
+              value={filterFeatured}
+              onChange={(e) => setFilterFeatured(e.target.value)}
+              className={cn(
+                "w-full pl-10 pr-8 py-2.5 md:py-3 rounded-xl border-2 outline-none font-bold uppercase text-[10px] md:text-xs font-retro appearance-none cursor-pointer transition-all",
+                isDark 
+                  ? "bg-gray-800 border-gray-700 text-gray-300 focus:border-purple-500" 
+                  : "bg-white border-gray-200 text-gray-600 focus:border-purple-500"
+              )}
+            >
+              <option value="all">TODOS OS ARTIGOS</option>
+              <option value="featured">APENAS CARROSSEL</option>
+              <option value="not_featured">FORA DO CARROSSEL</option>
             </select>
           </div>
         </div>

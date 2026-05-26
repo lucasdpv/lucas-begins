@@ -1,8 +1,8 @@
 import React from "react";
-import { Edit, Tag, Inbox, User, Wrench } from "lucide-react";
+import { Edit, Tag, Inbox, User } from "lucide-react";
 import { cn } from "../../../lib/utils";
 
-export type AdminTab = "posts" | "categories" | "messages" | "profile" | "tools";
+export type AdminTab = "posts" | "categories" | "messages" | "profile";
 
 interface AdminTabsProps {
   activeTab: AdminTab;
@@ -22,7 +22,6 @@ export default function AdminTabs({
     { id: "categories" as AdminTab, label: "Categorias", icon: Tag },
     { id: "messages" as AdminTab, label: "Inbox", icon: Inbox, badge: hasNewMessages },
     { id: "profile" as AdminTab, label: "Perfil", icon: User },
-    { id: "tools" as AdminTab, label: "Ferramentas", icon: Wrench },
   ];
 
   return (

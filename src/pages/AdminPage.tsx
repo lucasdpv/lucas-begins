@@ -19,7 +19,6 @@ import TabPosts from "../features/admin/components/TabPosts";
 import TabCategories from "../features/admin/components/TabCategories";
 import TabProfile from "../features/admin/components/TabProfile";
 import TabInbox from "../features/admin/components/TabInbox";
-import TabTools from "../features/admin/components/TabTools";
 import DeleteModal from "../features/admin/components/DeleteModal";
 
 export default function AdminPage() {
@@ -45,10 +44,6 @@ export default function AdminPage() {
     confirmDelete,
     handleReply,
     handleAddCategory,
-    handleResetViews,
-    handleResetAllMetrics,
-    isResettingViews,
-    isResettingAll,
     profileData,
     onUpdateProfile,
     currentUser
@@ -162,15 +157,6 @@ export default function AdminPage() {
           />
         )}
 
-        {adminTab === "tools" && (
-          <TabTools 
-            onResetViews={handleResetViews}
-            onResetAllMetrics={handleResetAllMetrics}
-            isResettingViews={isResettingViews}
-            isResettingAll={isResettingAll}
-            isDark={isDark}
-          />
-        )}
 
         {/* Modal de Exclusão Único */}
         <DeleteModal 
