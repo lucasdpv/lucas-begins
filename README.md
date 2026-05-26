@@ -1,8 +1,8 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v3.4.0)
+# 🕹️ BeginsProject - Retro Gaming Journal (v3.10.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.0.0, o projeto atinge seu ápice estético com uma interface ultra-refinada, navegação inteligente baseada em conteúdo e acessibilidade total para todos os temas.
+O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.10.0, o portal adiciona um sistema completo de imagens premium no editor de conteúdo, com molduras retrô, lightbox de zoom, re-corte in-context e bypass de CORS para edição de imagens remotas.
 
 ---
 
@@ -17,22 +17,22 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 
 ---
 
-## ✨ Destaques da Versão 3.0.0
+## ✨ Destaques da Versão 3.10.0
 
-### 🎨 UI Ultra-Slim & Premium
-Redesign completo do rodapé para uma barra minimalista elegante e revisão de contraste em toda a interface. O modo claro agora conta com legibilidade absoluta em todos os elementos de texto e metadados.
+### 🖼️ Editor de Imagens Premium
+Suporte completo a proporções livres (`1:1`, `16:9`, `4:5`, `Original`) e 4 estilos de moldura por bloco: retrô normal, CRT retro com scanlines, adesivo e sem moldura. Re-corte in-context sem novo upload, preview dinâmico de aspecto no editor e propagação do aspecto confirmado de volta ao bloco.
 
-### 🧭 Navegação Inteligente (Smart Nav)
-O menu de categorias agora é dinâmico: ele analisa o conteúdo em tempo real e oculta automaticamente seções que ainda não possuem artigos publicados, garantindo um portal sempre vibrante e pronto.
+### 🔍 Lightbox de Zoom
+Clicar em qualquer imagem de artigo abre um overlay full-screen com a imagem em alta qualidade, bordas neon retrô, backdrop blur e suporte a fechar via ESC ou clique.
 
-### 🎮 Gamificação & QG (Dashboard)
-Sistema de progressão real com XP e níveis. O "Meu QG" permite que cada usuário acompanhe seu progresso, gerencie favoritos e personalize sua identidade com estética Modern Brutalist.
+### 🔧 CORS Proxy para Crop Remoto
+Proxy same-origin configurado no Vite (dev) e Vercel (produção) para contornar restrições CORS ao desenhar imagens do Firebase Storage no canvas do editor de corte, eliminando erros de "tainted canvas".
 
-### ⚡ Performance "Instant-Browse"
-Utilização estratégica de cache local para filtragem instantânea. A busca global e a troca de categorias acontecem sem atrasos, proporcionando uma experiência de navegação fluida e moderna.
+### 🛠️ Painel Admin Refinado
+Remoção da aba "Ferramentas". Filtro de posts em destaque (carrossel). Dropdowns customizados com Framer Motion, scrollbar retrô pill-shaped e header do painel com alinhamento vertical perfeito.
 
-### 🔐 Segurança & Manutenção
-Painel Administrativo com ferramentas integradas para normalização de dados e gestão de categorias, protegido por rotas inteligentes que respeitam a hierarquia de acesso.
+### 🌐 Marca Protegida contra Tradução
+"BeginsProject" nunca é traduzido por motores de tradução automáticos — protegido em todos os elementos do site com `translate="no"` e classe `notranslate`.
 
 ---
 

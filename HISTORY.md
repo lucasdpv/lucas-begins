@@ -4,6 +4,52 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🖼️ [v3.10.0] - The Premium Media & Admin UX Update
+*Data: 26 de Maio de 2026*
+
+### 🖼️ Editor de Imagens Premium (BlockEditor + Cropper)
+- **Proporções Livres**: Adicionados seletores de aspecto de imagem no editor de blocos — `Original`, `1:1`, `16:9` e `4:5`. A escolha de proporção é propagada até o `ImageCropper` e persiste no Markdown com a tag `{#aspect-X}`.
+- **Estilos de Moldura Retrô**: Implementados 4 estilos de frame editáveis por bloco no `BlockEditor.tsx`, serializados como `{#frame-Y}` no Markdown: `normal` (card retrô com borda roxa), `crt` (moldura de TV com scanlines e glow), `sticker` (borda branca com sombra sólida), e `none` (imagem limpa, sem frame).
+- **Scanlines Toggle**: Adicionado toggle de pixel-art para ativar/desativar o efeito de scanlines CRT em blocos de imagem individualmente, controlado pela flag `{#scanlines-false}` no Markdown.
+- **Re-Crop In-Context**: Adicionado botão **Recortar** (`Crop` icon) no overlay de imagens já enviadas dentro de `ImageUpload.tsx`, permitindo ao editor cortar, reencadrar e atualizar a imagem diretamente sem novo upload.
+- **Fix de Segunda Abertura do Cropper**: Corrigido o bug crítico que impedia a confirmação do corte na segunda abertura do `ImageCropper` (CORS caching de canvas). A solução injeta um parâmetro `?nocache=` baseado em timestamp nas URLs de imagem remotas ao carregar na tela de crop.
+- **Aspect Ratio Preview no Editor**: O placeholder/preview de imagem no `ImageUpload.tsx` agora aplica dinamicamente as classes de aspecto CSS (`aspect-square`, `aspect-video`, `aspect-[4/5]`), sincronizando visualmente o editor com a proporção selecionada.
+- **Propagação de Aspecto do Cropper**: O aspecto confirmado no `ImageCropper` é propagado de volta ao `BlockEditor` via `onAspectConfirmed`, atualizando automaticamente a configuração do bloco.
+
+### 📰 Article Renderer Premium (Lightbox & Frames)
+- **Zoom Lightbox**: Implementado lightbox full-screen autocontido dentro de `ArticleRenderer.tsx`. Clicar em qualquer imagem padrão abre o overlay com a imagem em resolução original, backdropblur, borda neon, scanlines e suporte a fechar via tecla ESC ou clique externo.
+- **Renderização de Molduras**: `ArticleImage` agora interpreta as tags `{#frame-...}` do Markdown para aplicar estilos CSS distintos: card retrô normal, moldura CRT com bisel cinza, sombra inset e glow roxo, borda de adesivo branca ou sem moldura.
+- **Escala Inteligente por Proporção**: Imagens `original` com aspecto landscape (`>= 1.2`) crescem até a largura total da coluna com altura máxima capped. Imagens portrait ou quadradas são limitadas a `320px` / `384px` para evitar blocos verticais gigantes no conteúdo.
+- **Responsividade Aprimorada**: Limites de altura e largura dinâmicos para imagens centralizadas em ambos desktop e mobile, mantendo o layout do artigo equilibrado.
+
+### 🔧 CORS Proxy para Corte de Imagens Remotas
+- **Proxy Local (Vite)**: Configurado proxy `/firebase-storage` no `vite.config.js` mapeando para `https://firebasestorage.googleapis.com`, permitindo canvas tainted-free draw de imagens de produção durante o desenvolvimento.
+- **Proxy de Produção (Vercel)**: Adicionada rewrite correspondente no `vercel.json` para que o mesmo proxy funcione em produção sem depender de CORS do Firebase Storage diretamente.
+- **`getProxiedUrl` Helper**: Nova função em `cropUtils.ts` que reescreve URLs do Firebase Storage para o caminho proxy same-origin `/firebase-storage`, resolvendo bloqueios de `Access-Control-Allow-Origin` no canvas.
+
+### 🛠️ Painel Admin — Remoção de Ferramentas & Filtros Avançados
+- **Remoção da Aba Ferramentas**: Aba "Ferramentas" completamente removida do painel administrativo — componentes, estados, hooks e referências. Arquivo `TabTools.tsx` deletado.
+- **Filtro de Carrossel**: Adicionado filtro de **Destaques (Carrossel)** ao lado do filtro de categoria na listagem de posts (`TabPosts.tsx`), permitindo filtrar diretamente os posts em destaque.
+- **Custom Select Dropdowns**: Os seletores nativos `<select>` de Categoria e Carrossel foram substituídos por dropdowns customizados com Framer Motion (`AnimatePresence`), fechamento automático ao clicar fora, overlay de scanlines, bordas neon e animações suaves.
+
+### 🎨 Scrollbar Retrô nos Dropdowns
+- **`.retro-scrollbar` (CSS)**: Criada classe utilitária global em `index.css` com largura de 8px, thumb arredondado em estilo pill (`border-radius: 9999px`) nas cores roxa/cinza por tema, combinando com os dropdowns `rounded-xl`.
+- **Fix de Overflow Arredondado**: `overflow-hidden` aplicado no container externo do dropdown (`motion.div`) para garantir que a scrollbar nunca vaze fora das bordas curvas.
+
+### 🌐 Proteção de Marca contra Tradução
+- **`translate="no"` + `notranslate`**: Adicionados atributos HTML e classe CSS de proteção em todos os elementos que exibem o nome "BeginsProject" — Navbar (header logo), Footer (mobile e desktop), AboutPage (bio e citação) e PrivacyPolicyPage — evitando que motores de tradução (Google Translate, etc.) alterem o nome da marca.
+
+### 🎛️ Alinhamento do Header do Painel Admin
+- **Centralização Vertical**: O botão de voltar (←), o título "Painel de Controle" e o botão "+ Nova Publicação" foram alinhados verticalmente ao centro de forma consistente.
+- **Badge Flutuante**: O badge "Admin Mode Active" foi refatorado para posicionamento `absolute`, flutuando acima do título sem deslocar o alinhamento dos outros elementos.
+
+### 📱 Mobile Preview Fixes (PostEditorPage & PostDetailPage)
+- **Badge de Preview Responsivo**: Reduzido font-size e padding do badge "Modo de Pré-Visualização" em mobile para evitar sobreposição com o conteúdo.
+- **Padding Top no Preview Container**: Aumentado o padding superior em mobile de `p-4` para `pt-14` para dar espaço ao badge flutuante.
+- **Botão de Voltar Desabilitado em Preview**: O botão "Voltar à Seleção" fica com opacidade reduzida e cursor `not-allowed` dentro do preview mode, prevenindo perda acidental de progresso não salvo.
+
+---
+
 ## ⚡ [v3.9.4] - Service Worker & Image Load Optimization Update
 *Data: 22 de Maio de 2026*
 
