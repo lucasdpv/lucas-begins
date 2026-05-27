@@ -81,17 +81,25 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   useEffect(() => {
     if (post && post.id && !previewPost && !hasIncremented.current) {
       if (!authLoading) {
-        let guestId = localStorage.getItem('retro_guest_id');
-        if (!guestId) {
-          guestId = `guest_${Math.random().toString(36).substring(2, 15)}`;
-          localStorage.setItem('retro_guest_id', guestId);
+        // Controle de visualizações por localStorage para evitar spams e permitir contagem confiável para guests
+        const storageKey = "retro_viewed_posts";
+        let viewedPosts: string[] = [];
+        try {
+          viewedPosts = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        } catch (e) {
+          viewedPosts = [];
         }
-        const viewerId = currentUser?.id || guestId;
-        incrementViewMutation.mutate({ 
-          postId: post.id, 
-          userId: currentUser?.id,
-          viewerId
-        });
+
+        if (!viewedPosts.includes(post.id)) {
+          incrementViewMutation.mutate({ 
+            postId: post.id, 
+            userId: currentUser?.id,
+            viewerId: currentUser?.id || "guest"
+          });
+          
+          viewedPosts.push(post.id);
+          localStorage.setItem(storageKey, JSON.stringify(viewedPosts));
+        }
         hasIncremented.current = true;
       }
     }

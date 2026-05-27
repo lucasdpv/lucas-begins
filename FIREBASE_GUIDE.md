@@ -87,7 +87,8 @@ service cloud.firestore {
       allow read: if true;
       allow create, delete: if request.auth != null && 
         exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
-      allow update: if request.auth != null;
+      allow update: if request.auth != null || 
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']));
 
       // 💬 Subcoleção de Comentários e Respostas (Defuso de 1MB):
       match /comments/{commentId} {

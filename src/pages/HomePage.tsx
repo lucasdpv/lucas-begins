@@ -25,6 +25,25 @@ import { BRUTAL_DESIGN } from "../constants";
 
 const { BORDER, SHADOW_LG, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
 
+const getCategoryTheme = (category: string) => {
+  const normalized = category.toLowerCase().trim();
+  switch (normalized) {
+    case "reviews":
+      return { dot: "bg-amber-500", text: "text-amber-600 dark:text-amber-400" };
+    case "dossiês":
+    case "dossies":
+      return { dot: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" };
+    case "especial":
+      return { dot: "bg-purple-500", text: "text-purple-600 dark:text-purple-400" };
+    case "retrocafe":
+    case "retro-café":
+    case "retrocafé":
+      return { dot: "bg-orange-500", text: "text-orange-600 dark:text-orange-400" };
+    default:
+      return { dot: "bg-purple-500", text: "text-purple-600 dark:text-purple-400" };
+  }
+};
+
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
@@ -84,7 +103,15 @@ export default function HomePage() {
   const isLoadingPosts = isSearching ? isLoadingAll : (isLoadingFeatured || isLoadingPaginated);
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12 relative z-0">
+      {/* Ambient Glows */}
+      {isDark && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute top-[20%] left-[-15%] w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[120px] animate-pulse duration-[8000ms]" />
+          <div className="absolute top-[50%] right-[-15%] w-[450px] h-[450px] bg-blue-600/5 rounded-full blur-[130px] animate-pulse duration-[10000ms]" />
+          <div className="absolute top-[80%] left-[10%] w-[350px] h-[350px] bg-amber-500/3 rounded-full blur-[110px] animate-pulse duration-[12000ms]" />
+        </div>
+      )}
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
@@ -175,25 +202,28 @@ export default function HomePage() {
                       key={post.id}
                       to={`/post/${post.slug || slugify(post.title)}`}
                       className={cn(
-                        "flex items-center gap-5 cursor-pointer group py-3 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-2",
+                        "flex items-center gap-4 cursor-pointer group py-3 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
                         isDark ? "border-white/5" : "border-snes-mid/30"
                       )}
                     >
                       <span className={cn(
-                        "text-2xl font-retro font-bold trending-number transition-all duration-300 min-w-[40px]",
-                        isDark ? "text-purple-500/50" : "text-purple-600/50"
+                        "text-3xl font-retro font-black trending-number min-w-[36px] select-none",
+                        isDark 
+                          ? "text-purple-500/40" 
+                          : "text-purple-600/30"
                       )}>
                         {(idx + 1).toString().padStart(2, "0")}
                       </span>
+
                       <div className="flex-1 min-w-0">
                         <h4 className={cn(
-                          "font-bold text-[14px] leading-tight line-clamp-2 transition-colors",
-                          isDark ? "text-white group-hover:text-purple-200" : "text-snes-accent group-hover:text-purple-700"
+                          "font-bold text-[14px] leading-snug line-clamp-2 transition-colors duration-300",
+                          isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
                         )}>
                           {post.title}
                         </h4>
-                        <div className={cn("flex items-center gap-2 mt-1.5 text-[10px] font-bold uppercase tracking-wider", isDark ? "opacity-40" : "opacity-60")}>
-                          <span>{formatNumber(post.views || 0)} visualizações</span>
+                        <div className={cn("flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider", isDark ? "text-purple-400/50" : "text-slate-500")}>
+                          <span>{formatNumber(post.views || 0)} views</span>
                         </div>
                       </div>
                     </Link>
@@ -282,7 +312,7 @@ export default function HomePage() {
               <div className="flex flex-col gap-4">
                 {[1,2,3,4,5,6].map((i) => (
                   <div key={i} className={cn("flex gap-4 p-4 animate-pulse", isDark ? "bg-white/[0.02]" : "bg-gray-100")}>
-                    <div className={cn("w-28 h-20 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
+                    <div className={cn("w-28 h-28 sm:w-40 sm:h-40 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
                     <div className="flex-1 space-y-2">
                       <div className={cn("h-3 w-16 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
                       <div className={cn("h-4 w-full rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
@@ -292,19 +322,19 @@ export default function HomePage() {
                 ))}
               </div>
             ) : gridPosts.length > 0 ? (
-              <div className="flex flex-col divide-y divide-white/5">
+              <div className={cn("flex flex-col divide-y", isDark ? "divide-white/5" : "divide-black/5")}>
                 {gridPosts.map((post, i) => (
                   <motion.article
                     key={post.id}
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.06, type: "spring", stiffness: 90 }}
-                    className="group flex gap-6 py-6 first:pt-0 last:pb-0"
+                    className="group flex gap-6 py-6 first:pt-0 last:pb-0 transition-all duration-300 hover:translate-x-1"
                   >
                     {/* Thumbnail */}
                     <Link
                       to={`/post/${post.slug || slugify(post.title)}`}
-                      className="shrink-0 w-40 h-28 overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(168,85,247,0.5)] transition-shadow"
+                      className="shrink-0 w-28 h-28 sm:w-40 sm:h-40 overflow-hidden border border-black dark:border-white/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] group-hover:shadow-[4px_4px_0px_0px_rgba(168,85,247,0.5)] transition-all duration-300"
                     >
                       {post.imageUrl ? (
                         <img
@@ -323,17 +353,21 @@ export default function HomePage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 border border-purple-500/30 px-2 py-0.5">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className={cn(
+                            "text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5",
+                            getCategoryTheme(post.category).text
+                          )}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", getCategoryTheme(post.category).dot)} />
                             {post.category}
                           </span>
                           {post.score && (
-                            <span className="text-[9px] font-black uppercase tracking-widest text-yellow-500">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-yellow-500 flex items-center gap-0.5">
                               ★ {post.score}
                             </span>
                           )}
                         </div>
-                        <h3 className="font-retro font-bold text-[17px] leading-snug line-clamp-2 group-hover:text-purple-400 transition-colors duration-200">
+                        <h3 className="font-retro font-bold text-[17px] leading-snug line-clamp-2 group-hover:text-purple-400 dark:group-hover:text-purple-300 transition-colors duration-300">
                           <Link to={`/post/${post.slug || slugify(post.title)}`}>{post.title}</Link>
                         </h3>
                         {post.excerpt && (
@@ -411,7 +445,7 @@ export default function HomePage() {
 
                     {/* Score badge — top left */}
                     {post.score && (
-                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
+                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black shimmer-badge">
                         ★ {post.score}
                       </span>
                     )}

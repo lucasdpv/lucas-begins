@@ -78,13 +78,21 @@ export default function MobileMenu({
                 <button
                   onClick={() => { toggleTheme(); onClose(); }}
                   className={cn(
-                    "p-2.5 rounded-xl border-2 transition-all",
+                    "p-2.5 rounded-xl border-2 transition-all overflow-hidden relative flex items-center justify-center w-11 h-11",
                     isDark 
                       ? "border-purple-500/30 bg-gray-800 text-yellow-400" 
                       : "border-purple-500/20 bg-purple-50 text-purple-600"
                   )}
                 >
-                  {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                  <motion.div
+                    key={isDark ? "sun-mobile" : "moon-mobile"}
+                    initial={{ y: 15, rotate: 90, opacity: 0 }}
+                    animate={{ y: 0, rotate: 0, opacity: 1 }}
+                    exit={{ y: -15, rotate: -90, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 15 }}
+                  >
+                    {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                  </motion.div>
                 </button>
                 <button
                   onClick={onClose}

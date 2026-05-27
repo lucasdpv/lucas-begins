@@ -177,6 +177,19 @@ export default function Carousel({ posts }: CarouselProps) {
           ⏸ Pausado
         </div>
       )}
+
+      {/* Indicador de progresso de autoplay (barra de progresso) */}
+      {posts.length > 1 && (
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/10 z-20 overflow-hidden">
+          <div
+            key={currentIndex}
+            className={cn(
+              "h-full bg-purple-500 origin-left transition-all duration-300",
+              !isPaused ? "animate-carousel-progress" : "w-0"
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 }

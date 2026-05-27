@@ -1,6 +1,6 @@
 # ⚙️ Documentação Técnica — BeginsProject
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.10.0**.
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.10.1**.
 
 ---
 
@@ -89,6 +89,12 @@ Na **HomePage**, optamos por carregar todos os posts ativos via `useAllPosts()` 
 - **Fuzzy Search**: Integração do Fuse.js para pesquisa tolerante a erros de digitação e ausência de acentos.
 - **Vantagem**: Busca e troca de categorias instantâneas (zero delay) e uma interface sempre limpa.
 
+### Novo Mecanismo de Visualizações (v3.10.1)
+Para mitigar os erros de permissão de escrita para usuários não autenticados (guests) no Firestore, a contagem de visualizações foi simplificada e blindada:
+- **Controle de Duplicados Local**: As postagens já visualizadas pelo usuário são salvas no `localStorage` do navegador sob a chave `retro_viewed_posts`.
+- **Gravação Atômica e Leve**: Em vez de armazenar o histórico de IDs de visualizadores em uma array `viewedBy` no banco (o que corria o risco de estolar o limite de 1MB por documento do Firestore), usamos a função `increment(1)` nativa do Firestore.
+- **Segurança Otimizada**: Recomenda-se a regra de segurança do Firebase que permite escritas de atualização por usuários anônimos se e somente se o único campo sendo modificado for `views` (`request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])`).
+
 ---
 
 ## 🎨 Design System: Neo-Brutalist 2.0
@@ -109,4 +115,4 @@ A tradução é fornecida pelo Google Translate Element (via `TranslationContext
 - O nome da marca **BeginsProject** é protegido contra tradução em todos os componentes via `translate="no"` + classe `notranslate`.
 
 ---
-**Documentação atualizada em: 26 de Maio de 2026.**
+**Documentação atualizada em: 27 de Maio de 2026.**

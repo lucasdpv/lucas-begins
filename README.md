@@ -1,8 +1,8 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v3.10.0)
+# 🕹️ BeginsProject - Retro Gaming Journal (v3.10.1)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.10.0, o portal adiciona um sistema completo de imagens premium no editor de conteúdo, com molduras retrô, lightbox de zoom, re-corte in-context e bypass de CORS para edição de imagens remotas.
+O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.10.1, o portal traz um design mais moderno na homepage com micro-animações dinâmicas, barra de progresso no carrossel, correção de overflow responsivo, e um novo mecanismo atômico e leve de contagem de visualizações integrado com localStorage.
 
 ---
 
@@ -17,7 +17,7 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 
 ---
 
-## ✨ Destaques da Versão 3.10.0
+## ✨ Destaques da Versão 3.10.1
 
 ### 🖼️ Editor de Imagens Premium
 Suporte completo a proporções livres (`1:1`, `16:9`, `4:5`, `Original`) e 4 estilos de moldura por bloco: retrô normal, CRT retro com scanlines, adesivo e sem moldura. Re-corte in-context sem novo upload, preview dinâmico de aspecto no editor e propagação do aspecto confirmado de volta ao bloco.
