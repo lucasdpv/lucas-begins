@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from "react";
-import { Gamepad2, ChevronRight } from "lucide-react";
+import { Gamepad2, ChevronRight, LayoutGrid, Map, Layers } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
 import PostSkeleton from "../features/posts/components/PostSkeleton";
@@ -18,10 +18,12 @@ import {
   usePosts 
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify, formatNumber } from "../lib/utils";
+import { cn, slugify, formatNumber, formatDate } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 import { ScoreBadge } from "../components/ui/Badge";
 import { BRUTAL_DESIGN } from "../constants";
+import { useAuth } from "../context/AuthProvider";
+import { useUserProfile } from "../hooks/useUserQuery";
 
 const { BORDER, SHADOW_LG, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
 
@@ -46,6 +48,79 @@ const getCategoryTheme = (category: string) => {
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
+  const { currentUser } = useAuth();
+  const { data: profile } = useUserProfile(currentUser?.id);
+  const playInsertSound = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const now = ctx.currentTime;
+      
+      // Insertion clack: low pitch white noise click
+      const bufferSize = ctx.sampleRate * 0.05; // 50ms noise
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = "bandpass";
+      noiseFilter.frequency.setValueAtTime(300, now);
+      
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.15, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+      
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now);
+
+      // Power-on chime: retro synth sine wave beep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, now + 0.05); // C5
+      osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.setValueAtTime(0.05, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + 0.05);
+      osc.stop(now + 0.25);
+    } catch (e) {
+      console.log("Audio API not supported or allowed", e);
+    }
+  };
+
+  const playEjectSound = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const now = ctx.currentTime;
+      
+      // Eject mechanical clack: pitch sweep down saw wave
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch (e) {
+      console.log("Audio API not supported or allowed", e);
+    }
+  };
+
+
   const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,11 +143,14 @@ export default function HomePage() {
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
   const { data: mostViewedPosts = [], isLoading: isLoadingMostViewed } = useMostViewedPosts(5);
 
-  // 3. Reviews (Top Scores) - Puxa no máximo 3 melhores notas
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = useTopReviews(3);
+  // 3. Reviews - Puxa no máximo 3 posts mais recentes da categoria Reviews
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 3);
 
-  // 4. Dossiês - Puxa no máximo 3 posts da categoria
+  // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
   const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3);
+
+  // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
+  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3);
 
   // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
   const isSearching = searchQuery.trim() !== "";
@@ -84,6 +162,7 @@ export default function HomePage() {
   });
 
   const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -97,10 +176,11 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
-  // Grid exibe no máximo 5 itens
-  const gridPosts = isSearching ? filteredPosts.slice(0, 5) : paginatedPosts.slice(0, 5);
-
-  const isLoadingPosts = isSearching ? isLoadingAll : (isLoadingFeatured || isLoadingPaginated);
+  // Grid exibe no máximo 6 itens para um grid de 3 colunas balanceado
+  const gridPosts = isSearching ? filteredPosts.slice(0, 6) : paginatedPosts.slice(0, 6);
+  const isLoadingPosts = isSearching 
+    ? isLoadingAll 
+    : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe);
 
   return (
     <div className="flex flex-col gap-12 relative z-0">
@@ -145,388 +225,376 @@ export default function HomePage() {
         </script>
       </Helmet>
 
-      {/* ── 1. HERO: Carousel + Mais Acessados ─────────── */}
+      {/* ── 1. HERO BENTO GRID: Carousel + Mais Acessados ─────────── */}
       {isLoadingPosts && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
       ) : !isLoadingPosts && isDefaultView && posts.length > 0 ? (
-        <section>
-          {/* Section labels row */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-6">
-            <div className="lg:col-span-3 flex items-center gap-3">
-              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
               <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
+                <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
                   Em Destaque
                 </h2>
-                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
-                  Seleção Editorial
-                </p>
               </div>
             </div>
-            <div className="hidden lg:flex items-center gap-3">
-              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
-                  Mais Lidos
-                </h2>
-                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
-                  Em Alta no Portal
-                </p>
-              </div>
-            </div>
+            <Carousel posts={featuredPosts.slice(0, 5)} isDark={isDark} />
           </div>
 
-          {/* Carousel + Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <Carousel posts={featuredPosts.slice(0, 5)} isDark={isDark} />
-            </div>
-
-            <aside className="hidden lg:block lg:col-span-1">
-              <div
-                className={cn(
-                  "h-full md:h-[560px] p-8 rounded-none flex flex-col relative overflow-hidden transition-all duration-500",
-                  isDark
-                    ? "bg-[#161b2c] border border-white/5 shadow-xl"
-                    : "bg-snes-surface border-2 border-snes-dark shadow-[4px_4px_0px_0px_#2D1B69]"
-                )}
-              >
-                {/* Efeito de luz de fundo sutil */}
-                {isDark && (
-                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none" />
-                )}
-
-                <div className="flex flex-col justify-between h-full relative z-10 gap-1">
-                  {mostViewedPosts.map((post, idx) => (
-                    <Link
-                      key={post.id}
-                      to={`/post/${post.slug || slugify(post.title)}`}
-                      className={cn(
-                        "flex items-center gap-4 cursor-pointer group py-3 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
-                        isDark ? "border-white/5" : "border-snes-mid/30"
-                      )}
-                    >
-                      <span className={cn(
-                        "text-3xl font-retro font-black trending-number min-w-[36px] select-none",
-                        isDark 
-                          ? "text-purple-500/40" 
-                          : "text-purple-600/30"
-                      )}>
-                        {(idx + 1).toString().padStart(2, "0")}
-                      </span>
-
-                      <div className="flex-1 min-w-0">
-                        <h4 className={cn(
-                          "font-bold text-[14px] leading-snug line-clamp-2 transition-colors duration-300",
-                          isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
-                        )}>
-                          {post.title}
-                        </h4>
-                        <div className={cn("flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider", isDark ? "text-purple-400/50" : "text-slate-500")}>
-                          <span>{formatNumber(post.views || 0)} views</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+          {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
+          <div className="lg:col-span-1 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
+              <div>
+                <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
+                  Mais Lidos
+                </h2>
               </div>
-            </aside>
+            </div>
+            
+            <div
+              className={cn(
+                "h-full lg:h-[560px] p-6 rounded-3xl flex flex-col relative overflow-hidden transition-all duration-300 glass-card border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
+              )}
+            >
+              {isDark && (
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none" />
+              )}
+              <div className="flex flex-col justify-between h-full relative z-10 gap-3">
+                {mostViewedPosts.map((post, idx) => (
+                  <Link
+                    key={post.id}
+                    to={`/post/${post.slug || slugify(post.title)}`}
+                    className={cn(
+                      "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
+                      isDark ? "border-white/5" : "border-black/5"
+                    )}
+                  >
+                    <span className={cn(
+                      "text-2xl font-retro font-black trending-number min-w-[32px] select-none",
+                      isDark ? "text-purple-400/85 text-glow" : "text-purple-600/60"
+                    )}>
+                      {(idx + 1).toString().padStart(2, "0")}
+                    </span>
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className={cn(
+                        "font-bold text-xs md:text-sm leading-snug line-clamp-2 transition-colors duration-300",
+                        isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
+                      )}>
+                        {post.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <span>{formatNumber(post.views || 0)} views</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       ) : null}
 
-      {/* ── 2. PORTAL LAYOUT: Notícias + Reviews Sidebar ─ */}
-      <section>
-        {/* Section headers */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-0">
-          {/* Left header */}
-          <div className={cn(
-            "lg:col-span-2 flex items-center justify-between pb-5",
-            isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-          )}>
+      {/* ── 2. ROW 2 BENTO GRID: Dossiês Spotlight + RetroCafé Grid + Reviews Scoreboard ─────────── */}
+      {!isLoadingPosts && isDefaultView && (
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* CÉLULA ESQUERDA (2/3 de largura): Destaques Editoriais */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* Título Principal Dossiês */}
             <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
-                  {isLoadingPosts
-                    ? "Carregando..."
-                    : searchQuery
-                    ? `Resultados: "${searchQuery}"`
-                    : activeCategory !== "Todos"
-                    ? activeCategory
-                    : "Últimas Notícias"}
-                </h2>
-                {!isLoadingPosts && (
-                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-slate-500" : "text-slate-700")}>
-                    {searchQuery ? `${filteredPosts.length} resultado${filteredPosts.length !== 1 ? "s" : ""}` : "Mais recentes do portal"}
-                  </p>
-                )}
-              </div>
+              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-blue-400 text-glow-blue" : "text-snes-accent")}>
+                Dossiês & Especial
+              </h2>
             </div>
-            {!isLoadingPosts && isDefaultView && (
-              <Link
-                to="/archive"
+
+            {/* Spotlight Dossiê Card */}
+            {dossiePosts[0] ? (
+              <div
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 font-retro font-black text-[11px] uppercase tracking-widest border transition-all duration-200 hover:translate-x-0.5",
-                  isDark
-                    ? "border-blue-500/40 text-blue-400 hover:border-blue-400 hover:text-blue-300"
-                    : "border-blue-500/40 text-blue-600 hover:border-blue-600"
+                  "w-full p-6 md:p-8 rounded-3xl relative overflow-hidden border-2 transition-all duration-300 glass-card flex flex-col md:flex-row gap-6 items-stretch",
+                  isDark ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]"
                 )}
               >
-                Ver Todos <ChevronRight className="w-3 h-3" />
-              </Link>
+                {/* Scanlines overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(168,85,247,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px]" />
+                
+                {/* Imagem do Dossiê */}
+                {dossiePosts[0].imageUrl && (
+                  <div className="w-full md:w-1/2 aspect-video md:aspect-[4/3] lg:aspect-[16/10] rounded-2xl overflow-hidden shrink-0 border border-black/10 dark:border-white/5 relative group/img">
+                    <img
+                      src={dossiePosts[0].imageUrl}
+                      alt={dossiePosts[0].title}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none" />
+                    <span className="absolute top-3 left-3 text-[9px] font-retro font-bold text-blue-400 uppercase tracking-widest bg-blue-500/20 border border-blue-500/30 px-2 py-0.5 rounded">
+                      Destaque
+                    </span>
+                  </div>
+                )}
+
+                {/* Texto do Dossiê */}
+                <div className="flex flex-col justify-between flex-grow gap-4 py-1">
+                  <div className="space-y-3">
+                    <Link
+                      to={`/post/${dossiePosts[0].slug || slugify(dossiePosts[0].title)}`}
+                      className="group/link block"
+                    >
+                      <h3 className={cn(
+                        "font-retro font-black text-base md:text-lg lg:text-xl transition-colors leading-snug",
+                        isDark ? "text-white group-hover/link:text-blue-300 text-glow-blue" : "text-gray-900 group-hover/link:text-blue-600"
+                      )}>
+                        {dossiePosts[0].title}
+                      </h3>
+                    </Link>
+                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                      {dossiePosts[0].excerpt}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-t border-black/5 dark:border-white/5 pt-3">
+                    <span>{formatDate(dossiePosts[0].createdAt, dossiePosts[0].date)}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-600" />
+                    <span>{formatNumber(dossiePosts[0].views || 0)} views</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className={cn(
+                "w-full p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[200px]",
+                isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
+              )}>
+                <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
+              </div>
             )}
+
+            {/* Subtítulo RetroCafé */}
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2">
+                <div className={cn("w-1.5 h-5 rounded-none", isDark ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)]" : "bg-orange-600")} />
+                <h3 className={cn("font-retro text-sm md:text-base font-black uppercase tracking-wide leading-none", isDark ? "text-orange-400 text-glow" : "text-gray-700 dark:text-gray-300")}>
+                  RetroCafé
+                </h3>
+              </div>
+              <button
+                onClick={() => goToCategory("RetroCafé")}
+                className="text-[9px] md:text-xs font-retro font-black uppercase text-orange-400 hover:text-orange-300 transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                VER MAIS <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Grid de Cards RetroCafé */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {retrocafePosts.length > 0 ? (
+                retrocafePosts.slice(0, 2).map((post) => {
+                  const targetSlug = post.slug || slugify(post.title);
+                  return (
+                    <article
+                      key={post.id}
+                      className={cn(
+                        "p-5 rounded-3xl border-2 transition-all duration-300 glass-card flex flex-col justify-between gap-4 group hover:translate-y-[-4px]",
+                        isDark 
+                          ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_24px_rgba(249,115,22,0.08)]" 
+                          : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.05)]"
+                      )}
+                    >
+                      {/* Thumbnail do RetroCafé */}
+                      {post.imageUrl ? (
+                        <div className="w-full aspect-video rounded-2xl overflow-hidden border border-black/10 dark:border-white/5 bg-gray-900 shrink-0 relative group/img">
+                          <img
+                            src={post.imageUrl}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-full aspect-video rounded-2xl bg-gradient-to-br from-orange-600 to-amber-800 shrink-0 flex items-center justify-center">
+                          <span className="font-retro text-xs text-white uppercase opacity-50">RetroCafé</span>
+                        </div>
+                      )}
+
+                      {/* Info & Título */}
+                      <div className="flex flex-col justify-between flex-grow gap-3">
+                        <Link to={`/post/${targetSlug}`} className="block">
+                          <h4 className={cn(
+                            "font-bold text-sm md:text-base leading-snug line-clamp-2 transition-colors duration-200",
+                            isDark ? "text-gray-100 group-hover:text-orange-300" : "text-gray-900 group-hover:text-orange-600"
+                          )}>
+                            {post.title}
+                          </h4>
+                        </Link>
+
+                        <div className="flex items-center gap-3 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-auto border-t border-black/5 dark:border-white/5 pt-2">
+                          <span>{formatDate(post.createdAt, post.date)}</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-500" />
+                          <span>{formatNumber(post.views || 0)} views</span>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className={cn(
+                  "col-span-2 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[150px]",
+                  isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
+                )}>
+                  <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Right header (Visible ONLY on Desktop, as part of the sidebar header row) */}
-          {reviewPosts.length > 0 && isDefaultView && (
-            <div
-              onClick={() => goToCategory("Reviews")}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && goToCategory("Reviews")}
-              className={cn(
-                "hidden lg:flex items-center gap-3 pb-5 cursor-pointer group",
-                isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-              )}
-            >
-              <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
-                  Reviews
-                </h2>
-                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
-                  Análises com Nota
-                </p>
-              </div>
+          {/* CÉLULA DIREITA (1/3 de largura): Placar de Reviews */}
+          <div className="lg:col-span-1 flex flex-col gap-6">
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => goToCategory("Reviews")}>
+              <div className="w-1.5 h-6 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
+              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                Reviews
+              </h2>
             </div>
-          )}
-        </div>
 
-        {/* Content: list + sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8">
-
-          {/* LEFT: Horizontal article list */}
-          <div className="lg:col-span-2">
-            {isLoadingPosts ? (
-              <div className="flex flex-col gap-4">
-                {[1,2,3,4,5,6].map((i) => (
-                  <div key={i} className={cn("flex gap-4 p-4 animate-pulse", isDark ? "bg-white/[0.02]" : "bg-gray-100")}>
-                    <div className={cn("w-28 h-28 sm:w-40 sm:h-40 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
-                    <div className="flex-1 space-y-2">
-                      <div className={cn("h-3 w-16 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
-                      <div className={cn("h-4 w-full rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
-                      <div className={cn("h-4 w-2/3 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : gridPosts.length > 0 ? (
-              <div className={cn("flex flex-col divide-y", isDark ? "divide-white/5" : "divide-black/5")}>
-                {gridPosts.map((post, i) => (
-                  <motion.article
-                    key={post.id}
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06, type: "spring", stiffness: 90 }}
-                    className="group flex gap-6 py-6 first:pt-0 last:pb-0 transition-all duration-300 hover:translate-x-1"
-                  >
-                    {/* Thumbnail */}
+            {/* Listagem em Cards de Capa Inteira */}
+            <div className="flex-grow flex flex-col gap-4 h-full">
+              {reviewPosts.length > 0 ? (
+                reviewPosts.slice(0, 3).map((post) => {
+                  const targetSlug = post.slug || slugify(post.title);
+                  return (
                     <Link
-                      to={`/post/${post.slug || slugify(post.title)}`}
-                      className="shrink-0 w-28 h-28 sm:w-40 sm:h-40 overflow-hidden border border-black dark:border-white/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] group-hover:shadow-[4px_4px_0px_0px_rgba(168,85,247,0.5)] transition-all duration-300"
+                      key={post.id}
+                      to={`/post/${targetSlug}`}
+                      className={cn(
+                        "relative h-[150px] lg:flex-1 rounded-3xl overflow-hidden border-2 transition-all duration-300 group/item flex flex-col justify-end p-5",
+                        isDark 
+                          ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] hover:border-yellow-500/40 hover:shadow-[0_0_20px_rgba(234,179,8,0.15)]" 
+                          : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)] hover:border-yellow-600/40 hover:shadow-[0_0_20px_rgba(234,179,8,0.05)]"
+                      )}
                     >
+                      {/* Scanlines overlay */}
+                      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(168,85,247,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] z-10" />
+
+                      {/* Imagem de Capa */}
                       {post.imageUrl ? (
                         <img
                           src={post.imageUrl}
                           alt={post.title}
+                          className="absolute inset-0 w-full h-full object-cover opacity-85 dark:opacity-75 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-100"
                           loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
-                        <div className={cn("w-full h-full flex items-center justify-center", isDark ? "bg-gray-800" : "bg-gray-200")}>
-                          <Gamepad2 className="w-8 h-8 opacity-20" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/20 to-amber-900/20" />
+                      )}
+
+                      {/* Gradiente de Escurecimento para Legibilidade */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-0" />
+
+                      {/* Flutuante Top-Right: Neon Score Badge */}
+                      {post.score ? (
+                        <div className="absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center font-retro font-black text-[11px] border-2 bg-yellow-400/20 border-yellow-400 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.3)] z-20 group-hover/item:scale-105 group-hover/item:bg-yellow-400 group-hover/item:text-black transition-all">
+                          ★{post.score}
+                        </div>
+                      ) : (
+                        <div className="absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center font-retro font-black text-[11px] border-2 bg-gray-500/20 border-gray-400 text-gray-400 z-20">
+                          N/A
                         </div>
                       )}
+
+                      {/* Conteúdo do Card */}
+                      <div className="relative z-10 space-y-1">
+                        <h4 className="font-bold text-sm md:text-base text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-wider text-slate-300">
+                          <span>{formatNumber(post.views || 0)} views</span>
+                          <span className="w-1 h-1 rounded-full bg-slate-400" />
+                          <span>{formatDate(post.createdAt, post.date)}</span>
+                        </div>
+                      </div>
                     </Link>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5",
-                            getCategoryTheme(post.category).text
-                          )}>
-                            <span className={cn("w-1.5 h-1.5 rounded-full", getCategoryTheme(post.category).dot)} />
-                            {post.category}
-                          </span>
-                          {post.score && (
-                            <span className="text-[9px] font-black uppercase tracking-widest text-yellow-500 flex items-center gap-0.5">
-                              ★ {post.score}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-retro font-bold text-[17px] leading-snug line-clamp-2 group-hover:text-purple-400 dark:group-hover:text-purple-300 transition-colors duration-300">
-                          <Link to={`/post/${post.slug || slugify(post.title)}`}>{post.title}</Link>
-                        </h3>
-                        {post.excerpt && (
-                          <p className={cn("text-[13px] line-clamp-2 mt-1.5 hidden sm:block", isDark ? "text-slate-500" : "text-slate-700")}>
-                            {post.excerpt}
-                          </p>
-                        )}
-                      </div>
-                      <div className={cn("flex items-center gap-4 mt-3 text-[10px] font-black uppercase tracking-widest", isDark ? "text-slate-400" : "text-slate-700")}>
-                        <span>{post.author?.name || "Lucas"}</span>
-                        <span>·</span>
-                        <span>{formatNumber(post.views || 0)} views</span>
-                      </div>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
-            ) : (
-              <div className={cn("p-12 text-center retro-card", isDark ? "bg-gray-800/40" : "bg-snes-surface border-2 border-snes-dark")}>
-                <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500" />
-                <p className="font-retro font-bold uppercase">Nenhum artigo encontrado.</p>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT: Full-width review mini cards (Scrolling on mobile) */}
-          {reviewPosts.length > 0 && isDefaultView && (
-            <aside className="block lg:col-span-1">
-              {/* REVIEWS HEADER (Mobile Only - stacks here) */}
-              <div
-                onClick={() => goToCategory("Reviews")}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && goToCategory("Reviews")}
-                className={cn(
-                  "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6 cursor-pointer group",
-                  isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-                )}
-              >
-                <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
-                <div>
-                  <h2 className={cn("font-retro text-2xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
-                    Reviews
-                  </h2>
-                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
-                    Análises com Nota
-                  </p>
-                </div>
-              </div>
-
-              {/* Reviews Scroll Container */}
-              <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
-                {reviewPosts.map((post, i) => (
-                  <motion.article
-                    key={post.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07, type: "spring", stiffness: 90 }}
-                    className="group relative min-w-[280px] lg:min-w-0 w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.5)] transition-shadow cursor-pointer snap-center"
-                  >
-                    <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
-
-                    {/* BG image */}
-                    {post.imageUrl && (
-                      <img
-                        src={post.imageUrl}
-                        alt={post.title}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    )}
-
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-
-                    {/* Score badge — top left */}
-                    {post.score && (
-                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black shimmer-badge">
-                        ★ {post.score}
-                      </span>
-                    )}
-
-                    {/* Category — top right */}
-                    <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-yellow-400 bg-black/60 px-2 py-0.5 border border-yellow-500/30">
-                      {post.category}
-                    </span>
-
-                    {/* Title — bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                      <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-yellow-300 transition-colors">
-                        {post.title}
-                      </h4>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
-
-              {/* DOSSIÊS (Mobile version needs its own header here since the sidebar stacks) */}
-              {dossiePosts.length > 0 && (
-                <div className="mt-8 lg:mt-4">
-                  <div
-                    onClick={() => goToCategory("Dossiês")}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && goToCategory("Dossiês")}
-                    className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0 cursor-pointer group"
-                  >
-                    <div className="w-1.5 self-stretch rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)] group-hover:shadow-[0_0_14px_rgba(59,130,246,0.9)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                        Dossiês
-                      </h2>
-                      <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
-                        Reportagens Especiais
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Dossies Scroll Container */}
-                  <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
-                    {dossiePosts.map((post, i) => (
-                      <motion.article
-                        key={post.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: (i + reviewPosts.length) * 0.07, type: "spring", stiffness: 90 }}
-                        className="group relative min-w-[280px] lg:min-w-0 w-full h-32 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[3px_3px_0px_0px_rgba(59,130,246,0.5)] transition-shadow cursor-pointer snap-center"
-                      >
-                        <Link to={`/post/${post.slug || slugify(post.title)}`} className="absolute inset-0 z-20" />
-
-                        {post.imageUrl && (
-                          <img
-                            src={post.imageUrl}
-                            alt={post.title}
-                            loading="lazy"
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        )}
-
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-
-                        <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-blue-400 bg-black/60 px-2 py-0.5 border border-blue-500/30">
-                          {post.category}
-                        </span>
-
-                        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                          <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-blue-300 transition-colors">
-                            {post.title}
-                          </h4>
-                        </div>
-                      </motion.article>
-                    ))}
-                  </div>
+                  );
+                })
+              ) : (
+                <div className={cn(
+                  "w-full flex-grow p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[200px]",
+                  isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
+                )}>
+                  <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
                 </div>
               )}
-            </aside>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 3. FEED DE NOTÍCIAS: Bento Grid de 3 Colunas ── */}
+      <section className="flex flex-col gap-6">
+        {/* Feed Header */}
+        <div className={cn(
+          "flex items-center justify-between pb-5",
+          isDark ? "border-b border-white/5" : "border-b border-black/10"
+        )}>
+          <div className="flex items-center gap-3">
+            <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+            <div>
+              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
+                {isLoadingPosts
+                  ? "Carregando..."
+                  : searchQuery
+                  ? `Resultados: "${searchQuery}"`
+                  : activeCategory !== "Todos"
+                  ? activeCategory
+                  : "Últimas Notícias"}
+              </h2>
+            </div>
+          </div>
+          {!isLoadingPosts && isDefaultView && (
+            <Link
+              to="/archive"
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-xl transition-all duration-200 hover:translate-x-0.5",
+                isDark
+                  ? "border-blue-500/30 text-blue-400 hover:border-blue-400/50 hover:text-blue-300 bg-blue-500/5"
+                  : "border-blue-500/20 text-blue-600 hover:border-blue-600 hover:bg-blue-50/50"
+              )}
+            >
+              Ver Todos <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
           )}
         </div>
+
+        {/* Feed Content: Clean 3-Column Grid */}
+        {isLoadingPosts ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <PostSkeleton key={i} isDark={isDark} />
+            ))}
+          </div>
+        ) : gridPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gridPosts.map((post, i) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+              >
+                <PostCard post={post} />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className={cn("p-12 text-center rounded-3xl border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
+            <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500 animate-pulse" />
+            <p className="font-retro font-bold uppercase text-sm">Nenhum artigo encontrado.</p>
+          </div>
+        )}
       </section>
     </div>
   );
 }
+

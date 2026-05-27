@@ -77,7 +77,7 @@ export default function Carousel({ posts }: CarouselProps) {
 
   return (
     <div
-      className="relative rounded-none border-2 border-black overflow-hidden retro-card group/carousel select-none"
+      className="relative rounded-3xl overflow-hidden group/carousel select-none border-2 border-black dark:border-purple-500/20 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={onTouchStart}
@@ -100,10 +100,10 @@ export default function Carousel({ posts }: CarouselProps) {
         />
 
         {/* Scanlines */}
-        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover/carousel:opacity-50 transition-opacity z-[5]" />
+        <div className="absolute inset-0 scanline-overlay opacity-20 group-hover/carousel:opacity-40 transition-opacity z-[5]" />
         
         {/* Deep Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/70 to-transparent pointer-events-none z-[5]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent pointer-events-none z-[5]" />
         
         {/* Content Container */}
         <div className="absolute bottom-0 left-0 right-0 p-6 pb-16 md:p-12 z-[11] pointer-events-none flex justify-center md:justify-start">
@@ -135,6 +135,7 @@ export default function Carousel({ posts }: CarouselProps) {
           </div>
         </div>
       </div>
+
 
       {/* Botões de navegação - Devem estar acima do link (Z-INDEX 20+) */}
       {posts.length > 1 && (

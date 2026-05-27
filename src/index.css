@@ -227,27 +227,73 @@
 }
 
 /* Utilitário Glassmorphism - Refinado */
+/* Estilo Base: Glassmorphism Light Mode (Padrão) */
 .glass-card {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(245, 240, 252, 0.85);
+  border: 1px solid rgba(45, 27, 105, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Glassmorphism Dark Mode (Ativado quando HTML tem classe .dark) */
 .dark .glass-card {
-  background: rgba(13, 13, 20, 0.4);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  background: rgba(18, 18, 30, 0.72);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
 }
 
-/* Light mode: usa a superfície SNES com toque lavanda */
-.light .glass-card,
-:not(.dark) .glass-card {
-  background: rgba(245, 240, 252, 0.6);
-  border: 1px solid rgba(45, 27, 105, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.1);
+/* Hover e Estados Interativos para Cards Bento e PostCards */
+.glass-card-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.glass-card-hover:hover {
+  transform: translateY(-6px);
+}
+
+/* Hover Light Mode (Padrão) */
+.glass-card-hover:hover {
+  border-color: rgba(79, 67, 174, 0.4);
+  box-shadow: 0 0 25px rgba(79, 67, 174, 0.15), 0 16px 40px 0 rgba(45, 27, 105, 0.15);
+  background: rgba(242, 235, 252, 0.95);
+}
+
+/* Hover Dark Mode */
+.dark .glass-card-hover:hover {
+  border-color: rgba(168, 85, 247, 0.65);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.22), 0 16px 40px 0 rgba(0, 0, 0, 0.7);
+  background: rgba(26, 26, 42, 0.88);
+}
+
+/* Fundos Premium Mesh - Fiel ao SNES Purple / Retro */
+.bg-dark-mesh {
+  background: radial-gradient(circle at 50% 0%, rgba(79, 67, 174, 0.22) 0%, rgba(13, 12, 21, 0.98) 55%, rgba(10, 9, 15, 1) 100%);
+  background-color: #0a090f;
+}
+
+.bg-light-mesh {
+  background: radial-gradient(circle at 50% 0%, rgba(245, 240, 252, 0.8) 0%, rgba(215, 210, 213, 0.95) 70%, rgba(206, 201, 204, 1) 100%);
+  background-color: #cec9cc;
+}
+
+/* Logo Glow Pulse */
+@keyframes logoPulse {
+  0%, 100% {
+    text-shadow: 0 0 12px rgba(168, 85, 247, 0.4), 0 0 2px rgba(168, 85, 247, 0.2);
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.2));
+  }
+  50% {
+    text-shadow: 0 0 22px rgba(168, 85, 247, 0.85), 0 0 6px rgba(168, 85, 247, 0.45);
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+  }
+}
+
+.logo-glow-pulse {
+  animation: logoPulse 4s infinite ease-in-out;
+}
+
 
 /* Texto com Glow Moderno */
 .text-glow {

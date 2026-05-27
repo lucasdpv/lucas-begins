@@ -39,11 +39,11 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
   return (
     <article
       className={cn(
-        "flex flex-col h-full group relative",
-        BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT,
-        "hover:shadow-[8px_8px_0px_0px_rgba(168,85,247,1)]",
-        isDark ? "bg-gray-800" : "bg-snes-light",
-        isCompact && "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(168,85,247,1)]"
+        "flex flex-col h-full group relative overflow-hidden rounded-3xl border-2 transition-all duration-300 glass-card glass-card-hover",
+        isDark 
+          ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" 
+          : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]",
+        isCompact && "rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.05)]"
       )}
     >
       {/* Link Esticado (Stretched Link) - Captura o clique em todo o card */}
@@ -56,9 +56,9 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
       {/* Thumb */}
       <div
         className={cn(
-          "w-full relative overflow-hidden border-b-2 border-black flex items-center justify-center z-10 pointer-events-none",
+          "w-full relative overflow-hidden border-b-2 border-black/10 dark:border-white/5 flex items-center justify-center z-10 pointer-events-none",
           isCompact ? "h-32 sm:h-40" : "h-56 md:h-64",
-          isDark ? "bg-gray-900" : "bg-snes-mid",
+          isDark ? "bg-gray-900" : "bg-snes-mid/20",
           !post.imageUrl && !imgError && post.gradient && `bg-gradient-to-br ${post.gradient}`
         )}
         style={bgStyle}
@@ -110,8 +110,7 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         {/* Footer do card */}
         <div className={cn(
           "flex flex-wrap items-end justify-between mt-auto gap-y-3",
-          isCompact ? "pt-2 border-t border-black/10" : "pt-4 border-t-2 border-snes-mid",
-          isDark && !isCompact && "border-gray-800"
+          isCompact ? "pt-2 border-t border-black/5 dark:border-white/5" : "pt-4 border-t-2 border-black/10 dark:border-white/5"
         )}>
           {/* Data e tempo de leitura */}
           <div className="flex flex-col gap-0.5 min-w-[80px]">
