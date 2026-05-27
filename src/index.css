@@ -306,6 +306,16 @@
 /* ============================================================
    Google Translate Styling Resets (Ultra-Clean Page Translation)
    ============================================================ */
+html, body {
+  background-color: #111827; /* dark: bg-gray-900 */
+  color: #e5e7eb; /* dark: text-gray-200 */
+}
+
+html.light, html.light body {
+  background-color: #cec9cc; /* light: bg-snes-light */
+  color: #211a21; /* light: text-snes-accent */
+}
+
 body {
   top: 0px !important;
   position: static !important;

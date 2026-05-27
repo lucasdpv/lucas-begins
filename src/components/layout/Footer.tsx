@@ -15,7 +15,7 @@ export default function Footer() {
     <footer
       className={cn(
         "border-t-4 mt-6 pt-4 pb-4 transition-colors duration-300",
-        isDark ? "border-purple-600 bg-gray-900" : "border-black bg-white"
+        isDark ? "border-purple-600 bg-gray-900" : "border-black bg-snes-light"
       )}
     >
       {/* === MOBILE: layout compacto em 2 colunas === */}
