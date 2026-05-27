@@ -265,13 +265,13 @@
 
 /* Fundos Premium Mesh - Fiel ao SNES Purple / Retro */
 .bg-dark-mesh {
-  background: radial-gradient(circle at 50% 0%, rgba(79, 67, 174, 0.22) 0%, rgba(13, 12, 21, 0.98) 55%, rgba(10, 9, 15, 1) 100%);
-  background-color: #0a090f;
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(18, 17, 28, 0.98) 50%, rgba(15, 14, 23, 1) 100%);
+  background-color: #0f0e17;
 }
 
 .bg-light-mesh {
-  background: radial-gradient(circle at 50% 0%, rgba(245, 240, 252, 0.8) 0%, rgba(215, 210, 213, 0.95) 70%, rgba(206, 201, 204, 1) 100%);
-  background-color: #cec9cc;
+  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.08) 0%, rgba(247, 245, 250, 0.98) 50%, rgba(240, 238, 245, 1) 100%);
+  background-color: #f7f5fa;
 }
 
 /* Logo Glow Pulse */
@@ -349,12 +349,12 @@
    Google Translate Styling Resets (Ultra-Clean Page Translation)
    ============================================================ */
 html, body {
-  background-color: #111827; /* dark: bg-gray-900 */
+  background-color: #0f0e17; /* dark: obsidiana */
   color: #e5e7eb; /* dark: text-gray-200 */
 }
 
 html.light, html.light body {
-  background-color: #cec9cc; /* light: bg-snes-light */
+  background-color: #f7f5fa; /* light: lavanda suave */
   color: #211a21; /* light: text-snes-accent */
 }
 
