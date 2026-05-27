@@ -312,7 +312,7 @@ export default function HomePage() {
               <div className="flex flex-col gap-4">
                 {[1,2,3,4,5,6].map((i) => (
                   <div key={i} className={cn("flex gap-4 p-4 animate-pulse", isDark ? "bg-white/[0.02]" : "bg-gray-100")}>
-                    <div className={cn("w-28 h-20 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
+                    <div className={cn("w-28 h-28 sm:w-40 sm:h-40 shrink-0", isDark ? "bg-white/5" : "bg-gray-200")} />
                     <div className="flex-1 space-y-2">
                       <div className={cn("h-3 w-16 rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
                       <div className={cn("h-4 w-full rounded", isDark ? "bg-white/5" : "bg-gray-200")} />
@@ -334,7 +334,7 @@ export default function HomePage() {
                     {/* Thumbnail */}
                     <Link
                       to={`/post/${post.slug || slugify(post.title)}`}
-                      className="shrink-0 w-40 h-26 overflow-hidden border border-black dark:border-white/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] group-hover:shadow-[4px_4px_0px_0px_rgba(168,85,247,0.5)] transition-all duration-300"
+                      className="shrink-0 w-28 h-28 sm:w-40 sm:h-40 overflow-hidden border border-black dark:border-white/10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] group-hover:shadow-[4px_4px_0px_0px_rgba(168,85,247,0.5)] transition-all duration-300"
                     >
                       {post.imageUrl ? (
                         <img

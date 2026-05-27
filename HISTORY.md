@@ -4,6 +4,29 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🎨 [v3.10.1] - The Modern Visual & Robust Views Update
+*Data: 27 de Maio de 2026*
+
+### 🎨 Modernização Visual & Micro-animações
+- **Feed Clean & Moderno**: Removidos os números de ordenação sequencial nos cards de notícias da Home para um visual mais limpo e editorial.
+- **Indicadores de Categoria Estilizados**: Implementados novos indicadores de categoria estilo "dots" (bolinhas com a cor correspondente de cada categoria) na barra lateral.
+- **Números de Destaque Flutuantes**: O ranking de posts mais lidos agora exibe números estilizados em marca d'água grande de fundo que se iluminam dinamicamente no hover.
+- **Auras de Brilho no Modo Escuro**: Adicionados auras de brilho neon (ambient glows) no background do portal no modo escuro, com proteção estrita de overflow-hidden para evitar rolagem horizontal indesejada no mobile.
+- **Alternador de Tema Animado**: O botão de sol/lua agora possui micro-animações dinâmicas de rotação e pulo (scale bounce) no clique.
+- **Autoplay Carousel Progress**: Adicionada uma barra de progresso suave no topo do carrossel indicando o tempo restante de exibição de cada slide em autoplay.
+- **Remoção de Chanfros**: Removidos os chanfros (cartridge grooves) das bordas dos cards da HomePage para um design mais limpo e premium.
+
+### 👁️ Novo Mecanismo de Visualizações (Views Bug Fix)
+- **Views Atômicas para Todos (Guests & Offline)**: Resolvido o erro de permissão que impedia a contagem de visualizações de usuários não logados (guests) ou no carregamento offline.
+- **Prevenção contra Bloat de Documento**: Eliminada a antiga array `viewedBy` que armazenava IDs de visualizadores e corria o risco de estourar o limite de 1MB por post no Firestore.
+- **Duplicidade Controlada via LocalStorage**: Substituição por verificação local no cliente usando `localStorage` (`retro_viewed_posts`), permitindo incrementos de visualização leves e atômicos (`increment(1)`) direto no Firestore.
+- **Guia de Regras Firestore**: Atualizado o `FIREBASE_GUIDE.md` com a regra de segurança recomendada que permite atualizações anônimas somente se o único campo alterado for `views`.
+
+### 📱 Ajustes Responsivos & Mobile
+- **Fix de Transbordo Mobile**: Envelopamento dos glows absolutos em containers com `overflow-hidden`, prevenindo o vazamento do layout horizontal e impedindo que a tela seja movida para o lado revelando fundos brancos.
+
+---
+
 ## 🖼️ [v3.10.0] - The Premium Media & Admin UX Update
 *Data: 26 de Maio de 2026*
 
