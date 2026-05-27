@@ -236,7 +236,6 @@ export function useLikeMutation() {
       const action = await PostService.toggleLike(postId, userId);
       if (action === 'liked') {
         trackEvent('post_liked', { post_id: postId, user_id: userId });
-        await userService.addXP(userId, 5);
       }
       return action;
     },
@@ -280,6 +279,12 @@ export function useLikeMutation() {
       return { previousAll };
     },
 
+    onSuccess: (action, variables) => {
+      if (action === 'liked') {
+        userService.addXP(variables.userId, 5);
+      }
+    },
+
     onError: (err, variables, context) => {
       if (context?.previousAll) {
         queryClient.setQueryData(postKeys.all, context.previousAll);
@@ -290,6 +295,7 @@ export function useLikeMutation() {
     onSettled: (data, error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     }
   });
