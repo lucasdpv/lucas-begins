@@ -15,7 +15,8 @@ import {
   useMostViewedPosts, 
   useTopReviews, 
   usePostsByCategory, 
-  usePosts 
+  usePosts,
+  useLatestPosts
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber, formatDate } from "../lib/utils";
@@ -152,6 +153,9 @@ export default function HomePage() {
   // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
   const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3);
 
+  // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
+  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15);
+
   // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
   const isSearching = searchQuery.trim() !== "";
   const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
@@ -162,7 +166,6 @@ export default function HomePage() {
   });
 
   const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
-
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -176,11 +179,64 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
-  // Grid exibe no máximo 6 itens para um grid de 3 colunas balanceado
-  const gridPosts = isSearching ? filteredPosts.slice(0, 6) : paginatedPosts.slice(0, 6);
+  // Lógica de Deduplicação para a Home Padrão (Sem Duplicações!)
+  const carouselPosts = featuredPosts.slice(0, 5);
+  const carouselIds = new Set(carouselPosts.map(p => p.id));
+
+  // 1. Dossiê Spotlight (não repetido com Carrossel)
+  const displayDossie = dossiePosts.find(p => !carouselIds.has(p.id)) || dossiePosts[0];
+
+  // 2. RetroCafé (não repetido com Carrossel nem Dossiê)
+  const displayRetrocafe: Post[] = [];
+  retrocafePosts.forEach(p => {
+    if (displayRetrocafe.length < 2 && !carouselIds.has(p.id) && p.id !== displayDossie?.id) {
+      displayRetrocafe.push(p);
+    }
+  });
+  if (displayRetrocafe.length < 2 && retrocafePosts.length > 0) {
+    retrocafePosts.forEach(p => {
+      if (displayRetrocafe.length < 2 && !displayRetrocafe.some(x => x.id === p.id) && p.id !== displayDossie?.id) {
+        displayRetrocafe.push(p);
+      }
+    });
+  }
+
+  // 3. Reviews (não repetido com Carrossel nem Dossiê)
+  const displayReviews: Post[] = [];
+  reviewPosts.forEach(p => {
+    if (displayReviews.length < 3 && !carouselIds.has(p.id) && p.id !== displayDossie?.id) {
+      displayReviews.push(p);
+    }
+  });
+  if (displayReviews.length < 3 && reviewPosts.length > 0) {
+    reviewPosts.forEach(p => {
+      if (displayReviews.length < 3 && !displayReviews.some(x => x.id === p.id) && p.id !== displayDossie?.id) {
+        displayReviews.push(p);
+      }
+    });
+  }
+
+  // Coleta todos os IDs já exibidos nas seções superiores
+  const displayedIds = new Set<string>();
+  carouselPosts.forEach(p => displayedIds.add(p.id));
+  if (displayDossie) displayedIds.add(displayDossie.id);
+  displayRetrocafe.forEach(p => displayedIds.add(p.id));
+  displayReviews.forEach(p => displayedIds.add(p.id));
+
+  // Filtra as Últimas Notícias (apenas no modo padrão sem busca)
+  const paginatedFiltered = latestPosts
+    .filter(p => !displayedIds.has(p.id))
+    .slice(0, 6);
+
+  const gridPosts = isSearching 
+    ? filteredPosts.slice(0, 6) 
+    : isDefaultView 
+    ? paginatedFiltered 
+    : paginatedPosts.slice(0, 6);
+
   const isLoadingPosts = isSearching 
     ? isLoadingAll 
-    : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe);
+    : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe || isLoadingLatest);
 
   return (
     <div className="flex flex-col gap-12 relative z-0">
@@ -240,7 +296,7 @@ export default function HomePage() {
                 </h2>
               </div>
             </div>
-            <Carousel posts={featuredPosts.slice(0, 5)} isDark={isDark} />
+            <Carousel posts={carouselPosts} isDark={isDark} />
           </div>
 
           {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
@@ -312,7 +368,7 @@ export default function HomePage() {
             </div>
 
             {/* Spotlight Dossiê Card */}
-            {dossiePosts[0] ? (
+            {displayDossie ? (
               <div
                 className={cn(
                   "w-full p-6 md:p-8 rounded-3xl relative overflow-hidden border-2 transition-all duration-300 glass-card flex flex-col md:flex-row gap-6 items-stretch",
@@ -323,11 +379,11 @@ export default function HomePage() {
                 <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(168,85,247,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px]" />
                 
                 {/* Imagem do Dossiê */}
-                {dossiePosts[0].imageUrl && (
+                {displayDossie.imageUrl && (
                   <div className="w-full md:w-1/2 aspect-video md:aspect-[4/3] lg:aspect-[16/10] rounded-2xl overflow-hidden shrink-0 border border-black/10 dark:border-white/5 relative group/img">
                     <img
-                      src={dossiePosts[0].imageUrl}
-                      alt={dossiePosts[0].title}
+                      src={displayDossie.imageUrl}
+                      alt={displayDossie.title}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
                     />
@@ -342,25 +398,25 @@ export default function HomePage() {
                 <div className="flex flex-col justify-between flex-grow gap-4 py-1">
                   <div className="space-y-3">
                     <Link
-                      to={`/post/${dossiePosts[0].slug || slugify(dossiePosts[0].title)}`}
+                      to={`/post/${displayDossie.slug || slugify(displayDossie.title)}`}
                       className="group/link block"
                     >
                       <h3 className={cn(
                         "font-retro font-black text-base md:text-lg lg:text-xl transition-colors leading-snug",
                         isDark ? "text-white group-hover/link:text-blue-300 text-glow-blue" : "text-gray-900 group-hover/link:text-blue-600"
                       )}>
-                        {dossiePosts[0].title}
+                        {displayDossie.title}
                       </h3>
                     </Link>
                     <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
-                      {dossiePosts[0].excerpt}
+                      {displayDossie.excerpt}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-t border-black/5 dark:border-white/5 pt-3">
-                    <span>{formatDate(dossiePosts[0].createdAt, dossiePosts[0].date)}</span>
+                    <span>{formatDate(displayDossie.createdAt, displayDossie.date)}</span>
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-600" />
-                    <span>{formatNumber(dossiePosts[0].views || 0)} views</span>
+                    <span>{formatNumber(displayDossie.views || 0)} views</span>
                   </div>
                 </div>
               </div>
@@ -391,8 +447,8 @@ export default function HomePage() {
 
             {/* Grid de Cards RetroCafé */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {retrocafePosts.length > 0 ? (
-                retrocafePosts.slice(0, 2).map((post) => {
+              {displayRetrocafe.length > 0 ? (
+                displayRetrocafe.map((post) => {
                   const targetSlug = post.slug || slugify(post.title);
                   return (
                     <article
@@ -461,8 +517,8 @@ export default function HomePage() {
 
             {/* Listagem em Cards de Capa Inteira */}
             <div className="flex-grow flex flex-col gap-4 h-full">
-              {reviewPosts.length > 0 ? (
-                reviewPosts.slice(0, 3).map((post) => {
+              {displayReviews.length > 0 ? (
+                displayReviews.map((post) => {
                   const targetSlug = post.slug || slugify(post.title);
                   return (
                     <Link
