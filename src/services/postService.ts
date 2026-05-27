@@ -266,20 +266,8 @@ export const PostService = {
   async incrementPostViews(postId: string, userId?: string, viewerId?: string): Promise<void> {
     try {
       const postRef = doc(db, COLLECTIONS.POSTS, postId);
-      
-      await runTransaction(db, async (transaction) => {
-        const postSnap = await transaction.get(postRef);
-        if (!postSnap.exists()) return;
-
-        const data = postSnap.data();
-        const viewedBy = data.viewedBy || [];
-
-        if (viewerId && !viewedBy.includes(viewerId)) {
-          transaction.update(postRef, {
-            views: increment(1),
-            viewedBy: arrayUnion(viewerId)
-          });
-        }
+      await updateDoc(postRef, {
+        views: increment(1)
       });
     } catch (error) {
       errorService.handle(error, "ao incrementar views");

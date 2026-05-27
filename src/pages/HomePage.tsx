@@ -103,7 +103,15 @@ export default function HomePage() {
   const isLoadingPosts = isSearching ? isLoadingAll : (isLoadingFeatured || isLoadingPaginated);
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12 relative z-0">
+      {/* Ambient Glows */}
+      {isDark && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute top-[20%] left-[-15%] w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[120px] animate-pulse duration-[8000ms]" />
+          <div className="absolute top-[50%] right-[-15%] w-[450px] h-[450px] bg-blue-600/5 rounded-full blur-[130px] animate-pulse duration-[10000ms]" />
+          <div className="absolute top-[80%] left-[10%] w-[350px] h-[350px] bg-amber-500/3 rounded-full blur-[110px] animate-pulse duration-[12000ms]" />
+        </div>
+      )}
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
@@ -437,7 +445,7 @@ export default function HomePage() {
 
                     {/* Score badge — top left */}
                     {post.score && (
-                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
+                      <span className="absolute top-0 left-0 z-10 bg-yellow-400 text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black shimmer-badge">
                         ★ {post.score}
                       </span>
                     )}

@@ -369,3 +369,44 @@ div.skiptranslate,
   background: #9333ea;
 }
 
+/* Animação do timer do carrossel */
+@keyframes carouselProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.animate-carousel-progress {
+  animation: carouselProgress 6s linear forwards;
+}
+
+/* Shimmer Metálico para Badges */
+@keyframes metallicShine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.shimmer-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-badge::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 200%; height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.35) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.35) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-100%) rotate(45deg);
+  pointer-events: none;
+}
+
+.group:hover .shimmer-badge::after {
+  animation: metallicShine 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
