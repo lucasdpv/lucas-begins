@@ -265,8 +265,8 @@
 
 /* Fundos Premium Mesh - Fiel ao SNES Purple / Retro */
 .bg-dark-mesh {
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(18, 17, 28, 0.98) 50%, rgba(15, 14, 23, 1) 100%);
-  background-color: #0f0e17;
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.18) 0%, rgba(22, 21, 38, 0.98) 50%, rgba(19, 18, 30, 1) 100%);
+  background-color: #131222;
 }
 
 .bg-light-mesh {
@@ -349,7 +349,7 @@
    Google Translate Styling Resets (Ultra-Clean Page Translation)
    ============================================================ */
 html, body {
-  background-color: #0f0e17; /* dark: obsidiana */
+  background-color: #131222; /* dark: obsidiana soft */
   color: #e5e7eb; /* dark: text-gray-200 */
 }
 
