@@ -70,7 +70,7 @@ export default function App() {
   const themeClasses = isDark ? "bg-dark-mesh text-gray-200" : "bg-light-mesh text-snes-accent";
 
   return (
-    <div className={`min-h-screen font-body transition-colors duration-500 relative ${themeClasses}`}>
+    <div className={`min-h-screen overflow-x-hidden font-body transition-colors duration-500 relative ${themeClasses}`}>
       <SystemInitializer />
       <Toast toast={toast} isDark={isDark} />
 
