@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gamepad2, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import PostCard from "../features/posts/components/PostCard";
 import PostSkeleton from "../features/posts/components/PostSkeleton";
@@ -15,7 +15,21 @@ import { Post } from "../features/posts/schemas";
 
 export default function ArchivePage() {
   const { isDark } = useThemeStore();
-  const { activeCategory, searchQuery } = useUIStore();
+  const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Aplica categoria vinda da HomePáge via state (sem alterar a store antes da animação de entrada)
+  useEffect(() => {
+    const cat = (location.state as any)?.category;
+    if (cat) setActiveCategory(cat);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Volta para home e sinaliza reset de categoria (a HomePage reseta após montar)
+  const handleVoltar = () => {
+    navigate("/", { state: { resetCategory: true } });
+  };
 
   const isSearching = searchQuery.trim() !== "";
 
@@ -55,8 +69,8 @@ export default function ArchivePage() {
       </Helmet>
 
       {/* Voltar */}
-      <Link
-        to="/"
+      <button
+        onClick={handleVoltar}
         className={cn(
           "flex items-center gap-2 font-retro text-sm font-bold uppercase tracking-wider hover:text-purple-500 transition-colors group w-fit",
           isDark ? "text-gray-400" : "text-gray-600"
@@ -64,7 +78,7 @@ export default function ArchivePage() {
       >
         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
         Voltar
-      </Link>
+      </button>
 
       {/* Header */}
       <header className={cn("pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6", isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark")}>

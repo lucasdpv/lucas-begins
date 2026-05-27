@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Gamepad2, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
@@ -27,7 +27,21 @@ const { BORDER, SHADOW_LG, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
-  const { activeCategory, searchQuery } = useUIStore();
+  const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Reseta categoria ao voltar do arquivo (evita glitch de transição)
+  useEffect(() => {
+    if ((location.state as any)?.resetCategory) {
+      setActiveCategory("Todos");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const goToCategory = useCallback((category: string) => {
+    navigate("/archive", { state: { category } });
+  }, [navigate]);
 
   // 1. Destaques (Carrossel) - Puxa no máximo 5 posts do Firestore
   const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts();
@@ -112,7 +126,7 @@ export default function HomePage() {
           {/* Section labels row */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-6">
             <div className="lg:col-span-3 flex items-center gap-3">
-              <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
+              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
               <div>
                 <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
                   Em Destaque
@@ -123,7 +137,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="hidden lg:flex items-center gap-3">
-              <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
+              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
               <div>
                 <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
                   Mais Lidos
@@ -201,7 +215,7 @@ export default function HomePage() {
             isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
           )}>
             <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 h-8 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+              <div className={cn("w-1.5 self-stretch rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
               <div>
                 <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
                   {isLoadingPosts
@@ -240,15 +254,20 @@ export default function HomePage() {
               "hidden lg:flex items-center gap-3 pb-5",
               isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
             )}>
-              <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
-                  Reviews
-                </h2>
-                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
-                  Análises com Nota
-                </p>
-              </div>
+              <button
+                onClick={() => goToCategory("Reviews")}
+                className="flex items-center gap-3 p-0 group cursor-pointer"
+              >
+                <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
+                <div>
+                  <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                    Reviews
+                  </h2>
+                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
+                    Análises com Nota
+                  </p>
+                </div>
+              </button>
             </div>
           )}
         </div>
@@ -343,20 +362,23 @@ export default function HomePage() {
           {reviewPosts.length > 0 && isDefaultView && (
             <aside className="block lg:col-span-1">
               {/* REVIEWS HEADER (Mobile Only - stacks here) */}
-              <div className={cn(
-                "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6",
-                isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-              )}>
-                <div className="w-1.5 h-8 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)]" />
+              <button
+                onClick={() => goToCategory("Reviews")}
+                className={cn(
+                  "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6 p-0 group cursor-pointer text-left w-full",
+                  isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
+                )}
+              >
+                <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
                 <div>
-                  <h2 className={cn("font-retro text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                  <h2 className={cn("font-retro text-2xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
                     Reviews
                   </h2>
                   <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
                     Análises com Nota
                   </p>
                 </div>
-              </div>
+              </button>
 
               {/* Reviews Scroll Container */}
               <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
@@ -408,17 +430,20 @@ export default function HomePage() {
               {/* DOSSIÊS (Mobile version needs its own header here since the sidebar stacks) */}
               {dossiePosts.length > 0 && (
                 <div className="mt-8 lg:mt-4">
-                  <div className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0">
-                    <div className="w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]" />
+                  <button
+                    onClick={() => goToCategory("Dossiês")}
+                    className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 p-0 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0 group cursor-pointer text-left w-full"
+                  >
+                    <div className="w-1.5 self-stretch rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)] group-hover:shadow-[0_0_14px_rgba(59,130,246,0.9)] transition-all" />
                     <div>
-                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-white" : "text-snes-accent")}>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         Dossiês
                       </h2>
                       <p className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-500 mt-0.5">
                         Reportagens Especiais
                       </p>
                     </div>
-                  </div>
+                  </button>
                   
                   {/* Dossies Scroll Container */}
                   <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
