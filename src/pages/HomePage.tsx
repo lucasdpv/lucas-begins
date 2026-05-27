@@ -294,6 +294,9 @@ export default function HomePage() {
                 <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
                   Em Destaque
                 </h2>
+                <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                  Seleção Editorial
+                </span>
               </div>
             </div>
             <Carousel posts={carouselPosts} isDark={isDark} />
@@ -307,6 +310,9 @@ export default function HomePage() {
                 <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
                   Mais Lidos
                 </h2>
+                <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                  Em Alta no Portal
+                </span>
               </div>
             </div>
             
@@ -359,148 +365,174 @@ export default function HomePage() {
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* CÉLULA ESQUERDA (2/3 de largura): Destaques Editoriais */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            {/* Título Principal Dossiês */}
-            <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark ? "text-blue-400 text-glow-blue" : "text-snes-accent")}>
-                Dossiês & Especial
-              </h2>
-            </div>
-
-            {/* Spotlight Dossiê Card */}
-            {displayDossie ? (
-              <div
-                className={cn(
-                  "w-full p-6 md:p-8 rounded-3xl relative overflow-hidden border-2 transition-all duration-300 glass-card flex flex-col md:flex-row gap-6 items-stretch",
-                  isDark ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]"
-                )}
+            {/* Seção 1: RetroCafé (no topo) */}
+            <div className="space-y-4">
+              <div 
+                className="flex items-center justify-between cursor-pointer group/title"
+                onClick={() => goToCategory("RetroCafé")}
               >
-                {/* Scanlines overlay */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(168,85,247,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px]" />
-                
-                {/* Imagem do Dossiê */}
-                {displayDossie.imageUrl && (
-                  <div className="w-full md:w-1/2 aspect-video md:aspect-[4/3] lg:aspect-[16/10] rounded-2xl overflow-hidden shrink-0 border border-black/10 dark:border-white/5 relative group/img">
-                    <img
-                      src={displayDossie.imageUrl}
-                      alt={displayDossie.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none" />
-                    <span className="absolute top-3 left-3 text-[9px] font-retro font-bold text-blue-400 uppercase tracking-widest bg-blue-500/20 border border-blue-500/30 px-2 py-0.5 rounded">
-                      Destaque
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-1.5 h-6 rounded-none bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_16px_rgba(249,115,22,0.9)] transition-all")} />
+                  <div>
+                    <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white text-glow" : "text-snes-accent")}>
+                      RetroCafé
+                    </h2>
+                    <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                      Crônicas & Nostalgia
                     </span>
                   </div>
-                )}
-
-                {/* Texto do Dossiê */}
-                <div className="flex flex-col justify-between flex-grow gap-4 py-1">
-                  <div className="space-y-3">
-                    <Link
-                      to={`/post/${displayDossie.slug || slugify(displayDossie.title)}`}
-                      className="group/link block"
-                    >
-                      <h3 className={cn(
-                        "font-retro font-black text-base md:text-lg lg:text-xl transition-colors leading-snug",
-                        isDark ? "text-white group-hover/link:text-blue-300 text-glow-blue" : "text-gray-900 group-hover/link:text-blue-600"
-                      )}>
-                        {displayDossie.title}
-                      </h3>
-                    </Link>
-                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
-                      {displayDossie.excerpt}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-t border-black/5 dark:border-white/5 pt-3">
-                    <span>{formatDate(displayDossie.createdAt, displayDossie.date)}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-600" />
-                    <span>{formatNumber(displayDossie.views || 0)} views</span>
-                  </div>
                 </div>
+                <button
+                  className="text-[9px] md:text-xs font-retro font-black uppercase text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1.5"
+                >
+                  VER MAIS <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-            ) : (
-              <div className={cn(
-                "w-full p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[200px]",
-                isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
-              )}>
-                <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
-              </div>
-            )}
 
-            {/* Subtítulo RetroCafé */}
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-2">
-                <div className={cn("w-1.5 h-5 rounded-none", isDark ? "bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)]" : "bg-orange-600")} />
-                <h3 className={cn("font-retro text-sm md:text-base font-black uppercase tracking-wide leading-none", isDark ? "text-orange-400 text-glow" : "text-gray-700 dark:text-gray-300")}>
-                  RetroCafé
-                </h3>
+              {/* Grid de Cards RetroCafé */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {displayRetrocafe.length > 0 ? (
+                  displayRetrocafe.map((post) => {
+                    const targetSlug = post.slug || slugify(post.title);
+                    return (
+                      <article
+                        key={post.id}
+                        className={cn(
+                          "p-5 rounded-3xl border-2 transition-all duration-300 glass-card flex flex-col justify-between gap-4 group hover:translate-y-[-4px]",
+                          isDark 
+                            ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_24px_rgba(249,115,22,0.08)]" 
+                            : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.05)]"
+                        )}
+                      >
+                        {/* Thumbnail do RetroCafé */}
+                        {post.imageUrl ? (
+                          <div className="w-full aspect-video rounded-2xl overflow-hidden border border-black/10 dark:border-white/5 bg-gray-900 shrink-0 relative group/img">
+                            <img
+                              src={post.imageUrl}
+                              alt={post.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full aspect-video rounded-2xl bg-gradient-to-br from-orange-600 to-amber-800 shrink-0 flex items-center justify-center">
+                            <span className="font-retro text-xs text-white uppercase opacity-50">RetroCafé</span>
+                          </div>
+                        )}
+
+                        {/* Info & Título */}
+                        <div className="flex flex-col justify-between flex-grow gap-3">
+                          <Link to={`/post/${targetSlug}`} className="block">
+                            <h4 className={cn(
+                              "font-bold text-sm md:text-base leading-snug line-clamp-2 transition-colors duration-200",
+                              isDark ? "text-gray-100 group-hover:text-orange-300" : "text-gray-900 group-hover:text-orange-600"
+                            )}>
+                              {post.title}
+                            </h4>
+                          </Link>
+
+                          <div className="flex items-center gap-3 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-auto border-t border-black/5 dark:border-white/5 pt-2">
+                            <span>{formatDate(post.createdAt, post.date)}</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-500" />
+                            <span>{formatNumber(post.views || 0)} views</span>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })
+                ) : (
+                  <div className={cn(
+                    "col-span-2 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[150px]",
+                    isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
+                  )}>
+                    <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => goToCategory("RetroCafé")}
-                className="text-[9px] md:text-xs font-retro font-black uppercase text-orange-400 hover:text-orange-300 transition-colors cursor-pointer flex items-center gap-1.5"
-              >
-                VER MAIS <ChevronRight className="w-3.5 h-3.5" />
-              </button>
             </div>
 
-            {/* Grid de Cards RetroCafé */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {displayRetrocafe.length > 0 ? (
-                displayRetrocafe.map((post) => {
-                  const targetSlug = post.slug || slugify(post.title);
-                  return (
-                    <article
-                      key={post.id}
-                      className={cn(
-                        "p-5 rounded-3xl border-2 transition-all duration-300 glass-card flex flex-col justify-between gap-4 group hover:translate-y-[-4px]",
-                        isDark 
-                          ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_24px_rgba(249,115,22,0.08)]" 
-                          : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.05)]"
-                      )}
-                    >
-                      {/* Thumbnail do RetroCafé */}
-                      {post.imageUrl ? (
-                        <div className="w-full aspect-video rounded-2xl overflow-hidden border border-black/10 dark:border-white/5 bg-gray-900 shrink-0 relative group/img">
-                          <img
-                            src={post.imageUrl}
-                            alt={post.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full aspect-video rounded-2xl bg-gradient-to-br from-orange-600 to-amber-800 shrink-0 flex items-center justify-center">
-                          <span className="font-retro text-xs text-white uppercase opacity-50">RetroCafé</span>
-                        </div>
-                      )}
+            {/* Seção 2: Dossiês (na base) */}
+            <div className="space-y-4">
+              <div 
+                className="flex items-center justify-between cursor-pointer group/title"
+                onClick={() => goToCategory("Dossiês")}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-1.5 h-6 rounded-none bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_16px_rgba(59,130,246,0.9)] transition-all")} />
+                  <div>
+                    <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white text-glow-blue" : "text-snes-accent")}>
+                      Dossiês
+                    </h2>
+                    <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                      Reportagens Especiais
+                    </span>
+                  </div>
+                </div>
+                <button
+                  className="text-[9px] md:text-xs font-retro font-black uppercase text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1.5"
+                >
+                  VER MAIS <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-                      {/* Info & Título */}
-                      <div className="flex flex-col justify-between flex-grow gap-3">
-                        <Link to={`/post/${targetSlug}`} className="block">
-                          <h4 className={cn(
-                            "font-bold text-sm md:text-base leading-snug line-clamp-2 transition-colors duration-200",
-                            isDark ? "text-gray-100 group-hover:text-orange-300" : "text-gray-900 group-hover:text-orange-600"
-                          )}>
-                            {post.title}
-                          </h4>
-                        </Link>
+              {/* Spotlight Dossiê Card */}
+              {displayDossie ? (
+                <div
+                  className={cn(
+                    "w-full p-6 md:p-8 rounded-3xl relative overflow-hidden border-2 transition-all duration-300 glass-card flex flex-col md:flex-row gap-6 items-stretch",
+                    isDark ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]"
+                  )}
+                >
+                  {/* Scanlines overlay */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(168,85,247,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px]" />
+                  
+                  {/* Imagem do Dossiê */}
+                  {displayDossie.imageUrl && (
+                    <div className="w-full md:w-1/2 aspect-video md:aspect-[4/3] lg:aspect-[16/10] rounded-2xl overflow-hidden shrink-0 border border-black/10 dark:border-white/5 relative group/img">
+                      <img
+                        src={displayDossie.imageUrl}
+                        alt={displayDossie.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none" />
+                      <span className="absolute top-3 left-3 text-[9px] font-retro font-bold text-blue-400 uppercase tracking-widest bg-blue-500/20 border border-blue-500/30 px-2 py-0.5 rounded">
+                        Destaque
+                      </span>
+                    </div>
+                  )}
 
-                        <div className="flex items-center gap-3 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-auto border-t border-black/5 dark:border-white/5 pt-2">
-                          <span>{formatDate(post.createdAt, post.date)}</span>
-                          <span className="w-1 h-1 rounded-full bg-slate-500" />
-                          <span>{formatNumber(post.views || 0)} views</span>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })
+                  {/* Texto do Dossiê */}
+                  <div className="flex flex-col justify-between flex-grow gap-4 py-1">
+                    <div className="space-y-3">
+                      <Link
+                        to={`/post/${displayDossie.slug || slugify(displayDossie.title)}`}
+                        className="group/link block"
+                      >
+                        <h3 className={cn(
+                          "font-retro font-black text-base md:text-lg lg:text-xl transition-colors leading-snug",
+                          isDark ? "text-white group-hover/link:text-blue-300 text-glow-blue" : "text-gray-900 group-hover/link:text-blue-600"
+                        )}>
+                          {displayDossie.title}
+                        </h3>
+                      </Link>
+                      <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                        {displayDossie.excerpt}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-[9px] md:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border-t border-black/5 dark:border-white/5 pt-3">
+                      <span>{formatDate(displayDossie.createdAt, displayDossie.date)}</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-600" />
+                      <span>{formatNumber(displayDossie.views || 0)} views</span>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className={cn(
-                  "col-span-2 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[150px]",
+                  "w-full p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[200px]",
                   isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400"
                 )}>
-                  <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
+                  <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
                 </div>
               )}
             </div>
@@ -508,11 +540,26 @@ export default function HomePage() {
 
           {/* CÉLULA DIREITA (1/3 de largura): Placar de Reviews */}
           <div className="lg:col-span-1 flex flex-col gap-6">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => goToCategory("Reviews")}>
-              <div className="w-1.5 h-6 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
-              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
-                Reviews
-              </h2>
+            <div 
+              className="flex items-center justify-between cursor-pointer group/title" 
+              onClick={() => goToCategory("Reviews")}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-6 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
+                <div>
+                  <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                    Reviews
+                  </h2>
+                  <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                    Análises com Nota
+                  </span>
+                </div>
+              </div>
+              <button
+                className="text-[9px] md:text-xs font-retro font-black uppercase text-yellow-500 hover:text-yellow-400 transition-colors flex items-center gap-1.5"
+              >
+                VER MAIS <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
 
             {/* Listagem em Cards de Capa Inteira */}
@@ -606,6 +653,9 @@ export default function HomePage() {
                   ? activeCategory
                   : "Últimas Notícias"}
               </h2>
+              <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                Mais Recentes do Portal
+              </span>
             </div>
           </div>
           {!isLoadingPosts && isDefaultView && (
