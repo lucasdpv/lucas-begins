@@ -250,24 +250,25 @@ export default function HomePage() {
 
           {/* Right header (Visible ONLY on Desktop, as part of the sidebar header row) */}
           {reviewPosts.length > 0 && isDefaultView && (
-            <div className={cn(
-              "hidden lg:flex items-center gap-3 pb-5",
-              isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
-            )}>
-              <button
-                onClick={() => goToCategory("Reviews")}
-                className="flex items-center gap-3 p-0 group cursor-pointer"
-              >
-                <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
-                <div>
-                  <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
-                    Reviews
-                  </h2>
-                  <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
-                    Análises com Nota
-                  </p>
-                </div>
-              </button>
+            <div
+              onClick={() => goToCategory("Reviews")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && goToCategory("Reviews")}
+              className={cn(
+                "hidden lg:flex items-center gap-3 pb-5 cursor-pointer group",
+                isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
+              )}
+            >
+              <div className="w-1.5 self-stretch rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover:shadow-[0_0_16px_rgba(234,179,8,0.9)] transition-all" />
+              <div>
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover:text-yellow-400 transition-colors", isDark ? "text-white text-glow-amber" : "text-snes-accent")}>
+                  Reviews
+                </h2>
+                <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-0.5", isDark ? "text-yellow-500" : "text-amber-600")}>
+                  Análises com Nota
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -362,10 +363,13 @@ export default function HomePage() {
           {reviewPosts.length > 0 && isDefaultView && (
             <aside className="block lg:col-span-1">
               {/* REVIEWS HEADER (Mobile Only - stacks here) */}
-              <button
+              <div
                 onClick={() => goToCategory("Reviews")}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && goToCategory("Reviews")}
                 className={cn(
-                  "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6 p-0 group cursor-pointer text-left w-full",
+                  "lg:hidden flex items-center gap-3 pb-5 mt-12 mb-6 cursor-pointer group",
                   isDark ? "border-b border-white/5" : "border-b-2 border-snes-dark"
                 )}
               >
@@ -378,7 +382,7 @@ export default function HomePage() {
                     Análises com Nota
                   </p>
                 </div>
-              </button>
+              </div>
 
               {/* Reviews Scroll Container */}
               <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
@@ -430,9 +434,12 @@ export default function HomePage() {
               {/* DOSSIÊS (Mobile version needs its own header here since the sidebar stacks) */}
               {dossiePosts.length > 0 && (
                 <div className="mt-8 lg:mt-4">
-                  <button
+                  <div
                     onClick={() => goToCategory("Dossiês")}
-                    className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 p-0 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0 group cursor-pointer text-left w-full"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && goToCategory("Dossiês")}
+                    className="flex items-center gap-3 pt-4 pb-4 lg:pb-2 border-b lg:border-0 border-white/5 lg:border-transparent mb-4 lg:mb-0 cursor-pointer group"
                   >
                     <div className="w-1.5 self-stretch rounded-none bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)] group-hover:shadow-[0_0_14px_rgba(59,130,246,0.9)] transition-all" />
                     <div>
@@ -443,7 +450,7 @@ export default function HomePage() {
                         Reportagens Especiais
                       </p>
                     </div>
-                  </button>
+                  </div>
                   
                   {/* Dossies Scroll Container */}
                   <div className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide">
