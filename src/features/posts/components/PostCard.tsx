@@ -17,6 +17,66 @@ interface PostCardProps {
   variant?: "default" | "compact";
 }
 
+const getCategoryCardStyles = (category: string) => {
+  const norm = category?.toLowerCase().trim() || "";
+  switch (norm) {
+    case "reviews":
+      return {
+        textHover: "group-hover:text-amber-500 dark:group-hover:text-amber-400",
+        hoverBorder: "group-hover:border-amber-500/40 dark:group-hover:border-amber-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.25)]",
+      };
+    case "dossiês":
+    case "dossies":
+      return {
+        textHover: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
+        hoverBorder: "group-hover:border-blue-500/40 dark:group-hover:border-blue-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(59,130,246,0.25)]",
+      };
+    case "retrocafé":
+    case "retrocafe":
+    case "retro-café":
+      return {
+        textHover: "group-hover:text-orange-500 dark:group-hover:text-orange-400",
+        hoverBorder: "group-hover:border-orange-500/40 dark:group-hover:border-orange-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(249,115,22,0.25)]",
+      };
+    case "especial":
+      return {
+        textHover: "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+        hoverBorder: "group-hover:border-purple-500/40 dark:group-hover:border-purple-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.25)]",
+      };
+    case "nostalgia":
+      return {
+        textHover: "group-hover:text-pink-500 dark:group-hover:text-pink-400",
+        hoverBorder: "group-hover:border-pink-500/40 dark:group-hover:border-pink-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(236,72,153,0.25)]",
+      };
+    case "cultura pop":
+    case "culturapop":
+      return {
+        textHover: "group-hover:text-emerald-500 dark:group-hover:text-emerald-400",
+        hoverBorder: "group-hover:border-emerald-500/40 dark:group-hover:border-emerald-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]",
+      };
+    case "rpg & mmo":
+    case "rpg mmo":
+    case "rpg":
+      return {
+        textHover: "group-hover:text-cyan-500 dark:group-hover:text-cyan-400",
+        hoverBorder: "group-hover:border-cyan-500/40 dark:group-hover:border-cyan-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(6,182,212,0.25)]",
+      };
+    default:
+      return {
+        textHover: "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+        hoverBorder: "group-hover:border-purple-500/40 dark:group-hover:border-purple-400/40",
+        hoverShadow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.25)]",
+      };
+  }
+};
+
 export default function PostCard({ post, variant = "default" }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
@@ -24,10 +84,7 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
   const likeMutation = useLikeMutation();
   const favoriteMutation = useFavoriteMutation();
   const imgError = useImageFallback(post.imageUrl ?? undefined);
-  const bgStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
-
-  const { BORDER, SHADOW, ROUNDED, TRANSITION, HOVER_LIFT } = BRUTAL_DESIGN;
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
@@ -35,6 +92,7 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
 
   const targetSlug = post.slug || slugify(post.title);
   const targetPath = `/post/${targetSlug}`;
+  const cardStyles = getCategoryCardStyles(post.category);
 
   return (
     <article
@@ -43,6 +101,8 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         isDark 
           ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" 
           : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]",
+        cardStyles.hoverBorder,
+        cardStyles.hoverShadow,
         isCompact && "rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.05)]"
       )}
     >
@@ -61,8 +121,18 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
           isDark ? "bg-gray-900" : "bg-snes-mid/20",
           !post.imageUrl && !imgError && post.gradient && `bg-gradient-to-br ${post.gradient}`
         )}
-        style={bgStyle}
       >
+        {/* Imagem Real de Capa com Zoom suave no hover */}
+        {post.imageUrl && !imgError && (
+          <img
+            src={post.imageUrl}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            style={{ objectPosition: post.imagePosition || "center" }}
+            loading="lazy"
+          />
+        )}
+
         {/* Mensagem Gamificada em caso de Erro de Imagem */}
         {imgError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
@@ -80,7 +150,8 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
           </div>
         )}
 
-        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-70 transition-opacity duration-300" />
+        {/* CRT Scanlines Overlay */}
+        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-75 transition-opacity duration-300 z-10" />
         
         {!isCompact && (
           <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20">
@@ -95,7 +166,8 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
       {/* Conteúdo */}
       <div className={cn("flex flex-col flex-grow relative z-10 pointer-events-none", isCompact ? "p-3" : "px-5 py-6")}>
         <h3 className={cn(
-          "font-retro font-bold uppercase line-clamp-2 leading-tight group-hover:text-purple-400 transition-colors duration-300",
+          "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300",
+          cardStyles.textHover,
           isCompact ? "text-xs mb-2" : "text-lg md:text-xl mb-3"
         )}>
           {post.title}
@@ -133,9 +205,13 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all",
                   isCompact ? "text-[10px]" : "text-[11px] sm:text-sm",
-                  hasLiked ? "text-red-500" : isDark ? "text-gray-400" : "text-gray-600",
+                  hasLiked 
+                    ? "text-red-500 scale-105" 
+                    : isDark 
+                    ? "text-gray-400 hover:text-red-400 hover:scale-110" 
+                    : "text-gray-600 hover:text-red-500 hover:scale-110",
                   currentUser 
-                    ? "hover:scale-110 active:scale-95 cursor-pointer hover:text-red-400" 
+                    ? "active:scale-95 cursor-pointer" 
                     : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
@@ -150,9 +226,13 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all",
                   isCompact ? "text-[10px]" : "text-[11px] sm:text-sm",
-                  profile?.favorites?.includes(post.id) ? "text-yellow-500" : isDark ? "text-gray-400" : "text-gray-600",
+                  profile?.favorites?.includes(post.id) 
+                    ? "text-yellow-500 scale-105" 
+                    : isDark 
+                    ? "text-gray-400 hover:text-yellow-400 hover:scale-110" 
+                    : "text-gray-600 hover:text-yellow-500 hover:scale-110",
                   currentUser 
-                    ? "hover:scale-110 active:scale-95 cursor-pointer hover:text-yellow-400" 
+                    ? "active:scale-95 cursor-pointer" 
                     : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => {
