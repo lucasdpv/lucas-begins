@@ -1078,8 +1078,8 @@ export default function HomePage() {
                                   </h4>
                                 </div>
 
-                                {/* Footer details (Score badge, Date, views) */}
-                                <div className="flex items-end justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
+                                {/* Footer details (Score badge only) */}
+                                <div className="border-t border-black/10 dark:border-white/10 pt-1.5 mt-1 flex justify-start">
                                   {post.score && (
                                     <div className={cn(
                                       "inline-flex items-center gap-1 text-black px-2 py-0.5 font-retro font-black text-[10px] sm:text-[11px] border-2 border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none transition-all duration-300",
@@ -1088,10 +1088,6 @@ export default function HomePage() {
                                       ★ {post.score}
                                     </div>
                                   )}
-                                  <div className="text-[6.5px] text-slate-500 dark:text-slate-400 font-mono text-right leading-none space-y-0.5">
-                                    <div>{formatDate(post.createdAt, post.date ?? undefined)}</div>
-                                    <div>{formatNumber(post.views || 0)} VIEWS</div>
-                                  </div>
                                 </div>
                               </div>
 
