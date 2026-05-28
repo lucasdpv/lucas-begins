@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
-import { Gamepad2, ChevronRight, ChevronLeft, LayoutGrid, Map, Layers } from "lucide-react";
+import { Gamepad2, ChevronRight, ChevronLeft, LayoutGrid, Map, Layers, Coffee, FolderOpen } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -423,7 +423,7 @@ export default function HomePage() {
 
                     {/* Conteúdo */}
                     <div className="relative z-10 space-y-1">
-                      <h4 className="font-bold text-sm text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
+                      <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
                         {post.title}
                       </h4>
                       <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
@@ -518,8 +518,9 @@ export default function HomePage() {
                         </motion.div>
                       ))
                     ) : (
-                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
-                        <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
+                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 glass-card border-black/10 dark:border-white/10", isDark ? "text-slate-500" : "text-slate-400")}>
+                        <Coffee className="w-8 h-8 opacity-40 animate-pulse text-orange-500" />
+                        <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum cartucho de RetroCafé inserido no slot</span>
                       </div>
                     )}
                   </div>
@@ -597,8 +598,9 @@ export default function HomePage() {
                         </motion.div>
                       ))
                     ) : (
-                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
-                        <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
+                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 glass-card border-black/10 dark:border-white/10", isDark ? "text-slate-500" : "text-slate-400")}>
+                        <FolderOpen className="w-8 h-8 opacity-40 animate-pulse text-blue-500" />
+                        <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum dossiê secreto decodificado até o momento</span>
                       </div>
                     )}
                   </div>
@@ -628,6 +630,9 @@ export default function HomePage() {
 
             {/* ── DIREITA (1/3): Reviews ── */}
             <div className="lg:col-span-1 flex flex-col gap-5 lg:h-full">
+              {/* Divisor sutil acima de Reviews no mobile */}
+              <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/5")} />
+
               {/* Cabeçalho */}
               <div className="flex items-center justify-between">
                 <div
@@ -695,7 +700,7 @@ export default function HomePage() {
 
                           {/* Conteúdo */}
                           <div className="relative z-10 space-y-1">
-                            <h4 className="font-bold text-sm text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
+                            <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
                               {post.title}
                             </h4>
                             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
