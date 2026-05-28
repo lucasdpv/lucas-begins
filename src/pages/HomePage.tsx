@@ -125,10 +125,12 @@ export default function HomePage() {
   const retrocafeRef = useRef<HTMLDivElement>(null);
   const dossieRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  const mostViewedMobileRef = useRef<HTMLDivElement>(null);
 
   const [retrocafeScroll, setRetrocafeScroll] = useState({ left: false, right: true });
   const [dossieScroll, setDossieScroll] = useState({ left: false, right: true });
   const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
+  const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
 
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
     if (ref.current) {
@@ -142,7 +144,7 @@ export default function HomePage() {
 
   const scrollContainer = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
     if (ref.current) {
-      const scrollAmount = ref.current.clientWidth * 0.8;
+      const scrollAmount = ref.current.clientWidth;
       ref.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth"
@@ -218,15 +220,17 @@ export default function HomePage() {
       updateScrollState(retrocafeRef, setRetrocafeScroll);
       updateScrollState(dossieRef, setDossieScroll);
       updateScrollState(reviewsRef, setReviewsScroll);
+      updateScrollState(mostViewedMobileRef, setMostViewedScroll);
     }, 400);
     return () => clearTimeout(timer);
-  }, [displayRetrocafe, displayDossie, displayReviews, updateScrollState]);
+  }, [displayRetrocafe, displayDossie, displayReviews, mostViewedPosts, updateScrollState]);
 
   useEffect(() => {
     const handleResize = () => {
       updateScrollState(retrocafeRef, setRetrocafeScroll);
       updateScrollState(dossieRef, setDossieScroll);
       updateScrollState(reviewsRef, setReviewsScroll);
+      updateScrollState(mostViewedMobileRef, setMostViewedScroll);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -243,7 +247,7 @@ export default function HomePage() {
     : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe || isLoadingLatest);
 
   return (
-    <div className="flex flex-col gap-12 relative z-0">
+    <div className="flex flex-col gap-8 md:gap-12 relative z-0">
       {/* Ambient Glows */}
       {isDark && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
@@ -364,11 +368,103 @@ export default function HomePage() {
         </section>
       ) : null}
 
+      {/* ── MOBILE/TABLET MAIS LIDOS ── */}
+      {!isLoadingPosts && isDefaultView && mostViewedPosts.length > 0 && (
+        <div className="lg:hidden flex flex-col gap-4">
+          {/* Divisor sutil entre Carrossel e Mais Lidos no mobile */}
+          <div className={cn("h-px mb-6 -mt-2", isDark ? "bg-white/5" : "bg-black/8")} />
+
+          <div className="flex items-center gap-3">
+            <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
+            <div>
+              <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
+                Mais Lidos
+              </h2>
+              <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                Em Alta no Portal
+              </span>
+            </div>
+          </div>
+
+          <div className="relative group/scroll-container w-full">
+            <div
+              ref={mostViewedMobileRef}
+              onScroll={() => updateScrollState(mostViewedMobileRef, setMostViewedScroll)}
+              className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory w-full"
+            >
+              {mostViewedPosts.map((post, idx) => {
+                const targetSlug = post.slug || slugify(post.title);
+                return (
+                  <Link
+                    key={post.id}
+                    to={`/post/${targetSlug}`}
+                    className={cn(
+                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full shrink-0 snap-start snap-always"
+                    )}
+                  >
+                    {/* Imagem */}
+                    {post.imageUrl ? (
+                      <img
+                        src={post.imageUrl}
+                        alt={post.title}
+                        className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-700/20 to-orange-900/30" />
+                    )}
+                    {/* Gradiente */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+
+                    {/* Rank Number overlay */}
+                    <div className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded font-retro font-black text-base bg-black/75 border border-amber-400/60 text-amber-400 backdrop-blur-sm shadow-[0_0_8px_rgba(251,191,36,0.25)] group-hover/item:bg-amber-400 group-hover/item:text-black transition-all duration-300">
+                      {(idx + 1).toString().padStart(2, "0")}
+                    </div>
+
+                    {/* Conteúdo */}
+                    <div className="relative z-10 space-y-1">
+                      <h4 className="font-bold text-sm text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
+                        {post.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
+                        <span>{formatNumber(post.views || 0)} views</span>
+                        <span>·</span>
+                        <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Setinhas de navegação/feedback visual no Mobile */}
+            {mostViewedScroll.left && (
+              <button
+                onClick={() => scrollContainer(mostViewedMobileRef, "left")}
+                className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                aria-label="Deslizar esquerda"
+              >
+                <ChevronLeft className="w-5 h-5 text-amber-400" />
+              </button>
+            )}
+            {mostViewedScroll.right && (
+              <button
+                onClick={() => scrollContainer(mostViewedMobileRef, "right")}
+                className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                aria-label="Deslizar direita"
+              >
+                <ChevronRight className="w-5 h-5 text-amber-400" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── 2. ROW 2: RetroCafé / Dossiês / Reviews ─────────── */}
       {!isLoadingPosts && isDefaultView && (
         <section className="flex flex-col gap-0">
           {/* Divisor sutil entre seções */}
-          <div className={cn("h-px mb-10", isDark ? "bg-white/5" : "bg-black/8")} />
+          <div className={cn("h-px mb-6 md:mb-8 -mt-2 md:-mt-4", isDark ? "bg-white/5" : "bg-black/8")} />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 text-left">
 
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
@@ -416,7 +512,7 @@ export default function HomePage() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
+                          className="w-full md:w-auto shrink-0 snap-start snap-always"
                         >
                           <PostCard post={post} showCategory={false} />
                         </motion.div>
@@ -495,7 +591,7 @@ export default function HomePage() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
+                          className="w-full md:w-auto shrink-0 snap-start snap-always"
                         >
                           <PostCard post={post} showCategory={false} />
                         </motion.div>
@@ -575,7 +671,7 @@ export default function HomePage() {
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
+                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full lg:w-auto shrink-0 snap-start snap-always"
                           )}
                         >
                           {/* Imagem */}
