@@ -134,6 +134,7 @@ export default function HomePage() {
   const [hoveredMaisLidosIndex, setHoveredMaisLidosIndex] = useState<number>(0);
   const [hoveredRetrocafeIndex, setHoveredRetrocafeIndex] = useState<number | null>(null);
   const [hoveredDossieIndex, setHoveredDossieIndex] = useState<number | null>(null);
+  const [hoveredReviewsIndex, setHoveredReviewsIndex] = useState<number | null>(null);
 
   const playClickSound = useCallback(() => {
     try {
@@ -971,99 +972,258 @@ export default function HomePage() {
               {/* Divisor sutil acima de Reviews no mobile */}
               <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/5")} />
 
-              {/* Cabeçalho */}
-               <div className="flex items-center justify-between">
-                 <div
-                   className="flex items-center gap-3 cursor-pointer group/title"
-                   onClick={() => goToCategory("Reviews")}
-                 >
-                   <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
-                   <div>
-                     <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                       Reviews
-                     </h2>
-                     <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                       Análises com Nota
-                     </p>
-                   </div>
-                 </div>
-               </div>
-
-              {/* Cards Reviews */}
-              <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col">
-                <div
-                  ref={reviewsRef}
-                  onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                  className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
-                >
-                  {displayReviews.length > 0 ? (
-                    displayReviews.map((post, i) => {
-                      const targetSlug = post.slug || slugify(post.title);
-                      return (
-                        <motion.article
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="group relative min-w-[280px] lg:min-w-0 w-full h-32 lg:h-0 lg:flex-1 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.6)] transition-shadow cursor-pointer snap-center shrink-0 lg:shrink-0"
-                        >
-                          <Link to={`/post/${targetSlug}`} className="absolute inset-0 z-20" aria-label={post.title} />
-
-                          {post.imageUrl && (
-                            <img
-                              src={post.imageUrl}
-                              alt={post.title}
-                              loading="lazy"
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          )}
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-
-                          {post.score && (
-                            <span className="absolute top-0 left-0 z-10 shimmer-badge text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
-                              ★ {post.score}
-                            </span>
-                          )}
-
-                          <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-yellow-400 bg-black/60 px-2 py-0.5 border border-yellow-500/30">
-                            Reviews
-                          </span>
-
-                          <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                            <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-yellow-300 transition-colors">
-                              {post.title}
-                            </h4>
-                          </div>
-                        </motion.article>
-                      );
-                    })
-                  ) : (
-                    <div className="flex items-center justify-center py-12">
-                      <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
-                    </div>
+              <div 
+                className={cn(
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredReviewsIndex(null)}
+              >
+                {/* Background Image transition */}
+                <AnimatePresence>
+                  {hoveredReviewsIndex !== null && displayReviews[hoveredReviewsIndex] && (
+                    <motion.div
+                      key={displayReviews[hoveredReviewsIndex].id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-0 pointer-events-none"
+                    >
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 filter sepia brightness-[0.6] contrast-[1.4] hue-rotate-[15deg]", // amber/golden tint
+                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                        )}
+                        style={{
+                          backgroundImage: `url(${displayReviews[hoveredReviewsIndex].imageUrl})`,
+                        }}
+                      />
+                      
+                      {/* Tint overlay matching section theme */}
+                      <div className={cn(
+                        "absolute inset-0 mix-blend-color",
+                        isDark ? "bg-amber-950/45" : "bg-amber-100/30"
+                      )} />
+                      
+                      {/* CRT and line grid pattern overlay */}
+                      <div className="absolute inset-0 scanline-overlay opacity-30" />
+                      
+                      <div 
+                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+                        style={{
+                          backgroundImage: isDark
+                            ? "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)"
+                            : "linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)",
+                          backgroundSize: "20px 20px"
+                        }}
+                      />
+                      
+                      {/* Radial gradient mask to focus visual center */}
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: isDark
+                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
+                            : "radial-gradient(circle, transparent 20%, white 90%)"
+                        }}
+                      />
+                    </motion.div>
                   )}
+                </AnimatePresence>
+
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  REVIEWS
                 </div>
 
-                {reviewsScroll.left && (
-                  <button
-                    onClick={() => scrollContainer(reviewsRef, "left")}
-                    className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                    aria-label="Deslizar esquerda"
+                {/* Cabeçalho */}
+                <div className="flex items-center justify-between relative z-10">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer group/title"
+                    onClick={() => goToCategory("Reviews")}
                   >
-                    <ChevronLeft className="w-5 h-5 text-yellow-400" />
-                  </button>
-                )}
-                {reviewsScroll.right && (
-                  <button
-                    onClick={() => scrollContainer(reviewsRef, "right")}
-                    className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                    aria-label="Deslizar direita"
+                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
+                    <div>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                        Reviews
+                      </h2>
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
+                        Análises com Nota
+                      </p>
+                    </div>
+                  </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-yellow-500/20 dark:border-yellow-400/15 self-center" />
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-yellow-500/80 dark:text-yellow-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ ARCADE RACK SYSTEM // AR-256 ]</span>
+                    <span className="opacity-60">SHELF CONNECTED... OK</span>
+                  </div>
+                </div>
+
+                {/* Cards Reviews */}
+                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10">
+                  <div
+                    ref={reviewsRef}
+                    onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
+                    className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1 pt-4"
                   >
-                    <ChevronRight className="w-5 h-5 text-yellow-400" />
-                  </button>
-                )}
-              </div>{/* fim group/scroll-container reviews */}
+                    {displayReviews.length > 0 ? (
+                      displayReviews.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        const scoreNum = post.score ? parseFloat(post.score) : 0;
+                        let spineColor = "bg-amber-500 dark:bg-amber-600 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
+                        let sealBg = "from-yellow-300 via-amber-400 to-yellow-500 border-amber-600 text-amber-950 shadow-[0_0_8px_rgba(234,179,8,0.5)]";
+                        let ratingLabel = "GOLD CLASS";
+                        
+                        if (scoreNum >= 9.0) {
+                          spineColor = "bg-amber-500 dark:bg-amber-600 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
+                          sealBg = "from-yellow-300 via-amber-400 to-yellow-500 border-amber-600 text-amber-950 shadow-[0_0_8px_rgba(234,179,8,0.5)]";
+                          ratingLabel = "GOLD CLASS";
+                        } else if (scoreNum >= 8.0) {
+                          spineColor = "bg-slate-400 dark:bg-slate-500 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
+                          sealBg = "from-slate-200 via-slate-300 to-slate-400 border-slate-500 text-slate-900";
+                          ratingLabel = "SILVER CLASS";
+                        } else {
+                          spineColor = "bg-amber-800 dark:bg-amber-900 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
+                          sealBg = "from-amber-700 via-amber-800 to-amber-900 border-amber-950 text-amber-100";
+                          ratingLabel = "BRONZE CLASS";
+                        }
+
+                        const isHovered = hoveredReviewsIndex === i;
+                        const isAnyHovered = hoveredReviewsIndex !== null;
+
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "min-w-[290px] lg:min-w-0 w-full h-[120px] lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
+                              isAnyHovered && !isHovered
+                                ? "opacity-50 scale-[0.98] blur-[0.4px]"
+                                : isHovered
+                                ? "lg:translate-x-2.5 scale-[1.02] z-20"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredReviewsIndex(i);
+                              playEjectSound();
+                            }}
+                          >
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 bg-[#e2cb9f]/10 dark:bg-black/40 backdrop-blur-[2px] shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                                isHovered
+                                  ? "border-yellow-500 shadow-[5px_5px_0px_rgba(234,179,8,1)] bg-amber-500/10 dark:bg-amber-500/5"
+                                  : "border-black"
+                              )}
+                            >
+                              {/* Glossy Plastic highlight overlay */}
+                              <div className={cn(
+                                "absolute inset-0 pointer-events-none z-10 transition-transform duration-700 bg-gradient-to-tr from-white/0 via-white/10 to-white/0",
+                                isHovered ? "translate-x-full" : "-translate-x-full"
+                              )} style={{ transform: isHovered ? "none" : undefined }} />
+
+                              {/* 1. CD Jewel Case Spine (Colored Left Strip) */}
+                              <div className={cn("w-6 flex flex-col items-center justify-between py-2 shrink-0 border-r border-black/30", spineColor)}>
+                                <div className="w-2.5 h-2.5 rounded-full bg-white/20 border border-white/40 flex items-center justify-center">
+                                  <div className="w-1 h-1 rounded-full bg-black/40" />
+                                </div>
+                                <span className="font-mono font-bold text-[6px] tracking-widest text-black/60 rotate-90 uppercase select-none whitespace-nowrap -my-4">
+                                  {ratingLabel}
+                                </span>
+                                <div className="w-2.5 h-1 bg-black/30 rounded-sm" />
+                              </div>
+
+                              {/* 2. Album Cover (Square Thumbnail) */}
+                              {post.imageUrl && (
+                                <div className="w-24 h-full relative shrink-0 border-r border-black overflow-hidden select-none bg-black">
+                                  <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                  <div className="absolute inset-0 border border-white/20 pointer-events-none" />
+                                  <div className="absolute inset-y-0 right-0 w-[3px] bg-gradient-to-r from-transparent to-black/30" />
+                                </div>
+                              )}
+
+                              {/* 3. Jewel Case Contents (CD Booklet Title and Info) */}
+                              <div className="flex-1 p-3 flex flex-col justify-between relative min-w-0">
+                                <div>
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                                      OFFICIAL REVIEW
+                                    </span>
+                                    <div className="flex items-center gap-[0.5px] h-2.5 bg-white/80 dark:bg-white/95 px-0.5 border border-black/30 select-none">
+                                      {[1, 2, 1, 1, 2, 1, 2].map((w, idx) => (
+                                        <div key={idx} className="bg-black h-full" style={{ width: `${w}px` }} />
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <h4 className={cn(
+                                    "font-retro font-bold text-[11px] sm:text-xs leading-snug line-clamp-2 transition-colors duration-300",
+                                    isHovered 
+                                      ? "text-yellow-600 dark:text-yellow-400" 
+                                      : "text-gray-900 dark:text-gray-100"
+                                  )}>
+                                    {post.title}
+                                  </h4>
+                                </div>
+
+                                <div className="flex items-end justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
+                                  <div className="text-[7px] text-gray-500 font-mono font-bold">
+                                    RELEASED: {formatDate(post.createdAt, post.date ?? undefined)}
+                                  </div>
+
+                                  {post.score && (
+                                    <div className={cn(
+                                      "relative flex items-center justify-center w-9 h-9 rounded-full border border-double bg-gradient-to-br font-retro font-black text-[9px] shadow-[1px_1px_3px_rgba(0,0,0,0.3)] animate-pulse shrink-0 rotate-[-8deg] select-none",
+                                      sealBg
+                                    )}>
+                                      <div className="absolute inset-0 rounded-full border border-black/10 pointer-events-none" />
+                                      <span className="z-10 leading-none">{post.score}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <div className="flex items-center justify-center py-12">
+                        <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {reviewsScroll.left && (
+                    <button
+                      onClick={() => scrollContainer(reviewsRef, "left")}
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar esquerda"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-yellow-400" />
+                    </button>
+                  )}
+                  {reviewsScroll.right && (
+                    <button
+                      onClick={() => scrollContainer(reviewsRef, "right")}
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar direita"
+                    >
+                      <ChevronRight className="w-5 h-5 text-yellow-400" />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
