@@ -135,7 +135,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .magazine-float-left, .magazine-float-right {
     float: none;
     max-width: 100%;
