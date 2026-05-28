@@ -13,7 +13,7 @@ import { Post } from "../schemas";
 
 interface PostCardProps {
   post: Post;
-  variant?: "default" | "compact";
+  variant?: "default" | "compact" | "vintage";
   showCategory?: boolean;
 }
 
@@ -97,6 +97,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.comments?.length || 0;
   const isCompact = variant === "compact";
+  const isVintage = variant === "vintage";
 
   const targetSlug = post.slug || slugify(post.title);
   const targetPath = `/post/${targetSlug}`;
@@ -179,7 +180,158 @@ export default function PostCard({ post, variant = "default", showCategory = tru
     );
   }
 
-  // Variant Default: Design Card Contido
+  // Variant Vintage: Large HQ / Comic panel layout (Thick border, fixed h-56/64, large fonts)
+  if (isVintage) {
+    return (
+      <article
+        className={cn(
+          "flex flex-col h-full group relative border-2 border-black rounded-none transition-all duration-300 hover:-translate-y-1 active:translate-y-0",
+          isDark
+            ? "bg-[#1f1d35] text-gray-100 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(168,85,247,1)]"
+            : "bg-white text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(168,85,247,1)]"
+        )}
+      >
+        <Link
+          to={targetPath}
+          className="absolute inset-0 z-0"
+          aria-label={`Ler matéria: ${post.title}`}
+        />
+
+        {/* Thumbnail — com altura fixa e borda inferior grossa */}
+        <div
+          className={cn(
+            "w-full h-56 md:h-64 relative overflow-hidden border-b-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0",
+            isDark ? "bg-gray-900" : "bg-snes-mid/20"
+          )}
+        >
+          {post.imageUrl && !imgError && (
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              style={{ objectPosition: post.imagePosition || "center" }}
+              loading="lazy"
+            />
+          )}
+
+          {/* Mensagem Gamificada em caso de Erro de Imagem */}
+          {imgError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
+               <div className="text-red-500 font-retro text-[8px] sm:text-[10px] mb-1 animate-pulse bg-black/40 px-1.5 py-0.5 rounded border border-red-500/50">
+                 ⚠️ ERROR
+               </div>
+               <p className={cn(
+                 "text-[9px] sm:text-[10px] font-bold uppercase leading-tight max-w-[200px]",
+                 isDark ? "text-gray-400" : "text-gray-600"
+               )}>
+                 Textura no setor {randomSector} corrompida...
+               </p>
+            </div>
+          )}
+
+          {/* CRT Scanlines Overlay com maior opacidade no hover */}
+          <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-70 transition-opacity duration-300 z-10" />
+
+          {/* Category & Score Badges side-by-side at top-left */}
+          <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20 pointer-events-none">
+            {showCategory && <CategoryBadge size="sm">{post.category}</CategoryBadge>}
+            {post.score && <ScoreBadge score={post.score} size="sm" />}
+          </div>
+        </div>
+
+        {/* Conteúdo com maior padding e fontes maiores */}
+        <div className="flex flex-col flex-grow relative z-10 pointer-events-none px-5 py-6">
+          <h3 className={cn(
+            "font-retro font-bold uppercase line-clamp-2 transition-colors duration-300 text-lg md:text-xl mb-3",
+            "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+            isDark ? "text-gray-100" : "text-gray-900"
+          )}>
+            {post.title}
+          </h3>
+
+          {/* Excerpt com fonte de leitura confortável */}
+          {post.excerpt && (
+            <p className={cn(
+              "text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium",
+              isDark ? "text-gray-400" : "text-gray-600"
+            )}>
+              {post.excerpt}
+            </p>
+          )}
+
+          {/* Footer com divisor de borda de 2px e informações empilhadas à esquerda */}
+          <div className={cn(
+            "flex flex-wrap items-end justify-between mt-auto gap-y-3 pt-4 border-t-2",
+            isDark ? "border-gray-800" : "border-black/5"
+          )}>
+            {/* Data e Tempo de leitura empilhados */}
+            <div className="flex flex-col gap-0.5 min-w-[80px]">
+              <span className={cn("font-retro font-bold uppercase tracking-wider text-[9px] sm:text-[10px] whitespace-nowrap", isDark ? "opacity-60" : "opacity-80")}>
+                {formatDate(post.createdAt, post.date ?? undefined)}
+              </span>
+              <span className={cn("text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase whitespace-nowrap", isDark ? "opacity-40" : "opacity-60")}>
+                <Clock className="w-3 h-3 shrink-0" />
+                {calculateReadingTime(post.content || "").replace(" min de leitura", "m")}
+              </span>
+            </div>
+
+            {/* Container de Ações e HUD status à direita */}
+            <div className="flex items-center gap-3 sm:gap-4 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  className={cn(
+                    "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-sm text-red-500 hover:scale-110 active:scale-95 cursor-pointer hover:text-red-400",
+                    hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-600 hover:text-red-500"
+                  )}
+                  onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
+                  title={currentUser ? "Curtir" : "Faça login para curtir"}
+                  disabled={!currentUser}
+                >
+                  <Heart className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", hasLiked && "fill-current")} />
+                  <span>{formatNumber(post.likes || 0)}</span>
+                </button>
+
+                <button
+                  className={cn(
+                    "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-sm text-yellow-500 hover:scale-110 active:scale-95 cursor-pointer hover:text-yellow-400",
+                    profile?.favorites?.includes(post.id) ? "text-yellow-500" : isDark ? "text-gray-400 hover:text-yellow-400" : "text-gray-600 hover:text-yellow-500"
+                  )}
+                  onClick={() => {
+                    if (currentUser) {
+                      const isFavorited = profile?.favorites?.includes(post.id) || false;
+                      favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
+                    }
+                  }}
+                  title={currentUser ? "Favoritar" : "Faça login para favoritar"}
+                  disabled={!currentUser}
+                >
+                  <Bookmark className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", profile?.favorites?.includes(post.id) && "fill-current")} />
+                </button>
+
+                <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>{formatNumber(commentCount)}</span>
+                </div>
+
+                <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
+                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>{formatNumber(post.views || 0)}</span>
+                </div>
+              </div>
+
+              {!currentUser && (
+                <div className="pl-2 border-l border-black/10 dark:border-white/10">
+                  <AuthGate variant="inline" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  // Variant Default: Design Card Contido Widescreen (Aspect-Video) Original
   return (
     <article
       className={cn(
@@ -195,7 +347,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         aria-label={`Ler matéria: ${post.title}`}
       />
 
-      {/* Thumbnail — flush ao topo do card, sem margem */}
+      {/* Thumbnail — Widescreen aspect ratio */}
       <div
         className={cn(
           "w-full aspect-video relative overflow-hidden bg-gray-900 z-10 pointer-events-none shrink-0"
@@ -229,11 +381,20 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         {/* CRT Scanlines Overlay */}
         <div className="absolute inset-0 scanline-overlay opacity-20 group-hover:opacity-45 transition-opacity duration-300 z-10" />
 
-        {/* Category & Score Badges side-by-side at top-left */}
-        <div className="absolute top-3 left-3 flex gap-2 flex-wrap z-20 pointer-events-none">
-          {showCategory && <CategoryBadge size="sm">{post.category}</CategoryBadge>}
-          {post.score && <ScoreBadge score={post.score} size="sm" />}
-        </div>
+        {/* Category pill — canto inferior esquerdo sobre a imagem */}
+        {showCategory && (
+          <div className="absolute bottom-3 left-3 z-20 pointer-events-none">
+            <span className={cn(
+              "text-[9px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+              cardStyles.textLabel,
+              isDark
+                ? "bg-black/70 border-white/10 backdrop-blur-sm"
+                : "bg-white/80 border-black/10 backdrop-blur-sm"
+            )}>
+              {post.category}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Conteúdo dentro do card */}
@@ -245,7 +406,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
         <h3 className={cn(
           "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2 text-sm md:text-base lg:text-[17px]",
-          "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+          cardStyles.textHover,
           isDark ? "text-gray-100" : "text-gray-900"
         )}>
           {post.title}

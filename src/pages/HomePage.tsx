@@ -291,15 +291,15 @@ export default function HomePage() {
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
-            <div className="flex items-stretch gap-3.5">
-              <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.75)]" : "bg-purple-600")} />
-              <div className="flex flex-col justify-center">
-                <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow")}>
+            <div className="flex items-center gap-3">
+              <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
+              <div>
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
                   Em Destaque
                 </h2>
-                <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                   Seleção Editorial
-                </span>
+                </p>
               </div>
             </div>
             <Carousel posts={carouselPosts} isDark={isDark} />
@@ -307,15 +307,15 @@ export default function HomePage() {
 
           {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
           <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
-            <div className="flex items-stretch gap-3.5">
-              <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.75)]" : "bg-amber-500")} />
-              <div className="flex flex-col justify-center">
-                <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-amber")}>
+            <div className="flex items-center gap-3">
+              <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
+              <div>
+                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
                   Mais Lidos
                 </h2>
-                <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                   Em Alta no Portal
-                </span>
+                </p>
               </div>
             </div>
             
@@ -389,15 +389,15 @@ export default function HomePage() {
           {/* Divisor sutil entre Carrossel e Mais Lidos no mobile */}
           <div className={cn("h-px mb-6 -mt-2", isDark ? "bg-white/5" : "bg-black/8")} />
 
-          <div className="flex items-stretch gap-3.5">
-            <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.75)]" : "bg-amber-500")} />
-            <div className="flex flex-col justify-center">
-              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-amber")}>
+          <div className="flex items-center gap-3">
+            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
+            <div>
+              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
                 Mais Lidos
               </h2>
-              <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                 Em Alta no Portal
-              </span>
+              </p>
             </div>
           </div>
 
@@ -491,17 +491,17 @@ export default function HomePage() {
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between">
                   <div
-                    className="flex items-stretch gap-3.5 cursor-pointer group/title"
+                    className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("RetroCafé")}
                   >
-                    <div className="w-2 rounded-none shrink-0 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_18px_rgba(249,115,22,0.95)] transition-all" />
-                    <div className="flex flex-col justify-center">
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_15px_rgba(249,115,22,0.9)] transition-all" />
+                    <div>
+                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         RetroCafé
                       </h2>
-                      <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                         Crônicas &amp; Nostalgia
-                      </span>
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -571,17 +571,17 @@ export default function HomePage() {
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between">
                   <div
-                    className="flex items-stretch gap-3.5 cursor-pointer group/title"
+                    className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("Dossiês")}
                   >
-                    <div className="w-2 rounded-none shrink-0 bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_18px_rgba(59,130,246,0.95)] transition-all" />
-                    <div className="flex flex-col justify-center">
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_15px_rgba(59,130,246,0.9)] transition-all" />
+                    <div>
+                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         Dossiês
                       </h2>
-                      <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                         Reportagens Especiais
-                      </span>
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -652,17 +652,17 @@ export default function HomePage() {
               {/* Cabeçalho */}
               <div className="flex items-center justify-between">
                 <div
-                  className="flex items-stretch gap-3.5 cursor-pointer group/title"
+                  className="flex items-center gap-3 cursor-pointer group/title"
                   onClick={() => goToCategory("Reviews")}
                 >
-                  <div className="w-2 rounded-none shrink-0 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_18px_rgba(234,179,8,0.95)] transition-all" />
-                  <div className="flex flex-col justify-center">
-                    <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                  <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
+                  <div>
+                    <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                       Reviews
                     </h2>
-                    <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                       Análises com Nota
-                    </span>
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -770,10 +770,10 @@ export default function HomePage() {
           "flex items-center justify-between pb-5",
           isDark ? "border-b border-white/5" : "border-b border-black/10"
         )}>
-          <div className="flex items-stretch gap-3.5">
-            <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.75)]" : "bg-blue-600")} />
-            <div className="flex flex-col justify-center">
-              <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-blue")}>
+          <div className="flex items-center gap-3">
+            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+            <div>
+              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
                 {isLoadingPosts
                   ? "Carregando..."
                   : searchQuery
@@ -782,9 +782,9 @@ export default function HomePage() {
                   ? activeCategory
                   : "Últimas Notícias"}
               </h2>
-              <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
                 Mais Recentes do Portal
-              </span>
+              </p>
             </div>
           </div>
           {!isLoadingPosts && isDefaultView && (
@@ -818,7 +818,7 @@ export default function HomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
               >
-                <PostCard post={post} />
+                <PostCard post={post} variant="vintage" />
               </motion.div>
             ))}
           </div>
