@@ -17,22 +17,23 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 
 ---
 
-## ✨ Destaques da Versão 3.10.1
+## ✨ Destaques da Versão 4.1.0 (Retro-Modern Visual Decks)
 
-### 🖼️ Editor de Imagens Premium
-Suporte completo a proporções livres (`1:1`, `16:9`, `4:5`, `Original`) e 4 estilos de moldura por bloco: retrô normal, CRT retro com scanlines, adesivo e sem moldura. Re-corte in-context sem novo upload, preview dinâmico de aspecto no editor e propagação do aspecto confirmado de volta ao bloco.
+### 🎨 Redesign Visual da Homepage (Retro-Gaming Decks)
+- **RetroCafé (Banca de Revistas)**: Seção estilizada como capas de revistas de videogame físicas dos anos 90, com logotipo, preço simulado em Cruzeiros (Cr$), código de barras e elevação 3D brutalista.
+- **Dossiês (Arquivo Confidencial)**: Cards estilizados como pastas manila com clipes metálicos, abas de categoria numeradas, carimbo vermelho "CLASSIFICADO", fotos Polaroid (proporção 4:3) e animação interativa de scanner a laser azul no hover.
+- **Reviews (Decks com Fade)**: Cards horizontais integrados onde a arte do jogo (65% de largura) se funde suavemente à área de texto (50% de largura) usando uma máscara de gradiente de 70% de largura. A nota agora é exibida em um badge metálico dourado 3D de destaque.
 
-### 🔍 Lightbox de Zoom
-Clicar em qualquer imagem de artigo abre um overlay full-screen com a imagem em alta qualidade, bordas neon retrô, backdrop blur e suporte a fechar via ESC ou clique.
+### 🔊 Feedback Sonoro Retrô Nativo
+- Adicionado sistema de efeitos sonoros 8-bit sintetizados via **Web Audio API** (sem arquivos de áudio externos), gerando bipes clássicos de interface de forma instantânea nas interações do menu.
 
-### 🔧 CORS Proxy para Crop Remoto
-Proxy same-origin configurado no Vite (dev) e Vercel (produção) para contornar restrições CORS ao desenhar imagens do Firebase Storage no canvas do editor de corte, eliminando erros de "tainted canvas".
+---
 
-### 🛠️ Painel Admin Refinado
-Remoção da aba "Ferramentas". Filtro de posts em destaque (carrossel). Dropdowns customizados com Framer Motion, scrollbar retrô pill-shaped e header do painel com alinhamento vertical perfeito.
+## ✨ Destaques da Versão 4.0.0 (Neo-Brutalist Classic)
 
-### 🌐 Marca Protegida contra Tradução
-"BeginsProject" nunca é traduzido por motores de tradução automáticos — protegido em todos os elementos do site com `translate="no"` e classe `notranslate`.
+- **Cantos Retos 90°**: Conversão global para a estética retro pura usando `rounded-none` em todos os cards, modais e botões.
+- **Bordas Fortes e Sombras Offset**: Bordas pretas sólidas e sombras brutas 2D com elevação responsiva no hover.
+- **Fundo Mais Lidos com Imagem Dinâmica**: Efeito de hover na lista "Mais Lidos" que projeta e suaviza a imagem do post correspondente no fundo direito da seção com máscara gradiente `mask-image`.
 
 ---
 

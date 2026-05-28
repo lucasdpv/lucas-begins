@@ -1,6 +1,6 @@
 # ⚙️ Documentação Técnica — BeginsProject
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v3.10.1**.
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v4.1.0**.
 
 ---
 
@@ -12,6 +12,7 @@ Este documento detalha a arquitetura de software, o sistema de design e as decis
 - **Estado Global**: Zustand (UI/Tema) + Context API (Auth).
 - **Animações**: Framer Motion (transitions, dropdowns, lightbox).
 - **Busca Aproximada**: Fuse.js (tolerância a erros e acentuação).
+- **Síntese de Áudio**: Web Audio API (geração de efeitos sonoros nativos sem arquivos externos de mídia).
 
 ---
 
@@ -97,14 +98,28 @@ Para mitigar os erros de permissão de escrita para usuários não autenticados 
 
 ---
 
-## 🎨 Design System: Neo-Brutalist 2.0
+## 🎨 Design System: Neo-Brutalist Clássico & Temático (v4.0.0 / v4.1.0)
 
-A estética do portal evoluiu para um Neo-Brutalismo refinado:
-- **Bordas**: `border-2 border-black` para leveza ou `border-purple-600` para destaque.
-- **Sombras**: Sombras sólidas 2D (`shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`).
-- **Slim Footer**: Rodapé minimalista em estilo barra de ferramentas.
-- **Scrollbar Retrô**: Classe `.retro-scrollbar` com thumb arredondado (pill) para dropdowns e painéis.
-- **Acessibilidade**: Contraste otimizado para o modo claro (SNES).
+A estética do portal evoluiu para um Neo-Brutalismo clássico marcante, com elementos e decks temáticos inspirados na era retro:
+
+### 1. Diretrizes Visuais Core (v4.0.0)
+- **Cantos Retos**: Todos os componentes (cards, modais, botões, inputs e avatares) usam `rounded-none`, abandonando cantos arredondados por completo.
+- **Fundos Sólidos**: Transição de efeitos glassmorphic para fundos opacos e sólidos (`bg-[#1f1d35]` no tema escuro e `bg-white` no claro), garantindo contraste máximo.
+- **Bordas Pretas & Sombras 2D Offset**: Uso sistemático de `border-2 border-black` com sombras sólidas brutas (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`).
+- **Animações de Hover Brutalistas**: Elevação física da sombra para 8px acompanhada de deslocamento de translação e transição da borda para roxo vibrante (`border-purple-500`).
+- **Fundo Mais Lidos com Imagem Dinâmica**: Efeito de hover na lista "Mais Lidos" que projeta e suaviza a imagem do post correspondente no fundo direito da seção com máscara gradiente `mask-image`.
+
+### 2. Decks e Painéis Temáticos (v4.1.0)
+- **Banca de Revistas (RetroCafé)**: Cards verticais que emulam capas de revistas de videogame dos anos 90, contendo preço decorativo em Cruzeiros (Cr$), código de barras e logotipo estilizado da revista física.
+- **Arquivo Confidencial (Dossiês)**: Cards simulando pastas de arquivo manila com abas de categorização numeradas, clipes de papel metálicos no topo, carimbo vermelho "CLASSIFICADO", imagens em formato de fotografia Polaroid real (aspecto 4:3) e um feixe de laser azul de escaneamento que varre verticalmente o card no hover.
+- **Reviews com Fade Retro-Moderno**: Cards horizontais bipartidos onde a imagem do jogo ocupa 65% da largura sob uma máscara de gradiente fade (`linear-gradient(to right, transparent, bg-color)`) de 70% de largura, integrando-se suavemente ao texto do card na esquerda (50% de largura). Textura de scanlines restrita à imagem preserva a legibilidade do texto.
+- **Score Badges Metálicos Dourados**: Emblemas de nota de análises redesenhados com um gradiente metálico dourado brilhante de alta definição, com borda neobrutalista grossa, que escala, brilha e se eleva no hover.
+
+### 3. Síntese de Áudio Nativa (Web Audio API)
+- **Zero Dependência de Arquivos Externos**: Implementado um sintetizador de som leve diretamente em código usando a API de Áudio do navegador.
+- **Efeitos Sonoros Retro**:
+  - *Clique 8-bit*: Onda quadrada com decaimento rápido de frequência de 800Hz para 150Hz em 80ms para simular a seleção de botões clássicos do NES/SNES.
+  - *Som Mecânico / Laser*: Onda triangular simulando um clique de gaveta ou escaneamento de disco mecânico ao abrir pastas e interagir com elementos interativos.
 
 ---
 
@@ -115,4 +130,4 @@ A tradução é fornecida pelo Google Translate Element (via `TranslationContext
 - O nome da marca **BeginsProject** é protegido contra tradução em todos os componentes via `translate="no"` + classe `notranslate`.
 
 ---
-**Documentação atualizada em: 27 de Maio de 2026.**
+**Documentação atualizada em: 28 de Maio de 2026.**
