@@ -215,6 +215,18 @@
   animation: bgFadeIn 0.4s ease-out;
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-badge {
+  background: linear-gradient(90deg, #facc15 0%, #fef08a 40%, #facc15 60%, #facc15 100%);
+  background-size: 200% auto;
+  animation: shimmer 2.5s linear infinite;
+}
+
+
 
 @keyframes loading {
   0% { transform: translateX(-100%); }

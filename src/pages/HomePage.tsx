@@ -414,7 +414,7 @@ export default function HomePage() {
                     key={post.id}
                     to={`/post/${targetSlug}`}
                     className={cn(
-                      "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-full sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black",
+                      "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-full sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
                       isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                     )}
                   >
@@ -479,9 +479,7 @@ export default function HomePage() {
       {/* ── 2. ROW 2: RetroCafé / Dossiês / Reviews ─────────── */}
       {!isLoadingPosts && isDefaultView && (
         <section className="flex flex-col gap-0">
-          {/* Divisor sutil entre seções */}
-          <div className={cn("h-px mb-6 md:mb-8 -mt-2 md:-mt-4", isDark ? "bg-white/5" : "bg-black/8")} />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 text-left">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 text-left lg:items-stretch lg:grid-rows-1">
 
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
             <div className="lg:col-span-2 flex flex-col gap-10">
@@ -555,8 +553,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Divider */}
-              <div className={cn("h-px", isDark ? "bg-white/5" : "bg-black/5")} />
+
 
               {/* ── Dossiês ── */}
               <div className="space-y-5">
@@ -652,59 +649,52 @@ export default function HomePage() {
                </div>
 
               {/* Cards Reviews */}
-              <div className="relative group/scroll-container w-full lg:flex-1 lg:min-h-0 lg:flex lg:flex-col">
-                <div 
-                  ref={reviewsRef} 
+              <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col">
+                <div
+                  ref={reviewsRef}
                   onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                  className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full lg:h-full lg:justify-between"
+                  className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                 >
                   {displayReviews.length > 0 ? (
-                    displayReviews.map((post) => {
+                    displayReviews.map((post, i) => {
                       const targetSlug = post.slug || slugify(post.title);
                       return (
-                        <Link
+                        <motion.article
                           key={post.id}
-                          to={`/post/${targetSlug}`}
-                          className={cn(
-                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-full sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black",
-                            isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
-                          )}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                          className="group relative min-w-[280px] lg:min-w-0 w-full h-32 lg:h-0 lg:flex-1 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.6)] transition-shadow cursor-pointer snap-center shrink-0 lg:shrink-0"
                         >
-                          {/* Imagem */}
-                          {post.imageUrl ? (
+                          <Link to={`/post/${targetSlug}`} className="absolute inset-0 z-20" aria-label={post.title} />
+
+                          {post.imageUrl && (
                             <img
                               src={post.imageUrl}
                               alt={post.title}
-                              className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
                               loading="lazy"
+                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
-                          ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-700/20 to-amber-900/30" />
                           )}
-                          {/* Gradiente */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-[5]" />
 
-                          {/* Score badge at top left */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+
                           {post.score && (
-                            <ScoreBadge
-                              score={post.score}
-                              size="sm"
-                              className="absolute top-3 left-3 z-20 pointer-events-none"
-                            />
+                            <span className="absolute top-0 left-0 z-10 shimmer-badge text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
+                              ★ {post.score}
+                            </span>
                           )}
 
-                          {/* Category badge "REVIEWS" at top right */}
-                          <div className="absolute top-3 right-3 z-20 px-2 py-0.5 font-retro font-black text-[9px] uppercase tracking-widest bg-black/75 border border-yellow-400/60 text-yellow-400 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                          <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-yellow-400 bg-black/60 px-2 py-0.5 border border-yellow-500/30">
                             Reviews
-                          </div>
+                          </span>
 
-                          {/* Conteúdo */}
-                          <div className="relative z-10">
-                            <h4 className="font-retro font-bold text-xs md:text-sm text-white group-hover/item:text-yellow-400 transition-colors leading-snug line-clamp-2">
+                          <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                            <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-yellow-300 transition-colors">
                               {post.title}
                             </h4>
                           </div>
-                        </Link>
+                        </motion.article>
                       );
                     })
                   ) : (
@@ -714,7 +704,6 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* Setinhas de navegação/feedback visual no Mobile */}
                 {reviewsScroll.left && (
                   <button
                     onClick={() => scrollContainer(reviewsRef, "left")}
@@ -733,7 +722,7 @@ export default function HomePage() {
                     <ChevronRight className="w-5 h-5 text-yellow-400" />
                   </button>
                 )}
-              </div>
+              </div>{/* fim group/scroll-container reviews */}
             </div>
           </div>
         </section>
