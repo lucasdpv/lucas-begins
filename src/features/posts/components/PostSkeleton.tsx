@@ -19,10 +19,8 @@ export default function PostSkeleton({ isDark }: PostSkeletonProps) {
       aria-busy="true"
       aria-label="Carregando artigo..."
       className={cn(
-        "flex flex-col h-full rounded-3xl border-2 transition-all duration-300 glass-card",
-        isDark
-          ? "border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
-          : "border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+        "flex flex-col h-full rounded-none border-2 border-black transition-all duration-300 shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+        isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
       )}
     >
       {/* Thumb */}
@@ -36,7 +34,7 @@ export default function PostSkeleton({ isDark }: PostSkeletonProps) {
             width="w-20" 
             height="h-6" 
             isDark={isDark} 
-            className={cn("border border-black/10 dark:border-white/10 rounded")} 
+            className={cn("border-2 border-black rounded-none shadow-[2px_2px_0px_rgba(0,0,0,1)]")} 
           />
         </div>
       </div>

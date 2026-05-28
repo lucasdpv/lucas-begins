@@ -26,18 +26,18 @@ export default function AdminTabs({
 
   return (
     <div className={cn(
-      "p-2 rounded-[1.5rem] md:rounded-[2.5rem] border-4 mb-8 md:mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-1 md:gap-2 backdrop-blur-md transition-all",
-      isDark ? "bg-gray-900/40 border-gray-800/50" : "bg-gray-100/60 border-gray-200"
+      "p-2 rounded-none border-4 border-black mb-8 md:mb-10 flex flex-wrap items-center justify-center lg:justify-start gap-1 md:gap-2 transition-all shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+      isDark ? "bg-[#1f1d35] text-white" : "bg-white text-black"
     )}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            "relative flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-[1rem] md:rounded-[1.8rem] font-retro text-[10px] md:text-sm font-bold uppercase tracking-widest transition-all duration-300 flex-1 min-w-[120px] md:flex-initial",
+            "relative flex items-center justify-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-none font-retro text-[10px] md:text-sm font-bold uppercase tracking-widest transition-all duration-300 flex-1 min-w-[120px] md:flex-initial border-2 border-transparent",
             activeTab === tab.id 
-              ? (isDark ? "bg-purple-600 text-white shadow-lg shadow-purple-900/40" : "bg-purple-600 text-white shadow-lg shadow-purple-200")
-              : (isDark ? "text-gray-400 hover:text-white hover:bg-gray-800/50" : "text-gray-500 hover:text-purple-600 hover:bg-white")
+              ? "bg-purple-600 text-white border-black shadow-[4px_4px_0_rgba(0,0,0,1)]"
+              : (isDark ? "text-gray-400 hover:text-white hover:bg-gray-800/50" : "text-gray-500 hover:text-purple-600 hover:bg-gray-100")
           )}
         >
           <tab.icon size={14} className="md:size-4" />

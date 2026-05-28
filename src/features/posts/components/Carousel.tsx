@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { calculateReadingTime, cn, coverBgStyle, formatNumber, slugify } from "../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 import { Post } from "../schemas";
+import { useThemeStore } from "../../../store/useThemeStore";
 
 interface CarouselProps {
   posts: Post[];
@@ -18,6 +19,7 @@ const AUTOPLAY_INTERVAL = 6000;
  * strip de thumbnails de prévia, barra de progresso segmentada, swipe e teclado.
  */
 export default function Carousel({ posts }: CarouselProps) {
+  const { isDark } = useThemeStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
@@ -97,7 +99,10 @@ export default function Carousel({ posts }: CarouselProps) {
 
   return (
     <div
-      className="relative rounded-3xl overflow-hidden group/carousel select-none shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
+      className={cn(
+        "relative rounded-none overflow-hidden group/carousel select-none shadow-[6px_6px_0px_rgba(0,0,0,1)] border-2 border-black",
+        isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+      )}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={onTouchStart}
@@ -220,13 +225,13 @@ export default function Carousel({ posts }: CarouselProps) {
 
       {/* Pause indicator */}
       {isPaused && posts.length > 1 && (
-        <div className="absolute top-4 right-4 px-2.5 py-1 rounded-lg bg-black/60 text-white text-[10px] font-retro font-bold uppercase tracking-wider border border-white/15 backdrop-blur-sm z-30">
+        <div className="absolute top-4 right-4 px-2.5 py-1 rounded-none bg-black/60 text-white text-[10px] font-retro font-bold uppercase tracking-wider border border-white/15 backdrop-blur-sm z-30">
           ⏸ Pausado
         </div>
       )}
 
       {/* Absolute Border Overlay to mask jagged corners and bleeding images */}
-      <div className="absolute inset-0 rounded-3xl border-2 border-black dark:border-purple-500/20 pointer-events-none z-[25]" />
+      <div className="absolute inset-0 rounded-none border-2 border-black pointer-events-none z-[25]" />
     </div>
   );
 }

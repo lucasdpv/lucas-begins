@@ -30,13 +30,13 @@ export default function AdminStats({
         <div
           key={stat.label}
           className={cn(
-            "p-4 md:p-6 rounded-[1.5rem] md:rounded-[2.5rem] border-4 flex flex-col sm:flex-row items-center sm:items-center gap-3 md:gap-5 transition-all group text-center sm:text-left",
+            "p-4 md:p-6 rounded-none border-4 border-black flex flex-col sm:flex-row items-center sm:items-center gap-3 md:gap-5 transition-all group text-center sm:text-left shadow-[6px_6px_0px_rgba(0,0,0,1)]",
             isDark 
-              ? "bg-gray-800/40 border-gray-700/50 hover:border-purple-500/50 shadow-xl shadow-purple-900/5" 
-              : "bg-white border-gray-100 hover:border-purple-200 shadow-xl shadow-black/5"
+              ? "bg-[#1f1d35] text-white" 
+              : "bg-white text-black"
           )}
         >
-          <div className={cn("p-3 md:p-4 rounded-xl md:rounded-2xl transition-transform group-hover:scale-110 duration-300", stat.bg, stat.color)}>
+          <div className={cn("p-3 md:p-4 rounded-none border-2 border-black transition-transform group-hover:scale-110 duration-300", stat.bg, stat.color)}>
             <stat.icon size={20} className="md:size-[26px]" />
           </div>
           <div>

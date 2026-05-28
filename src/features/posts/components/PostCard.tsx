@@ -102,15 +102,15 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const targetPath = `/post/${targetSlug}`;
   const cardStyles = getCategoryCardStyles(post.category);
 
-  // Variant Compact: Mantém estrutura em caixa clássica de glassmorphism para tabelas de administração e painéis
+  // Variant Compact: Design Card Contido
   if (isCompact) {
     return (
       <article
         className={cn(
-          "flex flex-col h-full group relative overflow-hidden rounded-2xl border transition-all duration-300 glass-card glass-card-hover shadow-[4px_4px_0px_rgba(0,0,0,0.05)]",
-          isDark ? "border-purple-500/10" : "border-black/5",
-          cardStyles.hoverBorder,
-          cardStyles.hoverShadow
+          "flex flex-col h-full group relative overflow-hidden rounded-none border-2 transition-all duration-300 hover:translate-y-[-4px]",
+          isDark
+            ? "bg-[#1f1d35] border-black text-gray-100 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(168,85,247,1)] hover:border-black"
+            : "bg-white border-black text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(168,85,247,1)] hover:border-black"
         )}
       >
         <Link 
@@ -143,7 +143,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         <div className="flex flex-col flex-grow p-3 relative z-10 pointer-events-none">
           <h3 className={cn(
             "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300 text-xs mb-2",
-            cardStyles.textHover
+            "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+            isDark ? "text-gray-100" : "text-gray-900"
           )}>
             {post.title}
           </h3>
@@ -182,12 +183,10 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   return (
     <article
       className={cn(
-        "flex flex-col h-full group relative overflow-hidden rounded-3xl border-2 transition-all duration-300 hover:translate-y-[-4px] glass-card",
+        "flex flex-col h-full group relative overflow-hidden rounded-none border-2 transition-all duration-300 hover:translate-y-[-4px]",
         isDark
-          ? "border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] hover:border-purple-400/40"
-          : "border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black/70",
-        cardStyles.hoverBorder,
-        cardStyles.hoverShadow
+          ? "bg-[#1f1d35] border-black text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black"
+          : "bg-white border-black text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black"
       )}
     >
       <Link
@@ -230,27 +229,11 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         {/* CRT Scanlines Overlay */}
         <div className="absolute inset-0 scanline-overlay opacity-20 group-hover:opacity-45 transition-opacity duration-300 z-10" />
 
-        {/* Score Badge floating top-right */}
-        {post.score && (
-          <div className="absolute top-3 right-3 z-20">
-            <ScoreBadge score={post.score} />
-          </div>
-        )}
-
-        {/* Categoria pill — canto inferior esquerdo sobre a imagem */}
-        {showCategory && (
-          <div className="absolute bottom-3 left-3 z-20 pointer-events-none">
-            <span className={cn(
-              "text-[9px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded border",
-              cardStyles.textLabel,
-              isDark
-                ? "bg-black/70 border-white/10 backdrop-blur-sm"
-                : "bg-white/80 border-black/10 backdrop-blur-sm"
-            )}>
-              {post.category}
-            </span>
-          </div>
-        )}
+        {/* Category & Score Badges side-by-side at top-left */}
+        <div className="absolute top-3 left-3 flex gap-2 flex-wrap z-20 pointer-events-none">
+          {showCategory && <CategoryBadge size="sm">{post.category}</CategoryBadge>}
+          {post.score && <ScoreBadge score={post.score} size="sm" />}
+        </div>
       </div>
 
       {/* Conteúdo dentro do card */}
@@ -262,7 +245,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
         <h3 className={cn(
           "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2 text-sm md:text-base lg:text-[17px]",
-          cardStyles.textHover,
+          "group-hover:text-purple-500 dark:group-hover:text-purple-400",
           isDark ? "text-gray-100" : "text-gray-900"
         )}>
           {post.title}

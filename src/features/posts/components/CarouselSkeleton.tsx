@@ -36,7 +36,7 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
         {/* ── Carrossel (col-span-2) ── */}
         <div className="lg:col-span-2">
           <div className={cn(
-            "relative rounded-3xl border-2 border-black dark:border-purple-500/15 overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card",
+            "relative rounded-none border-2 border-black overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)]",
             skeletonBg
           )}>
             {/* Área da imagem principal */}
@@ -65,17 +65,17 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
 
               {/* Seta esquerda */}
               <div className={cn(
-                "absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-xl border-2 border-white/20",
+                "absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-none border-2 border-white/20",
                 "bg-black/40"
               )} />
               {/* Seta direita */}
               <div className={cn(
-                "absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-xl border-2 border-white/20",
+                "absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-none border-2 border-white/20",
                 "bg-black/40"
               )} />
 
               {/* Dots de navegação overlay no canto inferior direito */}
-              <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-10 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-2xl border border-white/10 backdrop-blur-md">
+              <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-10 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-none border border-white/10 backdrop-blur-md">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
@@ -95,7 +95,7 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
         {/* ── Sidebar Em Alta (col-span-1) — apenas desktop ── */}
         <aside className="hidden lg:block lg:col-span-1">
           <div className={cn(
-            "h-full lg:h-[560px] p-6 rounded-3xl flex flex-col justify-between overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
+            "h-full lg:h-[560px] p-6 rounded-none flex flex-col justify-between overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]"
           )}>
             {/* 5 itens da lista */}
             {[1, 2, 3, 4, 5].map((i) => (

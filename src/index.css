@@ -207,6 +207,15 @@
   animation: fadeIn 0.5s ease-out forwards;
 }
 
+@keyframes bgFadeIn {
+  from { opacity: 0; }
+}
+
+.animate-bg-fade {
+  animation: bgFadeIn 0.4s ease-out;
+}
+
+
 @keyframes loading {
   0% { transform: translateX(-100%); }
   50% { transform: translateX(0); }
@@ -263,8 +272,8 @@
 
 /* Fundos Premium Mesh - Fiel ao SNES Purple / Retro */
 .bg-dark-mesh {
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.18) 0%, rgba(22, 21, 38, 0.98) 50%, rgba(19, 18, 30, 1) 100%);
-  background-color: #131222;
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(20, 26, 42, 0.95) 50%, rgba(17, 24, 39, 1) 100%);
+  background-color: #111827;
 }
 
 .bg-light-mesh {
@@ -347,7 +356,7 @@
    Google Translate Styling Resets (Ultra-Clean Page Translation)
    ============================================================ */
 html, body {
-  background-color: #131222; /* dark: obsidiana soft */
+  background-color: #111827; /* dark: bg-gray-900 */
   color: #e5e7eb; /* dark: text-gray-200 */
 }
 

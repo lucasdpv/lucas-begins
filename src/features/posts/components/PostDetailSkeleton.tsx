@@ -47,7 +47,7 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
         )}>
           {/* Autor */}
           <div className="flex items-center gap-4">
-            <div className={cn("w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-14 h-14 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
             <div className="space-y-2">
               <div className={cn("w-36 h-5 rounded", accentColor)} />
               <div className={cn("w-48 h-3 rounded", skeletonColor)} />
@@ -55,10 +55,10 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
           </div>
           {/* Ações (share, like, views, login) */}
           <div className="flex items-center gap-3">
-            <div className={cn("w-12 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-24 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-20 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-24 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-12 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-24 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-20 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-24 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
           </div>
         </div>
 
@@ -123,10 +123,8 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
               <div 
                 key={i}
                 className={cn(
-                  "flex flex-col h-56 rounded-3xl border-2 overflow-hidden glass-card",
-                  isDark
-                    ? "border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
-                    : "border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+                  "flex flex-col h-56 rounded-none border-2 border-black overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+                  isDark ? "bg-[#1f1d35]" : "bg-white"
                 )}
               >
                 <div className={cn("w-full aspect-video shrink-0 relative overflow-hidden bg-gray-900", skeletonColor)} />

@@ -131,6 +131,7 @@ export default function HomePage() {
   const [dossieScroll, setDossieScroll] = useState({ left: false, right: true });
   const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
   const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
+  const [hoveredMaisLidosIndex, setHoveredMaisLidosIndex] = useState<number>(0);
 
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
     if (ref.current) {
@@ -242,6 +243,8 @@ export default function HomePage() {
     ? latestPosts.slice(0, 6) 
     : paginatedPosts.slice(0, 6);
 
+  const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
+
   const isLoadingPosts = isSearching 
     ? isLoadingAll 
     : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe || isLoadingLatest);
@@ -288,13 +291,13 @@ export default function HomePage() {
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
-              <div>
-                <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
+            <div className="flex items-stretch gap-3.5">
+              <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.75)]" : "bg-purple-600")} />
+              <div className="flex flex-col justify-center">
+                <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow")}>
                   Em Destaque
                 </h2>
-                <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                   Seleção Editorial
                 </span>
               </div>
@@ -304,13 +307,13 @@ export default function HomePage() {
 
           {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
           <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
-              <div>
-                <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
+            <div className="flex items-stretch gap-3.5">
+              <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.75)]" : "bg-amber-500")} />
+              <div className="flex flex-col justify-center">
+                <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-amber")}>
                   Mais Lidos
                 </h2>
-                <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+                <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                   Em Alta no Portal
                 </span>
               </div>
@@ -318,17 +321,37 @@ export default function HomePage() {
             
             <div
               className={cn(
-                "h-full lg:h-[560px] p-6 rounded-3xl flex flex-col relative overflow-hidden transition-all duration-300 glass-card border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
+                "h-full lg:h-[560px] p-6 rounded-none flex flex-col relative overflow-hidden transition-all duration-300 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+                isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
               )}
+              onMouseLeave={() => setHoveredMaisLidosIndex(0)}
             >
               {isDark && (
-                <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none z-0" />
               )}
+              
+              {/* Background Image Fade on Right Half */}
+              {activeMaisLidosPost?.imageUrl && (
+                <div
+                  key={activeMaisLidosPost.id}
+                  className={cn(
+                    "absolute right-0 top-0 bottom-0 w-1/2 bg-cover bg-center pointer-events-none transition-all duration-500 z-0 animate-bg-fade",
+                    isDark ? "opacity-20" : "opacity-[0.12]"
+                  )}
+                  style={{
+                    backgroundImage: `url(${activeMaisLidosPost.imageUrl})`,
+                    maskImage: "linear-gradient(to right, transparent, black)",
+                    WebkitMaskImage: "linear-gradient(to right, transparent, black)",
+                  }}
+                />
+              )}
+
               <div className="flex flex-col justify-between h-full relative z-10 gap-3">
                 {mostViewedPosts.map((post, idx) => (
                   <Link
                     key={post.id}
                     to={`/post/${post.slug || slugify(post.title)}`}
+                    onMouseEnter={() => setHoveredMaisLidosIndex(idx)}
                     className={cn(
                       "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
                       isDark ? "border-white/5" : "border-black/5"
@@ -366,13 +389,13 @@ export default function HomePage() {
           {/* Divisor sutil entre Carrossel e Mais Lidos no mobile */}
           <div className={cn("h-px mb-6 -mt-2", isDark ? "bg-white/5" : "bg-black/8")} />
 
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
-            <div>
-              <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
+          <div className="flex items-stretch gap-3.5">
+            <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.75)]" : "bg-amber-500")} />
+            <div className="flex flex-col justify-center">
+              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-amber")}>
                 Mais Lidos
               </h2>
-              <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+              <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                 Em Alta no Portal
               </span>
             </div>
@@ -391,7 +414,8 @@ export default function HomePage() {
                     key={post.id}
                     to={`/post/${targetSlug}`}
                     className={cn(
-                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
+                      "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-full sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black",
+                      isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                     )}
                   >
                     {/* Imagem */}
@@ -467,15 +491,15 @@ export default function HomePage() {
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title"
+                    className="flex items-stretch gap-3.5 cursor-pointer group/title"
                     onClick={() => goToCategory("RetroCafé")}
                   >
-                    <div className="w-1 h-6 rounded-none bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] group-hover/title:shadow-[0_0_16px_rgba(249,115,22,0.85)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                    <div className="w-2 rounded-none shrink-0 bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_18px_rgba(249,115,22,0.95)] transition-all" />
+                    <div className="flex flex-col justify-center">
+                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         RetroCafé
                       </h2>
-                      <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-0.5">
+                      <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                         Crônicas &amp; Nostalgia
                       </span>
                     </div>
@@ -510,7 +534,7 @@ export default function HomePage() {
                         </motion.div>
                       ))
                     ) : (
-                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 glass-card border-black/10 dark:border-white/10", isDark ? "text-slate-500" : "text-slate-400")}>
+                      <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <Coffee className="w-8 h-8 opacity-40 animate-pulse text-orange-500" />
                         <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum cartucho de RetroCafé inserido no slot</span>
                       </div>
@@ -547,15 +571,15 @@ export default function HomePage() {
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title"
+                    className="flex items-stretch gap-3.5 cursor-pointer group/title"
                     onClick={() => goToCategory("Dossiês")}
                   >
-                    <div className="w-1 h-6 rounded-none bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)] group-hover/title:shadow-[0_0_16px_rgba(59,130,246,0.85)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                    <div className="w-2 rounded-none shrink-0 bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_18px_rgba(59,130,246,0.95)] transition-all" />
+                    <div className="flex flex-col justify-center">
+                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         Dossiês
                       </h2>
-                      <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-0.5">
+                      <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                         Reportagens Especiais
                       </span>
                     </div>
@@ -590,7 +614,7 @@ export default function HomePage() {
                         </motion.div>
                       ))
                     ) : (
-                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 glass-card border-black/10 dark:border-white/10", isDark ? "text-slate-500" : "text-slate-400")}>
+                      <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <FolderOpen className="w-8 h-8 opacity-40 animate-pulse text-blue-500" />
                         <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum dossiê secreto decodificado até o momento</span>
                       </div>
@@ -628,15 +652,15 @@ export default function HomePage() {
               {/* Cabeçalho */}
               <div className="flex items-center justify-between">
                 <div
-                  className="flex items-center gap-3 cursor-pointer group/title"
+                  className="flex items-stretch gap-3.5 cursor-pointer group/title"
                   onClick={() => goToCategory("Reviews")}
                 >
-                  <div className="w-1 h-6 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.6)] group-hover/title:shadow-[0_0_16px_rgba(234,179,8,0.85)] transition-all" />
-                  <div>
-                    <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                  <div className="w-2 rounded-none shrink-0 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_18px_rgba(234,179,8,0.95)] transition-all" />
+                  <div className="flex flex-col justify-center">
+                    <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wider leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                       Reviews
                     </h2>
-                    <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-0.5">
+                    <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                       Análises com Nota
                     </span>
                   </div>
@@ -661,14 +685,13 @@ export default function HomePage() {
                   {displayReviews.length > 0 ? (
                     displayReviews.map((post) => {
                       const targetSlug = post.slug || slugify(post.title);
-                      const scoreNum = parseFloat(String(post.score ?? 0));
-                      const scorePercent = Math.min(100, (scoreNum / 10) * 100);
                       return (
                         <Link
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
+                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-full sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black",
+                            isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                           )}
                         >
                           {/* Imagem */}
@@ -683,31 +706,27 @@ export default function HomePage() {
                             <div className="absolute inset-0 bg-gradient-to-br from-yellow-700/20 to-amber-900/30" />
                           )}
                           {/* Gradiente */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-[5]" />
 
-                          {/* Score badge */}
-                          <div className="absolute top-3 right-3 z-20 px-2 py-0.5 rounded font-retro font-black text-[11px] bg-black/75 border border-yellow-400/60 text-yellow-400 backdrop-blur-sm shadow-[0_0_8px_rgba(234,179,8,0.25)] group-hover/item:bg-yellow-400 group-hover/item:text-black transition-all duration-300">
-                            ★ {post.score ?? "—"}
+                          {/* Score badge at top left */}
+                          {post.score && (
+                            <ScoreBadge
+                              score={post.score}
+                              size="sm"
+                              className="absolute top-3 left-3 z-20 pointer-events-none"
+                            />
+                          )}
+
+                          {/* Category badge "REVIEWS" at top right */}
+                          <div className="absolute top-3 right-3 z-20 px-2 py-0.5 font-retro font-black text-[9px] uppercase tracking-widest bg-black/75 border border-yellow-400/60 text-yellow-400 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                            Reviews
                           </div>
 
                           {/* Conteúdo */}
-                          <div className="relative z-10 space-y-1">
-                            <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
+                          <div className="relative z-10">
+                            <h4 className="font-retro font-bold text-xs md:text-sm text-white group-hover/item:text-yellow-400 transition-colors leading-snug line-clamp-2">
                               {post.title}
                             </h4>
-                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
-                              <span>{formatNumber(post.views || 0)} views</span>
-                              <span>·</span>
-                              <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
-                            </div>
-                            {post.score && (
-                              <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden mt-1.5">
-                                <div
-                                  className="h-full bg-gradient-to-r from-yellow-500 to-amber-300 rounded-full opacity-75 group-hover/item:opacity-100 transition-opacity"
-                                  style={{ width: `${scorePercent}%` }}
-                                />
-                              </div>
-                            )}
                           </div>
                         </Link>
                       );
@@ -751,10 +770,10 @@ export default function HomePage() {
           "flex items-center justify-between pb-5",
           isDark ? "border-b border-white/5" : "border-b border-black/10"
         )}>
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-            <div>
-              <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
+          <div className="flex items-stretch gap-3.5">
+            <div className={cn("w-2 rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.75)]" : "bg-blue-600")} />
+            <div className="flex flex-col justify-center">
+              <h2 className={cn("font-retro text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wider leading-none", isDark && "text-glow-blue")}>
                 {isLoadingPosts
                   ? "Carregando..."
                   : searchQuery
@@ -763,7 +782,7 @@ export default function HomePage() {
                   ? activeCategory
                   : "Últimas Notícias"}
               </h2>
-              <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1">
+              <span className="text-[10px] md:text-xs font-retro font-bold uppercase tracking-wider text-slate-500 block mt-1.5">
                 Mais Recentes do Portal
               </span>
             </div>
@@ -804,7 +823,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className={cn("p-12 text-center rounded-3xl border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
+          <div className={cn("p-12 text-center rounded-none border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
             <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500 animate-pulse" />
             <p className="font-retro font-bold uppercase text-sm">Nenhum artigo encontrado.</p>
           </div>
