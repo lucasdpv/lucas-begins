@@ -307,7 +307,7 @@ export default function HomePage() {
           </div>
 
           {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
-          <div className="lg:col-span-1 flex flex-col gap-4">
+          <div className="hidden md:flex lg:col-span-1 flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
               <div>
