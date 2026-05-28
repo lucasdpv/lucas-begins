@@ -1055,8 +1055,8 @@ export default function HomePage() {
                                 isHovered ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" : "border-black"
                               )}
                             >
-                              {/* 1. Left Side: Content Booklet (48% width) */}
-                              <div className="w-[48%] p-3 flex flex-col justify-between relative z-20 min-w-0">
+                              {/* 1. Left Side: Content Booklet (50% width) */}
+                              <div className="w-[50%] p-3 flex flex-col justify-between relative z-20 min-w-0">
                                 <div>
                                   <div className="flex items-center gap-1.5">
                                     <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
@@ -1069,7 +1069,7 @@ export default function HomePage() {
                                     )} />
                                   </div>
 
-                                  <h4 className="font-retro font-bold text-[11px] sm:text-xs leading-snug line-clamp-2 mt-1 transition-colors duration-300">
+                                  <h4 className="font-retro font-bold text-xs sm:text-[13px] leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
                                     <span className={cn(
                                       isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
                                     )}>
@@ -1079,7 +1079,7 @@ export default function HomePage() {
                                 </div>
 
                                 {/* Footer details (Score badge only) */}
-                                <div className="border-t border-black/10 dark:border-white/10 pt-1.5 mt-1 flex justify-start">
+                                <div className="border-t border-black/10 dark:border-white/10 pt-1.5 mt-1.5 flex justify-start">
                                   {post.score && (
                                     <div className={cn(
                                       "inline-flex items-center gap-1 text-black px-2 py-0.5 font-retro font-black text-[10px] sm:text-[11px] border-2 border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none transition-all duration-300",
@@ -1091,9 +1091,9 @@ export default function HomePage() {
                                 </div>
                               </div>
 
-                              {/* 2. Right Side: Game Artwork with Fade-out (52% width) */}
+                              {/* 2. Right Side: Game Artwork with Fade-out (absolute right overlay, 65% width) */}
                               {post.imageUrl && (
-                                <div className="w-[52%] h-full relative shrink-0 overflow-hidden select-none bg-black">
+                                <div className="absolute right-0 top-0 bottom-0 w-[65%] h-full select-none bg-black z-10 overflow-hidden">
                                   <img
                                     src={post.imageUrl}
                                     alt={post.title}
@@ -1102,7 +1102,7 @@ export default function HomePage() {
                                   />
                                   {/* Fade gradient overlay that blends into the background */}
                                   <div className={cn(
-                                    "absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r z-10 pointer-events-none",
+                                    "absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r z-10 pointer-events-none",
                                     fadeGradientClass
                                   )} />
                                   
