@@ -751,7 +751,7 @@ export default function HomePage() {
               {/* ── Dossiês ── */}
               <div 
                 className={cn(
-                  "px-4 pb-4 pt-8 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
@@ -844,7 +844,7 @@ export default function HomePage() {
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-5 scrollbar-hide snap-x snap-mandatory w-full pt-4"
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4"
                   >
                     {displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
