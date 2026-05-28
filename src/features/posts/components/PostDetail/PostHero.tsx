@@ -13,11 +13,22 @@ export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
   return (
     <div
       className={cn(
-        "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden flex items-center justify-center border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card",
+        "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden flex items-center justify-center shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card translate-z-0",
         (!post.imageUrl || imgError) && `bg-gradient-to-br ${(post as any).gradient || 'from-gray-900 to-purple-900'}`
       )}
-      style={heroStyle}
     >
+      {post.imageUrl && !imgError && (
+        <img
+          src={post.imageUrl}
+          alt={post.title}
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          style={{ objectPosition: post.imagePosition || "center" }}
+        />
+      )}
+      
+      {/* CRT Scanline Overlay (Website visual identity restored) */}
+      <div className="absolute inset-0 scanline-overlay opacity-30 pointer-events-none z-[6]" />
+      
       {imgError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 bg-black/60">
           <div className="text-red-500 font-retro text-2xl md:text-4xl mb-4 animate-pulse border-2 border-red-500 px-6 py-2 rounded bg-black/80">
@@ -31,6 +42,9 @@ export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
       
+      {/* Absolute Border Overlay to mask any jagged corners or image bleeding */}
+      <div className="absolute inset-0 rounded-3xl border-2 border-black dark:border-purple-500/30 pointer-events-none z-[12]" />
+
       <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-12 text-white w-full z-[10] pointer-events-none text-center md:text-left">
         <div className="flex flex-row flex-wrap justify-center md:justify-start items-center gap-3 mb-4 md:mb-6 pointer-events-auto">
           <CategoryBadge size="md" className="shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black">

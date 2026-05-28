@@ -232,7 +232,6 @@
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   background: rgba(245, 240, 252, 0.85);
-  border: 1px solid rgba(45, 27, 105, 0.18);
   box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.08);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -240,7 +239,6 @@
 /* Glassmorphism Dark Mode (Ativado quando HTML tem classe .dark) */
 .dark .glass-card {
   background: rgba(18, 18, 30, 0.72);
-  border: 1px solid rgba(168, 85, 247, 0.3);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
 }
 

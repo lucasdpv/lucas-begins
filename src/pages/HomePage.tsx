@@ -247,15 +247,7 @@ export default function HomePage() {
     : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe || isLoadingLatest);
 
   return (
-    <div className="flex flex-col gap-8 md:gap-12 relative z-0">
-      {/* Ambient Glows */}
-      {isDark && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-[20%] left-[-15%] w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[120px] animate-pulse duration-[8000ms]" />
-          <div className="absolute top-[50%] right-[-15%] w-[450px] h-[450px] bg-blue-600/5 rounded-full blur-[130px] animate-pulse duration-[10000ms]" />
-          <div className="absolute top-[80%] left-[10%] w-[350px] h-[350px] bg-amber-500/3 rounded-full blur-[110px] animate-pulse duration-[12000ms]" />
-        </div>
-      )}
+    <div className="flex flex-col gap-8 md:gap-12 relative">
       {/* ── SEO ─────────────────────────────────────────── */}
       <Helmet>
         <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
@@ -399,7 +391,7 @@ export default function HomePage() {
                     key={post.id}
                     to={`/post/${targetSlug}`}
                     className={cn(
-                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
+                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
                     )}
                   >
                     {/* Imagem */}
@@ -512,7 +504,7 @@ export default function HomePage() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-[85vw] sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
+                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
                         >
                           <PostCard post={post} showCategory={false} />
                         </motion.div>
@@ -592,7 +584,7 @@ export default function HomePage() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-[85vw] sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
+                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
                         >
                           <PostCard post={post} showCategory={false} />
                         </motion.div>
@@ -676,7 +668,7 @@ export default function HomePage() {
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
+                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-full sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
                           )}
                         >
                           {/* Imagem */}

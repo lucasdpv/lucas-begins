@@ -97,7 +97,7 @@ export default function Carousel({ posts }: CarouselProps) {
 
   return (
     <div
-      className="relative rounded-3xl overflow-hidden group/carousel select-none border-2 border-black dark:border-purple-500/20 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
+      className="relative rounded-3xl overflow-hidden group/carousel select-none shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={onTouchStart}
@@ -189,7 +189,7 @@ export default function Carousel({ posts }: CarouselProps) {
         )}
         {/* Slide Indicators & Progress (Bottom-Right overlay) */}
         {posts.length > 1 && (
-          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-30 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-md border border-white/10">
+          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-30 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-md border border-white/15">
             {posts.map((post, idx) => {
               const isActive = idx === currentIndex;
               return (
@@ -224,6 +224,9 @@ export default function Carousel({ posts }: CarouselProps) {
           ⏸ Pausado
         </div>
       )}
+
+      {/* Absolute Border Overlay to mask jagged corners and bleeding images */}
+      <div className="absolute inset-0 rounded-3xl border-2 border-black dark:border-purple-500/20 pointer-events-none z-[25]" />
     </div>
   );
 }
