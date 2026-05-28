@@ -1015,7 +1015,7 @@ export default function HomePage() {
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex sm:grid lg:flex-col sm:grid-cols-2 gap-3 overflow-x-auto sm:overflow-x-visible lg:overflow-x-visible pb-4 sm:pb-0 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
+                    className="flex sm:grid lg:flex lg:flex-col sm:grid-cols-2 gap-3 overflow-x-auto sm:overflow-x-visible lg:overflow-x-visible pb-4 sm:pb-0 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
                     {displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
@@ -1035,7 +1035,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto h-28 lg:h-32 shrink-0 snap-center transition-all duration-300 relative",
+                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto lg:w-full h-28 lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-center transition-all duration-300 relative",
                               isAnyHovered && !isHovered
                                 ? "opacity-65 scale-[0.99] blur-[0.2px]"
                                 : isHovered
