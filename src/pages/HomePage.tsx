@@ -351,7 +351,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                   {displayRetrocafe.length > 0 ? (
                     displayRetrocafe.map((post, i) => (
                       <motion.div
@@ -359,6 +359,7 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                        className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
                       >
                         <PostCard post={post} />
                       </motion.div>
@@ -398,7 +399,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards Dossiês */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                   {displayDossie.length > 0 ? (
                     displayDossie.map((post, i) => (
                       <motion.div
@@ -406,6 +407,7 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                        className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
                       >
                         <PostCard post={post} />
                       </motion.div>
@@ -443,7 +445,7 @@ export default function HomePage() {
               </div>
 
               {/* Cards Reviews */}
-              <div className="flex flex-col gap-4">
+              <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                 {displayReviews.length > 0 ? (
                   displayReviews.map((post) => {
                     const targetSlug = post.slug || slugify(post.title);
@@ -454,7 +456,7 @@ export default function HomePage() {
                         key={post.id}
                         to={`/post/${targetSlug}`}
                         className={cn(
-                          "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card"
+                          "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
                         )}
                       >
                         {/* Imagem */}
