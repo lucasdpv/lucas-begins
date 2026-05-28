@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react";
-import { Gamepad2, ChevronRight, LayoutGrid, Map, Layers } from "lucide-react";
+import React, { useEffect, useCallback, useRef } from "react";
+import { Gamepad2, ChevronRight, ChevronLeft, LayoutGrid, Map, Layers } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -121,6 +121,20 @@ export default function HomePage() {
     }
   };
 
+
+  const retrocafeRef = useRef<HTMLDivElement>(null);
+  const dossieRef = useRef<HTMLDivElement>(null);
+  const reviewsRef = useRef<HTMLDivElement>(null);
+
+  const scrollContainer = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
+    if (ref.current) {
+      const scrollAmount = ref.current.clientWidth * 0.8;
+      ref.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth"
+      });
+    }
+  }, []);
 
   const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
   const navigate = useNavigate();
@@ -330,11 +344,11 @@ export default function HomePage() {
               {/* ── RetroCafé ── */}
               <div className="space-y-5">
                 {/* Cabeçalho */}
-                <div
-                  className="flex items-center justify-between cursor-pointer group/title"
-                  onClick={() => goToCategory("RetroCafé")}
-                >
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer group/title"
+                    onClick={() => goToCategory("RetroCafé")}
+                  >
                     <div className="w-1 h-6 rounded-none bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] group-hover/title:shadow-[0_0_16px_rgba(249,115,22,0.85)] transition-all" />
                     <div>
                       <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
@@ -345,13 +359,36 @@ export default function HomePage() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-retro font-bold uppercase text-slate-500 group-hover/title:text-orange-400 flex items-center gap-1 transition-colors">
-                    Ver mais <ChevronRight className="w-3 h-3" />
-                  </span>
+                  <div className="flex items-center gap-3">
+                    {/* Indicadores de Scroll Mobile */}
+                    <div className="flex md:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrollContainer(retrocafeRef, "left"); }}
+                        className="p-1 hover:text-orange-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                        aria-label="Deslizar esquerda"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrollContainer(retrocafeRef, "right"); }}
+                        className="p-1 hover:text-orange-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                        aria-label="Deslizar direita"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <span 
+                      onClick={() => goToCategory("RetroCafé")}
+                      className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-orange-400 flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      Ver mais <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
+                <div ref={retrocafeRef} className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                   {displayRetrocafe.length > 0 ? (
                     displayRetrocafe.map((post, i) => (
                       <motion.div
@@ -378,11 +415,11 @@ export default function HomePage() {
               {/* ── Dossiês ── */}
               <div className="space-y-5">
                 {/* Cabeçalho */}
-                <div
-                  className="flex items-center justify-between cursor-pointer group/title"
-                  onClick={() => goToCategory("Dossiês")}
-                >
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer group/title"
+                    onClick={() => goToCategory("Dossiês")}
+                  >
                     <div className="w-1 h-6 rounded-none bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)] group-hover/title:shadow-[0_0_16px_rgba(59,130,246,0.85)] transition-all" />
                     <div>
                       <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
@@ -393,13 +430,36 @@ export default function HomePage() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-retro font-bold uppercase text-slate-500 group-hover/title:text-blue-400 flex items-center gap-1 transition-colors">
-                    Ver mais <ChevronRight className="w-3 h-3" />
-                  </span>
+                  <div className="flex items-center gap-3">
+                    {/* Indicadores de Scroll Mobile */}
+                    <div className="flex md:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrollContainer(dossieRef, "left"); }}
+                        className="p-1 hover:text-blue-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                        aria-label="Deslizar esquerda"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrollContainer(dossieRef, "right"); }}
+                        className="p-1 hover:text-blue-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                        aria-label="Deslizar direita"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <span 
+                      onClick={() => goToCategory("Dossiês")}
+                      className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-blue-400 flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      Ver mais <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
 
                 {/* Cards Dossiês */}
-                <div className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
+                <div ref={dossieRef} className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                   {displayDossie.length > 0 ? (
                     displayDossie.map((post, i) => (
                       <motion.div
@@ -424,11 +484,11 @@ export default function HomePage() {
             {/* ── DIREITA (1/3): Reviews ── */}
             <div className="lg:col-span-1 flex flex-col gap-5">
               {/* Cabeçalho */}
-              <div
-                className="flex items-center justify-between cursor-pointer group/title"
-                onClick={() => goToCategory("Reviews")}
-              >
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between">
+                <div
+                  className="flex items-center gap-3 cursor-pointer group/title"
+                  onClick={() => goToCategory("Reviews")}
+                >
                   <div className="w-1 h-6 rounded-none bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.6)] group-hover/title:shadow-[0_0_16px_rgba(234,179,8,0.85)] transition-all" />
                   <div>
                     <h2 className={cn("font-retro text-xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
@@ -439,13 +499,36 @@ export default function HomePage() {
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] font-retro font-bold uppercase text-slate-500 group-hover/title:text-yellow-400 flex items-center gap-1 transition-colors">
-                  Ver mais <ChevronRight className="w-3 h-3" />
-                </span>
+                <div className="flex items-center gap-3">
+                  {/* Indicadores de Scroll Mobile */}
+                  <div className="flex lg:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); scrollContainer(reviewsRef, "left"); }}
+                      className="p-1 hover:text-yellow-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                      aria-label="Deslizar esquerda"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); scrollContainer(reviewsRef, "right"); }}
+                      className="p-1 hover:text-yellow-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+                      aria-label="Deslizar direita"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <span 
+                    onClick={() => goToCategory("Reviews")}
+                    className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    Ver mais <ChevronRight className="w-3 h-3" />
+                  </span>
+                </div>
               </div>
 
               {/* Cards Reviews */}
-              <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
+              <div ref={reviewsRef} className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                 {displayReviews.length > 0 ? (
                   displayReviews.map((post) => {
                     const targetSlug = post.slug || slugify(post.title);
