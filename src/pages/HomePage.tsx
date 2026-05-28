@@ -608,7 +608,7 @@ export default function HomePage() {
                   <div 
                     ref={retrocafeRef} 
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex sm:grid overflow-x-auto sm:overflow-x-visible sm:grid-cols-2 md:grid-cols-3 gap-4 pb-4 sm:pb-0 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {displayRetrocafe.length > 0 ? (
                       displayRetrocafe.map((post, i) => {
@@ -620,7 +620,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always transition-all duration-300",
+                              "w-full sm:w-auto shrink-0 snap-start snap-always transition-all duration-300",
                               hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
                                 ? "opacity-50 scale-[0.96] blur-[0.4px]"
                                 : hoveredRetrocafeIndex === i
@@ -730,7 +730,7 @@ export default function HomePage() {
                   {retrocafeScroll.left && (
                     <button
                       onClick={() => scrollContainer(retrocafeRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar esquerda"
                     >
                       <ChevronLeft className="w-5 h-5 text-orange-400" />
@@ -739,7 +739,7 @@ export default function HomePage() {
                   {retrocafeScroll.right && (
                     <button
                       onClick={() => scrollContainer(retrocafeRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar direita"
                     >
                       <ChevronRight className="w-5 h-5 text-orange-400" />
@@ -846,7 +846,7 @@ export default function HomePage() {
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4"
+                    className="flex sm:grid overflow-x-auto sm:overflow-x-visible sm:grid-cols-2 md:grid-cols-3 gap-4 pb-4 sm:pb-0 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4"
                   >
                     {displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
@@ -858,7 +858,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always transition-all duration-300 relative",
+                              "w-full sm:w-auto shrink-0 snap-start snap-always transition-all duration-300 relative",
                               hoveredDossieIndex !== null && hoveredDossieIndex !== i
                                 ? "opacity-50 scale-[0.96] blur-[0.4px]"
                                 : hoveredDossieIndex === i
@@ -949,7 +949,7 @@ export default function HomePage() {
                   {dossieScroll.left && (
                     <button
                       onClick={() => scrollContainer(dossieRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar esquerda"
                     >
                       <ChevronLeft className="w-5 h-5 text-blue-400" />
@@ -958,7 +958,7 @@ export default function HomePage() {
                   {dossieScroll.right && (
                     <button
                       onClick={() => scrollContainer(dossieRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar direita"
                     >
                       <ChevronRight className="w-5 h-5 text-blue-400" />
@@ -1015,7 +1015,7 @@ export default function HomePage() {
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
+                    className="flex sm:grid lg:flex-col sm:grid-cols-2 gap-3 overflow-x-auto sm:overflow-x-visible lg:overflow-x-visible pb-4 sm:pb-0 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
                     {displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
@@ -1035,7 +1035,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "min-w-[290px] lg:min-w-0 w-full h-28 lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
+                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto h-28 lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
                               isAnyHovered && !isHovered
                                 ? "opacity-65 scale-[0.99] blur-[0.2px]"
                                 : isHovered
@@ -1124,7 +1124,7 @@ export default function HomePage() {
                   {reviewsScroll.left && (
                     <button
                       onClick={() => scrollContainer(reviewsRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar esquerda"
                     >
                       <ChevronLeft className="w-5 h-5 text-yellow-400" />
@@ -1133,7 +1133,7 @@ export default function HomePage() {
                   {reviewsScroll.right && (
                     <button
                       onClick={() => scrollContainer(reviewsRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar direita"
                     >
                       <ChevronRight className="w-5 h-5 text-yellow-400" />
@@ -1187,13 +1187,13 @@ export default function HomePage() {
 
         {/* Feed Content: Clean 3-Column Grid */}
         {isLoadingPosts ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <PostSkeleton key={i} isDark={isDark} />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
