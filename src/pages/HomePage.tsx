@@ -504,14 +504,6 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span 
-                      onClick={() => goToCategory("RetroCafé")}
-                      className="hidden md:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-orange-400 items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      Ver mais <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
                 </div>
 
                 {/* Cards RetroCafé */}
@@ -584,14 +576,6 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span 
-                      onClick={() => goToCategory("Dossiês")}
-                      className="hidden md:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-blue-400 items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      Ver mais <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
                 </div>
 
                 {/* Cards Dossiês */}
@@ -650,30 +634,22 @@ export default function HomePage() {
               <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/5")} />
 
               {/* Cabeçalho */}
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex items-center gap-3 cursor-pointer group/title"
-                  onClick={() => goToCategory("Reviews")}
-                >
-                  <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
-                  <div>
-                    <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                      Reviews
-                    </h2>
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                      Análises com Nota
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span 
-                    onClick={() => goToCategory("Reviews")}
-                    className="hidden lg:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 items-center gap-1 transition-colors cursor-pointer"
-                  >
-                    Ver mais <ChevronRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </div>
+               <div className="flex items-center justify-between">
+                 <div
+                   className="flex items-center gap-3 cursor-pointer group/title"
+                   onClick={() => goToCategory("Reviews")}
+                 >
+                   <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
+                   <div>
+                     <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                       Reviews
+                     </h2>
+                     <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
+                       Análises com Nota
+                     </p>
+                   </div>
+                 </div>
+               </div>
 
               {/* Cards Reviews */}
               <div className="relative group/scroll-container w-full lg:flex-1 lg:min-h-0 lg:flex lg:flex-col">
