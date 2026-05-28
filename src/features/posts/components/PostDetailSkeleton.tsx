@@ -118,15 +118,22 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
             <div className={cn("w-24 h-5 rounded border", skeletonColor, isDark ? "border-purple-700" : "border-purple-300")} />
           </div>
           {/* Grid de 3 cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i}>
-                <div className={cn(
-                  "h-36 md:h-40 w-full mb-3 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                  skeletonColor
-                )} />
-                <div className={cn("w-full h-4 rounded mb-2", accentColor)} />
-                <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+              <div 
+                key={i}
+                className={cn(
+                  "flex flex-col h-56 rounded-3xl border-2 overflow-hidden glass-card",
+                  isDark
+                    ? "border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
+                    : "border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+                )}
+              >
+                <div className={cn("w-full aspect-video shrink-0 relative overflow-hidden bg-gray-900", skeletonColor)} />
+                <div className="p-4 flex flex-col flex-grow gap-2">
+                  <div className={cn("w-full h-4 rounded", accentColor)} />
+                  <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+                </div>
               </div>
             ))}
           </div>

@@ -181,10 +181,10 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
   return (
     <article
       className={cn(
-        "flex flex-col h-full group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:translate-y-[-4px]",
+        "flex flex-col h-full group relative overflow-hidden rounded-3xl border-2 transition-all duration-300 hover:translate-y-[-4px] glass-card",
         isDark
-          ? "bg-[#1f1d35] border-purple-500/20 shadow-[0_4px_24px_rgba(0,0,0,0.5)] hover:border-purple-400/40 hover:shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
-          : "bg-white border-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.07)] hover:border-black/18 hover:shadow-[0_8px_28px_rgba(0,0,0,0.12)]",
+          ? "border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] hover:border-purple-400/40"
+          : "border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black/70",
         cardStyles.hoverBorder,
         cardStyles.hoverShadow
       )}

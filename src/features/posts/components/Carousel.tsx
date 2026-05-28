@@ -187,61 +187,36 @@ export default function Carousel({ posts }: CarouselProps) {
             </button>
           </>
         )}
-      </div>
-
-      {/* ── Bottom strip: thumbnails + segmented progress ── */}
-      {posts.length > 1 && (
-        <div className="flex items-stretch bg-gray-950/95 border-t border-white/5">
-          {posts.map((post, idx) => {
-            const isActive = idx === currentIndex;
-            return (
-              <button
-                key={post.id}
-                onClick={(e) => { e.stopPropagation(); goTo(idx, idx > currentIndex ? 1 : -1); }}
-                className={cn(
-                  "relative flex-1 h-14 md:h-16 overflow-hidden transition-all duration-300 focus:outline-none group/thumb",
-                  isActive ? "opacity-100" : "opacity-40 hover:opacity-70"
-                )}
-                aria-label={`Ir para slide ${idx + 1}: ${post.title}`}
-              >
-                {/* Thumbnail image */}
-                {post.imageUrl ? (
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className="absolute inset-0 w-full h-full object-cover scale-110 group-hover/thumb:scale-100 transition-transform duration-500"
-                    style={{ objectPosition: post.imagePosition || "center" }}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-800 to-slate-900" />
-                )}
-
-                {/* Dark overlay */}
-                <div className={cn(
-                  "absolute inset-0 transition-colors duration-300",
-                  isActive ? "bg-black/20" : "bg-black/50"
-                )} />
-
-                {/* Active indicator line at top */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/10">
+        {/* Slide Indicators & Progress (Bottom-Right overlay) */}
+        {posts.length > 1 && (
+          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-30 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-md border border-white/10">
+            {posts.map((post, idx) => {
+              const isActive = idx === currentIndex;
+              return (
+                <button
+                  key={post.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goTo(idx, idx > currentIndex ? 1 : -1);
+                  }}
+                  className={cn(
+                    "relative h-1.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none cursor-pointer",
+                    isActive ? "w-8 bg-white/20" : "w-3 bg-white/40 hover:bg-white/60"
+                  )}
+                  aria-label={`Ir para slide ${idx + 1}`}
+                >
                   {isActive && (
                     <div
-                      className="h-full bg-purple-500 transition-none"
+                      className="absolute inset-y-0 left-0 bg-purple-400 transition-none"
                       style={{ width: `${progress}%` }}
                     />
                   )}
-                </div>
-
-                {/* Active dot */}
-                {isActive && (
-                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-400" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Pause indicator */}
       {isPaused && posts.length > 1 && (

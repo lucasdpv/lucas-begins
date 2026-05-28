@@ -144,8 +144,8 @@ export default function HomePage() {
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
   const { data: mostViewedPosts = [], isLoading: isLoadingMostViewed } = useMostViewedPosts(5);
 
-  // 3. Reviews - Puxa no máximo 3 posts mais recentes da categoria Reviews
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 3);
+  // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5);
 
   // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
   const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3);
@@ -179,59 +179,16 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
-  // Lógica de Deduplicação para a Home Padrão (Sem Duplicações!)
+  // Definição das listas diretas sem deduplicação
   const carouselPosts = featuredPosts.slice(0, 5);
-  const carouselIds = new Set(carouselPosts.map(p => p.id));
-
-  // 1. Dossiê Spotlight (não repetido com Carrossel)
-  const displayDossie = dossiePosts.find(p => !carouselIds.has(p.id)) || dossiePosts[0];
-
-  // 2. RetroCafé (não repetido com Carrossel nem Dossiê)
-  const displayRetrocafe: Post[] = [];
-  retrocafePosts.forEach(p => {
-    if (displayRetrocafe.length < 2 && !carouselIds.has(p.id) && p.id !== displayDossie?.id) {
-      displayRetrocafe.push(p);
-    }
-  });
-  if (displayRetrocafe.length < 2 && retrocafePosts.length > 0) {
-    retrocafePosts.forEach(p => {
-      if (displayRetrocafe.length < 2 && !displayRetrocafe.some(x => x.id === p.id) && p.id !== displayDossie?.id) {
-        displayRetrocafe.push(p);
-      }
-    });
-  }
-
-  // 3. Reviews (não repetido com Carrossel nem Dossiê)
-  const displayReviews: Post[] = [];
-  reviewPosts.forEach(p => {
-    if (displayReviews.length < 3 && !carouselIds.has(p.id) && p.id !== displayDossie?.id) {
-      displayReviews.push(p);
-    }
-  });
-  if (displayReviews.length < 3 && reviewPosts.length > 0) {
-    reviewPosts.forEach(p => {
-      if (displayReviews.length < 3 && !displayReviews.some(x => x.id === p.id) && p.id !== displayDossie?.id) {
-        displayReviews.push(p);
-      }
-    });
-  }
-
-  // Coleta todos os IDs já exibidos nas seções superiores
-  const displayedIds = new Set<string>();
-  carouselPosts.forEach(p => displayedIds.add(p.id));
-  if (displayDossie) displayedIds.add(displayDossie.id);
-  displayRetrocafe.forEach(p => displayedIds.add(p.id));
-  displayReviews.forEach(p => displayedIds.add(p.id));
-
-  // Filtra as Últimas Notícias (apenas no modo padrão sem busca)
-  const paginatedFiltered = latestPosts
-    .filter(p => !displayedIds.has(p.id))
-    .slice(0, 6);
+  const displayRetrocafe = retrocafePosts.slice(0, 3);
+  const displayDossie = dossiePosts.slice(0, 3);
+  const displayReviews = reviewPosts.slice(0, 5);
 
   const gridPosts = isSearching 
     ? filteredPosts.slice(0, 6) 
     : isDefaultView 
-    ? paginatedFiltered 
+    ? latestPosts.slice(0, 6) 
     : paginatedPosts.slice(0, 6);
 
   const isLoadingPosts = isSearching 
@@ -394,57 +351,20 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {displayRetrocafe.length > 0 ? (
-                    displayRetrocafe.map((post) => {
-                      const targetSlug = post.slug || slugify(post.title);
-                      return (
-                        <Link
-                          key={post.id}
-                          to={`/post/${targetSlug}`}
-                          className={cn(
-                            "group flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:translate-y-[-3px]",
-                            isDark
-                              ? "bg-[#1f1d35] border-purple-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.45)] hover:border-orange-500/35 hover:shadow-[0_8px_24px_rgba(0,0,0,0.55)]"
-                              : "bg-white border-black/10 shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:border-orange-500/25 hover:shadow-[0_8px_20px_rgba(249,115,22,0.08)]"
-                          )}
-                        >
-                          {/* Thumbnail */}
-                          <div className="w-full aspect-video relative overflow-hidden bg-gray-900 shrink-0">
-                            {post.imageUrl ? (
-                              <img
-                                src={post.imageUrl}
-                                alt={post.title}
-                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 bg-gradient-to-br from-orange-700 to-amber-900" />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                          </div>
-                          {/* Corpo */}
-                          <div className="flex flex-col gap-1.5 p-4 relative">
-                            {/* Accent top */}
-                            <div className="absolute top-0 left-4 right-4 h-[1px] bg-orange-500/20" />
-                            <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-orange-400">
-                              {formatDate(post.createdAt, post.date ?? undefined)}
-                            </span>
-                            <h4 className={cn(
-                              "font-bold text-sm leading-snug line-clamp-2 transition-colors duration-200",
-                              isDark ? "text-gray-100 group-hover:text-orange-300" : "text-gray-900 group-hover:text-orange-600"
-                            )}>
-                              {post.title}
-                            </h4>
-                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 mt-0.5">
-                              {formatNumber(post.views || 0)} views
-                            </span>
-                          </div>
-                        </Link>
-                      );
-                    })
+                    displayRetrocafe.map((post, i) => (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                      >
+                        <PostCard post={post} />
+                      </motion.div>
+                    ))
                   ) : (
-                    <div className={cn("col-span-2 p-8 rounded-2xl border-2 border-dashed flex items-center justify-center min-h-[120px]", isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400")}>
+                    <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
                       <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
                     </div>
                   )}
@@ -477,56 +397,25 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                {/* Spotlight Dossiê */}
-                {displayDossie ? (
-                  <Link
-                    to={`/post/${displayDossie.slug || slugify(displayDossie.title)}`}
-                    className={cn(
-                      "group flex flex-col md:flex-row overflow-hidden rounded-2xl border transition-all duration-300 hover:translate-y-[-2px]",
-                      isDark
-                        ? "bg-[#1f1d35] border-purple-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.45)] hover:border-blue-500/35 hover:shadow-[0_8px_24px_rgba(0,0,0,0.55)]"
-                        : "bg-white border-black/10 shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:border-blue-500/25 hover:shadow-[0_8px_20px_rgba(59,130,246,0.08)]"
-                    )}
-                  >
-                    {/* Imagem */}
-                    {displayDossie.imageUrl && (
-                      <div className="w-full md:w-2/5 aspect-video md:aspect-auto relative overflow-hidden bg-gray-900 shrink-0">
-                        <img
-                          src={displayDossie.imageUrl}
-                          alt={displayDossie.title}
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 md:bg-gradient-to-r" />
-                        <span className="absolute top-3 left-3 text-[9px] font-retro font-bold text-blue-400 uppercase tracking-widest bg-black/60 border border-blue-500/30 px-2 py-0.5 rounded backdrop-blur-sm">
-                          Destaque
-                        </span>
-                      </div>
-                    )}
-                    {/* Texto */}
-                    <div className="flex flex-col justify-center gap-2.5 p-5 flex-grow">
-                      <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-blue-400">
-                        {formatDate(displayDossie.createdAt, displayDossie.date ?? undefined)}
-                      </span>
-                      <h3 className={cn(
-                        "font-retro font-black text-base md:text-lg leading-snug transition-colors",
-                        isDark ? "text-white group-hover:text-blue-300" : "text-gray-900 group-hover:text-blue-600"
-                      )}>
-                        {displayDossie.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                        {displayDossie.excerpt}
-                      </p>
-                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 mt-1">
-                        {formatNumber(displayDossie.views || 0)} views
-                      </span>
+                {/* Cards Dossiês */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {displayDossie.length > 0 ? (
+                    displayDossie.map((post, i) => (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                      >
+                        <PostCard post={post} />
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
+                      <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
                     </div>
-                  </Link>
-                ) : (
-                  <div className={cn("w-full p-8 rounded-2xl border-2 border-dashed flex items-center justify-center min-h-[160px]", isDark ? "border-white/10 text-gray-500" : "border-black/10 text-gray-400")}>
-                    <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
 
@@ -554,7 +443,7 @@ export default function HomePage() {
               </div>
 
               {/* Cards Reviews */}
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 {displayReviews.length > 0 ? (
                   displayReviews.map((post) => {
                     const targetSlug = post.slug || slugify(post.title);
@@ -565,10 +454,7 @@ export default function HomePage() {
                         key={post.id}
                         to={`/post/${targetSlug}`}
                         className={cn(
-                          "relative h-[148px] rounded-2xl overflow-hidden border transition-all duration-300 group/item flex flex-col justify-end p-4",
-                          isDark
-                            ? "border-purple-500/10 hover:border-yellow-500/25 hover:shadow-[0_0_20px_rgba(234,179,8,0.12)]"
-                            : "border-black/6 hover:border-yellow-500/20 hover:shadow-[0_0_20px_rgba(234,179,8,0.06)]"
+                          "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card"
                         )}
                       >
                         {/* Imagem */}
