@@ -513,7 +513,7 @@ export default function HomePage() {
               {/* ── RetroCafé ── */}
               <div 
                 className={cn(
-                  "p-6 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-5 rounded-none z-10",
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredRetrocafeIndex(null)}
@@ -584,7 +584,7 @@ export default function HomePage() {
                   >
                     <div className="w-1.5 self-stretch rounded-none shrink-0 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_15px_rgba(249,115,22,0.9)] transition-all" />
                     <div>
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         RetroCafé
                       </h2>
                       <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
@@ -606,7 +606,7 @@ export default function HomePage() {
                   <div 
                     ref={retrocafeRef} 
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {displayRetrocafe.length > 0 ? (
                       displayRetrocafe.map((post, i) => {
@@ -751,7 +751,7 @@ export default function HomePage() {
               {/* ── Dossiês ── */}
               <div 
                 className={cn(
-                  "p-6 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-5 rounded-none z-10 pt-10",
+                  "px-4 pb-4 pt-8 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
@@ -822,7 +822,7 @@ export default function HomePage() {
                   >
                     <div className="w-1.5 self-stretch rounded-none shrink-0 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_15px_rgba(59,130,246,0.9)] transition-all" />
                     <div>
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         Dossiês
                       </h2>
                       <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
@@ -844,7 +844,7 @@ export default function HomePage() {
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-5 scrollbar-hide snap-x snap-mandatory w-full pt-4"
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-4 pb-4 md:pb-5 scrollbar-hide snap-x snap-mandatory w-full pt-4"
                   >
                     {displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
