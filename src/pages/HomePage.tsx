@@ -531,7 +531,7 @@ export default function HomePage() {
             </div>
 
             {/* ── DIREITA (1/3): Reviews ── */}
-            <div className="lg:col-span-1 flex flex-col gap-5">
+            <div className="lg:col-span-1 flex flex-col gap-5 lg:h-full">
               {/* Cabeçalho */}
               <div className="flex items-center justify-between">
                 <div
@@ -559,11 +559,11 @@ export default function HomePage() {
               </div>
 
               {/* Cards Reviews */}
-              <div className="relative group/scroll-container w-full">
+              <div className="relative group/scroll-container w-full lg:flex-1 lg:min-h-0 lg:flex lg:flex-col">
                 <div 
                   ref={reviewsRef} 
                   onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                  className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                  className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full lg:h-full lg:justify-between"
                 >
                   {displayReviews.length > 0 ? (
                     displayReviews.map((post) => {
@@ -575,7 +575,7 @@ export default function HomePage() {
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
+                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
                           )}
                         >
                           {/* Imagem */}
