@@ -103,44 +103,20 @@ export default function HomePage() {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = ctx.currentTime;
       
-      // 1. Initial mechanical latch click (50ms)
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = "triangle";
-      osc1.frequency.setValueAtTime(120, now);
-      osc1.frequency.exponentialRampToValueAtTime(40, now + 0.05);
-      gain1.gain.setValueAtTime(0.06, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.05);
-
-      // 2. Step motor seek buzz: First step (40ms)
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = "sawtooth";
-      osc2.frequency.setValueAtTime(90, now + 0.06);
-      gain2.gain.setValueAtTime(0, now);
-      gain2.gain.setValueAtTime(0.03, now + 0.06);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now + 0.06);
-      osc2.stop(now + 0.1);
-
-      // 3. Step motor seek buzz: Second step (40ms)
-      const osc3 = ctx.createOscillator();
-      const gain3 = ctx.createGain();
-      osc3.type = "sawtooth";
-      osc3.frequency.setValueAtTime(105, now + 0.12);
-      gain3.gain.setValueAtTime(0, now);
-      gain3.gain.setValueAtTime(0.03, now + 0.12);
-      gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-      osc3.connect(gain3);
-      gain3.connect(ctx.destination);
-      osc3.start(now + 0.12);
-      osc3.stop(now + 0.16);
+      // Retro chime synth select tone
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(659.25, now); // E5
+      osc.frequency.setValueAtTime(987.77, now + 0.04); // B5
+      
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
     } catch (e) {
       console.log("Audio API not supported or allowed", e);
     }
@@ -1029,8 +1005,8 @@ export default function HomePage() {
                   <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-yellow-500/20 dark:border-yellow-400/15 self-center" />
                   {/* Informações de Status retro no cabeçalho */}
                   <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-yellow-500/80 dark:text-yellow-400/80 select-none text-right">
-                    <span className="font-bold tracking-wider">[ FLOPPY DRIVE SYSTEM // FD-350 ]</span>
-                    <span className="opacity-60">DISKETTE STORAGE READY</span>
+                    <span className="font-bold tracking-wider">[ DECK REVIEW SYSTEM // REV-005 ]</span>
+                    <span className="opacity-60">DECK CONNECTED... READY</span>
                   </div>
                 </div>
 
@@ -1047,15 +1023,10 @@ export default function HomePage() {
                         const isHovered = hoveredReviewsIndex === i;
                         const isAnyHovered = hoveredReviewsIndex !== null;
 
-                        // List of premium retro diskette plastic colors
-                        const floppyColors = [
-                          "bg-blue-600 dark:bg-blue-700 text-white", 
-                          "bg-red-600 dark:bg-red-700 text-white",   
-                          "bg-zinc-700 dark:bg-zinc-800 text-white", 
-                          "bg-teal-600 dark:bg-teal-700 text-white", 
-                          "bg-emerald-600 dark:bg-emerald-700 text-white", 
-                        ];
-                        const diskColorClass = floppyColors[i % floppyColors.length];
+                        const cardBgClass = isDark ? "bg-[#141226] text-white" : "bg-white text-zinc-900";
+                        const fadeGradientClass = isDark 
+                          ? "from-[#141226] via-[#141226]/50 to-transparent" 
+                          : "from-white via-white/50 to-transparent";
 
                         return (
                           <motion.div
@@ -1064,11 +1035,11 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "min-w-[290px] lg:min-w-0 w-full h-[120px] lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
+                              "min-w-[290px] lg:min-w-0 w-full h-28 lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
                               isAnyHovered && !isHovered
-                                ? "opacity-55 scale-[0.98] blur-[0.3px]"
+                                ? "opacity-65 scale-[0.99] blur-[0.2px]"
                                 : isHovered
-                                ? "lg:-translate-y-2 lg:scale-[1.02] z-20"
+                                ? "lg:-translate-y-0.5 lg:translate-x-0.5 z-20"
                                 : ""
                             )}
                             onMouseEnter={() => {
@@ -1079,99 +1050,67 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                                diskColorClass,
-                                isHovered ? "shadow-[6px_6px_0px_rgba(0,0,0,1)]" : ""
+                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                                cardBgClass,
+                                isHovered ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" : "border-black"
                               )}
                             >
-                              {/* Write-protect notch cut (bottom-right small indent) */}
-                              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-black border-t-2 border-l-2 border-black select-none pointer-events-none" />
-                              
-                              {/* Top-Right Chanfro (diagonal cut corner) */}
-                              <div className={cn(
-                                "absolute top-0 right-0 w-3 h-3 border-b-2 border-l-2 border-black rotate-45 translate-x-1.5 -translate-y-1.5 select-none pointer-events-none z-20",
-                                isDark ? "bg-[#1f1d35]" : "bg-white"
-                              )} />
-
-                              {/* 1. Metal Shutter Section (Left side) */}
-                              <div className="w-24 relative border-r-2 border-black bg-zinc-300 dark:bg-zinc-400 shrink-0 overflow-hidden flex items-center justify-center select-none">
-                                {/* Metallic finish effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-black/10 animate-pulse" />
-
-                                {/* Shutter Slider Plate (slides right/left when hovered) */}
-                                <div 
-                                  className={cn(
-                                    "absolute inset-0 bg-zinc-400 dark:bg-zinc-500 border-r border-black/30 transition-transform duration-500 ease-in-out flex flex-col justify-between py-3 items-center z-10",
-                                    isHovered ? "translate-x-full" : "translate-x-0"
-                                  )}
-                                >
-                                  <div className="w-4 h-5 border border-black/30 bg-zinc-500/30 rounded-sm flex items-center justify-center">
-                                    <span className="text-[8px] font-bold text-black/50">◀</span>
-                                  </div>
-                                  <div className="text-[6px] font-mono font-bold text-black/40 tracking-tighter">
-                                    HD 1.44MB
-                                  </div>
-                                </div>
-
-                                {/* Underneath the shutter: Magnetic Disk & Shutter window */}
-                                <div className="w-12 h-12 rounded-full bg-black/95 flex items-center justify-center border border-black shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] relative">
-                                  <div className="w-6 h-6 rounded-full bg-zinc-200 border border-black flex items-center justify-center relative">
-                                    <div className="w-1.5 h-1.5 bg-black/80 rounded-sm absolute top-0.5" />
-                                    <div className="w-1 h-1 bg-black/80 rounded-sm absolute right-1 top-2" />
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* 2. Paper Label Section (Right side) */}
-                              <div className="flex-1 bg-white text-black p-2.5 flex flex-col justify-between relative min-w-0 select-text">
-                                {/* Label header styling */}
-                                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500" />
-                                
-                                {/* Floppy Sticker Notebook lines */}
-                                <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{
-                                  backgroundImage: "repeating-linear-gradient(0deg, #000, #000 1px, transparent 1px, transparent 12px)",
-                                  backgroundPosition: "0 10px"
-                                }} />
-
-                                {/* Label Content */}
-                                <div className="relative z-10 pt-1">
-                                  <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-[6.5px] font-mono font-black text-red-500 tracking-wider">
-                                      PROJECT_BEGINS // DISK_0{i + 1}
+                              {/* 1. Left Side: Content Booklet (55% width) */}
+                              <div className="w-[55%] p-3 flex flex-col justify-between relative z-20 min-w-0">
+                                <div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                                      OFFICIAL REVIEW
                                     </span>
-
-                                    <div className="flex items-center gap-1 select-none">
-                                      <span className="text-[5.5px] font-mono text-gray-400 font-bold uppercase">READ</span>
-                                      <div className={cn(
-                                        "w-1.5 h-1.5 rounded-full border border-black/30 transition-colors duration-300",
-                                        isHovered ? "bg-emerald-500 shadow-[0_0_4px_#10b981]" : "bg-gray-300"
-                                      )} />
-                                    </div>
+                                    {/* Scanline dot status */}
+                                    <span className={cn(
+                                      "w-1 h-1 rounded-full",
+                                      isHovered ? "bg-yellow-400 animate-ping" : "bg-yellow-500/60"
+                                    )} />
                                   </div>
 
-                                  <h4 className="font-mono font-bold text-[10.5px] sm:text-xs leading-tight line-clamp-2 text-zinc-950 uppercase tracking-tight">
-                                    {post.title}
+                                  <h4 className="font-retro font-bold text-[11px] sm:text-xs leading-snug line-clamp-2 mt-1 transition-colors duration-300">
+                                    <span className={cn(
+                                      isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
+                                    )}>
+                                      {post.title}
+                                    </span>
                                   </h4>
                                 </div>
 
-                                {/* Bottom status and circular stamp */}
-                                <div className="relative z-10 flex items-end justify-between pt-1 border-t border-dashed border-zinc-300 mt-1 select-none">
-                                  <div className="text-[6.5px] text-zinc-500 font-mono font-bold leading-tight">
-                                    <div>DATE: {formatDate(post.createdAt, post.date ?? undefined)}</div>
-                                    <div>BLOCKS: {formatNumber(post.views || 0)} KB</div>
-                                  </div>
-
+                                {/* Footer details (Score badge, Date, views) */}
+                                <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
                                   {post.score && (
-                                    <div className={cn(
-                                      "relative flex flex-col items-center justify-center w-9 h-9 rounded-full border-2 border-red-500/80 text-red-600 font-retro font-black text-[9px] rotate-[-12deg] tracking-tighter leading-none select-none",
-                                      "bg-red-500/5 shadow-[inset_0_0_2px_rgba(239,68,68,0.2)]"
-                                    )}>
-                                      <span className="text-[5px] font-mono uppercase font-black tracking-tighter opacity-80 leading-none">NOTA</span>
-                                      <span className="text-[10px] leading-none mt-0.5">{post.score}</span>
+                                    <div className="inline-flex items-center gap-1 bg-yellow-400 text-black px-1.5 py-0.5 font-retro font-black text-[8px] border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none">
+                                      ★ {post.score}
                                     </div>
                                   )}
+                                  <div className="text-[6.5px] text-slate-500 dark:text-slate-400 font-mono text-right leading-none space-y-0.5">
+                                    <div>{formatDate(post.createdAt, post.date ?? undefined)}</div>
+                                    <div>{formatNumber(post.views || 0)} VIEWS</div>
+                                  </div>
                                 </div>
                               </div>
+
+                              {/* 2. Right Side: Game Artwork with Fade-out (45% width) */}
+                              {post.imageUrl && (
+                                <div className="w-[45%] h-full relative shrink-0 overflow-hidden select-none bg-black">
+                                  <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                  />
+                                  {/* Fade gradient overlay that blends into the background */}
+                                  <div className={cn(
+                                    "absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r z-10 pointer-events-none",
+                                    fadeGradientClass
+                                  )} />
+                                  
+                                  {/* Retro scanline overlay on image area */}
+                                  <div className="absolute inset-0 scanline-overlay opacity-[0.18] pointer-events-none z-10" />
+                                </div>
+                              )}
                             </Link>
                           </motion.div>
                         );
