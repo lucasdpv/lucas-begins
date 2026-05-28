@@ -11,13 +11,13 @@ export default function PostAuthorBox({ author, isDark }: PostAuthorBoxProps) {
 
   return (
     <section className={cn(
-      "border-2 overflow-hidden group clear-both",
-      isDark ? "bg-gray-800/40 border-purple-500/20" : "bg-snes-input border-snes-dark/10"
+      "border-2 border-black rounded-none overflow-hidden group clear-both shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+      isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
     )}>
       {/* Label topo */}
       <div className={cn(
-        "px-5 py-2 border-b-2 flex items-center gap-2",
-        isDark ? "border-purple-500/20 bg-purple-500/5" : "border-snes-dark/10 bg-purple-50"
+        "px-5 py-2 border-b-2 border-black flex items-center gap-2",
+        isDark ? "bg-purple-950/20" : "bg-purple-50"
       )}>
         <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
         <span className="font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest text-purple-500">
@@ -27,10 +27,10 @@ export default function PostAuthorBox({ author, isDark }: PostAuthorBoxProps) {
       {/* Conteúdo */}
       <div className="flex items-center gap-5 md:gap-8 p-5 md:p-7">
         <div className="relative shrink-0">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-2 group-hover:rotate-0 transition-transform">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-none overflow-hidden border-4 border-purple-600 shadow-[4px_4px_0px_rgba(0,0,0,1)] -rotate-2 group-hover:rotate-0 transition-transform">
             <img src={author.avatar ?? undefined} alt={author.name} className="w-full h-full object-cover" />
           </div>
-          <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black px-2 py-0.5 rounded-lg border-2 border-black font-retro font-bold text-[10px] shadow-[2px_2px_0px_rgba(0,0,0,1)] z-10">
+          <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-black px-2 py-0.5 rounded-none border-2 border-black font-retro font-bold text-[10px] shadow-[2px_2px_0px_rgba(0,0,0,1)] z-10">
             LV.{author.level || 1}
           </div>
         </div>

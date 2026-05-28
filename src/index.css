@@ -135,7 +135,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .magazine-float-left, .magazine-float-right {
     float: none;
     max-width: 100%;
@@ -207,6 +207,27 @@
   animation: fadeIn 0.5s ease-out forwards;
 }
 
+@keyframes bgFadeIn {
+  from { opacity: 0; }
+}
+
+.animate-bg-fade {
+  animation: bgFadeIn 0.4s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-badge {
+  background: linear-gradient(90deg, #facc15 0%, #fef08a 40%, #facc15 60%, #facc15 100%);
+  background-size: 200% auto;
+  animation: shimmer 2.5s linear infinite;
+}
+
+
+
 @keyframes loading {
   0% { transform: translateX(-100%); }
   50% { transform: translateX(0); }
@@ -227,27 +248,67 @@
 }
 
 /* Utilitário Glassmorphism - Refinado */
+/* Estilo Base: Glassmorphism Light Mode (Padrão) */
 .glass-card {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(245, 240, 252, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Glassmorphism Dark Mode (Ativado quando HTML tem classe .dark) */
 .dark .glass-card {
-  background: rgba(13, 13, 20, 0.4);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  background: rgba(18, 18, 30, 0.72);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.55);
 }
 
-/* Light mode: usa a superfície SNES com toque lavanda */
-.light .glass-card,
-:not(.dark) .glass-card {
-  background: rgba(245, 240, 252, 0.6);
-  border: 1px solid rgba(45, 27, 105, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(45, 27, 105, 0.1);
+/* Hover e Estados Interativos para Cards Bento e PostCards */
+.glass-card-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.glass-card-hover:hover {
+  transform: translateY(-6px);
+}
+
+/* Hover Light Mode (Padrão) */
+.glass-card-hover:hover {
+  background: rgba(242, 235, 252, 0.95);
+}
+
+/* Hover Dark Mode */
+.dark .glass-card-hover:hover {
+  background: rgba(26, 26, 42, 0.88);
+}
+
+/* Fundos Premium Mesh - Fiel ao SNES Purple / Retro */
+.bg-dark-mesh {
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(20, 26, 42, 0.95) 50%, rgba(17, 24, 39, 1) 100%);
+  background-color: #111827;
+}
+
+.bg-light-mesh {
+  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.08) 0%, rgba(247, 245, 250, 0.98) 50%, rgba(240, 238, 245, 1) 100%);
+  background-color: #f7f5fa;
+}
+
+/* Logo Glow Pulse */
+@keyframes logoPulse {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.15));
+  }
+  50% {
+    text-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+    filter: drop-shadow(0 0 3px rgba(168, 85, 247, 0.3));
+  }
+}
+
+.logo-glow-pulse {
+  animation: logoPulse 4s infinite ease-in-out;
+}
+
 
 /* Texto com Glow Moderno */
 .text-glow {
@@ -312,7 +373,7 @@ html, body {
 }
 
 html.light, html.light body {
-  background-color: #cec9cc; /* light: bg-snes-light */
+  background-color: #f7f5fa; /* light: lavanda suave */
   color: #211a21; /* light: text-snes-accent */
 }
 

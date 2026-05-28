@@ -84,14 +84,14 @@ export default function Navbar() {
             <div className="flex items-center gap-2 group shrink-0 pr-4 border-r-2 border-purple-500/10">
               <Link to="/" className="flex items-center gap-3" onClick={() => { handleCategorySelect("Todos"); setSearchQuery(""); }}>
                 <div className="relative">
-                  <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:-rotate-12 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]", isDark ? "text-purple-400" : "text-purple-600")} />
+                  <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:-rotate-12", isDark ? "text-purple-400" : "text-purple-600")} />
                   <div className="absolute -inset-1 bg-purple-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <h1 className={cn(
                   "font-retro font-bold text-xl md:text-2xl tracking-tighter uppercase transition-all notranslate",
-                  isDark ? "text-white text-glow" : "text-gray-900"
+                  isDark ? "text-white" : "text-gray-900"
                 )} translate="no">
-                  Begins<span className="text-purple-500 inline-block animate-glitch drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]">Project</span>
+                  Begins<span className="text-purple-500">Project</span>
                 </h1>
               </Link>
             </div>

@@ -74,8 +74,8 @@ export default function AdminPage() {
             <button
               onClick={() => navigate("/")}
               className={cn(
-                "p-3 md:p-4 rounded-2xl border-4 transition-all active:scale-95 group",
-                isDark ? "bg-gray-800 border-purple-600/30 text-white hover:border-purple-500 shadow-[4px_4px_0px_rgba(147,51,234,0.2)]" : "bg-white border-snes-dark text-snes-dark hover:bg-gray-50 shadow-[4px_4px_0px_rgba(0,0,0,1)]"
+                "p-3 md:p-4 rounded-none border-4 border-black transition-all active:scale-95 group shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                isDark ? "bg-[#1f1d35] text-white hover:bg-purple-600/20" : "bg-white text-snes-dark hover:bg-gray-50"
               )}
             >
               <ArrowLeft size={20} className="md:size-6 group-hover:-translate-x-1 transition-transform" />

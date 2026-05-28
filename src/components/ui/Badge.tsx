@@ -11,6 +11,34 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   isDark?: boolean;
 }
 
+const getCategoryBadgeClass = (category: string) => {
+  const norm = category?.toLowerCase().trim() || "";
+  switch (norm) {
+    case "reviews":
+      return "bg-amber-500 dark:bg-amber-400 text-black";
+    case "dossiês":
+    case "dossies":
+      return "bg-blue-600 dark:bg-blue-500 text-white";
+    case "retrocafé":
+    case "retrocafe":
+    case "retro-café":
+      return "bg-orange-500 dark:bg-orange-400 text-white";
+    case "especial":
+      return "bg-purple-600 dark:bg-purple-500 text-white";
+    case "nostalgia":
+      return "bg-pink-600 dark:bg-pink-500 text-white";
+    case "cultura pop":
+    case "culturapop":
+      return "bg-emerald-600 dark:bg-emerald-500 text-white";
+    case "rpg & mmo":
+    case "rpg mmo":
+    case "rpg":
+      return "bg-cyan-600 dark:bg-cyan-500 text-white";
+    default:
+      return "bg-purple-600 dark:bg-purple-500 text-white";
+  }
+};
+
 export function CategoryBadge({ children, size = "sm", className }: BadgeProps) {
   return (
     <span className={cn("bg-purple-600 text-white font-retro font-bold uppercase tracking-widest rounded-none border-2 border-black transition-all", retroSizes[size], className)}>

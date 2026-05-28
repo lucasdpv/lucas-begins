@@ -11,7 +11,7 @@ interface PostSkeletonProps {
  * Skeleton do PostCard refatorado para usar SkeletonItem e BRUTAL_DESIGN.
  */
 export default function PostSkeleton({ isDark }: PostSkeletonProps) {
-  const { BORDER, SHADOW, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
+  const { BORDER, SHADOW, TRANSITION } = BRUTAL_DESIGN;
 
   return (
     <div
@@ -19,15 +19,14 @@ export default function PostSkeleton({ isDark }: PostSkeletonProps) {
       aria-busy="true"
       aria-label="Carregando artigo..."
       className={cn(
-        "flex flex-col h-full",
-        BORDER, SHADOW, ROUNDED, TRANSITION,
-        isDark ? "bg-gray-800" : "bg-snes-light"
+        "flex flex-col h-full rounded-none border-2 border-black transition-all duration-300 shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+        isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
       )}
     >
       {/* Thumb */}
       <div className={cn(
-        "h-56 md:h-64 w-full relative overflow-hidden border-b-2 border-black",
-        isDark ? "bg-gray-900" : "bg-gray-200"
+        "w-full aspect-video relative overflow-hidden bg-gray-900 z-10 pointer-events-none shrink-0",
+        isDark ? "bg-gray-900" : "bg-gray-250"
       )}>
         {/* Badge de categoria */}
         <div className="absolute top-4 left-4 flex gap-2">
@@ -35,13 +34,13 @@ export default function PostSkeleton({ isDark }: PostSkeletonProps) {
             width="w-20" 
             height="h-6" 
             isDark={isDark} 
-            className={cn(BORDER, SHADOW.replace('4px', '2px'))} 
+            className={cn("border-2 border-black rounded-none shadow-[2px_2px_0px_rgba(0,0,0,1)]")} 
           />
         </div>
       </div>
 
       {/* Conteúdo */}
-      <div className="p-7 flex flex-col flex-grow">
+      <div className="p-5 flex flex-col flex-grow">
         {/* Título */}
         <div className="mb-3 space-y-2">
           <SkeletonItem height="h-5" isDark={isDark} />

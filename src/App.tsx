@@ -67,12 +67,21 @@ export default function App() {
   }, [isDark]);
 
 
-  const themeClasses = isDark ? "bg-gray-900 text-gray-200" : "bg-snes-light text-snes-accent";
+  const themeClasses = isDark ? "bg-dark-mesh text-gray-200" : "bg-light-mesh text-snes-accent";
 
   return (
-    <div className={`min-h-screen font-body transition-colors duration-300 relative ${themeClasses}`}>
+    <div className={`min-h-screen overflow-x-hidden font-body transition-colors duration-500 relative z-0 ${themeClasses}`}>
       <SystemInitializer />
       <Toast toast={toast} isDark={isDark} />
+
+      {/* Ambient Glows Globais (Full-width, sem cortes nas laterais do container do conteúdo) */}
+      {isDark && (
+        <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-[10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[120px] animate-pulse duration-[8000ms]" />
+          <div className="absolute top-[40%] right-[-5%] w-[550px] h-[550px] bg-blue-600/5 rounded-full blur-[130px] animate-pulse duration-[10000ms]" />
+          <div className="absolute top-[70%] left-[5%] w-[450px] h-[450px] bg-amber-500/3 rounded-full blur-[110px] animate-pulse duration-[12000ms]" />
+        </div>
+      )}
 
       <div className="flex flex-col min-h-screen">
         <Navbar />

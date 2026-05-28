@@ -47,7 +47,7 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
         )}>
           {/* Autor */}
           <div className="flex items-center gap-4">
-            <div className={cn("w-14 h-14 rounded-2xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-14 h-14 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
             <div className="space-y-2">
               <div className={cn("w-36 h-5 rounded", accentColor)} />
               <div className={cn("w-48 h-3 rounded", skeletonColor)} />
@@ -55,10 +55,10 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
           </div>
           {/* Ações (share, like, views, login) */}
           <div className="flex items-center gap-3">
-            <div className={cn("w-12 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-24 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-20 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
-            <div className={cn("w-24 h-12 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-12 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-24 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-20 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
+            <div className={cn("w-24 h-12 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
           </div>
         </div>
 
@@ -118,15 +118,20 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
             <div className={cn("w-24 h-5 rounded border", skeletonColor, isDark ? "border-purple-700" : "border-purple-300")} />
           </div>
           {/* Grid de 3 cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i}>
-                <div className={cn(
-                  "h-36 md:h-40 w-full mb-3 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                  skeletonColor
-                )} />
-                <div className={cn("w-full h-4 rounded mb-2", accentColor)} />
-                <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+              <div 
+                key={i}
+                className={cn(
+                  "flex flex-col h-56 rounded-none border-2 border-black overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+                  isDark ? "bg-[#1f1d35]" : "bg-white"
+                )}
+              >
+                <div className={cn("w-full aspect-video shrink-0 relative overflow-hidden bg-gray-900", skeletonColor)} />
+                <div className="p-4 flex flex-col flex-grow gap-2">
+                  <div className={cn("w-full h-4 rounded", accentColor)} />
+                  <div className={cn("w-2/3 h-3 rounded", skeletonColor)} />
+                </div>
               </div>
             ))}
           </div>

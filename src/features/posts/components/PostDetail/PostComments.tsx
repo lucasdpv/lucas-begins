@@ -69,15 +69,15 @@ export default function PostComments({
 
       {currentUser ? (
         <div className={cn(
-          "mb-12 p-6 md:p-8 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] retro-card", 
-          isDark ? "bg-gray-800" : "bg-snes-surface",
+          "mb-12 p-6 md:p-8 rounded-none border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,1)]", 
+          isDark ? "bg-[#1f1d35] text-gray-100" : "bg-snes-surface text-gray-900",
           isPreview && "opacity-50 pointer-events-none"
         )}>
           <form onSubmit={onSubmitComment}>
             <textarea
               className={cn(
-                "w-full p-4 md:p-5 rounded-none mb-3 resize-none outline-none border-2 focus:border-purple-500 text-base md:text-lg font-medium", 
-                isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-snes-input border-snes-dark text-snes-accent"
+                "w-full p-4 md:p-5 rounded-none mb-3 resize-none outline-none border-2 border-black focus:border-purple-500 text-base md:text-lg font-medium", 
+                isDark ? "bg-gray-900 text-white" : "bg-snes-input text-snes-accent"
               )}
               rows={4}
               placeholder={isPreview ? "Comentários desabilitados no modo Preview" : "Mande o papo reto..."}
@@ -115,7 +115,7 @@ export default function PostComments({
               <button 
                 type="submit" 
                 disabled={!commentText.trim() || isPreview} 
-                className="flex items-center gap-2 px-6 md:px-8 py-3.5 md:py-4 rounded-none font-retro uppercase text-base md:text-lg font-bold text-white bg-purple-600 retro-button"
+                className="flex items-center gap-2 px-6 md:px-8 py-3.5 md:py-4 rounded-none font-retro uppercase text-base md:text-lg font-bold text-white bg-purple-600 transition-all hover:scale-105 active:scale-95 border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)]"
               >
                 <Send className="w-4 h-4 md:w-5 md:h-5" /> {isPreview ? "Bloqueado" : "Enviar"}
               </button>
@@ -136,11 +136,11 @@ export default function PostComments({
             <div key={comment.id} className="flex flex-col">
               {/* Card de Comentário Principal */}
               <div className={cn(
-                "p-5 md:p-6 rounded-none border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] flex gap-4 md:gap-5 retro-card items-start", 
-                isDark ? "bg-gray-800" : "bg-snes-surface"
+                "p-5 md:p-6 rounded-none border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,1)] flex gap-4 md:gap-5 items-start", 
+                isDark ? "bg-[#1f1d35] text-gray-100" : "bg-snes-surface text-gray-900"
               )}>
                 <div className="shrink-0 relative">
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-black bg-purple-900/20 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-none border-2 border-black bg-purple-900/20 overflow-hidden shadow-[2px_2px_0_rgba(0,0,0,1)]">
                     <img 
                       src={comment.authorAvatar ? comment.authorAvatar : getPixelAvatar(comment.authorId)} 
                       alt={comment.author} 
@@ -236,8 +236,8 @@ export default function PostComments({
                   "animate-in slide-in-from-top-2 duration-200"
                 )}>
                   <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className={cn(
-                    "p-4 rounded-none border-2 border-black bg-gray-900/10 shadow-[2px_2px_0_rgba(0,0,0,1)]",
-                    isDark ? "bg-gray-800" : "bg-purple-50/50"
+                    "p-4 rounded-none border-2 border-black bg-gray-900/10 shadow-[4px_4px_0_rgba(0,0,0,1)]",
+                    isDark ? "bg-[#1f1d35] text-gray-100" : "bg-purple-50/50 text-gray-900"
                   )}>
                     <div className="flex items-center justify-between mb-2 text-xs font-retro uppercase font-bold text-purple-400">
                       <span>Respondendo a {comment.author}:</span>
@@ -249,8 +249,8 @@ export default function PostComments({
                     <input
                       type="text"
                       className={cn(
-                        "w-full px-3 py-2 border-2 outline-none mb-3 text-sm font-medium focus:border-purple-500",
-                        isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-snes-dark text-snes-accent"
+                        "w-full px-3 py-2 border-2 border-black rounded-none outline-none mb-3 text-sm font-medium focus:border-purple-500",
+                        isDark ? "bg-gray-900 text-white" : "bg-white text-snes-accent"
                       )}
                       placeholder="Sua resposta..."
                       value={replyText}
@@ -313,7 +313,7 @@ export default function PostComments({
                       >
                         {/* Indicador visual de encadeamento retro */}
                         <div className="shrink-0 relative">
-                          <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg border-2 border-black bg-purple-900/10 overflow-hidden shadow-[1px_1px_0_rgba(0,0,0,1)]">
+                          <div className="w-9 h-9 md:w-10 md:h-10 rounded-none border-2 border-black bg-purple-900/10 overflow-hidden shadow-[1px_1px_0_rgba(0,0,0,1)]">
                             <img 
                               src={reply.authorAvatar ? reply.authorAvatar : getPixelAvatar(reply.authorId)} 
                               alt={reply.author} 
@@ -330,8 +330,8 @@ export default function PostComments({
                         </div>
 
                         <div className={cn(
-                          "flex-1 p-3.5 md:p-4 rounded-none border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] min-w-0 relative",
-                          isDark ? "bg-gray-800/60" : "bg-snes-surface/70"
+                          "flex-1 p-3.5 md:p-4 rounded-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] min-w-0 relative",
+                          isDark ? "bg-[#1f1d35] text-gray-100" : "bg-snes-surface/70 text-gray-900"
                         )}>
                           <div className="flex items-center justify-between gap-3 mb-1.5">
                             <div className="font-retro font-bold text-xs md:text-sm uppercase text-purple-300 tracking-wide truncate">
@@ -395,10 +395,10 @@ export default function PostComments({
           <button
             onClick={onLoadMore}
             className={cn(
-              "px-10 py-4 font-retro font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 border-4 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+              "px-10 py-4 font-retro font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 border-2 border-black rounded-none shadow-[6px_6px_0px_rgba(0,0,0,1)]",
               isDark 
-                ? "bg-gray-800 border-purple-500 text-purple-400 hover:bg-purple-500/10" 
-                : "bg-white border-purple-600 text-purple-600 hover:bg-purple-50"
+                ? "bg-[#1f1d35] text-purple-400 hover:bg-purple-500/10" 
+                : "bg-white text-purple-600 hover:bg-purple-50"
             )}
           >
             Carregar Mais Comentários

@@ -51,8 +51,8 @@ export default function PostRelated({ posts, currentPostId, isDark, isPreview = 
             >
               <div
                 className={cn(
-                  "h-36 md:h-40 w-full mb-3 bg-cover bg-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                  !isPreview && "group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] transition-all",
+                  "h-36 md:h-40 w-full mb-3 bg-cover bg-center border-2 border-black rounded-none overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300",
+                  !isPreview && "group-hover:-translate-y-1 group-hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] group-hover:border-black",
                   !p.imageUrl && `bg-gradient-to-br ${(p as any).gradient || 'from-gray-900 to-purple-900'}`
                 )}
                 style={p.imageUrl ? { backgroundImage: `url(${p.imageUrl})` } : {}}
