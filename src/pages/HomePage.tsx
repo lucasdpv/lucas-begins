@@ -344,7 +344,7 @@ export default function HomePage() {
                   >
                     <span className={cn(
                       "text-2xl font-retro font-black trending-number min-w-[32px] select-none",
-                      isDark ? "text-purple-400/85 text-glow" : "text-purple-600/60"
+                      isDark ? "text-amber-400/85 text-glow-amber" : "text-amber-500/70"
                     )}>
                       {(idx + 1).toString().padStart(2, "0")}
                     </span>
@@ -399,7 +399,7 @@ export default function HomePage() {
                     key={post.id}
                     to={`/post/${targetSlug}`}
                     className={cn(
-                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always"
+                      "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
                     )}
                   >
                     {/* Imagem */}
@@ -676,7 +676,7 @@ export default function HomePage() {
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always"
+                            "relative h-[148px] lg:h-full lg:flex-1 lg:min-h-0 lg:max-h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[calc(50%-8px)] lg:w-auto shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_rgba(168,85,247,0.25)] hover:border-black/70 dark:hover:border-purple-400/40"
                           )}
                         >
                           {/* Imagem */}
