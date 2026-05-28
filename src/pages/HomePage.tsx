@@ -103,19 +103,44 @@ export default function HomePage() {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = ctx.currentTime;
       
-      // Eject mechanical clack: pitch sweep down saw wave
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.12);
+      // 1. Initial mechanical latch click (50ms)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(120, now);
+      osc1.frequency.exponentialRampToValueAtTime(40, now + 0.05);
+      gain1.gain.setValueAtTime(0.06, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.05);
+
+      // 2. Step motor seek buzz: First step (40ms)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sawtooth";
+      osc2.frequency.setValueAtTime(90, now + 0.06);
+      gain2.gain.setValueAtTime(0, now);
+      gain2.gain.setValueAtTime(0.03, now + 0.06);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.06);
+      osc2.stop(now + 0.1);
+
+      // 3. Step motor seek buzz: Second step (40ms)
+      const osc3 = ctx.createOscillator();
+      const gain3 = ctx.createGain();
+      osc3.type = "sawtooth";
+      osc3.frequency.setValueAtTime(105, now + 0.12);
+      gain3.gain.setValueAtTime(0, now);
+      gain3.gain.setValueAtTime(0.03, now + 0.12);
+      gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc3.connect(gain3);
+      gain3.connect(ctx.destination);
+      osc3.start(now + 0.12);
+      osc3.stop(now + 0.16);
     } catch (e) {
       console.log("Audio API not supported or allowed", e);
     }
@@ -979,59 +1004,6 @@ export default function HomePage() {
                 )}
                 onMouseLeave={() => setHoveredReviewsIndex(null)}
               >
-                {/* Background Image transition */}
-                <AnimatePresence>
-                  {hoveredReviewsIndex !== null && displayReviews[hoveredReviewsIndex] && (
-                    <motion.div
-                      key={displayReviews[hoveredReviewsIndex].id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute inset-0 z-0 pointer-events-none"
-                    >
-                      <div 
-                        className={cn(
-                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 filter sepia brightness-[0.6] contrast-[1.4] hue-rotate-[15deg]", // amber/golden tint
-                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
-                        )}
-                        style={{
-                          backgroundImage: `url(${displayReviews[hoveredReviewsIndex].imageUrl})`,
-                        }}
-                      />
-                      
-                      {/* Tint overlay matching section theme */}
-                      <div className={cn(
-                        "absolute inset-0 mix-blend-color",
-                        isDark ? "bg-amber-950/45" : "bg-amber-100/30"
-                      )} />
-                      
-                      {/* CRT and line grid pattern overlay */}
-                      <div className="absolute inset-0 scanline-overlay opacity-30" />
-                      
-                      <div 
-                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
-                        style={{
-                          backgroundImage: isDark
-                            ? "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)"
-                            : "linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)",
-                          backgroundSize: "20px 20px"
-                        }}
-                      />
-                      
-                      {/* Radial gradient mask to focus visual center */}
-                      <div 
-                        className="absolute inset-0"
-                        style={{
-                          background: isDark
-                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
-                            : "radial-gradient(circle, transparent 20%, white 90%)"
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
                 {/* Watermark gigante */}
                 <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
                   REVIEWS
@@ -1057,42 +1029,33 @@ export default function HomePage() {
                   <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-yellow-500/20 dark:border-yellow-400/15 self-center" />
                   {/* Informações de Status retro no cabeçalho */}
                   <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-yellow-500/80 dark:text-yellow-400/80 select-none text-right">
-                    <span className="font-bold tracking-wider">[ ARCADE RACK SYSTEM // AR-256 ]</span>
-                    <span className="opacity-60">SHELF CONNECTED... OK</span>
+                    <span className="font-bold tracking-wider">[ FLOPPY DRIVE SYSTEM // FD-350 ]</span>
+                    <span className="opacity-60">DISKETTE STORAGE READY</span>
                   </div>
                 </div>
 
                 {/* Cards Reviews */}
-                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10">
+                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10 pt-2">
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1 pt-4"
+                    className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
                     {displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
-                        const scoreNum = post.score ? parseFloat(post.score) : 0;
-                        let spineColor = "bg-amber-500 dark:bg-amber-600 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
-                        let sealBg = "from-yellow-300 via-amber-400 to-yellow-500 border-amber-600 text-amber-950 shadow-[0_0_8px_rgba(234,179,8,0.5)]";
-                        let ratingLabel = "GOLD CLASS";
-                        
-                        if (scoreNum >= 9.0) {
-                          spineColor = "bg-amber-500 dark:bg-amber-600 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
-                          sealBg = "from-yellow-300 via-amber-400 to-yellow-500 border-amber-600 text-amber-950 shadow-[0_0_8px_rgba(234,179,8,0.5)]";
-                          ratingLabel = "GOLD CLASS";
-                        } else if (scoreNum >= 8.0) {
-                          spineColor = "bg-slate-400 dark:bg-slate-500 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
-                          sealBg = "from-slate-200 via-slate-300 to-slate-400 border-slate-500 text-slate-900";
-                          ratingLabel = "SILVER CLASS";
-                        } else {
-                          spineColor = "bg-amber-800 dark:bg-amber-900 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.5)]";
-                          sealBg = "from-amber-700 via-amber-800 to-amber-900 border-amber-950 text-amber-100";
-                          ratingLabel = "BRONZE CLASS";
-                        }
-
                         const isHovered = hoveredReviewsIndex === i;
                         const isAnyHovered = hoveredReviewsIndex !== null;
+
+                        // List of premium retro diskette plastic colors
+                        const floppyColors = [
+                          "bg-blue-600 dark:bg-blue-700 text-white", 
+                          "bg-red-600 dark:bg-red-700 text-white",   
+                          "bg-zinc-700 dark:bg-zinc-800 text-white", 
+                          "bg-teal-600 dark:bg-teal-700 text-white", 
+                          "bg-emerald-600 dark:bg-emerald-700 text-white", 
+                        ];
+                        const diskColorClass = floppyColors[i % floppyColors.length];
 
                         return (
                           <motion.div
@@ -1103,9 +1066,9 @@ export default function HomePage() {
                             className={cn(
                               "min-w-[290px] lg:min-w-0 w-full h-[120px] lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
                               isAnyHovered && !isHovered
-                                ? "opacity-50 scale-[0.98] blur-[0.4px]"
+                                ? "opacity-55 scale-[0.98] blur-[0.3px]"
                                 : isHovered
-                                ? "lg:translate-x-2.5 scale-[1.02] z-20"
+                                ? "lg:-translate-y-2 lg:scale-[1.02] z-20"
                                 : ""
                             )}
                             onMouseEnter={() => {
@@ -1116,79 +1079,95 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 bg-[#e2cb9f]/10 dark:bg-black/40 backdrop-blur-[2px] shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-                                isHovered
-                                  ? "border-yellow-500 shadow-[5px_5px_0px_rgba(234,179,8,1)] bg-amber-500/10 dark:bg-amber-500/5"
-                                  : "border-black"
+                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+                                diskColorClass,
+                                isHovered ? "shadow-[6px_6px_0px_rgba(0,0,0,1)]" : ""
                               )}
                             >
-                              {/* Glossy Plastic highlight overlay */}
+                              {/* Write-protect notch cut (bottom-right small indent) */}
+                              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-black border-t-2 border-l-2 border-black select-none pointer-events-none" />
+                              
+                              {/* Top-Right Chanfro (diagonal cut corner) */}
                               <div className={cn(
-                                "absolute inset-0 pointer-events-none z-10 transition-transform duration-700 bg-gradient-to-tr from-white/0 via-white/10 to-white/0",
-                                isHovered ? "translate-x-full" : "-translate-x-full"
-                              )} style={{ transform: isHovered ? "none" : undefined }} />
+                                "absolute top-0 right-0 w-3 h-3 border-b-2 border-l-2 border-black rotate-45 translate-x-1.5 -translate-y-1.5 select-none pointer-events-none z-20",
+                                isDark ? "bg-[#1f1d35]" : "bg-white"
+                              )} />
 
-                              {/* 1. CD Jewel Case Spine (Colored Left Strip) */}
-                              <div className={cn("w-6 flex flex-col items-center justify-between py-2 shrink-0 border-r border-black/30", spineColor)}>
-                                <div className="w-2.5 h-2.5 rounded-full bg-white/20 border border-white/40 flex items-center justify-center">
-                                  <div className="w-1 h-1 rounded-full bg-black/40" />
+                              {/* 1. Metal Shutter Section (Left side) */}
+                              <div className="w-24 relative border-r-2 border-black bg-zinc-300 dark:bg-zinc-400 shrink-0 overflow-hidden flex items-center justify-center select-none">
+                                {/* Metallic finish effect */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-black/10 animate-pulse" />
+
+                                {/* Shutter Slider Plate (slides right/left when hovered) */}
+                                <div 
+                                  className={cn(
+                                    "absolute inset-0 bg-zinc-400 dark:bg-zinc-500 border-r border-black/30 transition-transform duration-500 ease-in-out flex flex-col justify-between py-3 items-center z-10",
+                                    isHovered ? "translate-x-full" : "translate-x-0"
+                                  )}
+                                >
+                                  <div className="w-4 h-5 border border-black/30 bg-zinc-500/30 rounded-sm flex items-center justify-center">
+                                    <span className="text-[8px] font-bold text-black/50">◀</span>
+                                  </div>
+                                  <div className="text-[6px] font-mono font-bold text-black/40 tracking-tighter">
+                                    HD 1.44MB
+                                  </div>
                                 </div>
-                                <span className="font-mono font-bold text-[6px] tracking-widest text-black/60 rotate-90 uppercase select-none whitespace-nowrap -my-4">
-                                  {ratingLabel}
-                                </span>
-                                <div className="w-2.5 h-1 bg-black/30 rounded-sm" />
+
+                                {/* Underneath the shutter: Magnetic Disk & Shutter window */}
+                                <div className="w-12 h-12 rounded-full bg-black/95 flex items-center justify-center border border-black shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] relative">
+                                  <div className="w-6 h-6 rounded-full bg-zinc-200 border border-black flex items-center justify-center relative">
+                                    <div className="w-1.5 h-1.5 bg-black/80 rounded-sm absolute top-0.5" />
+                                    <div className="w-1 h-1 bg-black/80 rounded-sm absolute right-1 top-2" />
+                                  </div>
+                                </div>
                               </div>
 
-                              {/* 2. Album Cover (Square Thumbnail) */}
-                              {post.imageUrl && (
-                                <div className="w-24 h-full relative shrink-0 border-r border-black overflow-hidden select-none bg-black">
-                                  <img
-                                    src={post.imageUrl}
-                                    alt={post.title}
-                                    loading="lazy"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                  <div className="absolute inset-0 border border-white/20 pointer-events-none" />
-                                  <div className="absolute inset-y-0 right-0 w-[3px] bg-gradient-to-r from-transparent to-black/30" />
-                                </div>
-                              )}
+                              {/* 2. Paper Label Section (Right side) */}
+                              <div className="flex-1 bg-white text-black p-2.5 flex flex-col justify-between relative min-w-0 select-text">
+                                {/* Label header styling */}
+                                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500" />
+                                
+                                {/* Floppy Sticker Notebook lines */}
+                                <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{
+                                  backgroundImage: "repeating-linear-gradient(0deg, #000, #000 1px, transparent 1px, transparent 12px)",
+                                  backgroundPosition: "0 10px"
+                                }} />
 
-                              {/* 3. Jewel Case Contents (CD Booklet Title and Info) */}
-                              <div className="flex-1 p-3 flex flex-col justify-between relative min-w-0">
-                                <div>
+                                {/* Label Content */}
+                                <div className="relative z-10 pt-1">
                                   <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
-                                      OFFICIAL REVIEW
+                                    <span className="text-[6.5px] font-mono font-black text-red-500 tracking-wider">
+                                      PROJECT_BEGINS // DISK_0{i + 1}
                                     </span>
-                                    <div className="flex items-center gap-[0.5px] h-2.5 bg-white/80 dark:bg-white/95 px-0.5 border border-black/30 select-none">
-                                      {[1, 2, 1, 1, 2, 1, 2].map((w, idx) => (
-                                        <div key={idx} className="bg-black h-full" style={{ width: `${w}px` }} />
-                                      ))}
+
+                                    <div className="flex items-center gap-1 select-none">
+                                      <span className="text-[5.5px] font-mono text-gray-400 font-bold uppercase">READ</span>
+                                      <div className={cn(
+                                        "w-1.5 h-1.5 rounded-full border border-black/30 transition-colors duration-300",
+                                        isHovered ? "bg-emerald-500 shadow-[0_0_4px_#10b981]" : "bg-gray-300"
+                                      )} />
                                     </div>
                                   </div>
 
-                                  <h4 className={cn(
-                                    "font-retro font-bold text-[11px] sm:text-xs leading-snug line-clamp-2 transition-colors duration-300",
-                                    isHovered 
-                                      ? "text-yellow-600 dark:text-yellow-400" 
-                                      : "text-gray-900 dark:text-gray-100"
-                                  )}>
+                                  <h4 className="font-mono font-bold text-[10.5px] sm:text-xs leading-tight line-clamp-2 text-zinc-950 uppercase tracking-tight">
                                     {post.title}
                                   </h4>
                                 </div>
 
-                                <div className="flex items-end justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
-                                  <div className="text-[7px] text-gray-500 font-mono font-bold">
-                                    RELEASED: {formatDate(post.createdAt, post.date ?? undefined)}
+                                {/* Bottom status and circular stamp */}
+                                <div className="relative z-10 flex items-end justify-between pt-1 border-t border-dashed border-zinc-300 mt-1 select-none">
+                                  <div className="text-[6.5px] text-zinc-500 font-mono font-bold leading-tight">
+                                    <div>DATE: {formatDate(post.createdAt, post.date ?? undefined)}</div>
+                                    <div>BLOCKS: {formatNumber(post.views || 0)} KB</div>
                                   </div>
 
                                   {post.score && (
                                     <div className={cn(
-                                      "relative flex items-center justify-center w-9 h-9 rounded-full border border-double bg-gradient-to-br font-retro font-black text-[9px] shadow-[1px_1px_3px_rgba(0,0,0,0.3)] animate-pulse shrink-0 rotate-[-8deg] select-none",
-                                      sealBg
+                                      "relative flex flex-col items-center justify-center w-9 h-9 rounded-full border-2 border-red-500/80 text-red-600 font-retro font-black text-[9px] rotate-[-12deg] tracking-tighter leading-none select-none",
+                                      "bg-red-500/5 shadow-[inset_0_0_2px_rgba(239,68,68,0.2)]"
                                     )}>
-                                      <div className="absolute inset-0 rounded-full border border-black/10 pointer-events-none" />
-                                      <span className="z-10 leading-none">{post.score}</span>
+                                      <span className="text-[5px] font-mono uppercase font-black tracking-tighter opacity-80 leading-none">NOTA</span>
+                                      <span className="text-[10px] leading-none mt-0.5">{post.score}</span>
                                     </div>
                                   )}
                                 </div>
