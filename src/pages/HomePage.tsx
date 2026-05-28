@@ -1035,7 +1035,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto h-28 lg:h-0 lg:flex-1 shrink-0 snap-center transition-all duration-300 relative",
+                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto h-28 lg:h-32 shrink-0 snap-center transition-all duration-300 relative",
                               isAnyHovered && !isHovered
                                 ? "opacity-65 scale-[0.99] blur-[0.2px]"
                                 : isHovered
