@@ -4,6 +4,19 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🖤 [v4.1.0] - The Retro-Modern Visual Decks Update
+*Data: 28 de Maio de 2026*
+
+### 🎨 Redesign Visual da Homepage (RetroCafé, Dossiês e Reviews)
+- **Visual Banca de Revistas (RetroCafé)**: Redesenhada a seção para exibir matérias como capas de revistas físicas dos anos 90, com logotipo estilizado, preço em Cruzeiros, código de barras e elevação 3D.
+- **Visual Arquivo Confidencial (Dossiês)**: Transformada a seção em pastas manila confidenciais com clipes metálicos, abas salientes numeradas, carimbo "CLASSIFICADO", fotos Polaroid ampliadas em proporção 4:3 e scanner laser azul interativo.
+- **Visual Decks Retro-Modernos com Fade (Reviews)**: Redesenhada a coluna de análises com cards horizontais divididos onde a arte do jogo (com 65% de largura) se integra ao texto na esquerda (50% de largura) através de um degradê de máscara (fade) suave e contínuo de 70% de largura. A imagem possui textura de scanlines limitada à sua área para preservar a leitura.
+- **Notas Metálicas Douradas em 3D**: O selo de nota das reviews foi promovido a um badge com degradê metálico brilhante (dourado/gold) e contornos neobrutalistas marcantes que escala, brilha e se eleva no hover.
+- **Feedback Sonoro Retrô**: Adicionada síntese de som nativa via Web Audio API, com cliques 8-bit suaves ao interagir com RetroCafé/Dossiês e bipe digital de menu clássico nas reviews.
+- **Otimização de Espaço e Layout**: Cabeçalhos alinhados com tipografia reduzida para maximizar o crescimento dos cards e preenchimento de espaços vazios com linhas conectoras pontilhadas e status do sistema retro-gaming.
+
+---
+
 ## 🖤 [v4.0.0] - The Neo-Brutalist Classic Edition
 *Data: 28 de Maio de 2026*
 

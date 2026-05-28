@@ -1,8 +1,8 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v3.10.1)
+# 🕹️ BeginsProject - Retro Gaming Journal (v4.1.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 3.10.1, o portal traz um design mais moderno na homepage com micro-animações dinâmicas, barra de progresso no carrossel, correção de overflow responsivo, e um novo mecanismo atômico e leve de contagem de visualizações integrado com localStorage.
+O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 4.1.0, o portal traz um redesign temático completo na homepage para as seções RetroCafé, Dossiês e Reviews, removendo os cards genéricos e substituindo-os por capas de revista vintage, pastas manila confidenciais e decks retro-modernos integrados com fade, acompanhados de efeitos de áudio sintetizados nativamente e animações interativas de alta fidelidade.
 
 ---
 
