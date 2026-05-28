@@ -1055,8 +1055,8 @@ export default function HomePage() {
                                 isHovered ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" : "border-black"
                               )}
                             >
-                              {/* 1. Left Side: Content Booklet (55% width) */}
-                              <div className="w-[55%] p-3 flex flex-col justify-between relative z-20 min-w-0">
+                              {/* 1. Left Side: Content Booklet (48% width) */}
+                              <div className="w-[48%] p-3 flex flex-col justify-between relative z-20 min-w-0">
                                 <div>
                                   <div className="flex items-center gap-1.5">
                                     <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
@@ -1079,9 +1079,12 @@ export default function HomePage() {
                                 </div>
 
                                 {/* Footer details (Score badge, Date, views) */}
-                                <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
+                                <div className="flex items-end justify-between border-t border-black/10 dark:border-white/10 pt-1.5 mt-1">
                                   {post.score && (
-                                    <div className="inline-flex items-center gap-1 bg-yellow-400 text-black px-1.5 py-0.5 font-retro font-black text-[8px] border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none">
+                                    <div className={cn(
+                                      "inline-flex items-center gap-1 text-black px-2 py-0.5 font-retro font-black text-[10px] sm:text-[11px] border-2 border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none transition-all duration-300",
+                                      isHovered ? "bg-yellow-300 scale-105 -translate-y-0.5" : "bg-yellow-400"
+                                    )}>
                                       ★ {post.score}
                                     </div>
                                   )}
@@ -1092,9 +1095,9 @@ export default function HomePage() {
                                 </div>
                               </div>
 
-                              {/* 2. Right Side: Game Artwork with Fade-out (45% width) */}
+                              {/* 2. Right Side: Game Artwork with Fade-out (52% width) */}
                               {post.imageUrl && (
-                                <div className="w-[45%] h-full relative shrink-0 overflow-hidden select-none bg-black">
+                                <div className="w-[52%] h-full relative shrink-0 overflow-hidden select-none bg-black">
                                   <img
                                     src={post.imageUrl}
                                     alt={post.title}
@@ -1103,7 +1106,7 @@ export default function HomePage() {
                                   />
                                   {/* Fade gradient overlay that blends into the background */}
                                   <div className={cn(
-                                    "absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r z-10 pointer-events-none",
+                                    "absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r z-10 pointer-events-none",
                                     fadeGradientClass
                                   )} />
                                   
