@@ -393,27 +393,9 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    {/* Indicadores de Scroll Mobile */}
-                    <div className="flex md:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); scrollContainer(retrocafeRef, "left"); }}
-                        className="p-1 hover:text-orange-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                        aria-label="Deslizar esquerda"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
-                      <button
-                        onClick={(e) => { e.stopPropagation(); scrollContainer(retrocafeRef, "right"); }}
-                        className="p-1 hover:text-orange-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                        aria-label="Deslizar direita"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
                     <span 
                       onClick={() => goToCategory("RetroCafé")}
-                      className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-orange-400 flex items-center gap-1 transition-colors cursor-pointer"
+                      className="hidden md:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-orange-400 items-center gap-1 transition-colors cursor-pointer"
                     >
                       Ver mais <ChevronRight className="w-3 h-3" />
                     </span>
@@ -490,27 +472,9 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    {/* Indicadores de Scroll Mobile */}
-                    <div className="flex md:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); scrollContainer(dossieRef, "left"); }}
-                        className="p-1 hover:text-blue-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                        aria-label="Deslizar esquerda"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
-                      <button
-                        onClick={(e) => { e.stopPropagation(); scrollContainer(dossieRef, "right"); }}
-                        className="p-1 hover:text-blue-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                        aria-label="Deslizar direita"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
                     <span 
                       onClick={() => goToCategory("Dossiês")}
-                      className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-blue-400 flex items-center gap-1 transition-colors cursor-pointer"
+                      className="hidden md:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-blue-400 items-center gap-1 transition-colors cursor-pointer"
                     >
                       Ver mais <ChevronRight className="w-3 h-3" />
                     </span>
@@ -585,27 +549,9 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  {/* Indicadores de Scroll Mobile */}
-                  <div className="flex lg:hidden items-center gap-1.5 bg-black/10 dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/5 select-none">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); scrollContainer(reviewsRef, "left"); }}
-                      className="p-1 hover:text-yellow-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                      aria-label="Deslizar esquerda"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); scrollContainer(reviewsRef, "right"); }}
-                      className="p-1 hover:text-yellow-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
-                      aria-label="Deslizar direita"
-                    >
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
                   <span 
                     onClick={() => goToCategory("Reviews")}
-                    className="text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 flex items-center gap-1 transition-colors cursor-pointer"
+                    className="hidden lg:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 items-center gap-1 transition-colors cursor-pointer"
                   >
                     Ver mais <ChevronRight className="w-3 h-3" />
                   </span>
