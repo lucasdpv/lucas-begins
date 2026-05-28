@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import { Gamepad2, ChevronRight, ChevronLeft, LayoutGrid, Map, Layers } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -126,6 +126,20 @@ export default function HomePage() {
   const dossieRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
+  const [retrocafeScroll, setRetrocafeScroll] = useState({ left: false, right: true });
+  const [dossieScroll, setDossieScroll] = useState({ left: false, right: true });
+  const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
+
+  const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
+    if (ref.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = ref.current;
+      setScroll({
+        left: scrollLeft > 5,
+        right: scrollLeft < scrollWidth - clientWidth - 10
+      });
+    }
+  }, []);
+
   const scrollContainer = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
     if (ref.current) {
       const scrollAmount = ref.current.clientWidth * 0.8;
@@ -198,6 +212,25 @@ export default function HomePage() {
   const displayRetrocafe = retrocafePosts.slice(0, 3);
   const displayDossie = dossiePosts.slice(0, 3);
   const displayReviews = reviewPosts.slice(0, 5);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateScrollState(retrocafeRef, setRetrocafeScroll);
+      updateScrollState(dossieRef, setDossieScroll);
+      updateScrollState(reviewsRef, setReviewsScroll);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [displayRetrocafe, displayDossie, displayReviews, updateScrollState]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      updateScrollState(retrocafeRef, setRetrocafeScroll);
+      updateScrollState(dossieRef, setDossieScroll);
+      updateScrollState(reviewsRef, setReviewsScroll);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateScrollState]);
 
   const gridPosts = isSearching 
     ? filteredPosts.slice(0, 6) 
@@ -388,23 +421,49 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div ref={retrocafeRef} className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
-                  {displayRetrocafe.length > 0 ? (
-                    displayRetrocafe.map((post, i) => (
-                      <motion.div
-                        key={post.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                        className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
-                      >
-                        <PostCard post={post} />
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
-                      <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
-                    </div>
+                <div className="relative group/scroll-container w-full">
+                  <div 
+                    ref={retrocafeRef} 
+                    onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                  >
+                    {displayRetrocafe.length > 0 ? (
+                      displayRetrocafe.map((post, i) => (
+                        <motion.div
+                          key={post.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                          className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
+                        >
+                          <PostCard post={post} />
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
+                        <span className="text-sm font-retro uppercase">Sem posts de RetroCafé</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Setinhas de navegação/feedback visual no Mobile */}
+                  {retrocafeScroll.left && (
+                    <button
+                      onClick={() => scrollContainer(retrocafeRef, "left")}
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar esquerda"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-orange-400" />
+                    </button>
+                  )}
+                  {retrocafeScroll.right && (
+                    <button
+                      onClick={() => scrollContainer(retrocafeRef, "right")}
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar direita"
+                    >
+                      <ChevronRight className="w-5 h-5 text-orange-400" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -459,23 +518,49 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards Dossiês */}
-                <div ref={dossieRef} className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
-                  {displayDossie.length > 0 ? (
-                    displayDossie.map((post, i) => (
-                      <motion.div
-                        key={post.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                        className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
-                      >
-                        <PostCard post={post} />
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
-                      <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
-                    </div>
+                <div className="relative group/scroll-container w-full">
+                  <div 
+                    ref={dossieRef} 
+                    onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                  >
+                    {displayDossie.length > 0 ? (
+                      displayDossie.map((post, i) => (
+                        <motion.div
+                          key={post.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                          className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
+                        >
+                          <PostCard post={post} />
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className={cn("col-span-3 p-8 rounded-3xl border-2 border-dashed flex items-center justify-center min-h-[120px] glass-card border-black/10 dark:border-white/10", isDark ? "text-gray-500" : "text-gray-400")}>
+                        <span className="text-sm font-retro uppercase">Sem Dossiês Cadastrados</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Setinhas de navegação/feedback visual no Mobile */}
+                  {dossieScroll.left && (
+                    <button
+                      onClick={() => scrollContainer(dossieRef, "left")}
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar esquerda"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-blue-400" />
+                    </button>
+                  )}
+                  {dossieScroll.right && (
+                    <button
+                      onClick={() => scrollContainer(dossieRef, "right")}
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar direita"
+                    >
+                      <ChevronRight className="w-5 h-5 text-blue-400" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -528,65 +613,91 @@ export default function HomePage() {
               </div>
 
               {/* Cards Reviews */}
-              <div ref={reviewsRef} className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
-                {displayReviews.length > 0 ? (
-                  displayReviews.map((post) => {
-                    const targetSlug = post.slug || slugify(post.title);
-                    const scoreNum = parseFloat(String(post.score ?? 0));
-                    const scorePercent = Math.min(100, (scoreNum / 10) * 100);
-                    return (
-                      <Link
-                        key={post.id}
-                        to={`/post/${targetSlug}`}
-                        className={cn(
-                          "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
-                        )}
-                      >
-                        {/* Imagem */}
-                        {post.imageUrl ? (
-                          <img
-                            src={post.imageUrl}
-                            alt={post.title}
-                            className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-yellow-700/20 to-amber-900/30" />
-                        )}
-                        {/* Gradiente */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-
-                        {/* Score badge */}
-                        <div className="absolute top-3 right-3 z-20 px-2 py-0.5 rounded font-retro font-black text-[11px] bg-black/75 border border-yellow-400/60 text-yellow-400 backdrop-blur-sm shadow-[0_0_8px_rgba(234,179,8,0.25)] group-hover/item:bg-yellow-400 group-hover/item:text-black transition-all duration-300">
-                          ★ {post.score ?? "—"}
-                        </div>
-
-                        {/* Conteúdo */}
-                        <div className="relative z-10 space-y-1">
-                          <h4 className="font-bold text-sm text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
-                            {post.title}
-                          </h4>
-                          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
-                            <span>{formatNumber(post.views || 0)} views</span>
-                            <span>·</span>
-                            <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
-                          </div>
-                          {post.score && (
-                            <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden mt-1.5">
-                              <div
-                                className="h-full bg-gradient-to-r from-yellow-500 to-amber-300 rounded-full opacity-75 group-hover/item:opacity-100 transition-opacity"
-                                style={{ width: `${scorePercent}%` }}
-                              />
-                            </div>
+              <div className="relative group/scroll-container w-full">
+                <div 
+                  ref={reviewsRef} 
+                  onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
+                  className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                >
+                  {displayReviews.length > 0 ? (
+                    displayReviews.map((post) => {
+                      const targetSlug = post.slug || slugify(post.title);
+                      const scoreNum = parseFloat(String(post.score ?? 0));
+                      const scorePercent = Math.min(100, (scoreNum / 10) * 100);
+                      return (
+                        <Link
+                          key={post.id}
+                          to={`/post/${targetSlug}`}
+                          className={cn(
+                            "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
                           )}
-                        </div>
-                      </Link>
-                    );
-                  })
-                ) : (
-                  <div className="flex items-center justify-center py-12">
-                    <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
-                  </div>
+                        >
+                          {/* Imagem */}
+                          {post.imageUrl ? (
+                            <img
+                              src={post.imageUrl}
+                              alt={post.title}
+                              className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-700/20 to-amber-900/30" />
+                          )}
+                          {/* Gradiente */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+
+                          {/* Score badge */}
+                          <div className="absolute top-3 right-3 z-20 px-2 py-0.5 rounded font-retro font-black text-[11px] bg-black/75 border border-yellow-400/60 text-yellow-400 backdrop-blur-sm shadow-[0_0_8px_rgba(234,179,8,0.25)] group-hover/item:bg-yellow-400 group-hover/item:text-black transition-all duration-300">
+                            ★ {post.score ?? "—"}
+                          </div>
+
+                          {/* Conteúdo */}
+                          <div className="relative z-10 space-y-1">
+                            <h4 className="font-bold text-sm text-white group-hover/item:text-yellow-300 transition-colors leading-snug line-clamp-2">
+                              {post.title}
+                            </h4>
+                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
+                              <span>{formatNumber(post.views || 0)} views</span>
+                              <span>·</span>
+                              <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+                            </div>
+                            {post.score && (
+                              <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className="h-full bg-gradient-to-r from-yellow-500 to-amber-300 rounded-full opacity-75 group-hover/item:opacity-100 transition-opacity"
+                                  style={{ width: `${scorePercent}%` }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </Link>
+                      );
+                    })
+                  ) : (
+                    <div className="flex items-center justify-center py-12">
+                      <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Setinhas de navegação/feedback visual no Mobile */}
+                {reviewsScroll.left && (
+                  <button
+                    onClick={() => scrollContainer(reviewsRef, "left")}
+                    className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                    aria-label="Deslizar esquerda"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-yellow-400" />
+                  </button>
+                )}
+                {reviewsScroll.right && (
+                  <button
+                    onClick={() => scrollContainer(reviewsRef, "right")}
+                    className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                    aria-label="Deslizar direita"
+                  >
+                    <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  </button>
                 )}
               </div>
             </div>
