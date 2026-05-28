@@ -215,12 +215,12 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
           {post.excerpt && (
             <div className={cn(
-              "relative p-8 pt-12 rounded-none border-4 group", 
-              isDark ? "bg-gray-800/40 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]" : "bg-white border-purple-400 shadow-[4px_4px_0_rgba(168,85,247,0.4)]"
+              "relative p-8 pt-12 rounded-3xl border-2 glass-card transition-all duration-300 group", 
+              isDark ? "border-purple-500/15 shadow-[6px_6px_0_rgba(168,85,247,0.15)]" : "border-black shadow-[6px_6px_0_rgba(0,0,0,1)]"
             )}>
               <div className="absolute -top-6 left-8">
                 <span className={cn(
-                  "font-retro text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-none border-4 border-black flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)]", 
+                  "font-retro text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-2xl border-2 border-black flex items-center gap-2 shadow-[4px_4px_0_rgba(0,0,0,1)] dark:border-purple-500/15 dark:shadow-[4px_4px_0_rgba(168,85,247,0.15)]", 
                   isDark ? "bg-purple-600 text-white" : "bg-purple-500 text-white"
                 )}>
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse" />

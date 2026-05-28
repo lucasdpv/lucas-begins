@@ -13,7 +13,7 @@ export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
   return (
     <div
       className={cn(
-        "w-full h-[350px] md:h-[550px] rounded-none relative overflow-hidden retro-card flex items-center justify-center",
+        "w-full h-[350px] md:h-[550px] rounded-3xl relative overflow-hidden flex items-center justify-center border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card",
         (!post.imageUrl || imgError) && `bg-gradient-to-br ${(post as any).gradient || 'from-gray-900 to-purple-900'}`
       )}
       style={heroStyle}

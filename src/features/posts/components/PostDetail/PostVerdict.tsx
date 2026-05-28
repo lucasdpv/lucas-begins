@@ -13,13 +13,13 @@ export default function PostVerdict({ post, isDark }: PostVerdictProps) {
 
   return (
     <section className={cn(
-      "border-2 overflow-hidden group clear-both",
-      isDark ? "bg-gray-800/40 border-yellow-500/20" : "bg-snes-input border-snes-dark/10"
+      "border-2 rounded-3xl overflow-hidden group clear-both glass-card shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]",
+      isDark ? "border-yellow-500/15" : "border-black"
     )}>
       {/* Label topo */}
       <div className={cn(
         "px-5 py-2 border-b-2 flex items-center gap-2",
-        isDark ? "border-yellow-500/20 bg-yellow-500/5" : "border-snes-dark/10 bg-yellow-50"
+        isDark ? "border-yellow-500/15 bg-yellow-500/5" : "border-black/10 bg-yellow-50"
       )}>
         <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
         <span className="font-retro text-[10px] md:text-xs font-bold uppercase tracking-widest text-yellow-500">
