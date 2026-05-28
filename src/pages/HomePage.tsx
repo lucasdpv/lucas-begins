@@ -592,6 +592,8 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-orange-500/20 dark:border-orange-400/15 self-center" />
                   {/* Informações de Status retro no cabeçalho */}
                   <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-orange-500/80 dark:text-orange-400/80 select-none text-right">
                     <span className="font-bold tracking-wider">[ RETRO JOURNALISM SYSTEM // RC-012 ]</span>
@@ -828,6 +830,8 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-blue-500/20 dark:border-blue-400/15 self-center" />
                   {/* Informações de Status retro no cabeçalho */}
                   <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-blue-500/80 dark:text-blue-400/80 select-none text-right">
                     <span className="font-bold tracking-wider">[ DECK CLASSIFIED SYSTEM // DE-084 ]</span>
