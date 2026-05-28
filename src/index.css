@@ -481,3 +481,21 @@ div.skiptranslate,
   animation: metallicShine 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ============================================================
+   Redesign Seções RetroCafé & Dossiês
+   ============================================================ */
+@keyframes scannerBeam {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+.animate-scanner-beam {
+  animation: scannerBeam 3s ease-in-out infinite;
+}
+
+.font-stamp {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+

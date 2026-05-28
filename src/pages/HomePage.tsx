@@ -19,7 +19,7 @@ import {
   useLatestPosts
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify, formatNumber, formatDate } from "../lib/utils";
+import { cn, slugify, formatNumber, formatDate, calculateReadingTime } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 import { ScoreBadge } from "../components/ui/Badge";
 import { BRUTAL_DESIGN } from "../constants";
@@ -103,13 +103,14 @@ export default function HomePage() {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = ctx.currentTime;
       
-      // Eject mechanical clack: pitch sweep down saw wave
+      // Retro chime synth select tone
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.exponentialRampToValueAtTime(80, now + 0.12);
-      gain.gain.setValueAtTime(0.08, now);
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(659.25, now); // E5
+      osc.frequency.setValueAtTime(987.77, now + 0.04); // B5
+      
+      gain.gain.setValueAtTime(0.04, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
       
       osc.connect(gain);
@@ -132,6 +133,33 @@ export default function HomePage() {
   const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
   const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
   const [hoveredMaisLidosIndex, setHoveredMaisLidosIndex] = useState<number>(0);
+  const [hoveredRetrocafeIndex, setHoveredRetrocafeIndex] = useState<number | null>(null);
+  const [hoveredDossieIndex, setHoveredDossieIndex] = useState<number | null>(null);
+  const [hoveredReviewsIndex, setHoveredReviewsIndex] = useState<number | null>(null);
+
+  const playClickSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+      
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch (e) {
+      // Audio context block
+    }
+  }, []);
+
 
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
     if (ref.current) {
@@ -485,16 +513,80 @@ export default function HomePage() {
             <div className="lg:col-span-2 flex flex-col gap-10">
 
               {/* ── RetroCafé ── */}
-              <div className="space-y-5">
+              <div 
+                className={cn(
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredRetrocafeIndex(null)}
+              >
+                {/* Background Image transition */}
+                <AnimatePresence>
+                  {hoveredRetrocafeIndex !== null && displayRetrocafe[hoveredRetrocafeIndex] && (
+                    <motion.div
+                      key={displayRetrocafe[hoveredRetrocafeIndex].id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-0 pointer-events-none"
+                    >
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500",
+                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                        )}
+                        style={{
+                          backgroundImage: `url(${displayRetrocafe[hoveredRetrocafeIndex].imageUrl})`,
+                        }}
+                      />
+                      
+                      {/* Tint overlay matching section theme */}
+                      <div className={cn(
+                        "absolute inset-0 mix-blend-color",
+                        isDark ? "bg-orange-950/40" : "bg-orange-100/30"
+                      )} />
+                      
+                      {/* CRT and Dot Matrix grid pattern overlay */}
+                      <div className="absolute inset-0 scanline-overlay opacity-30" />
+                      
+                      <div 
+                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+                        style={{
+                          backgroundImage: isDark
+                            ? "radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0)"
+                            : "radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 0)",
+                          backgroundSize: "16px 16px"
+                        }}
+                      />
+                      
+                      {/* Radial gradient mask to focus visual center */}
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: isDark
+                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
+                            : "radial-gradient(circle, transparent 20%, white 90%)"
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  RETROCAFÉ
+                </div>
+
                 {/* Cabeçalho */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10">
                   <div
                     className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("RetroCafé")}
                   >
                     <div className="w-1.5 self-stretch rounded-none shrink-0 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_15px_rgba(249,115,22,0.9)] transition-all" />
                     <div>
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         RetroCafé
                       </h2>
                       <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
@@ -502,27 +594,130 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-orange-500/20 dark:border-orange-400/15 self-center" />
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-orange-500/80 dark:text-orange-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ RETRO JOURNALISM SYSTEM // RC-012 ]</span>
+                    <span className="opacity-60">EDITIONS INDEX: 3/3 READY</span>
+                  </div>
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div className="relative group/scroll-container w-full">
+                <div className="relative group/scroll-container w-full relative z-10">
                   <div 
                     ref={retrocafeRef} 
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex sm:grid overflow-x-auto sm:overflow-x-visible sm:grid-cols-2 md:grid-cols-3 gap-4 pb-4 sm:pb-0 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {displayRetrocafe.length > 0 ? (
-                      displayRetrocafe.map((post, i) => (
-                        <motion.div
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
-                        >
-                          <PostCard post={post} showCategory={false} />
-                        </motion.div>
-                      ))
+                      displayRetrocafe.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "w-full sm:w-auto shrink-0 snap-start snap-always transition-all duration-300",
+                              hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
+                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
+                                : hoveredRetrocafeIndex === i
+                                ? "scale-[1.03] z-10"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredRetrocafeIndex(i);
+                              playClickSound();
+                            }}
+                          >
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative aspect-[3/4] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none transition-all duration-300",
+                                isDark
+                                  ? "bg-gray-900 text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
+                                  : "bg-white text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
+                              )}
+                            >
+                              {/* Capa background image */}
+                              {post.imageUrl && (
+                                <img
+                                  src={post.imageUrl}
+                                  alt={post.title}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                  loading="lazy"
+                                />
+                              )}
+                              {/* Color gradient to make text readable and pop */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75 z-10" />
+
+                              {/* Scanline overlay */}
+                              <div className="absolute inset-0 scanline-overlay opacity-25 z-10 pointer-events-none" />
+
+                              {/* Magazine Header Bar */}
+                              <div className="relative z-20 p-3 flex justify-between items-start border-b border-white/10 bg-black/60 backdrop-blur-sm">
+                                <div className="flex flex-col">
+                                  <span className="font-retro font-black uppercase text-[15px] tracking-wide text-orange-500 text-glow">
+                                    RETROCAFÉ
+                                  </span>
+                                  <span className="text-[7px] font-black uppercase tracking-[0.2em] text-gray-400">
+                                    Crônicas &amp; Nostalgia
+                                  </span>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                  <span className="text-[7px] font-bold text-orange-400">ED. #0{i + 1}</span>
+                                  <span className="text-[6px] text-gray-400">MAI 2026</span>
+                                </div>
+                              </div>
+
+                              {/* Central Sticker Price Badge */}
+                              <div className="absolute top-16 right-3 z-20 w-10 h-10 rounded-full bg-yellow-400 border-2 border-black flex flex-col items-center justify-center rotate-12 shadow-[2px_2px_0px_rgba(0,0,0,1)] text-black select-none">
+                                <span className="text-[5px] font-black uppercase leading-none">PREÇO</span>
+                                <span className="text-[9px] font-retro font-black leading-none mt-0.5">CR$450</span>
+                              </div>
+
+                              {/* Main Headline Content */}
+                              <div className="relative z-20 p-4 mt-auto flex flex-col gap-2">
+                                {/* Subhead tag */}
+                                <div className="flex items-center gap-1.5">
+                                  <span className="inline-block px-1.5 py-0.5 text-[6px] font-retro font-black uppercase bg-orange-500 text-black border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] select-none">
+                                    NOSTALGIA!
+                                  </span>
+                                  <span className="text-[8px] font-bold text-gray-300 uppercase tracking-wider">
+                                    {formatDate(post.createdAt, post.date ?? undefined)}
+                                  </span>
+                                </div>
+
+                                {/* Mega Headline title */}
+                                <h3 className="font-retro font-black uppercase text-sm md:text-base text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                  {post.title}
+                                </h3>
+
+                                {/* Barcode and Views at the bottom */}
+                                <div className="flex items-end justify-between mt-2 pt-2 border-t border-white/10">
+                                  {/* Simulado Barcode */}
+                                  <div className="flex items-center gap-0.5 h-4 bg-white/90 p-0.5 border border-black select-none">
+                                    {[1, 2, 1, 3, 1, 2, 4, 1, 2, 3].map((width, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="bg-black h-full"
+                                        style={{ width: `${width}px` }}
+                                      />
+                                    ))}
+                                  </div>
+
+                                  <div className="flex flex-col items-end text-[7px] text-gray-400 font-bold uppercase">
+                                    <span>READING TIME: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
+                                    <span className="text-orange-400 font-retro tracking-wide">{formatNumber(post.views || 0)} VIEWS</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })
                     ) : (
                       <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <Coffee className="w-8 h-8 opacity-40 animate-pulse text-orange-500" />
@@ -535,7 +730,7 @@ export default function HomePage() {
                   {retrocafeScroll.left && (
                     <button
                       onClick={() => scrollContainer(retrocafeRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar esquerda"
                     >
                       <ChevronLeft className="w-5 h-5 text-orange-400" />
@@ -544,7 +739,7 @@ export default function HomePage() {
                   {retrocafeScroll.right && (
                     <button
                       onClick={() => scrollContainer(retrocafeRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar direita"
                     >
                       <ChevronRight className="w-5 h-5 text-orange-400" />
@@ -556,16 +751,80 @@ export default function HomePage() {
 
 
               {/* ── Dossiês ── */}
-              <div className="space-y-5">
+              <div 
+                className={cn(
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredDossieIndex(null)}
+              >
+                {/* Background Image transition */}
+                <AnimatePresence>
+                  {hoveredDossieIndex !== null && displayDossie[hoveredDossieIndex] && (
+                    <motion.div
+                      key={displayDossie[hoveredDossieIndex].id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-0 pointer-events-none"
+                    >
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 filter sepia brightness-[0.7] contrast-[1.2] hue-rotate-[180deg]",
+                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                        )}
+                        style={{
+                          backgroundImage: `url(${displayDossie[hoveredDossieIndex].imageUrl})`,
+                        }}
+                      />
+                      
+                      {/* Tint overlay matching section theme */}
+                      <div className={cn(
+                        "absolute inset-0 mix-blend-color",
+                        isDark ? "bg-blue-950/45" : "bg-blue-100/30"
+                      )} />
+                      
+                      {/* CRT and Blueprint line grid pattern overlay */}
+                      <div className="absolute inset-0 scanline-overlay opacity-30" />
+                      
+                      <div 
+                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+                        style={{
+                          backgroundImage: isDark
+                            ? "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)"
+                            : "linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)",
+                          backgroundSize: "20px 20px"
+                        }}
+                      />
+                      
+                      {/* Radial gradient mask to focus visual center */}
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: isDark
+                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
+                            : "radial-gradient(circle, transparent 20%, white 90%)"
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  DOSSIÊS
+                </div>
+
                 {/* Cabeçalho */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10">
                   <div
                     className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("Dossiês")}
                   >
                     <div className="w-1.5 self-stretch rounded-none shrink-0 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_15px_rgba(59,130,246,0.9)] transition-all" />
                     <div>
-                      <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
                         Dossiês
                       </h2>
                       <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
@@ -573,27 +832,111 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-blue-500/20 dark:border-blue-400/15 self-center" />
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-blue-500/80 dark:text-blue-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ DECK CLASSIFIED SYSTEM // DE-084 ]</span>
+                    <span className="opacity-60">DECODING DECK INDEX... READY</span>
+                  </div>
                 </div>
 
                 {/* Cards Dossiês */}
-                <div className="relative group/scroll-container w-full">
+                <div className="relative group/scroll-container w-full relative z-10">
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex sm:grid overflow-x-auto sm:overflow-x-visible sm:grid-cols-2 md:grid-cols-3 gap-4 pb-4 sm:pb-0 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4"
                   >
                     {displayDossie.length > 0 ? (
-                      displayDossie.map((post, i) => (
-                        <motion.div
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
-                        >
-                          <PostCard post={post} showCategory={false} />
-                        </motion.div>
-                      ))
+                      displayDossie.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "w-full sm:w-auto shrink-0 snap-start snap-always transition-all duration-300 relative",
+                              hoveredDossieIndex !== null && hoveredDossieIndex !== i
+                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
+                                : hoveredDossieIndex === i
+                                ? "scale-[1.03] z-10"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredDossieIndex(i);
+                              playClickSound();
+                            }}
+                          >
+                            {/* Salient folder tab */}
+                            <div className={cn(
+                              "absolute -top-4.5 left-4 px-3 py-0.5 border-t-2 border-x-2 border-black rounded-t-sm text-[7px] font-retro font-bold uppercase tracking-wider text-black select-none z-10 transition-colors duration-300",
+                              hoveredDossieIndex === i
+                                ? "bg-[#f1e0c5] dark:bg-[#d6be90]"
+                                : "bg-[#e3cb9f] dark:bg-[#c2aa78]"
+                            )}>
+                              DOSSIÊ #0{i + 1}
+                            </div>
+
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative h-[350px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
+                                hoveredDossieIndex === i
+                                  ? "bg-[#ebd5ad] dark:bg-[#cbb284]"
+                                  : "bg-[#e2cba0] dark:bg-[#c2aa78]"
+                              )}
+                            >
+                              {/* Laser scan line overlay */}
+                              <div className="absolute h-0.5 w-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)] top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30" />
+
+                              {/* Paperclip */}
+                              <div className="absolute top-2.5 left-6 w-3.5 h-8 bg-slate-400 border border-slate-600 rounded-full opacity-90 z-20 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] transform -rotate-12 select-none" />
+
+                              {/* Polaroid photo frame */}
+                              <div className="relative w-full aspect-[4/3] border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1.5deg] z-10 shrink-0 overflow-hidden select-none">
+                                {post.imageUrl && (
+                                  <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                    loading="lazy"
+                                  />
+                                )}
+                                <div className="absolute inset-0 scanline-overlay opacity-15 pointer-events-none" />
+                                
+                                {/* Photo tape or label */}
+                                <div className="mt-1.5 text-[5.5px] font-mono text-center text-gray-500 tracking-wider leading-none">
+                                  ANEXO_FOTO_REGISTRO_0{i + 1}.PNG
+                                </div>
+                              </div>
+
+                              {/* Manila page details (typewriter style) */}
+                              <div className="relative z-10 font-mono text-black mt-3 flex-grow flex flex-col justify-between">
+                                <div className="space-y-2">
+                                  {/* Confidencial stamp */}
+                                  <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[7px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
+                                    ★ CLASSIFICADO ★
+                                  </div>
+                                  <h3 className="font-bold text-xs uppercase tracking-tight leading-snug line-clamp-3 text-black">
+                                    {post.title}
+                                  </h3>
+                                </div>
+
+                                <div className="text-[7.5px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
+                                  <div>DATA REGISTRO: {formatDate(post.createdAt, post.date ?? undefined)}</div>
+                                  <div className="flex items-center justify-between text-blue-800 dark:text-blue-900 font-retro tracking-wider">
+                                    <span>LEITURA: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
+                                    <span>{formatNumber(post.views || 0)} VIEWS</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })
                     ) : (
                       <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <FolderOpen className="w-8 h-8 opacity-40 animate-pulse text-blue-500" />
@@ -606,7 +949,7 @@ export default function HomePage() {
                   {dossieScroll.left && (
                     <button
                       onClick={() => scrollContainer(dossieRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar esquerda"
                     >
                       <ChevronLeft className="w-5 h-5 text-blue-400" />
@@ -615,7 +958,7 @@ export default function HomePage() {
                   {dossieScroll.right && (
                     <button
                       onClick={() => scrollContainer(dossieRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                       aria-label="Deslizar direita"
                     >
                       <ChevronRight className="w-5 h-5 text-blue-400" />
@@ -630,99 +973,174 @@ export default function HomePage() {
               {/* Divisor sutil acima de Reviews no mobile */}
               <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/5")} />
 
-              {/* Cabeçalho */}
-               <div className="flex items-center justify-between">
-                 <div
-                   className="flex items-center gap-3 cursor-pointer group/title"
-                   onClick={() => goToCategory("Reviews")}
-                 >
-                   <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
-                   <div>
-                     <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                       Reviews
-                     </h2>
-                     <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                       Análises com Nota
-                     </p>
-                   </div>
-                 </div>
-               </div>
-
-              {/* Cards Reviews */}
-              <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col">
-                <div
-                  ref={reviewsRef}
-                  onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                  className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
-                >
-                  {displayReviews.length > 0 ? (
-                    displayReviews.map((post, i) => {
-                      const targetSlug = post.slug || slugify(post.title);
-                      return (
-                        <motion.article
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="group relative min-w-[280px] lg:min-w-0 w-full h-32 lg:h-0 lg:flex-1 bg-black overflow-hidden border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(234,179,8,0.6)] transition-shadow cursor-pointer snap-center shrink-0 lg:shrink-0"
-                        >
-                          <Link to={`/post/${targetSlug}`} className="absolute inset-0 z-20" aria-label={post.title} />
-
-                          {post.imageUrl && (
-                            <img
-                              src={post.imageUrl}
-                              alt={post.title}
-                              loading="lazy"
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          )}
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-
-                          {post.score && (
-                            <span className="absolute top-0 left-0 z-10 shimmer-badge text-black font-retro font-black text-[11px] px-2 py-1 border-b-2 border-r-2 border-black">
-                              ★ {post.score}
-                            </span>
-                          )}
-
-                          <span className="absolute top-2 right-2 z-10 text-[8px] font-black uppercase tracking-widest text-yellow-400 bg-black/60 px-2 py-0.5 border border-yellow-500/30">
-                            Reviews
-                          </span>
-
-                          <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                            <h4 className="font-retro font-bold text-[13px] leading-snug line-clamp-2 text-white group-hover:text-yellow-300 transition-colors">
-                              {post.title}
-                            </h4>
-                          </div>
-                        </motion.article>
-                      );
-                    })
-                  ) : (
-                    <div className="flex items-center justify-center py-12">
-                      <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
-                    </div>
-                  )}
+              <div 
+                className={cn(
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredReviewsIndex(null)}
+              >
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  REVIEWS
                 </div>
 
-                {reviewsScroll.left && (
-                  <button
-                    onClick={() => scrollContainer(reviewsRef, "left")}
-                    className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                    aria-label="Deslizar esquerda"
+                {/* Cabeçalho */}
+                <div className="flex items-center justify-between relative z-10">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer group/title"
+                    onClick={() => goToCategory("Reviews")}
                   >
-                    <ChevronLeft className="w-5 h-5 text-yellow-400" />
-                  </button>
-                )}
-                {reviewsScroll.right && (
-                  <button
-                    onClick={() => scrollContainer(reviewsRef, "right")}
-                    className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                    aria-label="Deslizar direita"
+                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
+                    <div>
+                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                        Reviews
+                      </h2>
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
+                        Análises com Nota
+                      </p>
+                    </div>
+                  </div>
+                  {/* Linha pontilhada conectora para preencher o espaço */}
+                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-yellow-500/20 dark:border-yellow-400/15 self-center" />
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-yellow-500/80 dark:text-yellow-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ DECK REVIEW SYSTEM // REV-005 ]</span>
+                    <span className="opacity-60">DECK CONNECTED... READY</span>
+                  </div>
+                </div>
+
+                {/* Cards Reviews */}
+                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10 pt-2">
+                  <div
+                    ref={reviewsRef}
+                    onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
+                    className="flex sm:grid lg:flex lg:flex-col sm:grid-cols-2 gap-3 overflow-x-auto sm:overflow-x-visible lg:overflow-x-visible pb-4 sm:pb-0 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
-                    <ChevronRight className="w-5 h-5 text-yellow-400" />
-                  </button>
-                )}
-              </div>{/* fim group/scroll-container reviews */}
+                    {displayReviews.length > 0 ? (
+                      displayReviews.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        const isHovered = hoveredReviewsIndex === i;
+                        const isAnyHovered = hoveredReviewsIndex !== null;
+
+                        const cardBgClass = isDark ? "bg-[#141226] text-white" : "bg-white text-zinc-900";
+                        const fadeGradientClass = isDark 
+                          ? "from-[#141226] via-[#141226]/50 to-transparent" 
+                          : "from-white via-white/50 to-transparent";
+
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "min-w-[290px] sm:min-w-0 lg:min-w-0 w-full sm:w-auto lg:w-full h-28 lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-center transition-all duration-300 relative",
+                              isAnyHovered && !isHovered
+                                ? "opacity-65 scale-[0.99] blur-[0.2px]"
+                                : isHovered
+                                ? "lg:-translate-y-0.5 lg:translate-x-0.5 z-20"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredReviewsIndex(i);
+                              playEjectSound();
+                            }}
+                          >
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                                cardBgClass,
+                                isHovered ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" : "border-black"
+                              )}
+                            >
+                              {/* 1. Left Side: Content Booklet (50% width) */}
+                              <div className="w-[50%] p-3 flex flex-col justify-between relative z-20 min-w-0">
+                                <div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                                      OFFICIAL REVIEW
+                                    </span>
+                                    {/* Scanline dot status */}
+                                    <span className={cn(
+                                      "w-1 h-1 rounded-full",
+                                      isHovered ? "bg-yellow-400 animate-ping" : "bg-yellow-500/60"
+                                    )} />
+                                  </div>
+
+                                  <h4 className="font-retro font-bold text-xs sm:text-[13px] leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
+                                    <span className={cn(
+                                      isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
+                                    )}>
+                                      {post.title}
+                                    </span>
+                                  </h4>
+                                </div>
+
+                                {/* Footer details (Score badge only) */}
+                                <div className="border-t border-black/10 dark:border-white/10 pt-1.5 mt-1.5 flex justify-start">
+                                  {post.score && (
+                                    <div className={cn(
+                                      "inline-flex items-center gap-1 text-black px-3 py-1 font-retro font-black text-xs sm:text-[13px] border-2 border-black shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 uppercase tracking-wider select-none leading-none transition-all duration-300",
+                                      isHovered ? "from-yellow-200 via-yellow-300 to-amber-400 scale-110 -translate-y-1 shadow-[3.5px_3.5px_0px_rgba(0,0,0,1)] border-yellow-500" : ""
+                                    )}>
+                                      ★ {post.score}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* 2. Right Side: Game Artwork with Fade-out (absolute right overlay, 65% width) */}
+                              {post.imageUrl && (
+                                <div className="absolute right-0 top-0 bottom-0 w-[65%] h-full select-none bg-black z-10 overflow-hidden">
+                                  <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                  />
+                                  {/* Fade gradient overlay that blends into the background */}
+                                  <div className={cn(
+                                    "absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r z-10 pointer-events-none",
+                                    fadeGradientClass
+                                  )} />
+                                  
+                                  {/* Retro scanline overlay on image area */}
+                                  <div className="absolute inset-0 scanline-overlay opacity-[0.18] pointer-events-none z-10" />
+                                </div>
+                              )}
+                            </Link>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <div className="flex items-center justify-center py-12">
+                        <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {reviewsScroll.left && (
+                    <button
+                      onClick={() => scrollContainer(reviewsRef, "left")}
+                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar esquerda"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-yellow-400" />
+                    </button>
+                  )}
+                  {reviewsScroll.right && (
+                    <button
+                      onClick={() => scrollContainer(reviewsRef, "right")}
+                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex sm:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                      aria-label="Deslizar direita"
+                    >
+                      <ChevronRight className="w-5 h-5 text-yellow-400" />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -769,13 +1187,13 @@ export default function HomePage() {
 
         {/* Feed Content: Clean 3-Column Grid */}
         {isLoadingPosts ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <PostSkeleton key={i} isDark={isDark} />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
