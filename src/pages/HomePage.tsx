@@ -19,7 +19,7 @@ import {
   useLatestPosts
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify, formatNumber, formatDate } from "../lib/utils";
+import { cn, slugify, formatNumber, formatDate, calculateReadingTime } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 import { ScoreBadge } from "../components/ui/Badge";
 import { BRUTAL_DESIGN } from "../constants";
@@ -132,6 +132,32 @@ export default function HomePage() {
   const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
   const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
   const [hoveredMaisLidosIndex, setHoveredMaisLidosIndex] = useState<number>(0);
+  const [hoveredRetrocafeIndex, setHoveredRetrocafeIndex] = useState<number | null>(null);
+  const [hoveredDossieIndex, setHoveredDossieIndex] = useState<number | null>(null);
+
+  const playClickSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+      
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch (e) {
+      // Audio context block
+    }
+  }, []);
+
 
   const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
     if (ref.current) {
@@ -485,9 +511,73 @@ export default function HomePage() {
             <div className="lg:col-span-2 flex flex-col gap-10">
 
               {/* ── RetroCafé ── */}
-              <div className="space-y-5">
+              <div 
+                className={cn(
+                  "p-6 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-5 rounded-none z-10",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredRetrocafeIndex(null)}
+              >
+                {/* Background Image transition */}
+                <AnimatePresence>
+                  {hoveredRetrocafeIndex !== null && displayRetrocafe[hoveredRetrocafeIndex] && (
+                    <motion.div
+                      key={displayRetrocafe[hoveredRetrocafeIndex].id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-0 pointer-events-none"
+                    >
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500",
+                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                        )}
+                        style={{
+                          backgroundImage: `url(${displayRetrocafe[hoveredRetrocafeIndex].imageUrl})`,
+                        }}
+                      />
+                      
+                      {/* Tint overlay matching section theme */}
+                      <div className={cn(
+                        "absolute inset-0 mix-blend-color",
+                        isDark ? "bg-orange-950/40" : "bg-orange-100/30"
+                      )} />
+                      
+                      {/* CRT and Dot Matrix grid pattern overlay */}
+                      <div className="absolute inset-0 scanline-overlay opacity-30" />
+                      
+                      <div 
+                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+                        style={{
+                          backgroundImage: isDark
+                            ? "radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0)"
+                            : "radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 0)",
+                          backgroundSize: "16px 16px"
+                        }}
+                      />
+                      
+                      {/* Radial gradient mask to focus visual center */}
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: isDark
+                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
+                            : "radial-gradient(circle, transparent 20%, white 90%)"
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  RETROCAFÉ
+                </div>
+
                 {/* Cabeçalho */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10">
                   <div
                     className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("RetroCafé")}
@@ -505,24 +595,120 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards RetroCafé */}
-                <div className="relative group/scroll-container w-full">
+                <div className="relative group/scroll-container w-full relative z-10">
                   <div 
                     ref={retrocafeRef} 
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
                     className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {displayRetrocafe.length > 0 ? (
-                      displayRetrocafe.map((post, i) => (
-                        <motion.div
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
-                        >
-                          <PostCard post={post} showCategory={false} />
-                        </motion.div>
-                      ))
+                      displayRetrocafe.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always transition-all duration-300",
+                              hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
+                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
+                                : hoveredRetrocafeIndex === i
+                                ? "scale-[1.03] z-10"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredRetrocafeIndex(i);
+                              playClickSound();
+                            }}
+                          >
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative aspect-[3/4] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none transition-all duration-300",
+                                isDark
+                                  ? "bg-gray-900 text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
+                                  : "bg-white text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
+                              )}
+                            >
+                              {/* Capa background image */}
+                              {post.imageUrl && (
+                                <img
+                                  src={post.imageUrl}
+                                  alt={post.title}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                  loading="lazy"
+                                />
+                              )}
+                              {/* Color gradient to make text readable and pop */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75 z-10" />
+
+                              {/* Scanline overlay */}
+                              <div className="absolute inset-0 scanline-overlay opacity-25 z-10 pointer-events-none" />
+
+                              {/* Magazine Header Bar */}
+                              <div className="relative z-20 p-3 flex justify-between items-start border-b border-white/10 bg-black/60 backdrop-blur-sm">
+                                <div className="flex flex-col">
+                                  <span className="font-retro font-black uppercase text-[15px] tracking-wide text-orange-500 text-glow">
+                                    RETROCAFÉ
+                                  </span>
+                                  <span className="text-[7px] font-black uppercase tracking-[0.2em] text-gray-400">
+                                    Crônicas &amp; Nostalgia
+                                  </span>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                  <span className="text-[7px] font-bold text-orange-400">ED. #0{i + 1}</span>
+                                  <span className="text-[6px] text-gray-400">MAI 2026</span>
+                                </div>
+                              </div>
+
+                              {/* Central Sticker Price Badge */}
+                              <div className="absolute top-16 right-3 z-20 w-10 h-10 rounded-full bg-yellow-400 border-2 border-black flex flex-col items-center justify-center rotate-12 shadow-[2px_2px_0px_rgba(0,0,0,1)] text-black select-none">
+                                <span className="text-[5px] font-black uppercase leading-none">PREÇO</span>
+                                <span className="text-[9px] font-retro font-black leading-none mt-0.5">CR$450</span>
+                              </div>
+
+                              {/* Main Headline Content */}
+                              <div className="relative z-20 p-4 mt-auto flex flex-col gap-2">
+                                {/* Subhead tag */}
+                                <div className="flex items-center gap-1.5">
+                                  <span className="inline-block px-1.5 py-0.5 text-[6px] font-retro font-black uppercase bg-orange-500 text-black border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] select-none">
+                                    NOSTALGIA!
+                                  </span>
+                                  <span className="text-[8px] font-bold text-gray-300 uppercase tracking-wider">
+                                    {formatDate(post.createdAt, post.date ?? undefined)}
+                                  </span>
+                                </div>
+
+                                {/* Mega Headline title */}
+                                <h3 className="font-retro font-black uppercase text-sm md:text-base text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                  {post.title}
+                                </h3>
+
+                                {/* Barcode and Views at the bottom */}
+                                <div className="flex items-end justify-between mt-2 pt-2 border-t border-white/10">
+                                  {/* Simulado Barcode */}
+                                  <div className="flex items-center gap-0.5 h-4 bg-white/90 p-0.5 border border-black select-none">
+                                    {[1, 2, 1, 3, 1, 2, 4, 1, 2, 3].map((width, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="bg-black h-full"
+                                        style={{ width: `${width}px` }}
+                                      />
+                                    ))}
+                                  </div>
+
+                                  <div className="flex flex-col items-end text-[7px] text-gray-400 font-bold uppercase">
+                                    <span>READING TIME: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
+                                    <span className="text-orange-400 font-retro tracking-wide">{formatNumber(post.views || 0)} VIEWS</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })
                     ) : (
                       <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <Coffee className="w-8 h-8 opacity-40 animate-pulse text-orange-500" />
@@ -556,9 +742,73 @@ export default function HomePage() {
 
 
               {/* ── Dossiês ── */}
-              <div className="space-y-5">
+              <div 
+                className={cn(
+                  "p-6 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-5 rounded-none z-10 pt-10",
+                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                )}
+                onMouseLeave={() => setHoveredDossieIndex(null)}
+              >
+                {/* Background Image transition */}
+                <AnimatePresence>
+                  {hoveredDossieIndex !== null && displayDossie[hoveredDossieIndex] && (
+                    <motion.div
+                      key={displayDossie[hoveredDossieIndex].id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-0 pointer-events-none"
+                    >
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 filter sepia brightness-[0.7] contrast-[1.2] hue-rotate-[180deg]",
+                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                        )}
+                        style={{
+                          backgroundImage: `url(${displayDossie[hoveredDossieIndex].imageUrl})`,
+                        }}
+                      />
+                      
+                      {/* Tint overlay matching section theme */}
+                      <div className={cn(
+                        "absolute inset-0 mix-blend-color",
+                        isDark ? "bg-blue-950/45" : "bg-blue-100/30"
+                      )} />
+                      
+                      {/* CRT and Blueprint line grid pattern overlay */}
+                      <div className="absolute inset-0 scanline-overlay opacity-30" />
+                      
+                      <div 
+                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+                        style={{
+                          backgroundImage: isDark
+                            ? "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)"
+                            : "linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)",
+                          backgroundSize: "20px 20px"
+                        }}
+                      />
+                      
+                      {/* Radial gradient mask to focus visual center */}
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: isDark
+                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
+                            : "radial-gradient(circle, transparent 20%, white 90%)"
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Watermark gigante */}
+                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
+                  DOSSIÊS
+                </div>
+
                 {/* Cabeçalho */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between relative z-10">
                   <div
                     className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("Dossiês")}
@@ -576,24 +826,101 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards Dossiês */}
-                <div className="relative group/scroll-container w-full">
+                <div className="relative group/scroll-container w-full relative z-10">
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex md:grid overflow-x-auto md:overflow-x-visible md:grid-cols-3 gap-6 pb-4 md:pb-5 scrollbar-hide snap-x snap-mandatory w-full pt-4"
                   >
                     {displayDossie.length > 0 ? (
-                      displayDossie.map((post, i) => (
-                        <motion.div
-                          key={post.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                          className="w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always"
-                        >
-                          <PostCard post={post} showCategory={false} />
-                        </motion.div>
-                      ))
+                      displayDossie.map((post, i) => {
+                        const targetSlug = post.slug || slugify(post.title);
+                        return (
+                          <motion.div
+                            key={post.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                            className={cn(
+                              "w-full sm:w-[calc(50%-12px)] md:w-auto shrink-0 snap-start snap-always transition-all duration-300 relative",
+                              hoveredDossieIndex !== null && hoveredDossieIndex !== i
+                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
+                                : hoveredDossieIndex === i
+                                ? "scale-[1.03] z-10"
+                                : ""
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredDossieIndex(i);
+                              playClickSound();
+                            }}
+                          >
+                            {/* Salient folder tab */}
+                            <div className={cn(
+                              "absolute -top-4.5 left-4 px-3 py-0.5 border-t-2 border-x-2 border-black rounded-t-sm text-[7px] font-retro font-bold uppercase tracking-wider text-black select-none z-10 transition-colors duration-300",
+                              hoveredDossieIndex === i
+                                ? "bg-[#f1e0c5] dark:bg-[#d6be90]"
+                                : "bg-[#e3cb9f] dark:bg-[#c2aa78]"
+                            )}>
+                              DOSSIÊ #0{i + 1}
+                            </div>
+
+                            <Link
+                              to={`/post/${targetSlug}`}
+                              className={cn(
+                                "relative h-[330px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
+                                hoveredDossieIndex === i
+                                  ? "bg-[#ebd5ad] dark:bg-[#cbb284]"
+                                  : "bg-[#e2cba0] dark:bg-[#c2aa78]"
+                              )}
+                            >
+                              {/* Laser scan line overlay */}
+                              <div className="absolute h-0.5 w-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)] top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30" />
+
+                              {/* Paperclip */}
+                              <div className="absolute top-2.5 left-6 w-3.5 h-8 bg-slate-400 border border-slate-600 rounded-full opacity-90 z-20 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] transform -rotate-12 select-none" />
+
+                              {/* Polaroid photo frame */}
+                              <div className="relative w-full aspect-video border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1.5deg] z-10 shrink-0 overflow-hidden select-none">
+                                {post.imageUrl && (
+                                  <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                    loading="lazy"
+                                  />
+                                )}
+                                <div className="absolute inset-0 scanline-overlay opacity-15 pointer-events-none" />
+                                
+                                {/* Photo tape or label */}
+                                <div className="mt-1.5 text-[5.5px] font-mono text-center text-gray-500 tracking-wider leading-none">
+                                  ANEXO_FOTO_REGISTRO_0{i + 1}.PNG
+                                </div>
+                              </div>
+
+                              {/* Manila page details (typewriter style) */}
+                              <div className="relative z-10 font-mono text-black mt-3 flex-grow flex flex-col justify-between">
+                                <div className="space-y-2">
+                                  {/* Confidencial stamp */}
+                                  <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[7px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
+                                    ★ CLASSIFICADO ★
+                                  </div>
+                                  <h3 className="font-bold text-xs uppercase tracking-tight leading-snug line-clamp-3 text-black">
+                                    {post.title}
+                                  </h3>
+                                </div>
+
+                                <div className="text-[7.5px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
+                                  <div>DATA REGISTRO: {formatDate(post.createdAt, post.date ?? undefined)}</div>
+                                  <div className="flex items-center justify-between text-blue-800 dark:text-blue-900 font-retro tracking-wider">
+                                    <span>LEITURA: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
+                                    <span>{formatNumber(post.views || 0)} VIEWS</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        );
+                      })
                     ) : (
                       <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
                         <FolderOpen className="w-8 h-8 opacity-40 animate-pulse text-blue-500" />

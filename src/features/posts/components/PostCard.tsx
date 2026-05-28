@@ -26,6 +26,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-amber-600 dark:text-amber-400",
         hoverBorder: "group-hover:border-amber-500/40 dark:group-hover:border-amber-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(234,179,8,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(234,179,8,1)]",
       };
     case "dossiês":
     case "dossies":
@@ -34,6 +36,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-blue-600 dark:text-blue-400",
         hoverBorder: "group-hover:border-blue-500/40 dark:group-hover:border-blue-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(59,130,246,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(59,130,246,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(59,130,246,1)]",
       };
     case "retrocafé":
     case "retrocafe":
@@ -43,6 +47,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-orange-600 dark:text-orange-450",
         hoverBorder: "group-hover:border-orange-500/40 dark:group-hover:border-orange-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(249,115,22,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(249,115,22,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(249,115,22,1)]",
       };
     case "especial":
       return {
@@ -50,6 +56,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-purple-600 dark:text-purple-400",
         hoverBorder: "group-hover:border-purple-500/40 dark:group-hover:border-purple-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(168,85,247,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(168,85,247,1)]",
       };
     case "nostalgia":
       return {
@@ -57,6 +65,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-pink-600 dark:text-pink-400",
         hoverBorder: "group-hover:border-pink-500/40 dark:group-hover:border-pink-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(236,72,153,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(236,72,153,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(236,72,153,1)]",
       };
     case "cultura pop":
     case "culturapop":
@@ -65,6 +75,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-emerald-600 dark:text-emerald-400",
         hoverBorder: "group-hover:border-emerald-500/40 dark:group-hover:border-emerald-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(16,185,129,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(16,185,129,1)]",
       };
     case "rpg & mmo":
     case "rpg mmo":
@@ -74,6 +86,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-cyan-600 dark:text-cyan-400",
         hoverBorder: "group-hover:border-cyan-500/40 dark:group-hover:border-cyan-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(6,182,212,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(6,182,212,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(6,182,212,1)]",
       };
     default:
       return {
@@ -81,6 +95,8 @@ const getCategoryCardStyles = (category: string) => {
         textLabel: "text-purple-600 dark:text-purple-400",
         hoverBorder: "group-hover:border-purple-500/40 dark:group-hover:border-purple-400/40",
         hoverShadow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.25)]",
+        hoverShadowBrutal: "hover:shadow-[6px_6px_0px_rgba(168,85,247,1)]",
+        hoverShadowBrutalCompact: "hover:shadow-[4px_4px_0px_rgba(168,85,247,1)]",
       };
   }
 };
@@ -110,8 +126,9 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         className={cn(
           "flex flex-col h-full group relative overflow-hidden rounded-none border-2 transition-all duration-300 hover:translate-y-[-4px]",
           isDark
-            ? "bg-[#1f1d35] border-black text-gray-100 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(168,85,247,1)] hover:border-black"
-            : "bg-white border-black text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(168,85,247,1)] hover:border-black"
+            ? "bg-[#1f1d35] border-black text-gray-100 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:border-black"
+            : "bg-white border-black text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:border-black",
+          cardStyles.hoverShadowBrutalCompact
         )}
       >
         <Link 
@@ -337,8 +354,9 @@ export default function PostCard({ post, variant = "default", showCategory = tru
       className={cn(
         "flex flex-col h-full group relative overflow-hidden rounded-none border-2 transition-all duration-300 hover:translate-y-[-4px]",
         isDark
-          ? "bg-[#1f1d35] border-black text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black"
-          : "bg-white border-black text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black"
+          ? "bg-[#1f1d35] border-black text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black"
+          : "bg-white border-black text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black",
+        cardStyles.hoverShadowBrutal
       )}
     >
       <Link
