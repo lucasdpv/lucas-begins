@@ -19,22 +19,22 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
   return (
     <section className="animate-pulse">
       {/* Linha de títulos (mesmo grid da página real) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* "Em Destaque" */}
-        <div className="md:col-span-2 flex items-center gap-3">
+        <div className="lg:col-span-2 flex items-center gap-3">
           <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-purple-850 shadow-[0_0_10px_rgba(168,85,247,0.5)]" : "bg-purple-300")} />
           <div className={cn("w-40 md:w-52 h-7 md:h-8 rounded", skeletonAcc)} />
         </div>
-        {/* Sidebar title (apenas tablet/desktop) */}
-        <div className="hidden md:flex items-center gap-3 w-full">
+        {/* Sidebar title (apenas desktop) */}
+        <div className="hidden lg:flex items-center gap-3 w-full">
           <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-amber-405 shadow-[0_0_10px_rgba(251,191,36,0.5)]" : "bg-amber-300")} />
           <div className={cn("w-32 h-7 rounded", skeletonAcc)} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Carrossel (col-span-2) ── */}
-        <div className="md:col-span-2">
+        <div className="lg:col-span-2">
           <div className={cn(
             "relative rounded-3xl border-2 border-black dark:border-purple-500/15 overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card",
             skeletonBg
@@ -92,8 +92,8 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
           </div>
         </div>
 
-        {/* ── Sidebar Em Alta (col-span-1) — apenas tablet/desktop ── */}
-        <aside className="hidden md:block lg:col-span-1">
+        {/* ── Sidebar Em Alta (col-span-1) — apenas desktop ── */}
+        <aside className="hidden lg:block lg:col-span-1">
           <div className={cn(
             "h-full lg:h-[560px] p-6 rounded-3xl flex flex-col justify-between overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card"
           )}>
