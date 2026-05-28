@@ -592,6 +592,11 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-orange-500/80 dark:text-orange-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ RETRO JOURNALISM SYSTEM // RC-012 ]</span>
+                    <span className="opacity-60">EDITIONS INDEX: 3/3 READY</span>
+                  </div>
                 </div>
 
                 {/* Cards RetroCafé */}
@@ -823,6 +828,11 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
+                  {/* Informações de Status retro no cabeçalho */}
+                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-blue-500/80 dark:text-blue-400/80 select-none text-right">
+                    <span className="font-bold tracking-wider">[ DECK CLASSIFIED SYSTEM // DE-084 ]</span>
+                    <span className="opacity-60">DECODING DECK INDEX... READY</span>
+                  </div>
                 </div>
 
                 {/* Cards Dossiês */}
@@ -867,7 +877,7 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative h-[330px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
+                                "relative h-[350px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
                                 hoveredDossieIndex === i
                                   ? "bg-[#ebd5ad] dark:bg-[#cbb284]"
                                   : "bg-[#e2cba0] dark:bg-[#c2aa78]"
@@ -880,7 +890,7 @@ export default function HomePage() {
                               <div className="absolute top-2.5 left-6 w-3.5 h-8 bg-slate-400 border border-slate-600 rounded-full opacity-90 z-20 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] transform -rotate-12 select-none" />
 
                               {/* Polaroid photo frame */}
-                              <div className="relative w-full aspect-video border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1.5deg] z-10 shrink-0 overflow-hidden select-none">
+                              <div className="relative w-full aspect-[4/3] border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1.5deg] z-10 shrink-0 overflow-hidden select-none">
                                 {post.imageUrl && (
                                   <img
                                     src={post.imageUrl}
