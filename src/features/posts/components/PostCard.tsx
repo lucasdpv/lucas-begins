@@ -177,27 +177,28 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
     );
   }
 
-  // Variant Default: Design Editorial "Borderless" Premium
-  // A caixa e bordas externas são removidas; o contorno e as auras de categoria residem inteiramente na imagem
+  // Variant Default: Design Card Contido
   return (
     <article
-      className="flex flex-col h-full group relative transition-all duration-300 hover:translate-y-[-4px]"
+      className={cn(
+        "flex flex-col h-full group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:translate-y-[-4px]",
+        isDark
+          ? "bg-[#1f1d35] border-purple-500/20 shadow-[0_4px_24px_rgba(0,0,0,0.5)] hover:border-purple-400/40 hover:shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+          : "bg-white border-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.07)] hover:border-black/18 hover:shadow-[0_8px_28px_rgba(0,0,0,0.12)]",
+        cardStyles.hoverBorder,
+        cardStyles.hoverShadow
+      )}
     >
-      <Link 
-        to={targetPath} 
-        className="absolute inset-0 z-0" 
+      <Link
+        to={targetPath}
+        className="absolute inset-0 z-0"
         aria-label={`Ler matéria: ${post.title}`}
       />
 
-      {/* Thumbnail Container (Image gets borders/shadows/glows) */}
+      {/* Thumbnail — flush ao topo do card, sem margem */}
       <div
         className={cn(
-          "w-full aspect-video md:aspect-[16/10] relative overflow-hidden rounded-3xl border transition-all duration-500 bg-gray-900 z-10 pointer-events-none shadow-md",
-          isDark 
-            ? "border-purple-500/10 shadow-[6px_6px_0px_rgba(0,0,0,0.35)]" 
-            : "border-black/5 shadow-[6px_6px_0px_rgba(45,27,105,0.05)]",
-          cardStyles.hoverBorder,
-          cardStyles.hoverShadow
+          "w-full aspect-video relative overflow-hidden bg-gray-900 z-10 pointer-events-none shrink-0"
         )}
       >
         {post.imageUrl && !imgError && (
@@ -226,44 +227,61 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         )}
 
         {/* CRT Scanlines Overlay */}
-        <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-60 transition-opacity duration-300 z-10" />
+        <div className="absolute inset-0 scanline-overlay opacity-20 group-hover:opacity-45 transition-opacity duration-300 z-10" />
 
         {/* Score Badge floating top-right */}
         {post.score && (
-          <div className="absolute top-4 right-4 z-20">
+          <div className="absolute top-3 right-3 z-20">
             <ScoreBadge score={post.score} />
           </div>
         )}
-      </div>
 
-      {/* Conteúdo Area (Borderless, sitting directly on page bg) */}
-      <div className="flex flex-col flex-grow mt-4 px-1 relative z-10 pointer-events-none">
-        {/* Editorial Metadata HUD */}
-        <div className="flex items-center gap-2 mb-2 text-[10px] font-retro font-bold uppercase tracking-wider">
-          <span className={cn("transition-colors duration-300", cardStyles.textLabel)}>
+        {/* Categoria pill — canto inferior esquerdo sobre a imagem */}
+        <div className="absolute bottom-3 left-3 z-20 pointer-events-none">
+          <span className={cn(
+            "text-[9px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+            cardStyles.textLabel,
+            isDark
+              ? "bg-black/70 border-white/10 backdrop-blur-sm"
+              : "bg-white/80 border-black/10 backdrop-blur-sm"
+          )}>
             {post.category}
           </span>
-          <span className="text-slate-600 dark:text-slate-500">•</span>
-          <span className="text-slate-500 dark:text-slate-400">
-            {formatDate(post.createdAt, post.date ?? undefined)}
-          </span>
         </div>
+      </div>
+
+      {/* Conteúdo dentro do card */}
+      <div className="flex flex-col flex-grow p-4 relative z-10 pointer-events-none">
+        {/* Data */}
+        <span className="text-[9px] font-retro font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-1.5">
+          {formatDate(post.createdAt, post.date ?? undefined)}
+        </span>
 
         <h3 className={cn(
-          "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2.5 text-base md:text-lg lg:text-xl",
-          cardStyles.textHover
+          "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2 text-sm md:text-base lg:text-[17px]",
+          cardStyles.textHover,
+          isDark ? "text-gray-100" : "text-gray-900"
         )}>
           {post.title}
         </h3>
-        
-        <p className={cn("text-xs md:text-sm mb-5 line-clamp-3 flex-grow leading-relaxed font-medium", isDark ? "text-gray-400" : "text-gray-600")}>
-          {post.excerpt}
-        </p>
+
+        {/* Excerpt preview */}
+        {post.excerpt && (
+          <p className={cn(
+            "text-[11px] md:text-xs leading-relaxed line-clamp-2 mb-3",
+            isDark ? "text-slate-400" : "text-slate-500"
+          )}>
+            {post.excerpt}
+          </p>
+        )}
 
         {/* Footer do card com HUD de ações minimalista */}
-        <div className="flex items-center justify-between mt-auto pt-3.5 border-t border-black/5 dark:border-white/5">
+        <div className={cn(
+          "flex items-center justify-between mt-auto pt-3 border-t",
+          isDark ? "border-white/5" : "border-black/5"
+        )}>
           {/* Tempo de leitura */}
-          <span className={cn("text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase whitespace-nowrap", isDark ? "opacity-45" : "opacity-60")}>
+          <span className={cn("text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase whitespace-nowrap", isDark ? "opacity-40" : "opacity-55")}>
             <Clock className="w-3.5 h-3.5 shrink-0" />
             {calculateReadingTime(post.content || "").replace(" min de leitura", "m")}
           </span>
@@ -274,13 +292,13 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
               <button
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs",
-                  hasLiked 
-                    ? "text-red-500 scale-105" 
-                    : isDark 
-                    ? "text-gray-400 hover:text-red-400 hover:scale-110" 
+                  hasLiked
+                    ? "text-red-500 scale-105"
+                    : isDark
+                    ? "text-gray-400 hover:text-red-400 hover:scale-110"
                     : "text-gray-600 hover:text-red-500 hover:scale-110",
-                  currentUser 
-                    ? "active:scale-95 cursor-pointer" 
+                  currentUser
+                    ? "active:scale-95 cursor-pointer"
                     : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
@@ -294,13 +312,13 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
               <button
                 className={cn(
                   "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs",
-                  profile?.favorites?.includes(post.id) 
-                    ? "text-yellow-500 scale-105" 
-                    : isDark 
-                    ? "text-gray-400 hover:text-yellow-400 hover:scale-110" 
+                  profile?.favorites?.includes(post.id)
+                    ? "text-yellow-500 scale-105"
+                    : isDark
+                    ? "text-gray-400 hover:text-yellow-400 hover:scale-110"
                     : "text-gray-600 hover:text-yellow-500 hover:scale-110",
-                  currentUser 
-                    ? "active:scale-95 cursor-pointer" 
+                  currentUser
+                    ? "active:scale-95 cursor-pointer"
                     : isDark ? "opacity-40" : "opacity-50"
                 )}
                 onClick={() => {
@@ -337,3 +355,4 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
     </article>
   );
 }
+
