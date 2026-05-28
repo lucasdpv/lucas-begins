@@ -29,7 +29,6 @@ export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
           </p>
         </div>
       )}
-      <div className="absolute inset-0 scanline-overlay opacity-30" />
       <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
       
       <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-12 text-white w-full z-[10] pointer-events-none text-center md:text-left">
