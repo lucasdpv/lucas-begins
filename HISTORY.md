@@ -4,6 +4,35 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🖤 [v4.0.0] - The Neo-Brutalist Classic Edition
+*Data: 28 de Maio de 2026*
+
+### 🎨 Redesign Completo: Neo-Brutalismo Clássico
+- **Cantos 90°**: Remoção de todos os arredondamentos do portal. Todos os cards, modais, inputs, botões, avatares e painéis agora usam `rounded-none`, entregando uma estética de painel de HQ clássico.
+- **Fundos Sólidos**: Transição de efeitos glassmorphic translúcidos para fundos opacos e sólidos (`bg-[#1f1d35]` no modo escuro e `bg-white` no claro), garantindo contraste máximo e identidade visual forte.
+- **Bordas Pretas & Sombras Offset 2D**: Todos os cards usam `border-2 border-black` com sombras brutalistas offset (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`). Hover unificado que eleva a sombra para 8px e muda a cor para roxo vibrante (`rgba(168,85,247,1)`).
+- **Cor de Fundo Principal**: Fundo global definido como `#111827` (Tailwind gray-900) no modo escuro, com gradiente radial de iluminação superior em roxo que dissipa suavemente para a base sem escurecer ao rolar.
+
+### 🃏 Restauração do Layout Clássico dos Cards
+- **PostCard**: Imagem de altura fixa (`h-56 md:h-64`) com borda inferior preta grossa, título grande (`text-lg md:text-xl`), sinopse maior (`text-sm md:text-base`) e scanlines CRT com opacidade aprimorada no hover.
+- **Rodapé do Card**: Data e tempo de leitura empilhados à esquerda; HUD com curtidas, favoritos e autenticação à direita — fiel ao layout editorial clássico.
+- **Badges Unificados**: `CategoryBadge` sempre roxo (`bg-purple-600 text-white`) em todo o portal, alinhando-se à identidade visual clássica.
+
+### 🖼️ Imagem de Fundo Dinâmica com Fade (Mais Lidos)
+- **Hover Interativo**: Ao passar o mouse sobre qualquer item da lista desktop "Mais Lidos", a imagem do post correspondente aparece no fundo do painel, ocupando a metade direita da caixa.
+- **Fade Gradiente**: Máscara CSS `linear-gradient(to right, transparent, black)` aplicada via `mask-image` e `-webkit-mask-image` cria uma transição perfeita de transparente para sólido da esquerda para a direita.
+- **Animação Suave**: Keyframe `@keyframes bgFadeIn` e classe `.animate-bg-fade` no `index.css` para a transição de opacidade ao trocar de post.
+- **Fallback de Mouse-Leave**: Ao tirar o mouse do painel, o foco retorna para o primeiro item da lista.
+
+### 📰 Cabeçalhos de Seção Restaurados
+- Todos os cabeçalhos de seção da `HomePage` seguem o padrão clássico: barra indicadora lateral `w-1.5 self-stretch`, título `text-2xl md:text-3xl font-black uppercase`, subtítulo `text-[9px] tracking-[0.3em]`.
+- Botões de atalho "Ver mais" removidos de RetroCafé, Dossiês e Reviews para cabeçalhos limpos e focados.
+
+### 📱 Responsividade Aprimorada para Tablets
+- Media query de mobile corrigida de `max-width: 768px` para `max-width: 767px`, garantindo que tablets de 8" em portrait (768px) utilizem o layout editorial completo de desktop: colunas, imagens flutuadas e grid 2 colunas.
+
+---
+
 ## 🎨 [v3.10.1] - The Modern Visual & Robust Views Update
 *Data: 27 de Maio de 2026*
 
