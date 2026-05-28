@@ -1082,8 +1082,8 @@ export default function HomePage() {
                                 <div className="border-t border-black/10 dark:border-white/10 pt-1.5 mt-1.5 flex justify-start">
                                   {post.score && (
                                     <div className={cn(
-                                      "inline-flex items-center gap-1 text-black px-2 py-0.5 font-retro font-black text-[10px] sm:text-[11px] border-2 border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] uppercase tracking-wider select-none leading-none transition-all duration-300",
-                                      isHovered ? "bg-yellow-300 scale-105 -translate-y-0.5" : "bg-yellow-400"
+                                      "inline-flex items-center gap-1 text-black px-3 py-1 font-retro font-black text-xs sm:text-[13px] border-2 border-black shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 uppercase tracking-wider select-none leading-none transition-all duration-300",
+                                      isHovered ? "from-yellow-200 via-yellow-300 to-amber-400 scale-110 -translate-y-1 shadow-[3.5px_3.5px_0px_rgba(0,0,0,1)] border-yellow-500" : ""
                                     )}>
                                       ★ {post.score}
                                     </div>
