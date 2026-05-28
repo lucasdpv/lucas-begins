@@ -19,9 +19,9 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
   return (
     <section className="animate-pulse">
       {/* Linha de títulos (mesmo grid da página real) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* "Em Destaque" */}
-        <div className="lg:col-span-2 flex items-center gap-3">
+        <div className="md:col-span-2 flex items-center gap-3">
           <div className={cn("w-1.5 h-6 md:h-8 rounded-sm", isDark ? "bg-purple-850 shadow-[0_0_10px_rgba(168,85,247,0.5)]" : "bg-purple-300")} />
           <div className={cn("w-40 md:w-52 h-7 md:h-8 rounded", skeletonAcc)} />
         </div>
@@ -32,9 +32,9 @@ export default function CarouselSkeleton({ isDark }: CarouselSkeletonProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* ── Carrossel (col-span-2) ── */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <div className={cn(
             "relative rounded-3xl border-2 border-black dark:border-purple-500/15 overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] glass-card",
             skeletonBg

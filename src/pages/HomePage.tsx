@@ -289,9 +289,9 @@ export default function HomePage() {
       {isLoadingPosts && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
       ) : !isLoadingPosts && isDefaultView && posts.length > 0 ? (
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="md:col-span-2 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
               <div>
@@ -307,7 +307,7 @@ export default function HomePage() {
           </div>
 
           {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
-          <div className="hidden md:flex lg:col-span-1 flex-col gap-4">
+          <div className="hidden md:flex md:col-span-1 flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className={cn("w-1.5 h-6 rounded-none", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
               <div>
@@ -322,7 +322,7 @@ export default function HomePage() {
             
             <div
               className={cn(
-                "h-full lg:h-[560px] p-6 rounded-3xl flex flex-col relative overflow-hidden transition-all duration-300 glass-card border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
+                "h-full md:h-[560px] p-6 rounded-3xl flex flex-col relative overflow-hidden transition-all duration-300 glass-card border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)]"
               )}
             >
               {isDark && (
@@ -369,10 +369,10 @@ export default function HomePage() {
         <section className="flex flex-col gap-0">
           {/* Divisor sutil entre seções */}
           <div className={cn("h-px mb-10", isDark ? "bg-white/5" : "bg-black/8")} />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
 
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
-            <div className="lg:col-span-2 flex flex-col gap-10">
+            <div className="md:col-span-2 flex flex-col gap-10">
 
               {/* ── RetroCafé ── */}
               <div className="space-y-5">
@@ -531,7 +531,7 @@ export default function HomePage() {
             </div>
 
             {/* ── DIREITA (1/3): Reviews ── */}
-            <div className="lg:col-span-1 flex flex-col gap-5">
+            <div className="md:col-span-1 flex flex-col gap-5">
               {/* Cabeçalho */}
               <div className="flex items-center justify-between">
                 <div
@@ -551,7 +551,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-3">
                   <span 
                     onClick={() => goToCategory("Reviews")}
-                    className="hidden lg:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 items-center gap-1 transition-colors cursor-pointer"
+                    className="hidden md:flex text-[10px] font-retro font-bold uppercase text-slate-500 hover:text-yellow-400 items-center gap-1 transition-colors cursor-pointer"
                   >
                     Ver mais <ChevronRight className="w-3 h-3" />
                   </span>
@@ -563,7 +563,7 @@ export default function HomePage() {
                 <div 
                   ref={reviewsRef} 
                   onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                  className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                  className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-4 pb-4 md:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                 >
                   {displayReviews.length > 0 ? (
                     displayReviews.map((post) => {
@@ -575,7 +575,7 @@ export default function HomePage() {
                           key={post.id}
                           to={`/post/${targetSlug}`}
                           className={cn(
-                            "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-start snap-always"
+                            "relative h-[148px] rounded-3xl overflow-hidden border-2 border-black dark:border-purple-500/15 shadow-[6px_6px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_rgba(168,85,247,0.15)] transition-all duration-300 group/item flex flex-col justify-end p-4 glass-card w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
                           )}
                         >
                           {/* Imagem */}
@@ -630,7 +630,7 @@ export default function HomePage() {
                 {reviewsScroll.left && (
                   <button
                     onClick={() => scrollContainer(reviewsRef, "left")}
-                    className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                    className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                     aria-label="Deslizar esquerda"
                   >
                     <ChevronLeft className="w-5 h-5 text-yellow-400" />
@@ -639,7 +639,7 @@ export default function HomePage() {
                 {reviewsScroll.right && (
                   <button
                     onClick={() => scrollContainer(reviewsRef, "right")}
-                    className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                    className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex md:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
                     aria-label="Deslizar direita"
                   >
                     <ChevronRight className="w-5 h-5 text-yellow-400" />
