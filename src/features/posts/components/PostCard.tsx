@@ -14,6 +14,7 @@ import { Post } from "../schemas";
 interface PostCardProps {
   post: Post;
   variant?: "default" | "compact";
+  showCategory?: boolean;
 }
 
 const getCategoryCardStyles = (category: string) => {
@@ -84,7 +85,7 @@ const getCategoryCardStyles = (category: string) => {
   }
 };
 
-export default function PostCard({ post, variant = "default" }: PostCardProps) {
+export default function PostCard({ post, variant = "default", showCategory = true }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
@@ -237,17 +238,19 @@ export default function PostCard({ post, variant = "default" }: PostCardProps) {
         )}
 
         {/* Categoria pill — canto inferior esquerdo sobre a imagem */}
-        <div className="absolute bottom-3 left-3 z-20 pointer-events-none">
-          <span className={cn(
-            "text-[9px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded border",
-            cardStyles.textLabel,
-            isDark
-              ? "bg-black/70 border-white/10 backdrop-blur-sm"
-              : "bg-white/80 border-black/10 backdrop-blur-sm"
-          )}>
-            {post.category}
-          </span>
-        </div>
+        {showCategory && (
+          <div className="absolute bottom-3 left-3 z-20 pointer-events-none">
+            <span className={cn(
+              "text-[9px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+              cardStyles.textLabel,
+              isDark
+                ? "bg-black/70 border-white/10 backdrop-blur-sm"
+                : "bg-white/80 border-black/10 backdrop-blur-sm"
+            )}>
+              {post.category}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Conteúdo dentro do card */}

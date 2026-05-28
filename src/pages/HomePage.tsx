@@ -418,7 +418,7 @@ export default function HomePage() {
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                           className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
                         >
-                          <PostCard post={post} />
+                          <PostCard post={post} showCategory={false} />
                         </motion.div>
                       ))
                     ) : (
@@ -497,7 +497,7 @@ export default function HomePage() {
                           transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                           className="w-[85vw] sm:w-[320px] md:w-auto shrink-0 snap-start snap-always"
                         >
-                          <PostCard post={post} />
+                          <PostCard post={post} showCategory={false} />
                         </motion.div>
                       ))
                     ) : (
