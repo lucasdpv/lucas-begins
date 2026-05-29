@@ -316,7 +316,7 @@ export default function HomePage() {
       {isLoadingPosts && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
       ) : !isLoadingPosts && isDefaultView && posts.length > 0 ? (
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
           {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="flex items-center gap-3">
@@ -349,7 +349,7 @@ export default function HomePage() {
             
             <div
               className={cn(
-                "h-full lg:h-[560px] p-6 rounded-none flex flex-col relative overflow-hidden transition-all duration-300 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]",
+                "h-full lg:flex-1 p-6 rounded-none flex flex-col relative overflow-hidden transition-all duration-300 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]",
                 isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
               )}
               onMouseLeave={() => setHoveredMaisLidosIndex(0)}
@@ -573,10 +573,7 @@ export default function HomePage() {
                   )}
                 </AnimatePresence>
 
-                {/* Watermark gigante */}
-                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
-                  RETROCAFÉ
-                </div>
+
 
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between relative z-10">
@@ -590,7 +587,7 @@ export default function HomePage() {
                         RetroCafé
                       </h2>
                       <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                        Crônicas &amp; Nostalgia
+                        Crônicas
                       </p>
                     </div>
                   </div>
@@ -657,28 +654,15 @@ export default function HomePage() {
                               <div className="absolute inset-0 scanline-overlay opacity-25 z-10 pointer-events-none" />
 
                               {/* Magazine Header Bar */}
-                              <div className="relative z-20 p-3 flex justify-between items-start border-b border-white/10 bg-black/60 backdrop-blur-sm">
-                                <div className="flex flex-col">
-                                  <span className="font-retro font-black uppercase text-[15px] tracking-wide text-orange-500 text-glow">
-                                    RETROCAFÉ
-                                  </span>
-                                  <span className="text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">
-                                    Crônicas &amp; Nostalgia
-                                  </span>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                  <span className="text-[9px] font-bold text-orange-400">ED. #0{i + 1}</span>
-                                  <span className="text-[8px] text-gray-400">MAI 2026</span>
-                                </div>
+                              <div className="relative z-20 p-3 flex justify-between items-center border-b border-white/10 bg-black/60 backdrop-blur-sm">
+                                <span className="text-[10px] font-bold text-orange-400">ED. #0{i + 1}</span>
+                                <span className="text-[9px] font-mono text-gray-400 uppercase">MAI 2026</span>
                               </div>
 
                               {/* Main Headline Content */}
                               <div className="relative z-20 p-4 mt-auto flex flex-col gap-2">
                                 {/* Subhead tag */}
                                 <div className="flex items-center gap-1.5">
-                                  <span className="inline-block px-1.5 py-0.5 text-[8px] font-retro font-black uppercase bg-orange-500 text-black border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] select-none">
-                                    NOSTALGIA!
-                                  </span>
                                   <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
                                     {formatDate(post.createdAt, post.date ?? undefined)}
                                   </span>
@@ -805,10 +789,7 @@ export default function HomePage() {
                   )}
                 </AnimatePresence>
 
-                {/* Watermark gigante */}
-                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
-                  DOSSIÊS
-                </div>
+
 
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between relative z-10">
@@ -963,21 +944,19 @@ export default function HomePage() {
             </div>
 
             {/* ── DIREITA (1/3): Reviews ── */}
-            <div className="lg:col-span-1 flex flex-col gap-5 lg:h-full">
+            <div className="flex flex-col gap-5 lg:contents">
               {/* Divisor sutil acima de Reviews no mobile */}
               <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/10")} />
 
               <div 
                 className={cn(
-                  "px-0 pb-0 pt-5 lg:px-4 lg:pb-4 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
-                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                  "relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:col-span-1 lg:h-full",
+                  "border-0 shadow-none bg-transparent px-0 pb-0 pt-0 lg:border-2 lg:border-black lg:shadow-[6px_6px_0px_rgba(0,0,0,1)] lg:px-4 lg:pb-4 lg:pt-5",
+                  isDark ? "text-gray-100 lg:bg-[#1f1d35]" : "text-gray-900 lg:bg-white"
                 )}
                 onMouseLeave={() => setHoveredReviewsIndex(null)}
               >
-                {/* Watermark gigante */}
-                <div className="font-retro text-[80px] font-black text-black/[0.04] dark:text-white/[0.04] uppercase select-none pointer-events-none absolute right-4 bottom-4 leading-none tracking-tighter z-0">
-                  REVIEWS
-                </div>
+
 
                 {/* Cabeçalho */}
                 <div className="flex items-center justify-between relative z-10 px-4 lg:px-0">
@@ -1009,7 +988,7 @@ export default function HomePage() {
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex lg:flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
+                    className="flex lg:flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
                     {displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
@@ -1017,7 +996,7 @@ export default function HomePage() {
                         const isHovered = hoveredReviewsIndex === i;
                         const isAnyHovered = hoveredReviewsIndex !== null;
 
-                        const cardBgClass = "review-card-custom";
+                        const cardBgClass = isDark ? "bg-[#141226] text-white" : "bg-white text-zinc-900";
 
                         return (
                           <motion.div
@@ -1026,7 +1005,7 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "w-[280px] sm:w-[280px] md:w-[300px] lg:w-full h-28 lg:h-0 lg:flex-1 lg:min-h-[96px] xl:min-h-[112px] shrink-0 snap-center transition-all duration-300 relative",
+                              "w-full sm:w-[calc(50%-8px)] lg:w-full h-[148px] lg:h-0 lg:flex-1 lg:min-h-[96px] xl:min-h-[112px] shrink-0 snap-start snap-always transition-all duration-300 relative",
                               isAnyHovered && !isHovered
                                 ? "opacity-65 scale-[0.99] blur-[0.2px]"
                                 : isHovered
@@ -1041,13 +1020,11 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300",
+                                "relative w-full h-full flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]",
                                 cardBgClass,
-                                "border-0 shadow-none lg:border-2 lg:shadow-[3px_3px_0px_rgba(0,0,0,1)]",
-                                isDark ? "text-white" : "text-zinc-900",
                                 isHovered 
-                                  ? "lg:border-yellow-500 lg:shadow-[4px_4px_0px_rgba(234,179,8,1)]" 
-                                  : "lg:border-black"
+                                  ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" 
+                                  : "border-black"
                               )}
                             >
                               {/* 1. Left Side: Content Booklet (50% width) */}
@@ -1099,7 +1076,9 @@ export default function HomePage() {
                                   <div 
                                     className="absolute inset-0 z-10 pointer-events-none"
                                     style={{
-                                      background: "linear-gradient(to right, rgb(var(--card-fade-bg)) 0%, rgb(var(--card-fade-bg)) 38%, rgba(var(--card-fade-bg), 0.4) 70%, transparent 100%)"
+                                      background: isDark
+                                        ? "linear-gradient(to right, #141226 0%, #141226 38%, rgba(20, 18, 38, 0.4) 70%, transparent 100%)"
+                                        : "linear-gradient(to right, #ffffff 0%, #ffffff 38%, rgba(255, 255, 255, 0.4) 70%, transparent 100%)"
                                     }}
                                   />
                                   
@@ -1184,13 +1163,13 @@ export default function HomePage() {
 
         {/* Feed Content: Clean 3-Column Grid */}
         {isLoadingPosts ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <PostSkeleton key={i} isDark={isDark} />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
