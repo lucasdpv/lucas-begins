@@ -877,7 +877,7 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative h-[350px] lg:h-[310px] xl:h-[350px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
+                                "relative h-[370px] lg:h-[320px] xl:h-[370px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
                                 hoveredDossieIndex === i
                                   ? "bg-[#ebd5ad] dark:bg-[#cbb284]"
                                   : "bg-[#e2cba0] dark:bg-[#c2aa78]"
@@ -914,7 +914,7 @@ export default function HomePage() {
                                   <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
                                     ★ CLASSIFICADO ★
                                   </div>
-                                  <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 text-black">
+                                  <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-2 text-black">
                                     {post.title}
                                   </h3>
                                 </div>
