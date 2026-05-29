@@ -1161,15 +1161,15 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Feed Content: Clean 3-Column Grid */}
+        {/* Feed Content: Clean 2-Column Grid */}
         {isLoadingPosts ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <PostSkeleton key={i} isDark={isDark} />
+              <PostSkeleton key={i} isDark={isDark} variant="vintage" />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
