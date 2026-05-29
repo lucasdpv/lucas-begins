@@ -662,13 +662,13 @@ export default function HomePage() {
                                   <span className="font-retro font-black uppercase text-[15px] tracking-wide text-orange-500 text-glow">
                                     RETROCAFÉ
                                   </span>
-                                  <span className="text-[7px] font-black uppercase tracking-[0.2em] text-gray-400">
+                                  <span className="text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">
                                     Crônicas &amp; Nostalgia
                                   </span>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                  <span className="text-[7px] font-bold text-orange-400">ED. #0{i + 1}</span>
-                                  <span className="text-[6px] text-gray-400">MAI 2026</span>
+                                  <span className="text-[9px] font-bold text-orange-400">ED. #0{i + 1}</span>
+                                  <span className="text-[8px] text-gray-400">MAI 2026</span>
                                 </div>
                               </div>
 
@@ -676,16 +676,16 @@ export default function HomePage() {
                               <div className="relative z-20 p-4 mt-auto flex flex-col gap-2">
                                 {/* Subhead tag */}
                                 <div className="flex items-center gap-1.5">
-                                  <span className="inline-block px-1.5 py-0.5 text-[6px] font-retro font-black uppercase bg-orange-500 text-black border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] select-none">
+                                  <span className="inline-block px-1.5 py-0.5 text-[8px] font-retro font-black uppercase bg-orange-500 text-black border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] select-none">
                                     NOSTALGIA!
                                   </span>
-                                  <span className="text-[8px] font-bold text-gray-300 uppercase tracking-wider">
+                                  <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
                                     {formatDate(post.createdAt, post.date ?? undefined)}
                                   </span>
                                 </div>
 
                                 {/* Mega Headline title */}
-                                <h3 className="font-retro font-black uppercase text-sm md:text-base text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                <h3 className="font-retro font-black uppercase text-base md:text-lg text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                                   {post.title}
                                 </h3>
 
@@ -702,7 +702,7 @@ export default function HomePage() {
                                     ))}
                                   </div>
 
-                                  <div className="flex flex-col items-end text-[7px] text-gray-400 font-bold uppercase">
+                                  <div className="flex flex-col items-end text-[9px] text-gray-400 font-bold uppercase">
                                     <span>READING TIME: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
                                     <span className="text-orange-400 font-retro tracking-wide">{formatNumber(post.views || 0)} VIEWS</span>
                                   </div>
@@ -866,7 +866,7 @@ export default function HomePage() {
                           >
                             {/* Salient folder tab */}
                             <div className={cn(
-                              "absolute -top-4.5 left-4 px-3 py-0.5 border-t-2 border-x-2 border-black rounded-t-sm text-[7px] font-retro font-bold uppercase tracking-wider text-black select-none z-10 transition-colors duration-300",
+                              "absolute -top-4.5 left-4 px-3 py-0.5 border-t-2 border-x-2 border-black rounded-t-sm text-[9px] font-retro font-bold uppercase tracking-wider text-black select-none z-10 transition-colors duration-300",
                               hoveredDossieIndex === i
                                 ? "bg-[#f1e0c5] dark:bg-[#d6be90]"
                                 : "bg-[#e3cb9f] dark:bg-[#c2aa78]"
@@ -911,15 +911,15 @@ export default function HomePage() {
                               <div className="relative z-10 font-mono text-black mt-3 flex-grow flex flex-col justify-between">
                                 <div className="space-y-2">
                                   {/* Confidencial stamp */}
-                                  <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[7px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
+                                  <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
                                     ★ CLASSIFICADO ★
                                   </div>
-                                  <h3 className="font-bold text-xs uppercase tracking-tight leading-snug line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 text-black">
+                                  <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 text-black">
                                     {post.title}
                                   </h3>
                                 </div>
 
-                                <div className="text-[7.5px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
+                                <div className="text-[10px] lg:text-[9px] xl:text-[10px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
                                   <div>DATA REGISTRO: {formatDate(post.createdAt, post.date ?? undefined)}</div>
                                   <div className="flex items-center justify-between text-blue-800 dark:text-blue-900 font-retro tracking-wider">
                                     <span>LEITURA: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
@@ -1053,7 +1053,7 @@ export default function HomePage() {
                               <div className="w-[50%] p-3 flex flex-col justify-between relative z-20 min-w-0">
                                 <div>
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-[7px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
                                       OFFICIAL REVIEW
                                     </span>
                                     {/* Scanline dot status */}
@@ -1063,7 +1063,7 @@ export default function HomePage() {
                                     )} />
                                   </div>
 
-                                  <h4 className="font-retro font-bold text-xs sm:text-[13px] leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
+                                  <h4 className="font-retro font-bold text-sm sm:text-base lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
                                     <span className={cn(
                                       isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
                                     )}>
@@ -1076,7 +1076,7 @@ export default function HomePage() {
                                 <div className="pt-1.5 mt-1.5 flex justify-start">
                                   {post.score && (
                                     <div className={cn(
-                                      "inline-flex items-center gap-1 text-black px-3 py-1 font-retro font-black text-xs sm:text-[13px] border-2 border-black shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 uppercase tracking-wider select-none leading-none transition-all duration-300",
+                                      "inline-flex items-center gap-1 text-black px-3 py-1 font-retro font-black text-[13px] sm:text-sm lg:text-xs xl:text-sm border-2 border-black shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 uppercase tracking-wider select-none leading-none transition-all duration-300",
                                       isHovered ? "from-yellow-200 via-yellow-300 to-amber-400 scale-110 -translate-y-1 shadow-[3.5px_3.5px_0px_rgba(0,0,0,1)] border-yellow-500" : ""
                                     )}>
                                       ★ {post.score}
