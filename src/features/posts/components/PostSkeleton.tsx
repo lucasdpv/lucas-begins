@@ -22,7 +22,7 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         aria-busy="true"
         aria-label="Carregando artigo..."
         className={cn(
-          "flex items-stretch h-[140px] sm:h-[150px] md:h-[160px] rounded-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+          "flex items-stretch h-[150px] sm:h-[165px] md:h-[180px] rounded-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]",
           isDark ? "bg-[#1f1d35]" : "bg-white"
         )}
       >
@@ -35,9 +35,9 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         </div>
 
         {/* Content block skeleton */}
-        <div className="flex flex-col flex-grow p-3.5 sm:p-4 min-w-0">
+        <div className="flex flex-col flex-grow p-3 sm:py-3 sm:px-4 min-w-0">
           {/* Header Row */}
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <SkeletonItem width="w-14" height="h-4" isDark={isDark} className="opacity-50" />
               <SkeletonItem width="w-16" height="h-3" isDark={isDark} className="opacity-30" />
@@ -46,13 +46,13 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
           </div>
 
           {/* Title skeleton */}
-          <div className="space-y-1.5 flex-grow">
+          <div className="space-y-1.5 mb-1.5">
             <SkeletonItem height="h-4" isDark={isDark} />
             <SkeletonItem width="w-4/5" height="h-4" isDark={isDark} />
           </div>
 
           {/* Excerpt skeleton */}
-          <div className="hidden sm:block space-y-1 mt-1 mb-2">
+          <div className="hidden sm:block space-y-1 mb-2">
             <SkeletonItem height="h-3" isDark={isDark} className="opacity-30" />
           </div>
 
