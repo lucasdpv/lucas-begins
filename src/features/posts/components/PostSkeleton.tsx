@@ -37,7 +37,7 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         {/* Content block skeleton */}
         <div className="flex flex-col flex-grow p-3 sm:py-3 sm:px-4 min-w-0">
           {/* Header Row */}
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-1 shrink-0">
             <div className="flex items-center gap-2">
               <SkeletonItem width="w-14" height="h-4" isDark={isDark} className="opacity-50" />
               <SkeletonItem width="w-16" height="h-3" isDark={isDark} className="opacity-30" />
@@ -46,18 +46,18 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
           </div>
 
           {/* Title skeleton */}
-          <div className="space-y-1.5 mb-1.5">
+          <div className="space-y-1.5 mb-1.5 shrink-0">
             <SkeletonItem height="h-4" isDark={isDark} />
             <SkeletonItem width="w-4/5" height="h-4" isDark={isDark} />
           </div>
 
           {/* Excerpt skeleton */}
-          <div className="hidden sm:block space-y-1 mb-2">
+          <div className="hidden sm:block space-y-1 mb-2 shrink-0">
             <SkeletonItem height="h-3" isDark={isDark} className="opacity-30" />
           </div>
 
           {/* Footer skeleton */}
-          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
             <div className="flex gap-2">
               <SkeletonItem width="w-8" height="h-3.5" isDark={isDark} className="opacity-30" />
               <SkeletonItem width="w-8" height="h-3.5" isDark={isDark} className="opacity-30" />

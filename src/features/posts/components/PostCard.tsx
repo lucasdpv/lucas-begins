@@ -255,7 +255,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         {/* 3. Content Block (Title, excerpt, metadata) */}
         <div className="flex flex-col flex-grow relative z-10 pointer-events-none p-3 sm:py-3 sm:px-4 min-w-0">
           {/* Header Row: Category Badge & Date */}
-          <div className="flex items-center justify-between text-[9px] font-retro font-bold uppercase tracking-wider select-none text-gray-500 dark:text-gray-400 mb-1">
+          <div className="flex items-center justify-between text-[9px] font-retro font-bold uppercase tracking-wider select-none text-gray-500 dark:text-gray-400 mb-1 shrink-0">
             <div className="flex items-center gap-2 overflow-hidden min-w-0">
               <span className={cn(
                 "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] shrink-0",
@@ -277,7 +277,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
           {/* Title */}
           <h3 className={cn(
-            "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1",
+            "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1 shrink-0",
             post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
             post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
             post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
@@ -290,7 +290,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           {/* Excerpt - Hidden on mobile, visible on sm and up */}
           {post.excerpt && (
             <p className={cn(
-              "text-[10px] md:text-xs mb-2 line-clamp-1 sm:line-clamp-2 leading-relaxed opacity-75 hidden sm:block",
+              "text-[10px] md:text-xs mb-2 line-clamp-2 leading-relaxed opacity-75 hidden sm:block shrink-0",
               isDark ? "text-gray-300" : "text-gray-600"
             )}>
               {post.excerpt}
@@ -298,7 +298,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           )}
 
           {/* Footer controls row */}
-          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
             {/* Left spec widgets */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2.5 text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
