@@ -510,7 +510,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10 text-left lg:items-stretch lg:grid-rows-1">
 
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
-            <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-10">
+            <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-10 lg:flex-1">
 
               {/* ── RetroCafé ── */}
               <div 
@@ -731,7 +731,7 @@ export default function HomePage() {
               {/* ── Dossiês ── */}
               <div 
                 className={cn(
-                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
+                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
@@ -821,7 +821,7 @@ export default function HomePage() {
                   <div 
                     ref={dossieRef} 
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4"
+                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4 lg:items-start"
                   >
                     {displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
