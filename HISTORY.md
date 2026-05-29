@@ -4,6 +4,28 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🖤 [v4.2.0] - The Clean & Precise Horizontal Feed Update
+*Data: 29 de Maio de 2026*
+
+### 📰 Refatoração e Simplificação do Feed (Últimas Notícias)
+- **Design Vintage Horizontal Limpo**: Redesenhamos a variante `vintage` de cards horizontais (`PostCard.tsx`) para eliminar elementos poluídos como o código de barras, o laser scanner móvel (`scanner-beam`) e textos técnicos redundantes (`BG-SYS-v4.1` / `S-XX`), garantindo um visual editorial premium e focado.
+- **Resolução de Overlaps de Texto**: 
+  - Resolvido o encolhimento de flexbox adicionando a classe `shrink-0` a todos os filhos diretos do bloco de conteúdo (cabeçalho, título `h3`, resumo `p` e rodapé), impedindo que as caixas de texto colapsassem e gerassem sobreposição de letras.
+  - Fixado o resumo com a classe de clamp `line-clamp-2` direta, solucionando problemas de mesclagem do Tailwind CSS no desktop.
+  - Removida a diretiva `flex-grow` do título `h3` para evitar desalinhamento interno de cartões com títulos curtos.
+- **Aumento Proporcional de Altura**: Aumentamos a altura física dos cartões horizontais para acomodar o texto confortavelmente sem transbordamento:
+  - Mobile: `h-[150px]` (antes `140px`)
+  - Tablet: `h-[165px]` (antes `150px`)
+  - Desktop: `h-[180px]` (antes `160px`)
+- **Ajuste de Gaps e Paddings**: Otimizado o padding do bloco de texto para `p-3 sm:py-3 sm:px-4` e reduzidas as margens verticais internas (`mb-1` no cabeçalho e título; `mb-2` no resumo), ganhando mais espaço livre para leitura.
+
+### 🖼️ Layout de Grade & Skeletons
+- **Home em 2 Colunas no Desktop**: Reduzimos o grid de Últimas Notícias na `HomePage.tsx` de 3 colunas (`lg:grid-cols-3`) para 2 colunas (`lg:grid-cols-2`). Isso assegura cerca de 500px de largura para cada card horizontal no desktop, eliminando o esmagamento de texto.
+- **Skeletons Vintage Coesos**: Adicionado suporte para `variant="vintage"` no `PostSkeleton.tsx`, aplicando as novas dimensões de altura e paddings idênticos aos cards reais para zerar layout shifts no carregamento.
+- **Visual Padrão no Arquivo**: Revertido o card da `ArchivePage.tsx` para `variant="default"` (vertical), que se ajusta perfeitamente ao grid de 3 colunas da página sem espremer o conteúdo.
+
+---
+
 ## 🖤 [v4.1.0] - The Retro-Modern Visual Decks Update
 *Data: 28 de Maio de 2026*
 
