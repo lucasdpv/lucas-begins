@@ -110,7 +110,7 @@ export default function Carousel({ posts }: CarouselProps) {
       onTouchEnd={onTouchEnd}
     >
       {/* Slide area */}
-      <div className="relative w-full h-[400px] md:h-[560px] overflow-hidden bg-gray-950">
+      <div className="relative w-full h-[360px] sm:h-[400px] md:h-[560px] overflow-hidden bg-gray-950">
         <AnimatePresence custom={direction} initial={false} mode="sync">
           <motion.div
             key={currentIndex}
@@ -139,7 +139,7 @@ export default function Carousel({ posts }: CarouselProps) {
 
             {/* Content */}
             <div className="absolute bottom-0 left-0 right-0 p-6 pb-5 md:p-10 md:pb-8 z-[11] pointer-events-none">
-              <div className="max-w-2xl flex flex-col items-start">
+              <div className="max-w-2xl flex flex-col items-start pr-16 md:pr-0">
                 <div className="flex items-center gap-2.5 mb-3">
                   <CategoryBadge size="sm">{currentPost.category}</CategoryBadge>
                   {currentPost.score && (
@@ -178,14 +178,14 @@ export default function Carousel({ posts }: CarouselProps) {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); prev(); }}
-              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-2.5 rounded-xl bg-black/60 text-white border border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
+              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-2.5 rounded-xl bg-black/60 text-white border border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 hidden sm:flex opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
               aria-label="Anterior"
             >
               <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); next(); }}
-              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-2.5 rounded-xl bg-black/60 text-white border border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
+              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-2.5 rounded-xl bg-black/60 text-white border border-white/20 backdrop-blur-md z-30 transition-all hover:bg-purple-600 hover:border-purple-500 active:scale-90 hidden sm:flex opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100"
               aria-label="Próximo"
             >
               <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />

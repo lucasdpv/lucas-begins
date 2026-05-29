@@ -197,15 +197,16 @@ export default function PostCard({ post, variant = "default", showCategory = tru
     );
   }
 
-  // Variant Vintage: Large HQ / Comic panel layout (Thick border, fixed h-56/64, large fonts)
+  // Variant Vintage: Sleek Neoretro Horizontal Console Lane (Straight lines, brutalist)
   if (isVintage) {
     return (
       <article
         className={cn(
-          "flex flex-col h-full group relative border-2 border-black rounded-none transition-all duration-300 hover:-translate-y-1 active:translate-y-0",
+          "flex items-stretch h-[150px] sm:h-[165px] md:h-[180px] group relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:translate-x-0.5 active:translate-y-0 select-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rounded-none",
           isDark
-            ? "bg-[#1f1d35] text-gray-100 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(168,85,247,1)]"
-            : "bg-white text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(168,85,247,1)]"
+            ? "bg-[#1f1d35] text-white"
+            : "bg-white text-gray-900",
+          cardStyles.hoverShadowBrutal
         )}
       >
         <Link
@@ -214,11 +215,18 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           aria-label={`Ler matéria: ${post.title}`}
         />
 
-        {/* Thumbnail — com altura fixa e borda inferior grossa */}
+        {/* 1. Category Color Strip (Leftmost visual indicator) */}
+        <div className={cn(
+          "w-3 shrink-0 border-r-2 border-black",
+          post.category.toLowerCase().includes("reviews") ? "bg-yellow-500" :
+          post.category.toLowerCase().includes("dossi") ? "bg-blue-500" :
+          post.category.toLowerCase().includes("retro") ? "bg-orange-500" : "bg-purple-500"
+        )} />
+
+        {/* 2. Visor / Image Box (Rectangular aspect ratio) */}
         <div
           className={cn(
-            "w-full h-56 md:h-64 relative overflow-hidden border-b-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0",
-            isDark ? "bg-gray-900" : "bg-snes-mid/20"
+            "w-32 sm:w-40 md:w-48 h-full relative overflow-hidden border-r-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0 bg-gray-950"
           )}
         >
           {post.imageUrl && !imgError && (
@@ -231,87 +239,99 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             />
           )}
 
-          {/* Mensagem Gamificada em caso de Erro de Imagem */}
-          {imgError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
-               <div className="text-red-500 font-retro text-[8px] sm:text-[10px] mb-1 animate-pulse bg-black/40 px-1.5 py-0.5 rounded border border-red-500/50">
-                 ⚠️ ERROR
-               </div>
-               <p className={cn(
-                 "text-[9px] sm:text-[10px] font-bold uppercase leading-tight max-w-[200px]",
-                 isDark ? "text-gray-400" : "text-gray-600"
-               )}>
-                 Textura no setor {randomSector} corrompida...
-               </p>
+          {/* CRT Scanlines Overlay (Very subtle) */}
+          <div className="absolute inset-0 scanline-overlay opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-300 z-10" />
+
+          {/* Floating score indicator */}
+          {post.score && (
+            <div className="absolute top-2 left-2 z-20 pointer-events-none select-none">
+              <div className="flex items-center gap-1 px-1.5 py-0.5 font-retro font-black text-[9px] border border-black bg-yellow-400 text-black uppercase tracking-wider leading-none shadow-[1px_1px_0px_rgba(0,0,0,1)]">
+                ★ {post.score}
+              </div>
             </div>
           )}
-
-          {/* CRT Scanlines Overlay com maior opacidade no hover */}
-          <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-70 transition-opacity duration-300 z-10" />
-
-          {/* Category & Score Badges side-by-side at top-left */}
-          <div className="absolute top-4 left-4 flex gap-2 flex-wrap z-20 pointer-events-none">
-            {showCategory && <CategoryBadge size="sm">{post.category}</CategoryBadge>}
-            {post.score && <ScoreBadge score={post.score} size="sm" />}
-          </div>
         </div>
 
-        {/* Conteúdo com maior padding e fontes maiores */}
-        <div className="flex flex-col flex-grow relative z-10 pointer-events-none px-5 py-6">
+        {/* 3. Content Block (Title, excerpt, metadata) */}
+        <div className="flex flex-col flex-grow relative z-10 pointer-events-none p-3 sm:py-3 sm:px-4 min-w-0">
+          {/* Header Row: Category Badge & Date */}
+          <div className="flex items-center justify-between text-[9px] font-retro font-bold uppercase tracking-wider select-none text-gray-500 dark:text-gray-400 mb-1 shrink-0">
+            <div className="flex items-center gap-2 overflow-hidden min-w-0">
+              <span className={cn(
+                "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] shrink-0",
+                post.category.toLowerCase().includes("reviews") ? "bg-yellow-400 text-black" :
+                post.category.toLowerCase().includes("dossi") ? "bg-blue-500 text-white" :
+                post.category.toLowerCase().includes("retro") ? "bg-orange-500 text-black" : "bg-purple-500 text-white"
+              )}>
+                {post.category}
+              </span>
+              <span className="whitespace-nowrap truncate opacity-70">
+                {formatDate(post.createdAt, post.date ?? undefined)}
+              </span>
+            </div>
+            
+            <div className="font-mono text-[8px] opacity-75 whitespace-nowrap shrink-0">
+              {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}
+            </div>
+          </div>
+
+          {/* Title */}
           <h3 className={cn(
-            "font-retro font-bold uppercase line-clamp-2 transition-colors duration-300 text-lg md:text-xl mb-3",
+            "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1 shrink-0",
+            post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
+            post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
+            post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
             "group-hover:text-purple-500 dark:group-hover:text-purple-400",
-            isDark ? "text-gray-100" : "text-gray-900"
+            isDark ? "text-white" : "text-gray-900"
           )}>
             {post.title}
           </h3>
 
-          {/* Excerpt com fonte de leitura confortável */}
+          {/* Excerpt - Hidden on mobile, visible on sm and up */}
           {post.excerpt && (
             <p className={cn(
-              "text-sm md:text-base mb-6 line-clamp-3 flex-grow leading-relaxed font-medium",
-              isDark ? "text-gray-400" : "text-gray-600"
+              "text-[10px] md:text-xs mb-2 line-clamp-2 leading-relaxed opacity-75 hidden sm:block shrink-0",
+              isDark ? "text-gray-300" : "text-gray-600"
             )}>
               {post.excerpt}
             </p>
           )}
 
-          {/* Footer com divisor de borda de 2px e informações empilhadas à esquerda */}
-          <div className={cn(
-            "flex flex-wrap items-end justify-between mt-auto gap-y-3 pt-4 border-t-2",
-            isDark ? "border-gray-800" : "border-black/5"
-          )}>
-            {/* Data e Tempo de leitura empilhados */}
-            <div className="flex flex-col gap-0.5 min-w-[80px]">
-              <span className={cn("font-retro font-bold uppercase tracking-wider text-[9px] sm:text-[10px] whitespace-nowrap", isDark ? "opacity-60" : "opacity-80")}>
-                {formatDate(post.createdAt, post.date ?? undefined)}
-              </span>
-              <span className={cn("text-[9px] sm:text-[10px] flex items-center gap-1 font-bold uppercase whitespace-nowrap", isDark ? "opacity-40" : "opacity-60")}>
-                <Clock className="w-3 h-3 shrink-0" />
-                {calculateReadingTime(post.content || "").replace(" min de leitura", "m")}
-              </span>
+          {/* Footer controls row */}
+          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
+            {/* Left spec widgets */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5 text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-0.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-blue-500 opacity-80" />
+                  <span>{formatNumber(commentCount)}</span>
+                </div>
+                <div className="flex items-center gap-0.5">
+                  <Eye className="w-3.5 h-3.5 text-purple-500 opacity-80" />
+                  <span>{formatNumber(post.views || 0)}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Container de Ações e HUD status à direita */}
-            <div className="flex items-center gap-3 sm:gap-4 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-2 sm:gap-3">
+            {/* Right action block */}
+            <div className="flex items-center gap-2 relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center gap-1.5">
                 <button
                   className={cn(
-                    "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-sm text-red-500 hover:scale-110 active:scale-95 cursor-pointer hover:text-red-400",
-                    hasLiked ? "text-red-500" : isDark ? "text-gray-400 hover:text-red-400" : "text-gray-600 hover:text-red-500"
+                    "flex items-center justify-center w-6 h-6 rounded-none border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 transition-all text-red-500 hover:scale-105 active:scale-95 cursor-pointer hover:border-red-500 dark:hover:border-red-400",
+                    hasLiked ? "bg-red-500/10 border-red-500" : ""
                   )}
                   onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
                   title={currentUser ? "Curtir" : "Faça login para curtir"}
                   disabled={!currentUser}
                 >
-                  <Heart className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", hasLiked && "fill-current")} />
-                  <span>{formatNumber(post.likes || 0)}</span>
+                  <Heart className={cn("w-3 h-3", hasLiked && "fill-current")} />
                 </button>
 
                 <button
                   className={cn(
-                    "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-sm text-yellow-500 hover:scale-110 active:scale-95 cursor-pointer hover:text-yellow-400",
-                    profile?.favorites?.includes(post.id) ? "text-yellow-500" : isDark ? "text-gray-400 hover:text-yellow-400" : "text-gray-600 hover:text-yellow-500"
+                    "flex items-center justify-center w-6 h-6 rounded-none border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 transition-all text-yellow-500 hover:scale-105 active:scale-95 cursor-pointer hover:border-yellow-500 dark:hover:border-yellow-400",
+                    profile?.favorites?.includes(post.id) ? "bg-yellow-500/10 border-yellow-500" : ""
                   )}
                   onClick={() => {
                     if (currentUser) {
@@ -322,22 +342,12 @@ export default function PostCard({ post, variant = "default", showCategory = tru
                   title={currentUser ? "Favoritar" : "Faça login para favoritar"}
                   disabled={!currentUser}
                 >
-                  <Bookmark className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", profile?.favorites?.includes(post.id) && "fill-current")} />
+                  <Bookmark className={cn("w-3 h-3", profile?.favorites?.includes(post.id) && "fill-current")} />
                 </button>
-
-                <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
-                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>{formatNumber(commentCount)}</span>
-                </div>
-
-                <div className={cn("flex items-center gap-1 font-bold text-[11px] sm:text-sm", isDark ? "text-gray-500" : "text-gray-400")}>
-                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>{formatNumber(post.views || 0)}</span>
-                </div>
               </div>
 
               {!currentUser && (
-                <div className="pl-2 border-l border-black/10 dark:border-white/10">
+                <div className="pl-1 border-l border-black/10 dark:border-white/10">
                   <AuthGate variant="inline" />
                 </div>
               )}

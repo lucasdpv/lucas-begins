@@ -1,6 +1,6 @@
 # ⚙️ Documentação Técnica — BeginsProject
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v4.1.0**.
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v4.2.0**.
 
 ---
 
@@ -94,11 +94,7 @@ Na **HomePage**, optamos por carregar todos os posts ativos via `useAllPosts()` 
 Para mitigar os erros de permissão de escrita para usuários não autenticados (guests) no Firestore, a contagem de visualizações foi simplificada e blindada:
 - **Controle de Duplicados Local**: As postagens já visualizadas pelo usuário são salvas no `localStorage` do navegador sob a chave `retro_viewed_posts`.
 - **Gravação Atômica e Leve**: Em vez de armazenar o histórico de IDs de visualizadores em uma array `viewedBy` no banco (o que corria o risco de estolar o limite de 1MB por documento do Firestore), usamos a função `increment(1)` nativa do Firestore.
-- **Segurança Otimizada**: Recomenda-se a regra de segurança do Firebase que permite escritas de atualização por usuários anônimos se e somente se o único campo sendo modificado for `views` (`request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])`).
-
----
-
-## 🎨 Design System: Neo-Brutalist Clássico & Temático (v4.0.0 / v4.1.0)
+- **Segurança Otimizada**: Recomenda-se a regra de segurança do Firebase que permite escritas de atualização por usuários anônimos se e somente se o �## 🎨 Design System: Neo-Brutalist Clássico & Temático (v4.0.0 / v4.1.0 / v4.2.0)
 
 A estética do portal evoluiu para um Neo-Brutalismo clássico marcante, com elementos e decks temáticos inspirados na era retro:
 
@@ -115,7 +111,12 @@ A estética do portal evoluiu para um Neo-Brutalismo clássico marcante, com ele
 - **Reviews com Fade Retro-Moderno**: Cards horizontais bipartidos onde a imagem do jogo ocupa 65% da largura sob uma máscara de gradiente fade (`linear-gradient(to right, transparent, bg-color)`) de 70% de largura, integrando-se suavemente ao texto do card na esquerda (50% de largura). Textura de scanlines restrita à imagem preserva a legibilidade do texto.
 - **Score Badges Metálicos Dourados**: Emblemas de nota de análises redesenhados com um gradiente metálico dourado brilhante de alta definição, com borda neobrutalista grossa, que escala, brilha e se eleva no hover.
 
-### 3. Síntese de Áudio Nativa (Web Audio API)
+### 3. Simplificação do Feed Horizontal e Prevenção de Overlaps (v4.2.0)
+- **Visual Vintage Horizontal Espaçoso**: Ajustado o grid na HomePage para 2 colunas e aumentado a altura do card de Últimas Notícias (`180px` no desktop), provendo espaço ideal para que a arte e o texto coexistam de forma legível.
+- **Rigidez do Box Model (`shrink-0`)**: Inseridas classes `shrink-0` nas tags internas de texto, prevenindo o comportamento de encolhimento padrão de flexbox que gerava sobreposição de letras.
+- **Limpeza Visual**: Omissão de laser scanner, código de barras e dados de sistema redundantes para remover a poluição e aumentar o foco editorial.
+
+### 4. Síntese de Áudio Nativa (Web Audio API)
 - **Zero Dependência de Arquivos Externos**: Implementado um sintetizador de som leve diretamente em código usando a API de Áudio do navegador.
 - **Efeitos Sonoros Retro**:
   - *Clique 8-bit*: Onda quadrada com decaimento rápido de frequência de 800Hz para 150Hz em 80ms para simular a seleção de botões clássicos do NES/SNES.
@@ -127,6 +128,10 @@ A estética do portal evoluiu para um Neo-Brutalismo clássico marcante, com ele
 
 A tradução é fornecida pelo Google Translate Element (via `TranslationContext.tsx`):
 - Idiomas suportados: PT, EN, ES, FR, JA, DE.
+- O nome da marca **BeginsProject** é protegido contra tradução em todos os componentes via `translate="no"` + classe `notranslate`.
+
+---
+**Documentação atualizada em: 29 de Maio de 2026.** JA, DE.
 - O nome da marca **BeginsProject** é protegido contra tradução em todos os componentes via `translate="no"` + classe `notranslate`.
 
 ---

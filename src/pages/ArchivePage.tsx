@@ -118,7 +118,7 @@ export default function ArchivePage() {
                   transition={{ duration: 0.2 }}
                   className="h-full"
                 >
-                  <PostCard post={post} variant="vintage" />
+                  <PostCard post={post} variant="default" />
                 </motion.div>
               ))}
             </AnimatePresence>
