@@ -969,7 +969,7 @@ export default function HomePage() {
 
               <div 
                 className={cn(
-                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
+                  "px-0 pb-0 pt-5 lg:px-4 lg:pb-4 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredReviewsIndex(null)}
@@ -980,7 +980,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Cabeçalho */}
-                <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center justify-between relative z-10 px-4 lg:px-0">
                   <div
                     className="flex items-center gap-3 cursor-pointer group/title"
                     onClick={() => goToCategory("Reviews")}
@@ -1005,7 +1005,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Cards Reviews */}
-                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10 pt-2">
+                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10 pt-2 px-4 lg:px-0">
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
@@ -1017,10 +1017,7 @@ export default function HomePage() {
                         const isHovered = hoveredReviewsIndex === i;
                         const isAnyHovered = hoveredReviewsIndex !== null;
 
-                        const cardBgClass = isDark ? "bg-[#141226] text-white" : "bg-white text-zinc-900";
-                        const fadeGradientClass = isDark 
-                          ? "from-[#141226] via-[#141226]/50 to-transparent" 
-                          : "from-white via-white/50 to-transparent";
+                        const cardBgClass = "review-card-custom";
 
                         return (
                           <motion.div
@@ -1044,9 +1041,13 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full border-2 border-black flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                                "relative w-full h-full flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300",
                                 cardBgClass,
-                                isHovered ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" : "border-black"
+                                "border-0 shadow-none lg:border-2 lg:shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+                                isDark ? "text-white" : "text-zinc-900",
+                                isHovered 
+                                  ? "lg:border-yellow-500 lg:shadow-[4px_4px_0px_rgba(234,179,8,1)]" 
+                                  : "lg:border-black"
                               )}
                             >
                               {/* 1. Left Side: Content Booklet (50% width) */}
@@ -1098,9 +1099,7 @@ export default function HomePage() {
                                   <div 
                                     className="absolute inset-0 z-10 pointer-events-none"
                                     style={{
-                                      background: isDark
-                                        ? "linear-gradient(to right, #141226 0%, #141226 38%, rgba(20, 18, 38, 0.4) 70%, transparent 100%)"
-                                        : "linear-gradient(to right, #ffffff 0%, #ffffff 38%, rgba(255, 255, 255, 0.4) 70%, transparent 100%)"
+                                      background: "linear-gradient(to right, rgb(var(--card-fade-bg)) 0%, rgb(var(--card-fade-bg)) 38%, rgba(var(--card-fade-bg), 0.4) 70%, transparent 100%)"
                                     }}
                                   />
                                   

@@ -498,4 +498,37 @@ div.skiptranslate,
   font-family: 'Courier New', Courier, monospace;
 }
 
+/* ============================================================
+   Reviews Card Mobile Integration
+   ============================================================ */
+.review-card-custom {
+  --card-fade-bg: 31, 29, 53; /* default mobile dark: #1f1d35 */
+  background-color: transparent;
+}
+.light .review-card-custom {
+  --card-fade-bg: 255, 255, 255; /* default mobile light: #ffffff */
+  background-color: transparent;
+}
+
+@media (min-width: 1024px) {
+  .review-card-custom {
+    --card-fade-bg: 20, 18, 38; /* desktop dark: #141226 */
+    background-color: rgb(var(--card-fade-bg));
+  }
+  .light .review-card-custom {
+    --card-fade-bg: 255, 255, 255; /* desktop light: #ffffff */
+    background-color: rgb(var(--card-fade-bg));
+  }
+}
+
+/* Ensure line-clamp-2 works reliably under all browser styles */
+.line-clamp-2 {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+
+
 
