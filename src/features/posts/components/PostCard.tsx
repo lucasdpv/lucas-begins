@@ -197,23 +197,16 @@ export default function PostCard({ post, variant = "default", showCategory = tru
     );
   }
 
-  // Variant Vintage: Large HQ / Comic panel layout (Thick border, fixed h-56/64, large fonts)
+  // Variant Vintage: Sleek Neoretro Glassmorphic layout
   if (isVintage) {
     return (
       <article
         className={cn(
-          "flex flex-col h-full group relative border-2 border-black rounded-none transition-all duration-300 hover:-translate-y-1.5 hover:translate-x-0.5 active:translate-y-0 select-none",
+          "flex flex-col h-full group relative overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl border rounded-2xl select-none",
           isDark
-            ? "bg-[#1f1d35] text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)]"
-            : "bg-white text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)]",
-          cardStyles.hoverShadowBrutal
+            ? "bg-[#141226]/80 backdrop-blur-md border-[#2d284f] text-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:border-purple-500/30"
+            : "bg-white/80 backdrop-blur-md border-gray-200 text-gray-900 shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:border-purple-500/20"
         )}
-        style={{
-          backgroundImage: isDark
-            ? "radial-gradient(circle, rgba(255, 255, 255, 0.035) 1px, transparent 1px)"
-            : "radial-gradient(circle, rgba(0, 0, 0, 0.035) 1px, transparent 1px)",
-          backgroundSize: "16px 16px"
-        }}
       >
         <Link
           to={targetPath}
@@ -221,133 +214,141 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           aria-label={`Ler matéria: ${post.title}`}
         />
 
-        {/* 1. Spine / Top Bar (Retro cartridge box header) */}
+        {/* Subtle holographic cyber-grid overlay */}
+        <div 
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] dark:opacity-[0.06] transition-opacity duration-300 group-hover:opacity-[0.08]"
+          style={{
+            backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)",
+            backgroundSize: "20px 20px"
+          }}
+        />
+
+        {/* 1. Header Bar (Tech bar with category pill) */}
         <div className={cn(
-          "relative z-20 px-4 py-2 border-b-2 border-black flex justify-between items-center text-[9px] font-mono font-bold tracking-wider select-none shrink-0 bg-black/5 dark:bg-white/5",
-          isDark ? "text-gray-400" : "text-gray-600"
+          "relative z-20 px-4.5 py-3 border-b flex justify-between items-center text-[9px] font-mono font-bold tracking-wider select-none shrink-0",
+          isDark ? "border-[#2d284f] text-gray-400" : "border-gray-150 text-gray-500"
         )}>
-          <div className="flex items-center gap-1.5">
-            <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", 
-              post.category.toLowerCase().includes("reviews") ? "bg-yellow-500" :
-              post.category.toLowerCase().includes("dossi") ? "bg-blue-500" :
-              post.category.toLowerCase().includes("retro") ? "bg-orange-500" : "bg-purple-500"
+          {/* Glass Category Badge */}
+          <div className={cn(
+            "flex items-center gap-2 px-2.5 py-0.5 rounded-full border text-[9px] font-retro font-black uppercase tracking-widest backdrop-blur-sm shadow-sm",
+            post.category.toLowerCase().includes("reviews") 
+              ? (isDark ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400" : "bg-yellow-500/10 border-yellow-400/30 text-yellow-700") :
+            post.category.toLowerCase().includes("dossi")
+              ? (isDark ? "bg-blue-500/10 border-blue-500/20 text-blue-400" : "bg-blue-500/10 border-blue-400/30 text-blue-700") :
+            post.category.toLowerCase().includes("retro")
+              ? (isDark ? "bg-orange-500/10 border-orange-500/20 text-orange-400" : "bg-orange-500/10 border-orange-400/30 text-orange-700") :
+              (isDark ? "bg-purple-500/10 border-purple-500/20 text-purple-400" : "bg-purple-500/10 border-purple-400/30 text-purple-700")
+          )}>
+            <span className={cn("w-1.5 h-1.5 rounded-full animate-ping shrink-0", 
+              post.category.toLowerCase().includes("reviews") ? "bg-yellow-400" :
+              post.category.toLowerCase().includes("dossi") ? "bg-blue-400" :
+              post.category.toLowerCase().includes("retro") ? "bg-orange-400" : "bg-purple-400"
             )} />
-            <span>PORTAL_SYS // {post.category.toUpperCase()}</span>
+            <span>{post.category}</span>
           </div>
-          <span>BG-ROM-v4.1 // S-{randomSector.toString().padStart(2, "0")}</span>
+          
+          <div className="flex items-center gap-1.5 opacity-80">
+            <span>SECTOR // 0{randomSector.toString().slice(-1)}</span>
+            <span className="opacity-30">|</span>
+            <span>SYS_OK</span>
+          </div>
         </div>
 
-        {/* 2. Visor / Box Art Image (Thick border, fixed h-56/64) */}
+        {/* 2. Box Art Area (Image with scanlines and glow border) */}
         <div
           className={cn(
-            "w-full h-56 md:h-64 relative overflow-hidden border-b-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0 bg-gray-950"
+            "w-full h-52 sm:h-56 md:h-60 relative overflow-hidden flex items-center justify-center z-10 pointer-events-none shrink-0 bg-gray-950/20"
           )}
         >
           {post.imageUrl && !imgError && (
             <img
               src={post.imageUrl}
               alt={post.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-hover:brightness-110"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-hover:brightness-105"
               style={{ objectPosition: post.imagePosition || "center" }}
               loading="lazy"
             />
           )}
 
-          {/* Golden Seal of Quality */}
-          {post.imageUrl && !imgError && (
-            <div className="absolute top-4 right-4 z-20 pointer-events-none select-none animate-bounce" style={{ animationDuration: "3s" }}>
-              <div className="w-11 h-11 rounded-full border border-dashed border-yellow-500/80 bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 text-black flex flex-col items-center justify-center font-retro text-[5px] font-black tracking-tighter uppercase leading-none shadow-[2px_2px_0px_rgba(0,0,0,0.8)] rotate-[15deg] p-0.5">
-                <span className="text-[4px] leading-none mb-0.5 text-yellow-950">★★★</span>
-                <span className="font-bold text-[6px]">BEGINS</span>
-                <span className="font-black text-[5px] text-yellow-950">SEAL</span>
-              </div>
-            </div>
-          )}
+          {/* CRT Scanlines Overlay */}
+          <div className="absolute inset-0 scanline-overlay opacity-[0.08] group-hover:opacity-15 transition-opacity duration-300 z-10" />
 
-          {/* Custom label badge for Reviews score */}
+          {/* Category-themed Glow Border Line under the image */}
+          <div className={cn(
+            "absolute bottom-0 left-0 right-0 h-[2px] z-20 shadow-[0_0_8px_rgba(0,0,0,0.5)]",
+            post.category.toLowerCase().includes("reviews") ? "bg-yellow-500" :
+            post.category.toLowerCase().includes("dossi") ? "bg-blue-500" :
+            post.category.toLowerCase().includes("retro") ? "bg-orange-500" : "bg-purple-500"
+          )} />
+
+          {/* Score Badge (Retro Futuristic style) */}
           {post.score && (
-            <div className="absolute top-4 left-4 z-20 pointer-events-none select-none">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 font-retro font-black text-xs border border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 to-amber-500 text-black uppercase tracking-wider">
+            <div className="absolute bottom-4 right-4 z-20 pointer-events-none select-none">
+              <div className="flex items-center gap-1.5 px-3 py-1 font-retro font-black text-xs rounded-full border border-yellow-500/20 bg-yellow-400/90 text-black shadow-md backdrop-blur-sm uppercase tracking-wider">
                 ★ {post.score}
               </div>
             </div>
           )}
-
-          {/* Laser scan line overlay */}
-          <div className={cn(
-            "absolute h-0.5 w-full top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30",
-            post.category.toLowerCase().includes("reviews") ? "bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,1)]" :
-            post.category.toLowerCase().includes("dossi") ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)]" :
-            post.category.toLowerCase().includes("retro") ? "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,1)]" :
-            "bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,1)]"
-          )} />
-
-          {/* CRT Scanlines Overlay */}
-          <div className="absolute inset-0 scanline-overlay opacity-[0.22] group-hover:opacity-40 transition-opacity duration-500 z-10" />
         </div>
 
-        {/* 3. Card Body Content (Title, excerpt) */}
-        <div className="flex flex-col flex-grow relative z-10 pointer-events-none px-5 py-5">
-          {/* Category Stamp */}
-          <div className="flex items-center gap-2 mb-2">
-            <span className={cn(
-              "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]",
-              post.category.toLowerCase().includes("reviews") ? "bg-yellow-400 text-black" :
-              post.category.toLowerCase().includes("dossi") ? "bg-blue-500 text-white" :
-              post.category.toLowerCase().includes("retro") ? "bg-orange-500 text-black" : "bg-purple-500 text-white"
-            )}>
-              {post.category}
-            </span>
-            <span className="text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
-              {formatDate(post.createdAt, post.date ?? undefined)}
+        {/* 3. Card Body Content */}
+        <div className="flex flex-col flex-grow relative z-10 pointer-events-none px-6 py-5.5">
+          {/* Date and read time row */}
+          <div className="flex items-center gap-3 text-[10px] font-mono font-semibold text-gray-500 dark:text-gray-400 mb-2">
+            <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+            <span className="opacity-30">•</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-purple-400 shrink-0" />
+              {calculateReadingTime(post.content || "").replace(" min de leitura", "m")}
             </span>
           </div>
 
           <h3 className={cn(
-            "font-retro font-bold uppercase line-clamp-2 transition-colors duration-300 text-base md:text-lg xl:text-xl leading-snug mb-2.5",
+            "font-retro font-bold uppercase line-clamp-2 transition-colors duration-300 text-base md:text-lg leading-snug mb-2.5",
+            post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
+            post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
+            post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
             "group-hover:text-purple-500 dark:group-hover:text-purple-400",
             isDark ? "text-gray-100" : "text-gray-900"
           )}>
             {post.title}
           </h3>
 
-          {/* Excerpt with typewriter styling */}
           {post.excerpt && (
             <p className={cn(
-              "text-xs md:text-sm mb-5 line-clamp-3 flex-grow leading-relaxed font-medium",
+              "text-xs md:text-[13px] mb-5 line-clamp-3 flex-grow leading-relaxed",
               isDark ? "text-gray-400" : "text-gray-600"
             )}>
               {post.excerpt}
             </p>
           )}
 
-          {/* 4. Specifications HUD Footer */}
-          <div className="mt-auto pt-4 border-t border-black/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-y-3">
-            {/* Left specifications (Playtime + Barcode) */}
-            <div className="flex items-center gap-3">
-              {/* Simulated Barcode */}
-              <div className="flex items-center gap-[1px] h-5 bg-white/95 p-1 border border-black select-none shrink-0">
-                {[1, 2, 1, 3, 1, 1, 2, 1, 2].map((w, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-black h-full"
-                    style={{ width: `${w}px` }}
-                  />
-                ))}
-              </div>
-
-              <div className="border border-black px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider bg-black/5 dark:bg-white/5 text-gray-700 dark:text-gray-300 leading-none">
-                READ TIME: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}
-              </div>
+          {/* 4. Sleek Interactive Controls Footer */}
+          <div className={cn(
+            "mt-auto pt-4 border-t flex items-center justify-between gap-y-3",
+            isDark ? "border-[#2d284f]" : "border-gray-100"
+          )}>
+            {/* Stats display (Mini terminal labels) */}
+            <div className="flex items-center gap-3 text-[10px] font-mono font-bold text-gray-400 dark:text-gray-500">
+              <span className="flex items-center gap-1">
+                <MessageSquare className="w-3 h-3 text-blue-400/80" />
+                {formatNumber(commentCount)}
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="w-3 h-3 text-purple-400/80" />
+                {formatNumber(post.views || 0)}
+              </span>
             </div>
 
-            {/* Right Interactive Buttons */}
-            <div className="flex items-center gap-2.5 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+            {/* Actions (Sleek capsule buttons) */}
+            <div className="flex items-center gap-2 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center gap-2">
                 <button
                   className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-none border border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] bg-black/5 dark:bg-white/5 transition-all text-red-500 hover:scale-105 active:scale-95 cursor-pointer hover:bg-red-50 dark:hover:bg-red-950/20",
-                    hasLiked ? "bg-red-500/10 border-red-500" : ""
+                    "flex items-center justify-center w-7.5 h-7.5 rounded-full border transition-all text-red-500 hover:scale-105 active:scale-95 cursor-pointer",
+                    hasLiked 
+                      ? "bg-red-500/10 border-red-500/30" 
+                      : (isDark ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-black/5 bg-black/5 hover:bg-black/10")
                   )}
                   onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
                   title={currentUser ? "Curtir" : "Faça login para curtir"}
@@ -358,8 +359,10 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
                 <button
                   className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-none border border-black shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] bg-black/5 dark:bg-white/5 transition-all text-yellow-500 hover:scale-105 active:scale-95 cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-950/20",
-                    profile?.favorites?.includes(post.id) ? "bg-yellow-500/10 border-yellow-500" : ""
+                    "flex items-center justify-center w-7.5 h-7.5 rounded-full border transition-all text-yellow-500 hover:scale-105 active:scale-95 cursor-pointer",
+                    profile?.favorites?.includes(post.id)
+                      ? "bg-yellow-500/10 border-yellow-500/30" 
+                      : (isDark ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-black/5 bg-black/5 hover:bg-black/10")
                   )}
                   onClick={() => {
                     if (currentUser) {
@@ -374,20 +377,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
                 </button>
               </div>
 
-              {/* Stats values */}
-              <div className="flex items-center gap-2 border border-black px-1.5 py-1 bg-black/5 dark:bg-white/5 text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-0.5">
-                  <MessageSquare className="w-2.5 h-2.5 text-blue-500" />
-                  <span>{formatNumber(commentCount)}</span>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  <Eye className="w-2.5 h-2.5 text-purple-500" />
-                  <span>{formatNumber(post.views || 0)}</span>
-                </div>
-              </div>
-
               {!currentUser && (
-                <div className="pl-2 border-l border-black/10 dark:border-white/10">
+                <div className="pl-2 border-l border-white/10">
                   <AuthGate variant="inline" />
                 </div>
               )}
