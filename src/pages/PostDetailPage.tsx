@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { cn, coverBgStyle } from "../lib/utils";
+import { cn } from "../lib/utils";
 
 // Stores & Hooks
 import { useAuth } from "../context/AuthProvider";
@@ -45,7 +45,7 @@ interface PostDetailPageProps {
 export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { showToast, setIsLoginModalOpen } = useUIStore();
+  const { setIsLoginModalOpen } = useUIStore();
   const { currentUser, authLoading } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
@@ -92,9 +92,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
         if (!viewedPosts.includes(post.id)) {
           incrementViewMutation.mutate({ 
-            postId: post.id, 
-            userId: currentUser?.id,
-            viewerId: currentUser?.id || "guest"
+            postId: post.id 
           });
           
           viewedPosts.push(post.id);
@@ -146,7 +144,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     setCommentText("");
   };
 
-  const heroStyle = imgError ? {} : coverBgStyle(post.imageUrl, post.imagePosition);
+
   const isFavorited = profile?.favorites?.includes(post.id) || false;
 
   return (
@@ -196,7 +194,6 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
         <PostHero 
           post={post} 
           imgError={imgError} 
-          heroStyle={heroStyle} 
         />
 
         <div id="article-content" className="space-y-12">

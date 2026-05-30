@@ -7,7 +7,6 @@ import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { useImageFallback } from "../../../hooks/useImageFallback";
-import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 import AuthGate from "../../auth/components/AuthGate";
 import { Post } from "../schemas";
 

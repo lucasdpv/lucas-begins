@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
-import { Gamepad2, ChevronRight, ChevronLeft, LayoutGrid, Map, Layers, Coffee, FolderOpen } from "lucide-react";
+import { Gamepad2, ChevronRight, ChevronLeft, Coffee, FolderOpen } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,7 +13,6 @@ import {
   useAllPosts, 
   useFeaturedPosts, 
   useMostViewedPosts, 
-  useTopReviews, 
   usePostsByCategory, 
   usePosts,
   useLatestPosts
@@ -21,84 +20,10 @@ import {
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber, formatDate, calculateReadingTime } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
-import { ScoreBadge } from "../components/ui/Badge";
-import { BRUTAL_DESIGN } from "../constants";
-import { useAuth } from "../context/AuthProvider";
-import { useUserProfile } from "../hooks/useUserQuery";
 
-const { BORDER, SHADOW_LG, ROUNDED, TRANSITION } = BRUTAL_DESIGN;
-
-const getCategoryTheme = (category: string) => {
-  const normalized = category.toLowerCase().trim();
-  switch (normalized) {
-    case "reviews":
-      return { dot: "bg-amber-500", text: "text-amber-600 dark:text-amber-400" };
-    case "dossiês":
-    case "dossies":
-    case "dossiê":
-    case "dossie":
-      return { dot: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" };
-    case "especial":
-      return { dot: "bg-purple-500", text: "text-purple-600 dark:text-purple-400" };
-    case "retrocafe":
-    case "retro-café":
-    case "retrocafé":
-      return { dot: "bg-orange-500", text: "text-orange-600 dark:text-orange-400" };
-    default:
-      return { dot: "bg-purple-500", text: "text-purple-600 dark:text-purple-400" };
-  }
-};
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
-  const { currentUser } = useAuth();
-  const { data: profile } = useUserProfile(currentUser?.id);
-  const playInsertSound = () => {
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const now = ctx.currentTime;
-      
-      // Insertion clack: low pitch white noise click
-      const bufferSize = ctx.sampleRate * 0.05; // 50ms noise
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-      
-      const noiseFilter = ctx.createBiquadFilter();
-      noiseFilter.type = "bandpass";
-      noiseFilter.frequency.setValueAtTime(300, now);
-      
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.15, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-      
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-      noise.start(now);
-
-      // Power-on chime: retro synth sine wave beep
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(523.25, now + 0.05); // C5
-      osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.setValueAtTime(0.05, now + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now + 0.05);
-      osc.stop(now + 0.25);
-    } catch (e) {
-      console.log("Audio API not supported or allowed", e);
-    }
-  };
 
   const playEjectSound = () => {
     try {
@@ -203,7 +128,7 @@ export default function HomePage() {
   const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts();
 
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
-  const { data: mostViewedPosts = [], isLoading: isLoadingMostViewed } = useMostViewedPosts(5);
+  const { data: mostViewedPosts = [] } = useMostViewedPosts(5);
 
   // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
   const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5);
@@ -579,12 +504,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10 text-left lg:items-stretch lg:grid-rows-1">
 
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
-            <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-10 lg:flex-1">
+            <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-6 xl:gap-10 lg:flex-1">
 
               {/* ── RetroCafé ── */}
               <div 
                 className={cn(
-                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
+                  "order-2 lg:order-none px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredRetrocafeIndex(null)}
@@ -800,7 +725,7 @@ export default function HomePage() {
               {/* ── Dossiês ── */}
               <div 
                 className={cn(
-                  "px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
+                  "order-3 lg:order-none px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
                   isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
@@ -1013,7 +938,7 @@ export default function HomePage() {
             </div>
 
             {/* ── DIREITA (1/3): Reviews ── */}
-            <div className="flex flex-col gap-5 lg:contents">
+            <div className="order-1 lg:order-none flex flex-col gap-5 lg:contents">
               {/* Divisor sutil acima de Reviews no mobile */}
               <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/10")} />
 

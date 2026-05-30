@@ -263,7 +263,7 @@ export const PostService = {
   /**
    * Incrementa o contador de visualizacoes.
    */
-  async incrementPostViews(postId: string, userId?: string, viewerId?: string): Promise<void> {
+  async incrementPostViews(postId: string): Promise<void> {
     try {
       const postRef = doc(db, COLLECTIONS.POSTS, postId);
       await updateDoc(postRef, {

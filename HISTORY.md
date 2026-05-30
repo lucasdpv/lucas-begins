@@ -4,6 +4,21 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🧹 [v4.4.0] - The Code Cleanup & Mobile Ordering Update
+*Data: 30 de Maio de 2026*
+
+### 🧹 Remoção de Código Morto (Dead Code Cleanup)
+- **Eliminação de Lixo e Avisos**: Removemos dezenas de imports, variáveis e parâmetros locais declarados mas nunca utilizados em mais de 10 arquivos do projeto, resultando em builds mais limpos e eliminando warnings do compilador.
+- **Simplificação de Componentes**:
+  - Removido o cálculo de `heroStyle` e prop do `PostHero` (imagens agora utilizam `objectPosition` nativo).
+  - Removido o parâmetro não utilizado `flip` em `getCroppedImg`.
+  - Simplificada a assinatura de `incrementPostViews` e chamadas associadas, removendo os parâmetros sem uso `userId` e `viewerId`.
+
+### 📱 Reordenação de Seções no Mobile
+- **Foco Responsivo na Home**: As seções do feed secundário da Home foram reordenadas via CSS Grid (com `order` e `contents`) para que, em dispositivos móveis, a seção **Reviews** seja exibida no topo, logo acima de **RetroCafé** e **Dossiês**, mantendo a diagramação de colunas intacta no desktop.
+
+---
+
 ## 🦴 [v4.3.0] - The Skeleton Fidelity Update
 *Data: 30 de Maio de 2026*
 

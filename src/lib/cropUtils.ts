@@ -3,8 +3,7 @@
  */
 export const getCroppedImg = async (
   imageSrc: string,
-  pixelCrop: { x: number; y: number; width: number; height: number },
-  flip = { horizontal: false, vertical: false }
+  pixelCrop: { x: number; y: number; width: number; height: number }
 ): Promise<Blob> => {
   const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');

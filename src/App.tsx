@@ -1,8 +1,7 @@
-import React, { useEffect, lazy, Suspense } from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useAuth } from "./context/AuthProvider";
 import { useThemeStore } from "./store/useThemeStore";
 import { useUIStore } from "./store/useUIStore";
 
@@ -14,11 +13,6 @@ import LoginModal from "./features/auth/components/LoginModal";
 import BackToTop from "./components/ui/BackToTop";
 import CookieConsent from "./components/ui/CookieConsent";
 import SystemInitializer from "./components/SystemInitializer";
-import PostSkeleton from "./features/posts/components/PostSkeleton";
-import PostDetailSkeleton from "./features/posts/components/PostDetailSkeleton";
-import FormSkeleton from "./components/ui/FormSkeleton";
-import AboutSkeleton from "./components/ui/AboutSkeleton";
-import ContactSkeleton from "./components/ui/ContactSkeleton";
 
 // Páginas (Imports diretos para estabilidade de contexto)
 import HomePage from "./pages/HomePage";

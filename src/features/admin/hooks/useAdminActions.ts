@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthProvider";
 import { useUIStore } from "../../../store/useUIStore";
-import { useDeletePostMutation, useUpdatePostMutation } from "../../posts/hooks/usePostsQuery";
+import { useDeletePostMutation } from "../../posts/hooks/usePostsQuery";
 import { useAddCategoryMutation, useDeleteCategoryMutation } from "../../posts/hooks/useCategoriesQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { contactService } from "../../../services/contactService";
@@ -23,7 +23,7 @@ export function useAdminActions(posts: Post[]) {
   const { data: profile } = useUserProfile(currentUser?.id);
 
   const deletePostMutation = useDeletePostMutation();
-  const updatePostMutation = useUpdatePostMutation();
+
   const addCategoryMutation = useAddCategoryMutation();
   const deleteCategoryMutation = useDeleteCategoryMutation();
 

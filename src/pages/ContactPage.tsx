@@ -5,7 +5,7 @@ import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
 import { cn } from "../lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslation } from "../context/TranslationContext";
 
 const DIALOGUE_TRANSLATIONS: Record<string, string> = {

@@ -122,8 +122,6 @@ function ArticleImage({
     );
   }
 
-  const isFloated = layout === 'left' || layout === 'right';
-
   const getContainerClass = () => {
     let widthClass = "w-full";
     if (aspect === 'original') {
@@ -359,7 +357,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
     };
 
     // 1. Extrair links de Markdown [texto](url)
-    let processed = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+    let processed = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
       const id = `__LINK_${linkCounter++}__`;
       links[id] = { url, label: truncateText(label) };
       return id;
