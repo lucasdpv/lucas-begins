@@ -35,6 +35,8 @@ const getCategoryTheme = (category: string) => {
       return { dot: "bg-amber-500", text: "text-amber-600 dark:text-amber-400" };
     case "dossiês":
     case "dossies":
+    case "dossiê":
+    case "dossie":
       return { dot: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" };
     case "especial":
       return { dot: "bg-purple-500", text: "text-purple-600 dark:text-purple-400" };
@@ -266,10 +268,10 @@ export default function HomePage() {
   }, [updateScrollState]);
 
   const gridPosts = isSearching 
-    ? filteredPosts.slice(0, 6) 
+    ? filteredPosts.slice(0, 4) 
     : isDefaultView 
-    ? latestPosts.slice(0, 6) 
-    : paginatedPosts.slice(0, 6);
+    ? latestPosts.slice(0, 4) 
+    : paginatedPosts.slice(0, 4);
 
   const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
 
@@ -503,6 +505,73 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      {/* ── 3. FEED DE NOTÍCIAS: Bento Grid de 3 Colunas ── */}
+      <section className="flex flex-col gap-6">
+        {/* Feed Header */}
+        <div className={cn(
+          "flex items-center justify-between pb-5",
+          isDark ? "border-b border-white/5" : "border-b border-black/10"
+        )}>
+          <div className="flex items-center gap-3">
+            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
+            <div>
+              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
+                {isLoadingPosts
+                  ? "Carregando..."
+                  : searchQuery
+                  ? `Resultados: "${searchQuery}"`
+                  : activeCategory !== "Todos"
+                  ? activeCategory
+                  : "Últimas Notícias"}
+              </h2>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
+                Mais Recentes do Portal
+              </p>
+            </div>
+          </div>
+          {!isLoadingPosts && isDefaultView && (
+            <Link
+              to="/archive"
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-xl transition-all duration-200 hover:translate-x-0.5",
+                isDark
+                  ? "border-blue-500/30 text-blue-400 hover:border-blue-400/50 hover:text-blue-300 bg-blue-500/5"
+                  : "border-blue-500/20 text-blue-600 hover:border-blue-600 hover:bg-blue-50/50"
+              )}
+            >
+              Ver Todos <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
+        </div>
+
+        {/* Feed Content: Clean 2-Column Grid */}
+        {isLoadingPosts ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <PostSkeleton key={i} isDark={isDark} variant="vintage" />
+            ))}
+          </div>
+        ) : gridPosts.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
+            {gridPosts.map((post, i) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+              >
+                <PostCard post={post} variant="vintage" />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className={cn("p-12 text-center rounded-none border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
+            <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500 animate-pulse" />
+            <p className="font-retro font-bold uppercase text-sm">Nenhum artigo encontrado.</p>
+          </div>
+        )}
+      </section>
 
       {/* ── 2. ROW 2: RetroCafé / Dossiês / Reviews ─────────── */}
       {!isLoadingPosts && isDefaultView && (
@@ -1122,72 +1191,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── 3. FEED DE NOTÍCIAS: Bento Grid de 3 Colunas ── */}
-      <section className="flex flex-col gap-6">
-        {/* Feed Header */}
-        <div className={cn(
-          "flex items-center justify-between pb-5",
-          isDark ? "border-b border-white/5" : "border-b border-black/10"
-        )}>
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-            <div>
-              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
-                {isLoadingPosts
-                  ? "Carregando..."
-                  : searchQuery
-                  ? `Resultados: "${searchQuery}"`
-                  : activeCategory !== "Todos"
-                  ? activeCategory
-                  : "Últimas Notícias"}
-              </h2>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                Mais Recentes do Portal
-              </p>
-            </div>
-          </div>
-          {!isLoadingPosts && isDefaultView && (
-            <Link
-              to="/archive"
-              className={cn(
-                "flex items-center gap-1.5 px-3.5 py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-xl transition-all duration-200 hover:translate-x-0.5",
-                isDark
-                  ? "border-blue-500/30 text-blue-400 hover:border-blue-400/50 hover:text-blue-300 bg-blue-500/5"
-                  : "border-blue-500/20 text-blue-600 hover:border-blue-600 hover:bg-blue-50/50"
-              )}
-            >
-              Ver Todos <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
-          )}
-        </div>
-
-        {/* Feed Content: Clean 2-Column Grid */}
-        {isLoadingPosts ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <PostSkeleton key={i} isDark={isDark} variant="vintage" />
-            ))}
-          </div>
-        ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
-            {gridPosts.map((post, i) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-              >
-                <PostCard post={post} variant="vintage" />
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className={cn("p-12 text-center rounded-none border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
-            <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500 animate-pulse" />
-            <p className="font-retro font-bold uppercase text-sm">Nenhum artigo encontrado.</p>
-          </div>
-        )}
-      </section>
     </div>
   );
 }

@@ -4,7 +4,35 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🦴 [v4.3.0] - The Skeleton Fidelity Update
+*Data: 30 de Maio de 2026*
+
+### 🖼️ Skeletons Fiéis ao Design Real
+
+- **`CarouselSkeleton` Reescrito do Zero**: O skeleton do bloco principal da homepage foi completamente refatorado para espelhar fielmente a estrutura, espaçamentos e visual do `Carousel` real e do painel "Mais Lidos". As novidades incluem:
+  - Bordas brutalistas `border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]` idênticas ao componente real.
+  - Hero com `bg-gray-900` + gradiente cinematográfico `from-gray-950 via-gray-950/55` + overlay de scanlines CRT.
+  - Placeholder do badge de categoria com `border border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]`.
+  - Título animado em 2 linhas (`h-9 md:h-11`) e excerpt em 2 linhas proporcionais.
+  - Row de metadados (♥ likes · ⏱ tempo de leitura) com as mesmas dimensões do original.
+  - Setas de navegação com `rounded-xl bg-black/60 border border-white/20` — idênticas ao `Carousel`.
+  - Dots de progresso dentro do container correto (`rounded-2xl backdrop-blur-md border border-white/15`).
+  - Sidebar "Mais Lidos" desktop com 5 itens, placeholder amber para números de ranking (`bg-amber-400/20`), 2 linhas de título e linha de views — espelhando o painel real.
+  - Headers das seções "Em Destaque" e "Mais Lidos" com barra lateral colorida (purple/amber) e subtítulo, iguais ao layout real.
+
+- **`PostSkeleton` Variant Vintage Refatorada**: A variante `vintage` (usada no feed "Últimas Notícias" da HomePage) foi reescrita para ser um espelho exato do `PostCard` variant vintage:
+  - Color strip lateral `w-3 shrink-0 border-r-2 border-black` animado com `animate-pulse`.
+  - Thumbnail `w-32 sm:w-40 md:w-48` com overlay de scanlines CRT dentro do placeholder.
+  - Header row com badge de categoria `border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)]` (igual ao real) + data à direita.
+  - Título em 2 linhas (`h-4`) e excerpt visível apenas em `sm+`, exatamente como no card real.
+  - Footer com views/comentários à esquerda e botões de ação quadrados `w-6 h-6 border border-black/20` à direita.
+
+- **Animação `shimmer-sweep`**: Adicionada `@keyframes shimmer-sweep` e a utility class `.animate-shimmer-sweep` ao `index.css` global, criando um efeito de varredura de luz suave sobre os placeholders do hero do carrossel para comunicar visualmente o estado de carregamento.
+
+---
+
 ## 🖤 [v4.2.0] - The Clean & Precise Horizontal Feed Update
+
 *Data: 29 de Maio de 2026*
 
 ### 📰 Refatoração e Simplificação do Feed (Últimas Notícias)

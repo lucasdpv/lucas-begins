@@ -31,6 +31,8 @@ const getCategoryCardStyles = (category: string) => {
       };
     case "dossiês":
     case "dossies":
+    case "dossiê":
+    case "dossie":
       return {
         textHover: "group-hover:text-blue-500 dark:group-hover:text-blue-400",
         textLabel: "text-blue-600 dark:text-blue-400",
