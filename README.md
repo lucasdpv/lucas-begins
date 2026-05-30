@@ -1,8 +1,8 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v4.1.0)
+# 🕹️ BeginsProject - Retro Gaming Journal (v4.3.0)
 
 > **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
 
-O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 4.1.0, o portal traz um redesign temático completo na homepage para as seções RetroCafé, Dossiês e Reviews, removendo os cards genéricos e substituindo-os por capas de revista vintage, pastas manila confidenciais e decks retro-modernos integrados com fade, acompanhados de efeitos de áudio sintetizados nativamente e animações interativas de alta fidelidade.
+O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 4.3.0, o portal recebe uma revisão completa dos skeletons de carregamento — o `CarouselSkeleton` e o `PostSkeleton` agora espelham fielmente a estrutura, bordas, gradientes e proporções dos componentes reais, eliminando shifts de layout e oferecendo uma experiência de carregamento visualmente coerente com o design Neo-Brutalist do portal.
 
 ---
 
@@ -14,6 +14,23 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 -   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação e ferramentas admin.
 -   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre TanStack Query, Zustand e Estrutura de Features.
 -   **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Tutorial passo a passo para integrar seu próprio backend.
+
+---
+
+## ✨ Destaques da Versão 4.3.0 (Skeleton Fidelity Update)
+
+### 🦴 Skeletons Fiéis ao Design Real
+- **CarouselSkeleton Redesenhado**: Espelha agora a estrutura exata do carrossel — `border-2 border-black shadow-[6px_6px_0px]`, gradiente cinematográfico `from-gray-950`, overlay de scanlines CRT, placeholder do badge de categoria, título em 2 linhas, excerpt, meta row (♥ · ⏱), setas de navegação e dots de progresso no container correto.
+- **Sidebar "Mais Lidos" no Skeleton**: A coluna lateral desktop do skeleton agora inclui os 5 itens com placeholder amber para os números de ranking, linhas de título e views — idêntico ao painel real.
+- **PostSkeleton Vintage Fiel**: A variante `vintage` replica o color strip lateral (`w-3 border-r-2 border-black`), thumbnail com scanlines, badge de categoria com `border + shadow-[1px_1px_0px]`, e botões de ação quadrados (`w-6 h-6`) — eliminando layout shift no carregamento do feed.
+- **Animação `shimmer-sweep`**: Adicionada keyframe e utility class global em `index.css` para o efeito de varredura de luz nos placeholders do hero do carousel.
+
+---
+
+## ✨ Destaques da Versão 4.2.0 (Clean & Precise Horizontal Feed)
+
+- **Feed Vintage Limpo**: Redesenhada a variante `vintage` dos cards horizontais — remoção de barcode, scanner-beam e textos técnicos redundantes para um visual editorial premium.
+- **Home em 2 Colunas**: Grid de Últimas Notícias reduzido de 3 para 2 colunas no desktop, garantindo ~500px de largura por card.
 
 ---
 

@@ -220,6 +220,16 @@
   100% { background-position: 200% center; }
 }
 
+/* Skeleton shimmer sweep — translates a highlight across the element */
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
 .shimmer-badge {
   background: linear-gradient(90deg, #facc15 0%, #fef08a 40%, #facc15 60%, #facc15 100%);
   background-size: 200% auto;
