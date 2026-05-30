@@ -6,10 +6,9 @@ import { Post } from "../../schemas";
 interface PostHeroProps {
   post: Post;
   imgError: boolean;
-  heroStyle: React.CSSProperties;
 }
 
-export default function PostHero({ post, imgError, heroStyle }: PostHeroProps) {
+export default function PostHero({ post, imgError }: PostHeroProps) {
   return (
     <div
       className={cn(

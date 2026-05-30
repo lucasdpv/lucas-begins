@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { ArrowLeft, Plus, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";

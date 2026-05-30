@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import { useUserProfile } from '../hooks/useUserQuery';
-import { usePostsByIds, useUserCommentsCount, useFavoriteMutation } from '../features/posts/hooks/usePostsQuery';
+import { usePostsByIds, useUserCommentsCount } from '../features/posts/hooks/usePostsQuery';
 import { useThemeStore } from '../store/useThemeStore';
 import { useUIStore } from '../store/useUIStore';
-import { cn, formatNumber } from '../lib/utils';
-import { Star, Trophy, MessageSquare, Heart, Bookmark, ChevronRight, Gamepad2, Zap, Info, Edit, X, Check, Camera, User, Trash2 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { cn } from '../lib/utils';
+import { Star, Trophy, MessageSquare, Bookmark, ChevronRight, Gamepad2, Zap, Info, Edit, X, Check, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PostCard from '../features/posts/components/PostCard';
 import ImageUpload from '../components/ui/ImageUpload';
 import { getPixelAvatar } from '../lib/utils';
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
+
   const { currentUser, handleUpdateProfile } = useAuth();
   const { isDark } = useThemeStore();
   const { showToast } = useUIStore();
-  const { data: profile, isLoading: isProfileLoading } = useUserProfile(currentUser?.id);
-  const favoriteMutation = useFavoriteMutation();
+  const { data: profile } = useUserProfile(currentUser?.id);
 
   // 1. Busca os posts favoritados de forma otimizada (apenas IDs necessários, economizando 99% de leituras)
   const favoriteIds = profile?.favorites || [];
-  const { data: favoritePosts = [], isLoading: isFavoritesLoading } = usePostsByIds(favoriteIds);
+  const { data: favoritePosts = [] } = usePostsByIds(favoriteIds);
 
   // 2. Busca a contagem de comentários do usuário usando Collection Group Query
   const { data: totalComments = 0 } = useUserCommentsCount(currentUser?.id || "");

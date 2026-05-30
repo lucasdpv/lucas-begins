@@ -6,13 +6,10 @@ import {
   Moon, 
   Sun, 
   X, 
-  PlusCircle, 
   Menu 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../lib/utils";
-import { BRUTAL_DESIGN } from "../../constants";
-import { InstagramIcon, ThreadsIcon, XIcon } from "../icons/SocialIcons";
 
 // Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -61,7 +58,7 @@ export default function Navbar() {
 
   // Só carrega a base de posts se a busca for aberta, focada ou houver termo digitado
   const shouldLoadPosts = isSearchExpanded || searchQuery.trim() !== "" || isSearchFocused;
-  const { data: allPosts = [] } = useAllPosts(shouldLoadPosts);
+  useAllPosts(shouldLoadPosts);
 
   // Exibe as categorias ativas de forma imediata (0ms de atraso e zero leituras desnecessárias no Firestore)
   const activeCategories = categories;

@@ -285,14 +285,14 @@ export function useLikeMutation() {
       }
     },
 
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousAll) {
         queryClient.setQueryData(postKeys.all, context.previousAll);
       }
       showToast("Falha na conexão com o servidor de likes. 📡", "error");
     },
 
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
@@ -340,14 +340,14 @@ export function useFavoriteMutation() {
       showToast(action === 'added' ? "Adicionado aos seus favoritos! ⭐" : "Removido dos favoritos.");
     },
 
-    onError: (err, variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousProfile) {
         queryClient.setQueryData(['userProfile', variables.userId], context.previousProfile);
       }
       showToast("Erro ao atualizar favoritos.", "error");
     },
 
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     }
   });
@@ -400,8 +400,8 @@ export function useDeleteCommentMutation() {
 export function useIncrementViewMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, userId, viewerId }: { postId: string, userId?: string, viewerId: string }) => 
-      PostService.incrementPostViews(postId, userId, viewerId),
+    mutationFn: ({ postId }: { postId: string }) => 
+      PostService.incrementPostViews(postId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
@@ -455,7 +455,7 @@ export function useLikeCommentMutation() {
       return { previousPost, previousSlugPost };
     },
 
-    onError: (err, variables, context) => {
+    onError: (_err, variables, context) => {
       // Se a mutação falhar, reverte para os snapshots anteriores salvos
       if (context?.previousPost) {
         queryClient.setQueryData(postKeys.detail(variables.postId), context.previousPost);
@@ -472,7 +472,7 @@ export function useLikeCommentMutation() {
       }
     },
 
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       // Invalida a query para sincronizar com o estado definitivo do banco de dados
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
@@ -575,7 +575,7 @@ export function useLikeReplyMutation() {
       return { previousPost, previousSlugPost };
     },
 
-    onError: (err, variables, context) => {
+    onError: (_err, variables, context) => {
       if (context?.previousPost) {
         queryClient.setQueryData(postKeys.detail(variables.postId), context.previousPost);
       }
@@ -591,7 +591,7 @@ export function useLikeReplyMutation() {
       }
     },
 
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
     }

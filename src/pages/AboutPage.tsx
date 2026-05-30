@@ -1,7 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import { useThemeStore } from "../store/useThemeStore";
-import RetroSeparator from "../components/ui/RetroSeparator";
 import { cn } from "../lib/utils";
 
 /**
