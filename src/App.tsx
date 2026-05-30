@@ -22,7 +22,6 @@ import ContactPage from "./pages/ContactPage";
 import AdminPage from "./pages/AdminPage";
 import PostEditorPage from "./pages/PostEditorPage";
 import DashboardPage from "./pages/DashboardPage";
-import DebugPage from "./pages/DebugPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ArchivePage from "./pages/ArchivePage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -115,7 +114,6 @@ export default function App() {
                   </ProtectedRoute>
                 } />
                 <Route path="/archive" element={<ArchivePage />} />
-                <Route path="/debug" element={<DebugPage />} />
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
