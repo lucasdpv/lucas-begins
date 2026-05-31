@@ -4,6 +4,15 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🩹 [v4.4.1] - The Mobile Overlay Positioning Update
+*Data: 31 de Maio de 2026*
+
+### 📱 Correção de Posicionamento de Overlays no Mobile
+- **Fix de Elementos Fixos (WebKit/iOS)**: Movemos os overlays globais `<BackToTop />`, `<CookieConsent />` e `<LoginModal />` para fora do container principal flexbox no [App.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/App.tsx). Isso impede que navegadores WebKit/iOS calculem incorretamente a posição `fixed` com base no fluxo do flexbox, resolvendo o bug do botão de topo travado no meio da tela.
+- **Alinhamento de Segurança**: Adicionada a classe `items-end` no container do [BackToTop.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/components/ui/BackToTop.tsx) para reforçar a ancoragem vertical.
+
+---
+
 ## 🧹 [v4.4.0] - The Code Cleanup & Mobile Ordering Update
 *Data: 30 de Maio de 2026*
 

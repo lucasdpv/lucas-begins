@@ -122,11 +122,12 @@ export default function App() {
         </main>
 
         <Footer />
-        <BackToTop />
-        {/* Overlays globais */}
-        <CookieConsent />
-        {isLoginModalOpen && <LoginModal />}
       </div>
+
+      <BackToTop />
+      {/* Overlays globais */}
+      <CookieConsent />
+      {isLoginModalOpen && <LoginModal />}
     </div>
   );
 }

@@ -35,7 +35,7 @@ export default function BackToTop() {
   return (
     <AnimatePresence>
       {isVisible && (
-        <div className="fixed inset-x-0 bottom-0 z-[60] pointer-events-none flex justify-center">
+        <div className="fixed inset-x-0 bottom-0 z-[60] pointer-events-none flex justify-center items-end">
           {/* Container maior que os artigos (1600px vs 1280px) para o botão ficar 'por fora' */}
           <div className="w-full max-w-[1600px] px-6 sm:px-10 relative h-24 md:h-32 flex justify-end items-end">
             <motion.button
