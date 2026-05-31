@@ -7,7 +7,7 @@ import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { useImageFallback } from "../../../hooks/useImageFallback";
-import AuthGate from "../../auth/components/AuthGate";
+import { useUIStore } from "../../../store/useUIStore";
 import { Post } from "../schemas";
 
 interface PostCardProps {
@@ -105,6 +105,7 @@ const getCategoryCardStyles = (category: string) => {
 export default function PostCard({ post, variant = "default", showCategory = true }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
+  const { setIsLoginModalOpen } = useUIStore();
   const { data: profile } = useUserProfile(currentUser?.id);
   const likeMutation = useLikeMutation();
   const favoriteMutation = useFavoriteMutation();
@@ -177,16 +178,15 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             <div className="flex items-center gap-2 ml-auto relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <button
                 className={cn(
-                  "flex items-center gap-1 font-bold transition-all text-[10px]",
+                  "flex items-center gap-1 font-bold transition-all text-[10px] active:scale-95 cursor-pointer",
                   hasLiked 
                     ? "text-red-500 scale-105" 
                     : isDark 
                     ? "text-gray-400 hover:text-red-400 hover:scale-110" 
-                    : "text-gray-600 hover:text-red-500 hover:scale-110",
-                  currentUser ? "active:scale-95 cursor-pointer" : isDark ? "opacity-40" : "opacity-50"
+                    : "text-gray-600 hover:text-red-500 hover:scale-110"
                 )}
-                onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
-                disabled={!currentUser}
+                onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : setIsLoginModalOpen(true)}
+                title={currentUser ? "Curtir" : "Faça login para curtir"}
               >
                 <Heart className="w-3 h-3" />
                 <span>{formatNumber(post.likes || 0)}</span>
@@ -322,9 +322,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
                     "flex items-center justify-center w-6 h-6 rounded-none border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 transition-all text-red-500 hover:scale-105 active:scale-95 cursor-pointer hover:border-red-500 dark:hover:border-red-400",
                     hasLiked ? "bg-red-500/10 border-red-500" : ""
                   )}
-                  onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
+                  onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : setIsLoginModalOpen(true)}
                   title={currentUser ? "Curtir" : "Faça login para curtir"}
-                  disabled={!currentUser}
                 >
                   <Heart className={cn("w-3 h-3", hasLiked && "fill-current")} />
                 </button>
@@ -338,20 +337,15 @@ export default function PostCard({ post, variant = "default", showCategory = tru
                     if (currentUser) {
                       const isFavorited = profile?.favorites?.includes(post.id) || false;
                       favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
+                    } else {
+                      setIsLoginModalOpen(true);
                     }
                   }}
                   title={currentUser ? "Favoritar" : "Faça login para favoritar"}
-                  disabled={!currentUser}
                 >
                   <Bookmark className={cn("w-3 h-3", profile?.favorites?.includes(post.id) && "fill-current")} />
                 </button>
               </div>
-
-              {!currentUser && (
-                <div className="pl-1 border-l border-black/10 dark:border-white/10">
-                  <AuthGate variant="inline" />
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -467,19 +461,15 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 className={cn(
-                  "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs",
+                  "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs active:scale-95 cursor-pointer",
                   hasLiked
                     ? "text-red-500 scale-105"
                     : isDark
                     ? "text-gray-400 hover:text-red-400 hover:scale-110"
-                    : "text-gray-600 hover:text-red-500 hover:scale-110",
-                  currentUser
-                    ? "active:scale-95 cursor-pointer"
-                    : isDark ? "opacity-40" : "opacity-50"
+                    : "text-gray-600 hover:text-red-500 hover:scale-110"
                 )}
-                onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : null}
+                onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : setIsLoginModalOpen(true)}
                 title={currentUser ? "Curtir" : "Faça login para curtir"}
-                disabled={!currentUser}
               >
                 <Heart className="w-3.5 h-3.5" />
                 <span>{formatNumber(post.likes || 0)}</span>
@@ -487,24 +477,22 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
               <button
                 className={cn(
-                  "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs",
+                  "flex items-center gap-1 font-bold transition-all text-[11px] sm:text-xs active:scale-95 cursor-pointer",
                   profile?.favorites?.includes(post.id)
                     ? "text-yellow-500 scale-105"
                     : isDark
                     ? "text-gray-400 hover:text-yellow-400 hover:scale-110"
-                    : "text-gray-600 hover:text-yellow-500 hover:scale-110",
-                  currentUser
-                    ? "active:scale-95 cursor-pointer"
-                    : isDark ? "opacity-40" : "opacity-50"
+                    : "text-gray-600 hover:text-yellow-500 hover:scale-110"
                 )}
                 onClick={() => {
                   if (currentUser) {
                     const isFavorited = profile?.favorites?.includes(post.id) || false;
                     favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
+                  } else {
+                    setIsLoginModalOpen(true);
                   }
                 }}
                 title={currentUser ? "Favoritar" : "Faça login para favoritar"}
-                disabled={!currentUser}
               >
                 <Bookmark className="w-3.5 h-3.5" />
               </button>
@@ -519,12 +507,6 @@ export default function PostCard({ post, variant = "default", showCategory = tru
                 <span>{formatNumber(post.views || 0)}</span>
               </div>
             </div>
-
-            {!currentUser && (
-              <div className="pl-2 border-l border-black/10 dark:border-white/10">
-                <AuthGate variant="inline" />
-              </div>
-            )}
           </div>
         </div>
       </div>

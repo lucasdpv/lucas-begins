@@ -87,7 +87,7 @@ export default function LoginModal() {
               <Gamepad2 className="w-8 h-8 text-yellow-300" />
             </div>
             <h2 className="font-retro font-bold text-3xl uppercase tracking-tight text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)]">
-              Insert Coin
+              Press Start
             </h2>
             <p className="text-purple-200 text-sm mt-1 font-medium">
               Faça login para desbloquear tudo

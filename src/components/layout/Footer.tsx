@@ -143,7 +143,7 @@ export default function Footer() {
         <p className="opacity-70 notranslate" translate="no">© {new Date().getFullYear()} BeginsProject</p>
         
         <span className="opacity-20 hidden md:inline">|</span>
-        <span className="opacity-40 hidden md:inline">Insert Coin to Continue.</span>
+        <span className="opacity-40 hidden md:inline">Press Start to Continue.</span>
         
         <span className="opacity-20 hidden md:inline">|</span>
         <span className="opacity-50 hidden md:inline">v{version}</span>

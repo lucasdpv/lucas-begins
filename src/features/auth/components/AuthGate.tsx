@@ -86,7 +86,7 @@ export default function AuthGate({ variant = "inline", className }: AuthGateProp
 
       <div>
         <p className="font-retro font-bold text-2xl uppercase tracking-wide mb-2">
-          Insert Coin para Comentar
+          Entre para Comentar
         </p>
         <p className={cn("text-base font-medium max-w-xs mx-auto leading-relaxed", isDark ? "text-gray-400" : "text-gray-500")}>
           Faça login para participar da discussão, curtir respostas e fazer parte da comunidade.
