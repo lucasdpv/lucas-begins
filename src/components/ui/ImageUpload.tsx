@@ -51,8 +51,30 @@ export default function ImageUpload({
     aspect === '4:5' ? "aspect-[4/5] w-full" :
     "aspect-auto min-h-[160px] w-full";
 
-  const handleFileSelection = (file: File) => {
+  const handleFileSelection = async (file: File) => {
     if (!file) return;
+
+    // Se for um GIF animado, não passa pelo cropper pois o crop transformaria em imagem estática.
+    // Fazemos o upload direto do GIF original.
+    if (file.type === 'image/gif') {
+      setIsUploading(true);
+      setProgress(0);
+      try {
+        const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const downloadUrl = await uploadFile(file, `${folder}/${fileName}`, (p) => {
+          setProgress(Math.round(p));
+        });
+        onUploadComplete(downloadUrl, 'original', downloadUrl);
+        setPreview(downloadUrl);
+      } catch (error) {
+        console.error("GIF upload failed", error);
+        alert("Falha ao enviar o GIF.");
+      } finally {
+        setIsUploading(false);
+      }
+      return;
+    }
+
     setOriginalFile(file);
     setOriginalUrl("");
     const reader = new FileReader();
@@ -223,24 +245,26 @@ export default function ImageUpload({
                   <div className="bg-purple-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg text-white">
                     <Upload className="w-5 h-5" />
                   </div>
-                  <button 
-                    type="button"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      let targetImage = originalUrl || preview;
-                      if (originalUrl) {
-                        const cachedBlob = await getCachedOriginalImage(originalUrl);
-                        if (cachedBlob) {
-                          targetImage = URL.createObjectURL(cachedBlob);
+                  {!(preview.toLowerCase().includes('.gif') || originalUrl.toLowerCase().includes('.gif')) && (
+                    <button 
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        let targetImage = originalUrl || preview;
+                        if (originalUrl) {
+                          const cachedBlob = await getCachedOriginalImage(originalUrl);
+                          if (cachedBlob) {
+                            targetImage = URL.createObjectURL(cachedBlob);
+                          }
                         }
-                      }
-                      setImageToCrop(targetImage);
-                    }} 
-                    className="bg-blue-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-blue-700 transition-colors text-white"
-                    title="Ajustar Recorte"
-                  >
-                    <Crop className="w-5 h-5" />
-                  </button>
+                        setImageToCrop(targetImage);
+                      }} 
+                      className="bg-blue-600 p-2.5 rounded-lg border-2 border-black/20 shadow-lg hover:bg-blue-700 transition-colors text-white"
+                      title="Ajustar Recorte"
+                    >
+                      <Crop className="w-5 h-5" />
+                    </button>
+                  )}
                   <button 
                     type="button"
                     onClick={removeImage} 

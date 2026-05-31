@@ -219,7 +219,7 @@ export default function PostEditorPage() {
             {/* Imagem de Capa */}
             <div className="md:col-span-2">
               <ImageUpload 
-                label="Imagem de Capa (Upload ou Link)"
+                label="Imagem ou GIF de Capa (Upload ou Link)"
                 initialValue={formData.imageUrl || ""}
                 onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
                 folder="posts"

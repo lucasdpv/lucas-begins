@@ -4,6 +4,16 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 👾 [v4.5.0] - The Animated Retro GIF Update
+*Data: 31 de Maio de 2026*
+
+### 🎞️ Suporte Completo a GIFs Animados nos Posts
+- **Exceção de Compressão no Upload**: Atualizado o [uploadService.ts](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/services/uploadService.ts) para identificar arquivos `image/gif` e ignorar a compressão e conversão para WebP, mantendo a animação do arquivo GIF original ao ser enviado para o Firebase Storage.
+- **Upload Direto sem Recorte (Direct Upload Flow)**: Modificado o [ImageUpload.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/components/ui/ImageUpload.tsx) para realizar o upload direto de GIFs assim que selecionados pelo editor, ignorando o passo de crop (o corte manual de imagem transformaria o GIF animado em um frame estático).
+- **Interface Inteligente**: Ocultado o botão "Ajustar Recorte" para imagens que sejam GIFs na visualização de mídia enviada do editor.
+
+---
+
 ## 🩹 [v4.4.1] - The Mobile Overlay Positioning Update
 *Data: 31 de Maio de 2026*
 

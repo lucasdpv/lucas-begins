@@ -113,7 +113,7 @@ export default function BlockEditor({ value, onChange, isDark }: BlockEditorProp
             <ToolbarButton onClick={() => addBlock('text')} icon={<FileText size={18} />} label="Texto" isDark={isDark} />
             <ToolbarButton onClick={() => addBlock('pullquote')} icon={<Star size={18} />} label="Frase" isDark={isDark} />
             <div className="w-px h-8 bg-white/10 mx-1 hidden md:block" />
-            <ToolbarButton onClick={() => addBlock('image')} icon={<ImageIcon size={18} />} label="Imagem" isDark={isDark} />
+            <ToolbarButton onClick={() => addBlock('image')} icon={<ImageIcon size={18} />} label="Imagem / GIF" isDark={isDark} />
             <ToolbarButton onClick={() => addBlock('video')} icon={<Play size={18} />} label="Vídeo" isDark={isDark} />
             <div className="w-px h-8 bg-white/10 mx-1 hidden md:block" />
             <ToolbarButton onClick={() => addBlock('info-box')} icon={<PlusCircle size={18} />} label="Box" isDark={isDark} />
@@ -365,7 +365,7 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
                 block.layout === 'right' && "w-1/2 float-right ml-8"
               )}>
                 <ImageUpload 
-                  label="Upload da Imagem"
+                  label="Upload de Imagem / GIF"
                   initialValue={block.url || ""}
                   originalUrl={block.originalUrl || ""}
                   onUploadComplete={(url, aspect, originalUrl) => {

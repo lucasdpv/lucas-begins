@@ -17,8 +17,8 @@ export const uploadFile = async (
   let fileToUpload: File | Blob = file;
   let finalPath = path;
 
-  // Se for uma imagem, tenta comprimir e converter para WebP
-  if (file.type.startsWith('image/')) {
+  // Se for uma imagem (e não for um GIF), tenta comprimir e converter para WebP
+  if (file.type.startsWith('image/') && file.type !== 'image/gif') {
     try {
       const options = {
         maxSizeMB: 0.8, // Tenta manter abaixo de 800KB
