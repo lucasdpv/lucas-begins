@@ -19,6 +19,7 @@ import TabCategories from "../features/admin/components/TabCategories";
 import TabProfile from "../features/admin/components/TabProfile";
 import TabInbox from "../features/admin/components/TabInbox";
 import DeleteModal from "../features/admin/components/DeleteModal";
+import TabSystem from "../features/admin/components/TabSystem";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -154,6 +155,10 @@ export default function AdminPage() {
             onReply={handleReply}
             isDark={isDark}
           />
+        )}
+
+        {adminTab === "system" && (
+          <TabSystem isDark={isDark} />
         )}
 
 

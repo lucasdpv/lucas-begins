@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthProvider';
 import { useUserProfile } from '../hooks/useUserQuery';
-import { usePostsByIds, useUserCommentsCount } from '../features/posts/hooks/usePostsQuery';
+import { usePostsByIds } from '../features/posts/hooks/usePostsQuery';
 import { useThemeStore } from '../store/useThemeStore';
 import { useUIStore } from '../store/useUIStore';
 import { cn } from '../lib/utils';
@@ -23,8 +23,8 @@ export default function DashboardPage() {
   const favoriteIds = profile?.favorites || [];
   const { data: favoritePosts = [] } = usePostsByIds(favoriteIds);
 
-  // 2. Busca a contagem de comentários do usuário usando Collection Group Query
-  const { data: totalComments = 0 } = useUserCommentsCount(currentUser?.id || "");
+  // 2. Obtém a contagem de comentários diretamente do perfil do usuário
+  const totalComments = profile?.commentsCount || 0;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({

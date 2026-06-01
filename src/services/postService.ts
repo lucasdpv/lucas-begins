@@ -364,6 +364,20 @@ export const PostService = {
         replies: [],
         createdAt: new Date().toISOString()
       });
+
+      // Incrementa commentsCount no documento do post
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      await updateDoc(postRef, {
+        commentsCount: increment(1)
+      });
+
+      // Incrementa commentsCount no documento do autor do comentário
+      if (comment.authorId) {
+        const userRef = doc(db, COLLECTIONS.USERS, comment.authorId);
+        await updateDoc(userRef, {
+          commentsCount: increment(1)
+        });
+      }
     } catch (error) {
       errorService.handle(error, "ao adicionar comentario");
       throw error;
@@ -376,7 +390,32 @@ export const PostService = {
   async deleteComment(postId: string, commentId: string | number): Promise<void> {
     try {
       const commentRef = doc(db, COLLECTIONS.POSTS, postId, "comments", String(commentId));
+      
+      // Busca informações do comentário para saber o autor e decrementar dele
+      try {
+        const snap = await getDoc(commentRef);
+        if (snap.exists()) {
+          const commentData = snap.data();
+          if (commentData.authorId) {
+            const userRef = doc(db, COLLECTIONS.USERS, commentData.authorId);
+            await updateDoc(userRef, {
+              commentsCount: increment(-1)
+            }).catch(err => {
+              console.warn("[PostService] Erro ao decrementar commentsCount do usuário:", err);
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("[PostService] Erro ao buscar comentário antes de deletar:", err);
+      }
+
       await deleteDoc(commentRef);
+
+      // Decrementa commentsCount no documento do post
+      const postRef = doc(db, COLLECTIONS.POSTS, postId);
+      await updateDoc(postRef, {
+        commentsCount: increment(-1)
+      });
     } catch (error) {
       errorService.handle(error, "ao remover comentario");
       throw error;
@@ -676,6 +715,54 @@ export const PostService = {
     } catch (error) {
       console.error("[PostService] Error in deletePost:", error);
       throw error;
+    }
+  },
+
+  /**
+   * Sincroniza a contagem de comentários de todos os posts e usuários.
+   */
+  async syncAllCommentsCounts(): Promise<void> {
+    try {
+      const posts = await this.getAllPosts();
+      
+      const userCommentsMap: Record<string, number> = {};
+
+      for (const post of posts) {
+        if (!post.id) continue;
+        
+        // 1. Busca comentários da subcoleção do post
+        const commentsQ = query(collection(db, COLLECTIONS.POSTS, post.id, "comments"));
+        const commentsSnap = await getDocs(commentsQ);
+        const count = commentsSnap.size;
+
+        // 2. Atualiza a contagem no post
+        const postRef = doc(db, COLLECTIONS.POSTS, post.id);
+        await updateDoc(postRef, {
+          commentsCount: count
+        });
+
+        // 3. Contabiliza comentários por usuário
+        commentsSnap.docs.forEach(docSnap => {
+          const commentData = docSnap.data();
+          if (commentData.authorId) {
+            userCommentsMap[commentData.authorId] = (userCommentsMap[commentData.authorId] || 0) + 1;
+          }
+        });
+      }
+
+      // 4. Atualiza a contagem nos documentos de usuários
+      for (const [userId, count] of Object.entries(userCommentsMap)) {
+        try {
+          const userRef = doc(db, COLLECTIONS.USERS, userId);
+          await updateDoc(userRef, {
+            commentsCount: count
+          });
+        } catch (userErr) {
+          console.warn(`[PostService] Erro ao sincronizar contagem do usuário ${userId}:`, userErr);
+        }
+      }
+    } catch (error) {
+      console.error("[PostService] Erro na sincronização de comentários:", error);
     }
   }
 };

@@ -41,7 +41,7 @@ export type Comment = z.infer<typeof CommentSchema>;
 
 export const PostSchema = z.object({
   id: z.string(),
-  title: z.string().catch('Sem Título'),
+  title: z.string().min(1),
   content: z.string().catch(''),
   excerpt: z.string().optional().nullable(),
   category: z.string().catch('Geral'),
@@ -56,6 +56,7 @@ export const PostSchema = z.object({
   likes: z.number().catch(0),
   likedBy: z.array(z.string()).catch([]),
   comments: z.array(CommentSchema).catch([]),
+  commentsCount: z.number().catch(0),
   author: AuthorSchema,
   createdAt: z.any().optional(),
   updatedAt: z.any().optional(),

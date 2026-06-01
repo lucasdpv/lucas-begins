@@ -113,7 +113,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
-  const commentCount = post.comments?.length || 0;
+  const commentCount = post.commentsCount || post.comments?.length || 0;
   const isCompact = variant === "compact";
   const isVintage = variant === "vintage";
 

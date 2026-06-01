@@ -16,6 +16,7 @@ export interface UserProfile {
   favorites: string[];
   readPosts?: string[];
   role: 'admin' | 'user';
+  commentsCount?: number;
 }
 
 
@@ -44,7 +45,8 @@ export const userService = {
         level: profileData.level || 1,
         xp: profileData.xp || 0,
         favorites: profileData.favorites || [],
-        role: profileData.role || "user"
+        role: profileData.role || "user",
+        commentsCount: profileData.commentsCount || 0
       };
     } catch (error) {
       errorService.handle(error, "ao buscar perfil por ID");
@@ -69,19 +71,40 @@ export const userService = {
       ]);
 
       if (adminDoc.exists()) role = "admin";
-      if (userDoc.exists()) profileData = userDoc.data() || {};
+      
+      if (userDoc.exists()) {
+        profileData = userDoc.data() || {};
+      } else {
+        // Se o perfil do usuário não existir no Firestore, criamos com os dados iniciais do login
+        const initialData = {
+          name: user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
+          email: user.email || "",
+          avatar: user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`,
+          bio: "",
+          aka: "",
+          level: 1,
+          xp: 0,
+          favorites: [],
+          role,
+          commentsCount: 0,
+          createdAt: new Date()
+        };
+        await setDoc(doc(db, COLLECTIONS.USERS, user.uid), initialData);
+        profileData = initialData;
+      }
 
       return {
         id: user.uid,
-        name: profileData.name || user.displayName || (user.email ? user.email.split('@')[0] : "Player"),
-        email: user.email || "",
-        avatar: profileData.avatar || user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`,
-        bio: profileData.bio || "",
-        aka: profileData.aka || "",
-        level: profileData.level || 1,
-        xp: profileData.xp || 0,
-        favorites: profileData.favorites || [],
-        role
+        name: profileData.name,
+        email: profileData.email,
+        avatar: profileData.avatar,
+        bio: profileData.bio,
+        aka: profileData.aka,
+        level: profileData.level,
+        xp: profileData.xp,
+        favorites: profileData.favorites,
+        role,
+        commentsCount: profileData.commentsCount || 0
       };
     } catch (error) {
       errorService.handle(error, "ao buscar perfil");
@@ -149,6 +172,7 @@ export const userService = {
 
         // Se um postId foi fornecido, verifica se o usuário já ganhou XP para este post
         if (postId && readPosts.includes(postId)) {
+          console.warn("[userService.addXP] Usuário já ganhou XP por ler este post:", postId);
           return null;
         }
 
@@ -177,6 +201,7 @@ export const userService = {
         return { leveledUp: newLevel > currentLevel, newLevel };
       });
     } catch (error) {
+      console.error("[userService.addXP] Erro na transação de addXP:", error);
       errorService.handle(error, "ao adicionar XP");
       return null;
     }

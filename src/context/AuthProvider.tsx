@@ -22,6 +22,7 @@ export interface User {
   favorites: string[];
   readPosts?: string[];
   role: 'admin' | 'user';
+  commentsCount?: number;
 }
 
 interface AuthContextType {

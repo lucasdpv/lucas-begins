@@ -279,9 +279,12 @@ export function useLikeMutation() {
       return { previousAll };
     },
 
-    onSuccess: (action, variables) => {
+    onSuccess: async (action, variables) => {
       if (action === 'liked') {
-        userService.addXP(variables.userId, 5);
+        const result = await userService.addXP(variables.userId, 5);
+        if (result?.leveledUp) {
+          showToast(`Post curtido! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`, "info");
+        }
       }
     },
 
@@ -331,13 +334,17 @@ export function useFavoriteMutation() {
       return { previousProfile };
     },
 
-    onSuccess: (action, variables) => {
+    onSuccess: async (action, variables) => {
+      let msg = action === 'added' ? "Adicionado aos seus favoritos! ⭐" : "Removido dos favoritos.";
       if (action === 'added') {
         trackEvent('post_favorited', { post_id: variables.postId, user_id: variables.userId });
-        userService.addXP(variables.userId, 15);
+        const result = await userService.addXP(variables.userId, 15);
+        if (result?.leveledUp) {
+          msg = `Adicionado aos favoritos! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`;
+        }
       }
       queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
-      showToast(action === 'added' ? "Adicionado aos seus favoritos! ⭐" : "Removido dos favoritos.");
+      showToast(msg);
     },
 
     onError: (_err, variables, context) => {
@@ -363,16 +370,21 @@ export function useCommentMutation() {
   return useMutation({
     mutationFn: ({ postId, comment }: { postId: string, comment: any }) => 
       PostService.addComment(postId, comment),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       trackEvent('post_commented', { post_id: variables.postId, user_id: variables.comment.authorId });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      
+      let msg = "Comentário enviado! 💬";
       if (variables.comment.authorId) {
-        userService.addXP(variables.comment.authorId, 20);
+        const result = await userService.addXP(variables.comment.authorId, 20);
+        if (result?.leveledUp) {
+          msg = `Comentário enviado! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`;
+        }
         queryClient.invalidateQueries({ queryKey: ['userProfile', variables.comment.authorId] });
       }
-      showToast("Comentário enviado! 💬");
+      showToast(msg);
     }
   });
 }
@@ -466,9 +478,13 @@ export function useLikeCommentMutation() {
       showToast("Erro ao curtir comentário.", "error");
     },
 
-    onSuccess: (action, variables) => {
+    onSuccess: async (action, variables) => {
       if (action === 'liked') {
-        userService.addXP(variables.userId, 2);
+        const result = await userService.addXP(variables.userId, 2);
+        if (result?.leveledUp) {
+          showToast(`Comentário curtido! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`, "info");
+        }
+        queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
       }
     },
 
@@ -476,6 +492,7 @@ export function useLikeCommentMutation() {
       // Invalida a query para sincronizar com o estado definitivo do banco de dados
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     }
   });
 }
@@ -490,15 +507,19 @@ export function useReplyCommentMutation() {
   return useMutation({
     mutationFn: ({ postId, commentId, reply }: { postId: string, commentId: string | number, reply: any }) => 
       PostService.addCommentReply(postId, commentId, reply),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      let msg = "Resposta enviada! 💬";
       if (variables.reply.authorId) {
-        userService.addXP(variables.reply.authorId, 10);
+        const result = await userService.addXP(variables.reply.authorId, 10);
+        if (result?.leveledUp) {
+          msg = `Resposta enviada! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`;
+        }
         queryClient.invalidateQueries({ queryKey: ['userProfile', variables.reply.authorId] });
       }
-      showToast("Resposta enviada! 💬");
+      showToast(msg);
     },
     onError: () => {
       showToast("Erro ao enviar resposta.", "error");
@@ -585,15 +606,20 @@ export function useLikeReplyMutation() {
       showToast("Erro ao curtir resposta.", "error");
     },
 
-    onSuccess: (action, variables) => {
+    onSuccess: async (action, variables) => {
       if (action === 'liked') {
-        userService.addXP(variables.userId, 2);
+        const result = await userService.addXP(variables.userId, 2);
+        if (result?.leveledUp) {
+          showToast(`Resposta curtida! LEVEL UP! Novo Nível: ${result.newLevel}! 🎮`, "info");
+        }
+        queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
       }
     },
 
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile', variables.userId] });
     }
   });
 }

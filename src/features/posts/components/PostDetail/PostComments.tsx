@@ -64,7 +64,7 @@ export default function PostComments({
     <section id="comments-section" className="pt-12 border-t-4 border-gray-800">
       <h3 className="font-retro text-3xl mb-10 flex items-center gap-3 uppercase font-bold">
         <MessageSquare className="w-8 h-8 text-purple-500" />
-        Comunidade ({formatNumber(post.comments?.length || 0)})
+        Comunidade ({formatNumber(post.commentsCount || post.comments?.length || 0)})
       </h3>
 
       {currentUser ? (
