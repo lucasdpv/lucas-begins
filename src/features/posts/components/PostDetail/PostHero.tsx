@@ -1,5 +1,4 @@
-import React from "react";
-import { cn } from "../../../../lib/utils";
+import { cn, splitTitle } from "../../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../../components/ui/Badge";
 import { Post } from "../../schemas";
 
@@ -9,6 +8,7 @@ interface PostHeroProps {
 }
 
 export default function PostHero({ post, imgError }: PostHeroProps) {
+  const { mainTitle, subtitle } = splitTitle(post.title);
   return (
     <div
       className={cn(
@@ -53,9 +53,20 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
             <ScoreBadge score={post.score} size="md" className="shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black shrink-0" />
           )}
         </div>
-        <h1 className="font-retro font-bold text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">
-          {post.title}
-        </h1>
+        {mainTitle ? (
+          <div className="flex flex-col gap-1 md:gap-2">
+            <span className="font-retro font-black uppercase text-xs sm:text-sm md:text-lg tracking-wider text-purple-300 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+              {mainTitle}
+            </span>
+            <h1 className="font-retro font-bold text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">
+              {subtitle}
+            </h1>
+          </div>
+        ) : (
+          <h1 className="font-retro font-bold text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">
+            {subtitle}
+          </h1>
+        )}
       </div>
     </div>
   );

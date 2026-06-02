@@ -1,7 +1,7 @@
 import React from "react";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
 import { Link } from "react-router-dom";
-import { calculateReadingTime, formatDate, cn, formatNumber, slugify } from "../../../lib/utils";
+import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle } from "../../../lib/utils";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
@@ -120,6 +120,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const targetSlug = post.slug || slugify(post.title);
   const targetPath = `/post/${targetSlug}`;
   const cardStyles = getCategoryCardStyles(post.category);
+  const { mainTitle, subtitle } = splitTitle(post.title);
 
   // Variant Compact: Design Card Contido
   if (isCompact) {
@@ -161,13 +162,31 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
         {/* Conteúdo Compact */}
         <div className="flex flex-col flex-grow p-3 relative z-10 pointer-events-none">
-          <h3 className={cn(
-            "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300 text-xs mb-2",
-            "group-hover:text-purple-500 dark:group-hover:text-purple-400",
-            isDark ? "text-gray-100" : "text-gray-900"
-          )}>
-            {post.title}
-          </h3>
+          {mainTitle ? (
+            <div className="flex flex-col gap-0.5 mb-2">
+              <span className={cn(
+                "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
+                cardStyles.textLabel
+              )}>
+                {mainTitle}
+              </span>
+              <h3 className={cn(
+                "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300 text-xs",
+                "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                isDark ? "text-gray-100" : "text-gray-900"
+              )}>
+                {subtitle}
+              </h3>
+            </div>
+          ) : (
+            <h3 className={cn(
+              "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300 text-xs mb-2",
+              "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+              isDark ? "text-gray-100" : "text-gray-900"
+            )}>
+              {subtitle}
+            </h3>
+          )}
 
           {/* Footer Compact */}
           <div className="flex items-center justify-between mt-auto pt-2 border-t border-black/5 dark:border-white/5">
@@ -276,17 +295,37 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             </div>
           </div>
 
-          {/* Title */}
-          <h3 className={cn(
-            "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1 shrink-0",
-            post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-            post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-            post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-            "group-hover:text-purple-500 dark:group-hover:text-purple-400",
-            isDark ? "text-white" : "text-gray-900"
-          )}>
-            {post.title}
-          </h3>
+          {mainTitle ? (
+            <div className="flex flex-col gap-0.5 mb-1 shrink-0">
+              <span className={cn(
+                "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
+                cardStyles.textLabel
+              )}>
+                {mainTitle}
+              </span>
+              <h3 className={cn(
+                "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-[11px] sm:text-xs md:text-sm",
+                post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
+                post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
+                post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
+                "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                isDark ? "text-white" : "text-gray-900"
+              )}>
+                {subtitle}
+              </h3>
+            </div>
+          ) : (
+            <h3 className={cn(
+              "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1 shrink-0",
+              post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
+              post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
+              post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
+              "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+              isDark ? "text-white" : "text-gray-900"
+            )}>
+              {subtitle}
+            </h3>
+          )}
 
           {/* Excerpt - Hidden on mobile, visible on sm and up */}
           {post.excerpt && (
@@ -427,13 +466,31 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           {formatDate(post.createdAt, post.date ?? undefined)}
         </span>
 
-        <h3 className={cn(
-          "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2 text-sm md:text-base lg:text-[17px]",
-          cardStyles.textHover,
-          isDark ? "text-gray-100" : "text-gray-900"
-        )}>
-          {post.title}
-        </h3>
+        {mainTitle ? (
+          <div className="flex flex-col gap-0.5 mb-2">
+            <span className={cn(
+              "font-retro font-black uppercase text-[9px] md:text-[10px] tracking-wider leading-none",
+              cardStyles.textLabel
+            )}>
+              {mainTitle}
+            </span>
+            <h3 className={cn(
+              "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-sm md:text-[15px] lg:text-base",
+              cardStyles.textHover,
+              isDark ? "text-gray-100" : "text-gray-900"
+            )}>
+              {subtitle}
+            </h3>
+          </div>
+        ) : (
+          <h3 className={cn(
+            "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 mb-2 text-sm md:text-base lg:text-[17px]",
+            cardStyles.textHover,
+            isDark ? "text-gray-100" : "text-gray-900"
+          )}>
+            {subtitle}
+          </h3>
+        )}
 
         {/* Excerpt preview */}
         {post.excerpt && (

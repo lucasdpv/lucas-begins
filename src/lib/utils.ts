@@ -102,3 +102,25 @@ export function getPixelAvatar(seed: string): string {
   
   return `${baseUrl}?${params.toString()}`;
 }
+
+/**
+ * Divide um título em título principal (ex: nome do jogo/série) e subtítulo/chamada.
+ * Procura por delimitadores comuns como ":", " - ", " – " ou " | ".
+ */
+export function splitTitle(title: string | null | undefined): { mainTitle: string; subtitle: string } {
+  if (!title) return { mainTitle: "", subtitle: "" };
+  
+  const separators = [":", " - ", " – ", " | "];
+  for (const sep of separators) {
+    if (title.includes(sep)) {
+      const parts = title.split(sep);
+      const main = parts[0].trim();
+      const sub = parts.slice(1).join(sep).trim();
+      if (main && sub) {
+        return { mainTitle: main, subtitle: sub };
+      }
+    }
+  }
+  return { mainTitle: "", subtitle: title.trim() };
+}
+

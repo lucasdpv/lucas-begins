@@ -18,7 +18,7 @@ import {
   useLatestPosts
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify, formatNumber, formatDate, calculateReadingTime } from "../lib/utils";
+import { cn, slugify, formatNumber, formatDate, calculateReadingTime, splitTitle } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 
 
@@ -663,9 +663,23 @@ export default function HomePage() {
                                 </div>
 
                                 {/* Mega Headline title */}
-                                <h3 className="font-retro font-black uppercase text-base md:text-lg text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                  {post.title}
-                                </h3>
+                                {(() => {
+                                  const { mainTitle, subtitle } = splitTitle(post.title);
+                                  return mainTitle ? (
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="font-retro font-black uppercase text-[10px] tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                        {mainTitle}
+                                      </span>
+                                      <h3 className="font-retro font-black uppercase text-sm md:text-base text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                        {subtitle}
+                                      </h3>
+                                    </div>
+                                  ) : (
+                                    <h3 className="font-retro font-black uppercase text-base md:text-lg text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                      {subtitle}
+                                    </h3>
+                                  );
+                                })()}
 
                                 {/* Barcode and Views at the bottom */}
                                 <div className="flex items-end justify-between mt-2 pt-2 border-t border-white/10">
@@ -889,9 +903,23 @@ export default function HomePage() {
                                   <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
                                     ★ CLASSIFICADO ★
                                   </div>
-                                  <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-2 text-black">
-                                    {post.title}
-                                  </h3>
+                                  {(() => {
+                                    const { mainTitle, subtitle } = splitTitle(post.title);
+                                    return mainTitle ? (
+                                      <div className="flex flex-col gap-0.5">
+                                        <span className="font-mono text-[8px] uppercase tracking-wider text-blue-800 font-black">
+                                          {mainTitle}
+                                        </span>
+                                        <h3 className="font-bold text-xs lg:text-[11px] xl:text-xs uppercase tracking-tight leading-snug line-clamp-2 text-black">
+                                          {subtitle}
+                                        </h3>
+                                      </div>
+                                    ) : (
+                                      <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-2 text-black">
+                                        {subtitle}
+                                      </h3>
+                                    );
+                                  })()}
                                 </div>
 
                                 <div className="text-[10px] lg:text-[9px] xl:text-[10px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
@@ -1035,13 +1063,34 @@ export default function HomePage() {
                                     )} />
                                   </div>
 
-                                  <h4 className="font-retro font-bold text-sm sm:text-base lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
-                                    <span className={cn(
-                                      isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
-                                    )}>
-                                      {post.title}
-                                    </span>
-                                  </h4>
+                                  {(() => {
+                                    const { mainTitle, subtitle } = splitTitle(post.title);
+                                    return mainTitle ? (
+                                      <div className="flex flex-col gap-0.5 mt-1.5">
+                                        <span className={cn(
+                                          "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
+                                          isHovered ? "text-yellow-600 dark:text-yellow-400" : "text-yellow-700/80 dark:text-yellow-500/80"
+                                        )}>
+                                          {mainTitle}
+                                        </span>
+                                        <h4 className="font-retro font-bold text-xs sm:text-sm lg:text-[11px] xl:text-xs leading-snug line-clamp-2 transition-colors duration-300">
+                                          <span className={cn(
+                                            isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
+                                          )}>
+                                            {subtitle}
+                                          </span>
+                                        </h4>
+                                      </div>
+                                    ) : (
+                                      <h4 className="font-retro font-bold text-sm sm:text-base lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
+                                        <span className={cn(
+                                          isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
+                                        )}>
+                                          {subtitle}
+                                        </span>
+                                      </h4>
+                                    );
+                                  })()}
                                 </div>
 
                                 {/* Footer details (Score badge only) */}

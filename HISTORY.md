@@ -4,6 +4,22 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🏷️ [v4.6.0] - The Split Title & SEO Optimization Update
+*Data: 02 de Junho de 2026*
+
+### 🏷️ Divisão Dinâmica de Títulos (Split Title)
+- **Utilitário `splitTitle`**: Adicionada a função helper [splitTitle](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/lib/utils.ts) que divide o título do post no caractere `:` (ou outros delimitadores comuns como ` - `, ` – ` e ` | `) em duas partes: Título Principal (nome do jogo/série) e Subtítulo (chamada principal).
+- **Cards de Posts Otimizados**: Atualizado o [PostCard.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostCard.tsx) para renderizar o Título Principal menor e com a cor temática da categoria, e o Subtítulo em fonte normal em destaque em todas as variantes (Default, Compact, Vintage).
+- **Visual Banca de Revistas & Arquivos**: Seções customizadas como **RetroCafé**, **Dossiês** e **Reviews** na [HomePage.tsx](file:///c:/Users/Lucas%2520Vieira/Documents/Projetos/lucas-begins/src/pages/HomePage.tsx) e na [CategoryRow.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/CategoryRow.tsx) atualizadas para utilizar a divisão, dando um visual de banca de revista retro e de relatórios secretos consistente.
+- **Carrossel & Hero**: Atualizados o [Carousel.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/Carousel.tsx) e o [PostHero.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostDetail/PostHero.tsx) para renderizar o título em duas linhas separadas, aumentando consideravelmente a harmonia e o apelo visual.
+- **Painel de Criação Inteligente**: Atualizada a página [PostEditorPage.tsx](file:///c:/Users/Lucas%2520Vieira/Documents/Projetos/lucas-begins/src/pages/PostEditorPage.tsx) para incluir uma dica visual abaixo do campo de título e uma **prévia em tempo real** da divisão do título à medida que o autor escreve.
+
+### 🌐 Otimizações de SEO & Canônicos (Google Search Console Fixes)
+- **Canônica Padrão Estática**: Adicionada a tag `<link rel="canonical" href="https://lucasbegins.com.br/" />` diretamente no [index.html](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/index.html) para informar aos robôs do Google a URL principal do portal em rastreamentos que não executam JavaScript.
+- **Canônica Absoluta e Limpa nos Artigos**: Atualizado o [PostDetailPage.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/pages/PostDetailPage.tsx) para gerar URLs canônicas limpas e absolutas baseadas no slug do post, descartando `window.location.href` que causava duplicidade de indexação por conta de query parameters (ex: do Google Searchbox e compartilhamento de redes sociais) e subdomínios `www`.
+
+---
+
 ## 👾 [v4.5.0] - The Animated Retro GIF Update
 *Data: 31 de Maio de 2026*
 

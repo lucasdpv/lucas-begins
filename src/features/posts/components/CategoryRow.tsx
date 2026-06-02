@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, ChevronLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Post } from "../schemas";
-import { cn, slugify, calculateReadingTime } from "../../../lib/utils";
+import { cn, slugify, calculateReadingTime, splitTitle } from "../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 
 interface CategoryRowProps {
@@ -125,14 +125,31 @@ export default function CategoryRow({
                 </div>
               </div>
 
-              <h3
-                className={cn(
-                  "font-retro font-bold text-[14px] leading-snug line-clamp-2 transition-colors duration-300",
-                  isDark ? "text-slate-200 hover:text-purple-300" : "text-gray-900 hover:text-purple-700"
-                )}
-              >
-                {post.title}
-              </h3>
+              {(() => {
+                const { mainTitle, subtitle } = splitTitle(post.title);
+                return mainTitle ? (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-retro font-black uppercase text-[9px] tracking-wider text-purple-400">
+                      {mainTitle}
+                    </span>
+                    <h3 className={cn(
+                      "font-retro font-bold text-[13px] leading-snug line-clamp-2 transition-colors duration-300",
+                      isDark ? "text-slate-200 hover:text-purple-300" : "text-gray-900 hover:text-purple-700"
+                    )}>
+                      {subtitle}
+                    </h3>
+                  </div>
+                ) : (
+                  <h3
+                    className={cn(
+                      "font-retro font-bold text-[14px] leading-snug line-clamp-2 transition-colors duration-300",
+                      isDark ? "text-slate-200 hover:text-purple-300" : "text-gray-900 hover:text-purple-700"
+                    )}
+                  >
+                    {subtitle}
+                  </h3>
+                );
+              })()}
             </Link>
           </motion.article>
         ))}

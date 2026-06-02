@@ -9,7 +9,7 @@ import {
   Star,
   Image as ImageIcon,
 } from "lucide-react";
-import { calculateReadingTime, cn } from "../lib/utils";
+import { calculateReadingTime, cn, splitTitle } from "../lib/utils";
 import PostDetailPage from "./PostDetailPage";
 import { useAuth } from "../context/AuthProvider";
 import { useThemeStore } from "../store/useThemeStore";
@@ -212,8 +212,35 @@ export default function PostEditorPage() {
                 onChange={handleChange}
                 required
                 className={inputClass}
-                placeholder="Ex: Análise Completa de Silent Hill 2..."
+                placeholder="Ex: Silent Hill 2: Análise Completa..."
               />
+              <p className={cn("text-[11px] font-medium tracking-normal opacity-85", isDark ? "text-slate-400" : "text-gray-650")}>
+                💡 <strong>Dica Retro:</strong> Use <code>:</code> (dois pontos) para separar o título. A primeira parte será o nome do jogo/série e a segunda será a chamada da matéria.
+              </p>
+              {formData.title && (() => {
+                const { mainTitle, subtitle } = splitTitle(formData.title);
+                if (mainTitle) {
+                  return (
+                    <div className={cn(
+                      "p-3.5 border-2 border-dashed rounded-xl flex flex-col gap-1 mt-2 text-xs",
+                      isDark ? "bg-purple-950/20 border-purple-500/30" : "bg-purple-50/50 border-purple-600/20"
+                    )}>
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500 font-bold">
+                        Prévia da Divisão de Títulos:
+                      </span>
+                      <div className="flex flex-col gap-0.5 font-retro">
+                        <span className="text-[10px] font-black uppercase text-purple-500 tracking-wider">
+                          {mainTitle}
+                        </span>
+                        <span className={cn("font-bold text-sm uppercase", isDark ? "text-white" : "text-snes-accent")}>
+                          {subtitle}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
 
             {/* Imagem de Capa */}

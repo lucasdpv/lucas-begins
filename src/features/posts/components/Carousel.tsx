@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { calculateReadingTime, cn, coverBgStyle, formatNumber, slugify } from "../../../lib/utils";
+import { calculateReadingTime, cn, coverBgStyle, formatNumber, slugify, splitTitle } from "../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
 import { Post } from "../schemas";
 import { useThemeStore } from "../../../store/useThemeStore";
@@ -89,6 +89,7 @@ export default function Carousel({ posts }: CarouselProps) {
   };
 
   const currentPost = posts[currentIndex];
+  const { mainTitle, subtitle } = splitTitle(currentPost?.title);
   if (!currentPost) return null;
 
   const variants = {
@@ -147,9 +148,20 @@ export default function Carousel({ posts }: CarouselProps) {
                   )}
                 </div>
 
-                <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-3">
-                  {currentPost.title}
-                </h2>
+                {mainTitle ? (
+                  <div className="flex flex-col gap-1 mb-3">
+                    <span className="font-retro font-black uppercase text-xs md:text-sm tracking-wider text-purple-300 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                      {mainTitle}
+                    </span>
+                    <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-200 transition-colors">
+                      {subtitle}
+                    </h2>
+                  </div>
+                ) : (
+                  <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-3">
+                    {subtitle}
+                  </h2>
+                )}
 
                 {currentPost.excerpt && (
                   <p className="text-xs md:text-sm text-white/70 leading-relaxed line-clamp-2 mb-4 max-w-xl drop-shadow-md">
