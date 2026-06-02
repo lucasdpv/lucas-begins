@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { cn } from "../lib/utils";
+import { cn, slugify } from "../lib/utils";
 
 // Stores & Hooks
 import { useAuth } from "../context/AuthProvider";
@@ -146,6 +146,8 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
 
   const isFavorited = profile?.favorites?.includes(post.id) || false;
+  
+  const postCanonicalUrl = `https://lucasbegins.com.br/post/${slug || post.slug || (post.title ? slugify(post.title) : "")}`;
 
   return (
     <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full relative">
@@ -155,7 +157,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
         
         {/* OpenGraph / Facebook */}
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:url" content={postCanonicalUrl} />
         <meta property="og:title" content={post.title || "BeginsProject"} />
         <meta property="og:description" content={post.excerpt || ""} />
         <meta property="og:site_name" content="BeginsProject" />
@@ -163,12 +165,12 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={window.location.href} />
+        <meta name="twitter:url" content={postCanonicalUrl} />
         <meta name="twitter:title" content={post.title || "BeginsProject"} />
         <meta name="twitter:description" content={post.excerpt || ""} />
         {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
         
-        <link rel="canonical" href={window.location.href} />
+        <link rel="canonical" href={postCanonicalUrl} />
       </Helmet>
 
       {/* Voltar */}
