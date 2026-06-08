@@ -26,7 +26,7 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         aria-busy="true"
         aria-label="Carregando artigo..."
         className={cn(
-          "flex items-stretch h-[170px] sm:h-[185px] md:h-[195px] rounded-none",
+          "flex items-stretch h-[176px] sm:h-[190px] md:h-[200px] rounded-none",
           border,
           "shadow-[4px_4px_0px_rgba(0,0,0,1)]",
           cardBg
@@ -45,9 +45,9 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         </div>
 
         {/* Content block — mimics the p-3 sm:py-3 sm:px-4 layout */}
-        <div className="flex flex-col flex-grow py-2 px-3 sm:py-3 sm:px-4 min-w-0">
+        <div className="flex flex-col flex-grow pt-2 pb-3 px-3 sm:pt-3 sm:pb-3.5 sm:px-4 min-w-0">
           {/* Header row: category badge + date (left) | reading-time (right) */}
-          <div className="flex items-center justify-between mb-1 shrink-0">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2 shrink-0">
             <div className="flex items-center gap-2">
               {/* Category badge — same border+shadow style */}
               <div className={cn(
@@ -60,13 +60,13 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
           </div>
 
           {/* Title — 2 lines, font-retro */}
-          <div className="space-y-1.5 mb-1 shrink-0">
+          <div className="space-y-1.5 mb-1.5 sm:mb-2 shrink-0">
             <div className={cn("w-full h-4 rounded-none animate-pulse", shimmer)} />
             <div className={cn("w-4/5 h-4 rounded-none animate-pulse", shimmer)} />
           </div>
 
           {/* Excerpt — hidden on mobile, visible sm+ */}
-          <div className="hidden sm:block mb-1.5 sm:mb-2 shrink-0">
+          <div className="hidden lg:block mb-1 shrink-0">
             <div className={cn("w-full h-3 rounded-none animate-pulse", shimmerDim)} />
           </div>
 

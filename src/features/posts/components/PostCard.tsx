@@ -164,19 +164,19 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         <div className="flex flex-col flex-grow p-3 relative z-10 pointer-events-none">
           {mainTitle ? (
             <div className="flex flex-col gap-0.5 mb-2">
-              <span className={cn(
-                "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
-                cardStyles.textLabel
-              )}>
-                {mainTitle}
-              </span>
               <h3 className={cn(
                 "font-retro font-bold uppercase line-clamp-2 leading-tight transition-colors duration-300 text-xs",
                 "group-hover:text-purple-500 dark:group-hover:text-purple-400",
                 isDark ? "text-gray-100" : "text-gray-900"
               )}>
-                {subtitle}
+                {mainTitle}
               </h3>
+              <span className={cn(
+                "font-sans text-[9px] sm:text-[10px] leading-tight opacity-75 mt-0.5",
+                isDark ? "text-gray-300" : "text-gray-600"
+              )}>
+                {subtitle}
+              </span>
             </div>
           ) : (
             <h3 className={cn(
@@ -222,7 +222,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
     return (
       <article
         className={cn(
-          "flex items-stretch h-[170px] sm:h-[185px] md:h-[195px] group relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:translate-x-0.5 active:translate-y-0 select-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rounded-none",
+          "flex items-stretch h-[176px] sm:h-[190px] md:h-[200px] group relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:translate-x-0.5 active:translate-y-0 select-none border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rounded-none",
           isDark
             ? "bg-[#1f1d35] text-white"
             : "bg-white text-gray-900",
@@ -273,9 +273,9 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         </div>
 
         {/* 3. Content Block (Title, excerpt, metadata) */}
-        <div className="flex flex-col flex-grow relative z-10 pointer-events-none py-2 px-3 sm:py-3 sm:px-4 min-w-0">
+        <div className="flex flex-col flex-grow relative z-10 pointer-events-none pt-2 pb-3 px-3 sm:pt-3 sm:pb-3.5 sm:px-4 min-w-0">
           {/* Header Row: Category Badge & Date */}
-          <div className="flex items-center justify-between text-[9px] font-retro font-bold uppercase tracking-wider select-none text-gray-500 dark:text-gray-400 mb-1 shrink-0">
+          <div className="flex items-center justify-between text-[9px] font-retro font-bold uppercase tracking-wider select-none text-gray-500 dark:text-gray-400 mb-1.5 sm:mb-2 shrink-0">
             <div className="flex items-center gap-2 overflow-hidden min-w-0">
               <span className={cn(
                 "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] shrink-0",
@@ -294,17 +294,31 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}
             </div>
           </div>
-
-          {mainTitle ? (
-            <div className="flex flex-col gap-0.5 mb-1 shrink-0">
-              <span className={cn(
-                "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
-                cardStyles.textLabel
-              )}>
-                {mainTitle}
-              </span>
+          
+          {/* Middle Body Container (Vertically centered) */}
+          <div className="flex-grow flex flex-col justify-center min-w-0">
+            {mainTitle ? (
+              <div className="flex flex-col gap-1 mb-1.5 sm:mb-2 shrink-0">
+                <h3 className={cn(
+                  "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-[11px] sm:text-xs md:text-sm",
+                  post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
+                  post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
+                  post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
+                  "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                  isDark ? "text-white" : "text-gray-900"
+                )}>
+                  {mainTitle}
+                </h3>
+                <span className={cn(
+                  "font-sans text-[9.5px] sm:text-[10.5px] leading-tight font-semibold mt-0.5",
+                  cardStyles.textLabel
+                )}>
+                  {subtitle}
+                </span>
+              </div>
+            ) : (
               <h3 className={cn(
-                "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-[11px] sm:text-xs md:text-sm",
+                "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1.5 sm:mb-2 shrink-0",
                 post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
                 post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
                 post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
@@ -313,32 +327,21 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               )}>
                 {subtitle}
               </h3>
-            </div>
-          ) : (
-            <h3 className={cn(
-              "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1 shrink-0",
-              post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-              post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-              post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-              "group-hover:text-purple-500 dark:group-hover:text-purple-400",
-              isDark ? "text-white" : "text-gray-900"
-            )}>
-              {subtitle}
-            </h3>
-          )}
+            )}
 
-          {/* Excerpt - Hidden on mobile, visible on sm and up */}
-          {post.excerpt && (
-            <p className={cn(
-              "text-[10px] md:text-xs mb-1.5 sm:mb-2 line-clamp-2 leading-relaxed opacity-75 hidden sm:block shrink-0",
-              isDark ? "text-gray-300" : "text-gray-600"
-            )}>
-              {post.excerpt}
-            </p>
-          )}
+            {/* Excerpt - Hidden on mobile/tablet, visible on desktop */}
+            {post.excerpt && (
+              <p className={cn(
+                "text-[10px] md:text-xs mb-1 line-clamp-2 leading-relaxed opacity-70 hidden lg:block shrink-0",
+                isDark ? "text-slate-400" : "text-slate-500"
+              )}>
+                {post.excerpt}
+              </p>
+            )}
+          </div>
 
           {/* Footer controls row */}
-          <div className="mt-auto pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
+          <div className="pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
             {/* Left spec widgets */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2.5 text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
@@ -468,19 +471,19 @@ export default function PostCard({ post, variant = "default", showCategory = tru
 
         {mainTitle ? (
           <div className="flex flex-col gap-0.5 mb-2">
-            <span className={cn(
-              "font-retro font-black uppercase text-[9px] md:text-[10px] tracking-wider leading-none",
-              cardStyles.textLabel
-            )}>
-              {mainTitle}
-            </span>
             <h3 className={cn(
               "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-sm md:text-[15px] lg:text-base",
               cardStyles.textHover,
               isDark ? "text-gray-100" : "text-gray-900"
             )}>
-              {subtitle}
+              {mainTitle}
             </h3>
+            <span className={cn(
+              "font-sans text-[10px] md:text-[11px] leading-tight opacity-75 mt-0.5",
+              isDark ? "text-slate-300" : "text-slate-600"
+            )}>
+              {subtitle}
+            </span>
           </div>
         ) : (
           <h3 className={cn(

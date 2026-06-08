@@ -150,12 +150,17 @@ export default function Carousel({ posts }: CarouselProps) {
 
                 {mainTitle ? (
                   <div className="flex flex-col gap-1 mb-3">
-                    <span className="font-retro font-black uppercase text-xs md:text-sm tracking-wider text-purple-300 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                      {mainTitle}
-                    </span>
                     <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-200 transition-colors">
-                      {subtitle}
+                      {mainTitle}
                     </h2>
+                    <span className={cn(
+                      "font-sans text-sm md:text-base leading-snug drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] font-medium",
+                      currentPost.category.toLowerCase().includes("reviews") ? "text-amber-400" :
+                      currentPost.category.toLowerCase().includes("dossi") ? "text-blue-400" :
+                      currentPost.category.toLowerCase().includes("retro") ? "text-orange-400" : "text-purple-400"
+                    )}>
+                      {subtitle}
+                    </span>
                   </div>
                 ) : (
                   <h2 className="font-retro font-bold text-xl md:text-3xl lg:text-4xl leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow group-hover/carousel:text-purple-300 transition-colors mb-3">
@@ -206,7 +211,7 @@ export default function Carousel({ posts }: CarouselProps) {
         )}
         {/* Slide Indicators & Progress (Bottom-Right overlay) */}
         {posts.length > 1 && (
-          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-10 z-30 flex items-center gap-2.5 bg-black/40 px-3.5 py-2 rounded-2xl backdrop-blur-md border border-white/15">
+          <div className="absolute bottom-3 right-3 md:bottom-8 md:right-10 z-30 flex items-center gap-1.5 md:gap-2.5 bg-black/35 px-2 py-1 md:px-3.5 md:py-2 rounded-xl md:rounded-2xl backdrop-blur-md border border-white/15">
             {posts.map((post, idx) => {
               const isActive = idx === currentIndex;
               return (
@@ -217,8 +222,8 @@ export default function Carousel({ posts }: CarouselProps) {
                     goTo(idx, idx > currentIndex ? 1 : -1);
                   }}
                   className={cn(
-                    "relative h-1.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none cursor-pointer",
-                    isActive ? "w-8 bg-white/20" : "w-3 bg-white/40 hover:bg-white/60"
+                    "relative h-1 md:h-1.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none cursor-pointer",
+                    isActive ? "w-5 md:w-8 bg-white/20" : "w-2 md:w-3 bg-white/40 hover:bg-white/60"
                   )}
                   aria-label={`Ir para slide ${idx + 1}`}
                 >

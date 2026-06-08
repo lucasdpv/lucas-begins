@@ -129,15 +129,20 @@ export default function CategoryRow({
                 const { mainTitle, subtitle } = splitTitle(post.title);
                 return mainTitle ? (
                   <div className="flex flex-col gap-0.5">
-                    <span className="font-retro font-black uppercase text-[9px] tracking-wider text-purple-400">
-                      {mainTitle}
-                    </span>
                     <h3 className={cn(
                       "font-retro font-bold text-[13px] leading-snug line-clamp-2 transition-colors duration-300",
                       isDark ? "text-slate-200 hover:text-purple-300" : "text-gray-900 hover:text-purple-700"
                     )}>
-                      {subtitle}
+                      {mainTitle}
                     </h3>
+                    <span className={cn(
+                      "font-sans text-[10px] leading-tight font-semibold mt-0.5",
+                      category.toLowerCase().includes("reviews") ? "text-amber-600 dark:text-amber-400" :
+                      category.toLowerCase().includes("dossi") ? "text-blue-600 dark:text-blue-400" :
+                      category.toLowerCase().includes("retro") ? "text-orange-600 dark:text-orange-400" : "text-purple-600 dark:text-purple-400"
+                    )}>
+                      {subtitle}
+                    </span>
                   </div>
                 ) : (
                   <h3

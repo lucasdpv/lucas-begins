@@ -55,12 +55,17 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
         </div>
         {mainTitle ? (
           <div className="flex flex-col gap-1 md:gap-2">
-            <span className="font-retro font-black uppercase text-xs sm:text-sm md:text-lg tracking-wider text-purple-300 drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-              {mainTitle}
-            </span>
             <h1 className="font-retro font-bold text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">
-              {subtitle}
+              {mainTitle}
             </h1>
+            <span className={cn(
+              "font-sans text-sm sm:text-lg md:text-xl leading-snug drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] font-medium",
+              post.category.toLowerCase().includes("reviews") ? "text-amber-400" :
+              post.category.toLowerCase().includes("dossi") ? "text-blue-400" :
+              post.category.toLowerCase().includes("retro") ? "text-orange-400" : "text-purple-400"
+            )}>
+              {subtitle}
+            </span>
           </div>
         ) : (
           <h1 className="font-retro font-bold text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-snug md:leading-tight text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] text-glow tracking-tight">

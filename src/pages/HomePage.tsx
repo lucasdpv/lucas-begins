@@ -1067,19 +1067,19 @@ export default function HomePage() {
                                     const { mainTitle, subtitle } = splitTitle(post.title);
                                     return mainTitle ? (
                                       <div className="flex flex-col gap-0.5 mt-1.5">
-                                        <span className={cn(
-                                          "font-retro font-black uppercase text-[8px] sm:text-[9px] tracking-wider leading-none",
-                                          isHovered ? "text-yellow-600 dark:text-yellow-400" : "text-yellow-700/80 dark:text-yellow-500/80"
-                                        )}>
-                                          {mainTitle}
-                                        </span>
                                         <h4 className="font-retro font-bold text-xs sm:text-sm lg:text-[11px] xl:text-xs leading-snug line-clamp-2 transition-colors duration-300">
                                           <span className={cn(
                                             isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
                                           )}>
-                                            {subtitle}
+                                            {mainTitle}
                                           </span>
                                         </h4>
+                                        <span className={cn(
+                                          "font-sans text-[10px] leading-tight opacity-75 mt-0.5",
+                                          isDark ? "text-gray-300" : "text-gray-650"
+                                        )}>
+                                          {subtitle}
+                                        </span>
                                       </div>
                                     ) : (
                                       <h4 className="font-retro font-bold text-sm sm:text-base lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">

@@ -4,6 +4,30 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🩹 [v4.6.2] - The Split Title Hierarchy & Card Spacing Tuning Update
+*Data: 08 de Junho de 2026*
+
+### 🏷️ Inversão de Hierarquia no Split Title
+- **Inversão de Destaque**: Modificamos a apresentação de títulos compostos (ex: `Título: Subtítulo`) em todo o portal. O Título Principal (nome do jogo/série) agora assume o papel de cabeçalho principal em fonte retrô destacada, enquanto o Subtítulo atua como texto secundário complementar.
+- **Colorização Dinâmica**: Os subtítulos agora utilizam `font-sans` com peso semibold e são coloridos dinamicamente de acordo com a categoria temática do artigo (amarelo para reviews, azul para dossiês, laranja para retrocafé, roxo para especial, etc.), criando um visual muito mais harmonioso e legível.
+- **Propagação no Sistema**: Atualizamos as regras de hierarquia e estilo em:
+  - [PostCard.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostCard.tsx) (todas as variantes).
+  - [Carousel.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/Carousel.tsx) (carrossel de destaque).
+  - [PostHero.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostDetail/PostHero.tsx) (tela de detalhe da matéria).
+  - [CategoryRow.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/CategoryRow.tsx) (seções da página inicial).
+  - [HomePage.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/pages/HomePage.tsx) (seções secundárias).
+  - [PostEditorPage.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/pages/PostEditorPage.tsx) (prévia dinâmica do editor de posts).
+
+### 📐 Ajuste Fino de Espaçamento e Margens (Vintage Card)
+- **Ajuste de Altura Física**: Aumentamos as alturas dos cards vintage em [PostCard.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostCard.tsx) e [PostSkeleton.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostSkeleton.tsx) de forma sincronizada para evitar cortes em títulos longos:
+  - Mobile: de `170px` para `176px`.
+  - Tablet (`sm`): de `185px` para `190px`.
+  - Desktop (`md`): de `195px` para `200px`.
+- **Margens Internas Compactas**: Reduzimos as margens inferiores do cabeçalho, bloco de título e resumo (`mb-1.5` e `mb-1`) para otimizar a distribuição do espaço vertical disponível.
+- **Paddings de Segurança**: Ajustamos as margens de preenchimento (`pb-3` no mobile, `pb-3.5` no desktop) para garantir que os botões de ação (likes, favoritos, visualizações) no rodapé nunca fiquem colados ou cortados pela borda externa do card.
+
+---
+
 ## 🩹 [v4.6.1] - The Vintage Card Mobile Visibility Update
 *Data: 08 de Junho de 2026*
 

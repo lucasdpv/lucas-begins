@@ -222,17 +222,17 @@ export default function PostEditorPage() {
                 if (mainTitle) {
                   return (
                     <div className={cn(
-                      "p-3.5 border-2 border-dashed rounded-xl flex flex-col gap-1 mt-2 text-xs",
+                       "p-3.5 border-2 border-dashed rounded-xl flex flex-col gap-1 mt-2 text-xs",
                       isDark ? "bg-purple-950/20 border-purple-500/30" : "bg-purple-50/50 border-purple-600/20"
                     )}>
                       <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500 font-bold">
                         Prévia da Divisão de Títulos:
                       </span>
                       <div className="flex flex-col gap-0.5 font-retro">
-                        <span className="text-[10px] font-black uppercase text-purple-500 tracking-wider">
+                        <span className={cn("font-bold text-sm uppercase", isDark ? "text-white" : "text-snes-accent")}>
                           {mainTitle}
                         </span>
-                        <span className={cn("font-bold text-sm uppercase", isDark ? "text-white" : "text-snes-accent")}>
+                        <span className="font-sans text-[10px] opacity-75 mt-0.5">
                           {subtitle}
                         </span>
                       </div>
