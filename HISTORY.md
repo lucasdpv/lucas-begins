@@ -4,6 +4,19 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🩹 [v4.6.1] - The Vintage Card Mobile Visibility Update
+*Data: 08 de Junho de 2026*
+
+### 📱 Correção de Visibilidade nos Cards Vintage no Mobile
+- **Aumento das Alturas dos Cards**: Ajustamos as alturas físicas dos cards da variante `vintage` no [PostCard.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostCard.tsx) de forma proporcional para garantir que todos os elementos (título em duas linhas, data, resumo e botões de ação) caibam confortavelmente sem sofrer cortes:
+  - Mobile: de `150px` para `170px`.
+  - Tablet (`sm`): de `165px` para `185px`.
+  - Desktop (`md`): de `180px` para `195px`.
+- **Sincronização nos Skeletons**: Atualizamos as dimensões de altura e paddings idênticos no [PostSkeleton.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/components/PostSkeleton.tsx) para assegurar estabilidade visual durante o carregamento de dados (CLS nulo).
+- **Otimização de Padding e Margens**: Reduzimos o padding vertical do bloco de conteúdo no mobile de `p-3` para `py-2 px-3` (ganhando 8px adicionais) e ajustamos a margem inferior do resumo de `mb-2` para `mb-1.5 sm:mb-2` para melhor distribuição dos elementos.
+
+---
+
 ## 🏷️ [v4.6.0] - The Split Title & SEO Optimization Update
 *Data: 02 de Junho de 2026*
 
