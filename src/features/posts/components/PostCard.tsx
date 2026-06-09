@@ -340,54 +340,59 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             )}
           </div>
 
-          {/* Footer controls row */}
+          {/* Footer controls row — unified, no labels, bigger icons */}
           <div className="pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between shrink-0">
-            {/* Left spec widgets */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2.5 text-[9px] font-mono font-bold text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-0.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-blue-500 opacity-80" />
-                  <span>{formatNumber(commentCount)}</span>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  <Eye className="w-3.5 h-3.5 text-purple-500 opacity-80" />
-                  <span>{formatNumber(post.views || 0)}</span>
-                </div>
+            {/* Left: passive stats */}
+            <div className="flex items-center gap-3 font-mono font-bold text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-1.5 text-[10px] md:text-xs">
+                <Eye className="w-4 h-4 md:w-[18px] md:h-[18px] text-purple-500" />
+                <span>{formatNumber(post.views || 0)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] md:text-xs">
+                <MessageSquare className="w-4 h-4 md:w-[18px] md:h-[18px] text-blue-500" />
+                <span>{formatNumber(commentCount)}</span>
               </div>
             </div>
 
-            {/* Right action block */}
-            <div className="flex items-center gap-2 relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center gap-1.5">
-                <button
-                  className={cn(
-                    "flex items-center justify-center w-6 h-6 rounded-none border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 transition-all text-red-500 hover:scale-105 active:scale-95 cursor-pointer hover:border-red-500 dark:hover:border-red-400",
-                    hasLiked ? "bg-red-500/10 border-red-500" : ""
-                  )}
-                  onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : setIsLoginModalOpen(true)}
-                  title={currentUser ? "Curtir" : "Faça login para curtir"}
-                >
-                  <Heart className={cn("w-3 h-3", hasLiked && "fill-current")} />
-                </button>
+            {/* Right: action buttons — icon only, bigger */}
+            <div className="flex items-center gap-3 md:gap-4 relative z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+              <button
+                className={cn(
+                  "flex items-center gap-1.5 font-bold transition-all active:scale-95 cursor-pointer text-[10px] md:text-xs",
+                  hasLiked
+                    ? "text-red-500 scale-105"
+                    : isDark
+                    ? "text-gray-400 hover:text-red-400 hover:scale-110"
+                    : "text-gray-600 hover:text-red-500 hover:scale-110"
+                )}
+                onClick={() => currentUser ? likeMutation.mutate({ postId: post.id, userId: currentUser.id }) : setIsLoginModalOpen(true)}
+                title={currentUser ? "Curtir" : "Faça login para curtir"}
+              >
+                <Heart className={cn("w-4 h-4 md:w-[18px] md:h-[18px]", hasLiked && "fill-current")} />
+                <span>{formatNumber(post.likes || 0)}</span>
+              </button>
 
-                <button
-                  className={cn(
-                    "flex items-center justify-center w-6 h-6 rounded-none border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 transition-all text-yellow-500 hover:scale-105 active:scale-95 cursor-pointer hover:border-yellow-500 dark:hover:border-yellow-400",
-                    profile?.favorites?.includes(post.id) ? "bg-yellow-500/10 border-yellow-500" : ""
-                  )}
-                  onClick={() => {
-                    if (currentUser) {
-                      const isFavorited = profile?.favorites?.includes(post.id) || false;
-                      favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
-                    } else {
-                      setIsLoginModalOpen(true);
-                    }
-                  }}
-                  title={currentUser ? "Favoritar" : "Faça login para favoritar"}
-                >
-                  <Bookmark className={cn("w-3 h-3", profile?.favorites?.includes(post.id) && "fill-current")} />
-                </button>
-              </div>
+              <button
+                className={cn(
+                  "flex items-center transition-all active:scale-95 cursor-pointer",
+                  profile?.favorites?.includes(post.id)
+                    ? "text-yellow-500 scale-105"
+                    : isDark
+                    ? "text-gray-400 hover:text-yellow-400 hover:scale-110"
+                    : "text-gray-600 hover:text-yellow-500 hover:scale-110"
+                )}
+                onClick={() => {
+                  if (currentUser) {
+                    const isFavorited = profile?.favorites?.includes(post.id) || false;
+                    favoriteMutation.mutate({ userId: currentUser.id, postId: post.id, isFavorited });
+                  } else {
+                    setIsLoginModalOpen(true);
+                  }
+                }}
+                title={currentUser ? "Favoritar" : "Faça login para favoritar"}
+              >
+                <Bookmark className={cn("w-4 h-4 md:w-[18px] md:h-[18px]", profile?.favorites?.includes(post.id) && "fill-current")} />
+              </button>
             </div>
           </div>
         </div>

@@ -4,6 +4,37 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🩹 [v4.7.1] - The Vintage Card Footer & Reviews Polish Update
+*Data: 09 de Junho de 2026*
+
+### 🃏 Rodapé do Card Vintage — Refinamento Visual
+- **Consistência de Opacidade dos Ícones**: Removida a `opacity-70` dos ícones `Eye` (visualizações) e `MessageSquare` (comentários) no rodapé do card vintage, igualando o peso visual aos ícones de ação (`Heart`, `Bookmark`) do lado direito.
+- **Espaçamento Uniforme**: Padronizado o `gap-1.5` em todos os pares ícone+número do rodapé, garantindo alinhamento visual perfeito e consistência horizontal.
+
+### 🎮 Cards de Reviews — Tipografia e Profundidade
+- **Títulos Maiores**: Aumentados os tamanhos de fonte dos títulos (`h4`) nos cards de Reviews de `text-[11px]` para `text-sm` (14px), e os subtítulos de `text-[10px]` para `text-[11px]`, tornando o texto muito mais legível.
+- **Text-Shadow Neo-Brutalist**: Adicionada sombra sólida de texto (`text-shadow: 2px 2px 0px rgba(0,0,0,0.9)`) no título principal de cada review card, criando o efeito de profundidade neo-brutalist. Subtítulos recebem shadow mais sutil (`1px 1px`). No modo claro a opacidade é reduzida para não pesar o visual.
+
+---
+
+## 🎨 [v4.7.0] - The Neoretro Arcade Redesign Update
+*Data: 09 de Junho de 2026*
+
+### 🌌 Design de Fusão Neon Retro-Futurista (Glassmorphism & Cyberpunk)
+- **Tipografia Premium**: Integração das fontes Google Fonts `Syne` e `Outfit` para títulos e corpo de texto modernos.
+- **Sistema de Cards de Vidro**: Introdução das classes `.glass-card-premium` com efeitos de `backdrop-blur-md`, bordas com brilho neon translúcido e sombras suaves.
+- **Scrollbar Neon Customizada**: Nova scrollbar ultrafina com cantos arredondados e cor roxo-neon pulsante.
+- **Micro-Animações e Efeitos**: Flutuação dinâmica (`animate-float`) nos elementos decorativos e scan line (CRT) sutil nos cards.
+
+### 🧩 Componentização e Refatoração Estrutural
+- **Navbar em Cápsula Flutuante**: Redesenhada como cápsula flutuante translúcida com barra de busca expansível com brilho dinâmico no foco.
+- **Footer Premium Multifuncional**: Nova organização em 3 colunas com widgets de monitoramento de sistema e badges neon interativas para redes sociais.
+- **Carrossel sem Overlaps**: Correção do modo de animação para `wait` no Framer Motion, garantindo que o slide anterior some antes do próximo iniciar.
+- **Cards e Skeletons Reestilizados**: Redesenho completo com skeletons em sincronia exata para CLS zero.
+- **Otimização Mobile**: Ajuste responsivo de fontes e margens para rolagem fluida.
+
+---
+
 ## 🩹 [v4.6.2] - The Split Title Hierarchy & Card Spacing Tuning Update
 *Data: 08 de Junho de 2026*
 
@@ -387,25 +418,6 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
-## 🎨 [v3.3.0] - The Editorial Precision Update
-*Data: 15 de Maio de 2026*
-
-### 🛠️ Block Editor: UI Stabilization & Precision
-- **Advanced Command Dock**: Redesign radical da barra de ferramentas do editor. Transição para um layout vertical (ícone sobre texto) que otimiza o espaço horizontal e elimina sobreposições em telas menores.
-- **Stable Interaction Logic**: Implementação de `type="button"` em todos os controles de imagem e editor, eliminando o bug de "pulos" de página (page jumps) e envios de formulário acidentais.
-- **Editorial Buttons**: Refinamento estético dos botões com tipografia retro ampliada (`11px`), tracking generoso e efeitos de hover em roxo editorial com escala dinâmica.
-- **Slim Interface**: Otimização do container de ferramentas com remoção de paddings excessivos e ajuste de margens para um workflow mais direto e compacto.
-
-### 🖼️ Media & Layout Intelligence
-- **Dynamic Aspect Ratio**: Implementação de proporções inteligentes para upload de imagens. Agora o editor sugere automaticamente **16:9** para imagens centralizadas e **4:3** para layouts "Lado a Lado", garantindo harmonia visual instantânea.
-- **Text Overflow Protection**: Blindagem global contra textos longos sem espaços (character spam). Implementação de `break-words` e `overflow-hidden` tanto no editor quanto no renderer final, prevenindo quebras de layout.
-- **Magazine Row Fixes**: Estabilização do componente de imagem lateral com suporte a alinhamento dinâmico e quebra de linha forçada para descrições longas.
-
-### ⚙️ Manutenção & Versão
-- **Architecture Cleanup**: Refatoração de componentes internos para o nível superior, melhorando o ciclo de vida do React e prevenindo bugs de sombra/referência.
-- **Version Bump**: Atualização global para v3.3.0, focada em precisão editorial e estabilidade de interface.
-
----
 
 ## 💎 [v3.2.0] - The Cockpit UX & Responsive Discovery
 *Data: 15 de Maio de 2026*

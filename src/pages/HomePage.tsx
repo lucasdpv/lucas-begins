@@ -1067,22 +1067,31 @@ export default function HomePage() {
                                     const { mainTitle, subtitle } = splitTitle(post.title);
                                     return mainTitle ? (
                                       <div className="flex flex-col gap-0.5 mt-1.5">
-                                        <h4 className="font-retro font-bold text-xs sm:text-sm lg:text-[11px] xl:text-xs leading-snug line-clamp-2 transition-colors duration-300">
+                                        <h4
+                                          className="font-retro font-bold text-sm lg:text-xs xl:text-sm leading-snug line-clamp-2 transition-colors duration-300"
+                                          style={{ textShadow: isDark ? "2px 2px 0px rgba(0,0,0,0.9)" : "2px 2px 0px rgba(0,0,0,0.25)" }}
+                                        >
                                           <span className={cn(
                                             isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
                                           )}>
                                             {mainTitle}
                                           </span>
                                         </h4>
-                                        <span className={cn(
-                                          "font-sans text-[10px] leading-tight opacity-75 mt-0.5",
-                                          isDark ? "text-gray-300" : "text-gray-650"
-                                        )}>
+                                        <span
+                                          className={cn(
+                                            "font-sans text-[11px] lg:text-[10px] xl:text-[11px] leading-tight opacity-80 mt-0.5",
+                                            isDark ? "text-gray-300" : "text-gray-650"
+                                          )}
+                                          style={{ textShadow: isDark ? "1px 1px 0px rgba(0,0,0,0.8)" : "none" }}
+                                        >
                                           {subtitle}
                                         </span>
                                       </div>
                                     ) : (
-                                      <h4 className="font-retro font-bold text-sm sm:text-base lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300">
+                                      <h4
+                                        className="font-retro font-bold text-sm lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300"
+                                        style={{ textShadow: isDark ? "2px 2px 0px rgba(0,0,0,0.9)" : "2px 2px 0px rgba(0,0,0,0.2)" }}
+                                      >
                                         <span className={cn(
                                           isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
                                         )}>
