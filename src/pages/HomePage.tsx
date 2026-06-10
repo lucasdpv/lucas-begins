@@ -200,9 +200,7 @@ export default function HomePage() {
 
   const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
 
-  const isLoadingPosts = isSearching 
-    ? isLoadingAll 
-    : (isLoadingFeatured || isLoadingPaginated || isLoadingReviews || isLoadingDossies || isLoadingRetrocafe || isLoadingLatest);
+  const isLoadingPosts = isSearching ? isLoadingAll : isLoadingFeatured;
 
   return (
     <div className="flex flex-col gap-8 md:gap-12 relative">
@@ -240,9 +238,9 @@ export default function HomePage() {
       </Helmet>
 
       {/* ── 1. HERO BENTO GRID: Carousel + Mais Acessados ─────────── */}
-      {isLoadingPosts && isDefaultView ? (
+      {isLoadingFeatured && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
-      ) : !isLoadingPosts && isDefaultView && posts.length > 0 ? (
+      ) : isDefaultView && posts.length > 0 ? (
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
           {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
@@ -302,36 +300,55 @@ export default function HomePage() {
               )}
 
               <div className="flex flex-col justify-between h-full relative z-10 gap-3">
-                {mostViewedPosts.map((post, idx) => (
-                  <Link
-                    key={post.id}
-                    to={`/post/${post.slug || slugify(post.title)}`}
-                    onMouseEnter={() => setHoveredMaisLidosIndex(idx)}
-                    className={cn(
-                      "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
-                      isDark ? "border-white/5" : "border-black/5"
-                    )}
-                  >
-                    <span className={cn(
-                      "text-2xl font-retro font-black trending-number min-w-[32px] select-none",
-                      isDark ? "text-amber-400/85 text-glow-amber" : "text-amber-500/70"
-                    )}>
-                      {(idx + 1).toString().padStart(2, "0")}
-                    </span>
-
-                    <div className="flex-1 min-w-0">
-                      <h4 className={cn(
-                        "font-bold text-xs md:text-sm leading-snug line-clamp-2 transition-colors duration-300",
-                        isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
-                      )}>
-                        {post.title}
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        <span>{formatNumber(post.views || 0)} views</span>
+                {mostViewedPosts.length === 0 ? (
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-start gap-4 py-2.5 border-b last:border-0 last:pb-0 border-dashed animate-pulse",
+                        isDark ? "border-white/5" : "border-black/5"
+                      )}
+                    >
+                      <div className={cn("min-w-[32px] h-8 rounded-none shrink-0", isDark ? "bg-amber-400/20" : "bg-amber-200/60")} />
+                      <div className="flex-1 space-y-2 min-w-0">
+                        <div className={cn("w-full h-3 rounded-none", isDark ? "bg-gray-800" : "bg-gray-200")} />
+                        <div className={cn("w-4/5 h-3 rounded-none", isDark ? "bg-gray-800" : "bg-gray-200")} />
+                        <div className={cn("w-20 h-2 rounded-none", isDark ? "bg-gray-900" : "bg-gray-150")} />
                       </div>
                     </div>
-                  </Link>
-                ))}
+                  ))
+                ) : (
+                  mostViewedPosts.map((post, idx) => (
+                    <Link
+                      key={post.id}
+                      to={`/post/${post.slug || slugify(post.title)}`}
+                      onMouseEnter={() => setHoveredMaisLidosIndex(idx)}
+                      className={cn(
+                        "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
+                        isDark ? "border-white/5" : "border-black/5"
+                      )}
+                    >
+                      <span className={cn(
+                        "text-2xl font-retro font-black trending-number min-w-[32px] select-none",
+                        isDark ? "text-amber-400/85 text-glow-amber" : "text-amber-500/70"
+                      )}>
+                        {(idx + 1).toString().padStart(2, "0")}
+                      </span>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className={cn(
+                          "font-bold text-xs md:text-sm leading-snug line-clamp-2 transition-colors duration-300",
+                          isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
+                        )}>
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          <span>{formatNumber(post.views || 0)} views</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -339,7 +356,7 @@ export default function HomePage() {
       ) : null}
 
       {/* ── MOBILE/TABLET MAIS LIDOS ── */}
-      {!isLoadingPosts && isDefaultView && mostViewedPosts.length > 0 && (
+      {isDefaultView && (
         <div className="lg:hidden flex flex-col gap-4">
           {/* Divisor sutil entre Carrossel e Mais Lidos no mobile */}
           <div className={cn("h-px mb-6 -mt-2", isDark ? "bg-white/5" : "bg-black/10")} />
@@ -362,50 +379,68 @@ export default function HomePage() {
               onScroll={() => updateScrollState(mostViewedMobileRef, setMostViewedScroll)}
               className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory w-full"
             >
-              {mostViewedPosts.map((post, idx) => {
-                const targetSlug = post.slug || slugify(post.title);
-                return (
-                  <Link
-                    key={post.id}
-                    to={`/post/${targetSlug}`}
+              {mostViewedPosts.length === 0 ? (
+                [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
                     className={cn(
-                      "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
-                      isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                      "relative h-[148px] rounded-none border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always animate-pulse",
+                      isDark ? "bg-[#1f1d35]" : "bg-gray-100"
                     )}
                   >
-                    {/* Imagem */}
-                    {post.imageUrl ? (
-                      <img
-                        src={post.imageUrl}
-                        alt={post.title}
-                        className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-700/20 to-orange-900/30" />
-                    )}
-                    {/* Gradiente */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-
-                    {/* Rank Number overlay */}
-                    <div className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded font-retro font-black text-base bg-black/75 border border-amber-400/60 text-amber-400 backdrop-blur-sm shadow-[0_0_8px_rgba(251,191,36,0.25)] group-hover/item:bg-amber-400 group-hover/item:text-black transition-all duration-300">
-                      {(idx + 1).toString().padStart(2, "0")}
+                    <div className="space-y-2">
+                      <div className={cn("w-full h-3 rounded-none", isDark ? "bg-gray-700" : "bg-gray-300")} />
+                      <div className={cn("w-4/5 h-3 rounded-none", isDark ? "bg-gray-700" : "bg-gray-300")} />
+                      <div className={cn("w-20 h-2 rounded-none", isDark ? "bg-gray-800" : "bg-gray-250")} />
                     </div>
+                  </div>
+                ))
+              ) : (
+                mostViewedPosts.map((post, idx) => {
+                  const targetSlug = post.slug || slugify(post.title);
+                  return (
+                    <Link
+                      key={post.id}
+                      to={`/post/${targetSlug}`}
+                      className={cn(
+                        "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
+                        isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                      )}
+                    >
+                      {/* Imagem */}
+                      {post.imageUrl ? (
+                        <img
+                          src={post.imageUrl}
+                          alt={post.title}
+                          className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-700/20 to-orange-900/30" />
+                      )}
+                      {/* Gradiente */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-                    {/* Conteúdo */}
-                    <div className="relative z-10 space-y-1">
-                      <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
-                        {post.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
-                        <span>{formatNumber(post.views || 0)} views</span>
-                        <span>·</span>
-                        <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+                      {/* Rank Number overlay */}
+                      <div className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded font-retro font-black text-base bg-black/75 border border-amber-400/60 text-amber-400 backdrop-blur-sm shadow-[0_0_8px_rgba(251,191,36,0.25)] group-hover/item:bg-amber-400 group-hover/item:text-black transition-all duration-300">
+                        {(idx + 1).toString().padStart(2, "0")}
                       </div>
-                    </div>
-                  </Link>
-                );
-              })}
+
+                      {/* Conteúdo */}
+                      <div className="relative z-10 space-y-1">
+                        <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
+                          <span>{formatNumber(post.views || 0)} views</span>
+                          <span>·</span>
+                          <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
             </div>
 
             {/* Setinhas de navegação/feedback visual no Mobile */}
@@ -471,9 +506,9 @@ export default function HomePage() {
         </div>
 
         {/* Feed Content: Clean 2-Column Grid */}
-        {isLoadingPosts ? (
+        {(isSearching ? isLoadingAll : (isLoadingLatest || isLoadingPaginated)) ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {[1, 2, 3, 4].map((i) => (
               <PostSkeleton key={i} isDark={isDark} variant="vintage" />
             ))}
           </div>
@@ -499,7 +534,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 2. ROW 2: RetroCafé / Dossiês / Reviews ─────────── */}
-      {!isLoadingPosts && isDefaultView && (
+      {isDefaultView && (
         <section className="flex flex-col gap-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10 text-left lg:items-stretch lg:grid-rows-1">
 
@@ -601,7 +636,11 @@ export default function HomePage() {
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
                     className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
-                    {displayRetrocafe.length > 0 ? (
+                    {isLoadingRetrocafe ? (
+                      [1, 2, 3].map((idx) => (
+                        <PostSkeleton key={idx} isDark={isDark} variant="compact" />
+                      ))
+                    ) : displayRetrocafe.length > 0 ? (
                       displayRetrocafe.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
                         return (
@@ -831,7 +870,11 @@ export default function HomePage() {
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
                     className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4 lg:items-start"
                   >
-                    {displayDossie.length > 0 ? (
+                    {isLoadingDossies ? (
+                      [1, 2, 3].map((idx) => (
+                        <PostSkeleton key={idx} isDark={isDark} variant="compact" />
+                      ))
+                    ) : displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
                         return (
@@ -1012,7 +1055,11 @@ export default function HomePage() {
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
                     className="flex lg:flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
-                    {displayReviews.length > 0 ? (
+                    {isLoadingReviews ? (
+                      [1, 2, 3, 4, 5].map((idx) => (
+                        <div key={idx} className={cn("w-full h-[112px] animate-pulse border-2 border-dashed rounded-none shrink-0 snap-start snap-always", isDark ? "border-white/10 bg-gray-900" : "border-snes-mid/40 bg-[#f5f4f7]")} />
+                      ))
+                    ) : displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
                         const isHovered = hoveredReviewsIndex === i;
