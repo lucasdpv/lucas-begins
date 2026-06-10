@@ -8,6 +8,8 @@ import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { useImageFallback } from "../../../hooks/useImageFallback";
 import { useUIStore } from "../../../store/useUIStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { PostService } from "../../../services/postService";
 import { Post } from "../schemas";
 
 interface PostCardProps {
@@ -111,6 +113,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const favoriteMutation = useFavoriteMutation();
   const imgError = useImageFallback(post.imageUrl ?? undefined);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
+  const queryClient = useQueryClient();
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.commentsCount || post.comments?.length || 0;
@@ -121,6 +124,14 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const targetPath = `/post/${targetSlug}`;
   const cardStyles = getCategoryCardStyles(post.category);
   const { mainTitle, subtitle } = splitTitle(post.title);
+
+  const handlePrefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["postBySlug", targetSlug],
+      queryFn: () => PostService.getPostBySlug(targetSlug),
+      staleTime: 1000 * 60 * 10,
+    });
+  };
 
   // Variant Compact: Design Card Contido
   if (isCompact) {
@@ -133,6 +144,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             : "bg-white border-black text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:border-black",
           cardStyles.hoverShadowBrutalCompact
         )}
+        onMouseEnter={handlePrefetch}
       >
         <Link 
           to={targetPath} 
@@ -228,6 +240,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             : "bg-white text-gray-900",
           cardStyles.hoverShadowBrutal
         )}
+        onMouseEnter={handlePrefetch}
       >
         <Link
           to={targetPath}
@@ -410,6 +423,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           : "bg-white border-black text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black",
         cardStyles.hoverShadowBrutal
       )}
+      onMouseEnter={handlePrefetch}
     >
       <Link
         to={targetPath}

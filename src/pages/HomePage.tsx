@@ -19,11 +19,22 @@ import {
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber, formatDate, calculateReadingTime, splitTitle } from "../lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { PostService } from "../services/postService";
 import { Post } from "../features/posts/schemas";
 
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
+  const queryClient = useQueryClient();
+
+  const handlePrefetch = useCallback((slug: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ["postBySlug", slug],
+      queryFn: () => PostService.getPostBySlug(slug),
+      staleTime: 1000 * 60 * 10,
+    });
+  }, [queryClient]);
 
   const playEjectSound = () => {
     try {
@@ -112,6 +123,8 @@ export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isDefaultView = activeCategory === "Todos" && searchQuery === "";
+
   // Reseta categoria ao voltar do arquivo (evita glitch de transição)
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
@@ -125,22 +138,22 @@ export default function HomePage() {
   }, [navigate]);
 
   // 1. Destaques (Carrossel) - Puxa no máximo 5 posts do Firestore
-  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts();
+  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
 
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
-  const { data: mostViewedPosts = [] } = useMostViewedPosts(5);
+  const { data: mostViewedPosts = [] } = useMostViewedPosts(5, isDefaultView);
 
   // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5);
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5, isDefaultView);
 
   // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
-  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3);
+  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3, isDefaultView);
 
   // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
-  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3);
+  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3, isDefaultView);
 
   // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
-  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15);
+  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
 
   // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
   const isSearching = searchQuery.trim() !== "";
@@ -163,7 +176,7 @@ export default function HomePage() {
     searchQuery
   );
 
-  const isDefaultView = activeCategory === "Todos" && searchQuery === "";
+  // isDefaultView definition moved up to prevent ReferenceError
 
   // Definição das listas diretas sem deduplicação
   const carouselPosts = featuredPosts.slice(0, 5);
@@ -200,7 +213,11 @@ export default function HomePage() {
 
   const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
 
-  const isLoadingPosts = isSearching ? isLoadingAll : isLoadingFeatured;
+  const isLoadingPosts = isSearching
+    ? isLoadingAll
+    : isDefaultView
+    ? isLoadingLatest
+    : isLoadingPaginated;
 
   return (
     <div className="flex flex-col gap-8 md:gap-12 relative">
@@ -322,7 +339,10 @@ export default function HomePage() {
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || slugify(post.title)}`}
-                      onMouseEnter={() => setHoveredMaisLidosIndex(idx)}
+                      onMouseEnter={() => {
+                        setHoveredMaisLidosIndex(idx);
+                        handlePrefetch(post.slug || slugify(post.title));
+                      }}
                       className={cn(
                         "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
                         isDark ? "border-white/5" : "border-black/5"
@@ -402,6 +422,7 @@ export default function HomePage() {
                     <Link
                       key={post.id}
                       to={`/post/${targetSlug}`}
+                      onMouseEnter={() => handlePrefetch(targetSlug)}
                       className={cn(
                         "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
                         isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
@@ -660,6 +681,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredRetrocafeIndex(i);
                               playClickSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             <Link
@@ -894,6 +916,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredDossieIndex(i);
                               playClickSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             {/* Salient folder tab */}
@@ -1084,6 +1107,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredReviewsIndex(i);
                               playEjectSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             <Link

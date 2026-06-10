@@ -38,29 +38,31 @@ export const PostService = {
    */
   async getPaginatedPosts(limitNumber: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null = null, category?: string): Promise<any> {
     try {
-      // Se tiver categoria específica, fazemos busca index-free e ordenação client-side
+      // Se tiver categoria específica, fazemos busca paginada nativa (exige índice composto no Firestore)
       if (category && category !== 'Todos' && category !== 'all') {
         const categoriesToSearch = category.toLowerCase().includes("dossi")
           ? ["Dossiê", "Dossiês", "dossie", "dossies"]
           : [category];
 
-        const q = query(
-          collection(db, COLLECTIONS.POSTS),
-          where("category", "in", categoriesToSearch)
-        );
+        const constraints: any[] = [
+          where("category", "in", categoriesToSearch),
+          orderBy("createdAt", "desc"),
+          limit(limitNumber)
+        ];
+
+        if (lastDoc) {
+          constraints.push(startAfter(lastDoc));
+        }
+
+        const q = query(collection(db, COLLECTIONS.POSTS), ...constraints);
         const snapshot = await getDocs(q);
         const posts = snapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() } as Post))
-          .filter(p => !p.isDraft)
-          .sort((a, b) => {
-            const timeA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
-            const timeB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
-            return timeB - timeA;
-          });
+          .filter(p => !p.isDraft);
 
         return {
           posts: posts,
-          lastDoc: null // Como já temos tudo em memória para a categoria, não precisamos de mais páginas
+          lastDoc: snapshot.docs[snapshot.docs.length - 1] || null
         };
       }
 
