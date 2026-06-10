@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { Link } from "react-router-dom";
+import Image from "next/image";
+import { Link } from "@/lib/router-compat";
 import { ChevronRight, ChevronLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Post } from "../schemas";
@@ -27,7 +28,15 @@ export default function CategoryRow({
 }: CategoryRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const categoryPosts = posts.filter((p) => p.category === category && !p.isDraft);
+  const categoryPosts = posts.filter((p) => {
+    if (p.isDraft) return false;
+    const normalize = (cat: string) => 
+      cat.toLowerCase()
+         .normalize("NFD")
+         .replace(/[\u0300-\u036f]/g, "")
+         .replace(/s$/, "");
+    return normalize(p.category) === normalize(category);
+  });
 
   if (categoryPosts.length === 0) return null;
 
@@ -97,11 +106,12 @@ export default function CategoryRow({
                 )}
               >
                 {post.imageUrl && (
-                  <img
+                  <Image
                     src={post.imageUrl}
                     alt={post.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 260px, 300px"
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />

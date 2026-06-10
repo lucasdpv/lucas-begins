@@ -6,7 +6,7 @@ import { useThemeStore } from '../store/useThemeStore';
 import { useUIStore } from '../store/useUIStore';
 import { cn } from '../lib/utils';
 import { Star, Trophy, MessageSquare, Bookmark, ChevronRight, Gamepad2, Zap, Info, Edit, X, Check, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router-compat';
 import { Helmet } from 'react-helmet-async';
 import PostCard from '../features/posts/components/PostCard';
 import ImageUpload from '../components/ui/ImageUpload';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@/lib/router-compat";
 import {
   Edit,
   Plus,
@@ -61,6 +61,15 @@ export default function PostEditorPage() {
       return { title: "", excerpt: "", content: "", category: (categories as string[])[0] || "", imageUrl: "", score: undefined, verdict: "", isDraft: false, showAuthorBox: false };
     }
   });
+  const [hasLoadedPost, setHasLoadedPost] = useState(false);
+
+  // Sincroniza o post carregado assincronamente com o estado do form (uma única vez)
+  useEffect(() => {
+    if (post && !hasLoadedPost) {
+      setFormData(post);
+      setHasLoadedPost(true);
+    }
+  }, [post, hasLoadedPost]);
 
   // Auto-save do rascunho com debounce de 1s (só para novos posts)
   useEffect(() => {
@@ -248,7 +257,15 @@ export default function PostEditorPage() {
               <ImageUpload 
                 label="Imagem ou GIF de Capa (Upload ou Link)"
                 initialValue={formData.imageUrl || ""}
-                onUploadComplete={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                originalUrl={formData.originalImageUrl || ""}
+                onUploadComplete={(url, aspect, originalUrl) => {
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    imageUrl: url,
+                    imageAspect: aspect || 'original',
+                    originalImageUrl: originalUrl || prev.originalImageUrl || ""
+                  }));
+                }}
                 folder="posts"
                 aspect={16 / 9}
               />

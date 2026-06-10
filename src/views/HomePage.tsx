@@ -1,7 +1,8 @@
+"use client";
+
 import React, { useEffect, useCallback, useRef, useState } from "react";
 import { Gamepad2, ChevronRight, ChevronLeft, Coffee, FolderOpen } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Link, useNavigate, useLocation } from "@/lib/router-compat";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
@@ -155,16 +156,17 @@ export default function HomePage() {
   // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
   const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
 
-  // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
+  // 5. Busca Otimizada (Híbrida) - Faz o download se houver busca ou se alguma categoria estiver selecionada
   const isSearching = searchQuery.trim() !== "";
-  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
+  const isLocalMode = isSearching || activeCategory !== "Todos";
+  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isLocalMode);
 
   // 6. Grid Principal Otimizado - Se não estiver buscando, usa a paginação nativa (leve!)
   const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({ 
     category: activeCategory 
   });
 
-  const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+  const posts = isLocalMode ? (allPosts as Post[]) : (paginatedPosts as Post[]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -205,55 +207,18 @@ export default function HomePage() {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateScrollState]);
 
-  const gridPosts = isSearching 
+  const gridPosts = isLocalMode 
     ? filteredPosts.slice(0, 4) 
-    : isDefaultView 
-    ? latestPosts.slice(0, 4) 
-    : paginatedPosts.slice(0, 4);
+    : latestPosts.slice(0, 4);
 
   const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
 
-  const isLoadingPosts = isSearching
+  const isLoadingPosts = isLocalMode
     ? isLoadingAll
-    : isDefaultView
-    ? isLoadingLatest
-    : isLoadingPaginated;
+    : isLoadingLatest;
 
   return (
     <div className="flex flex-col gap-8 md:gap-12 relative">
-      {/* ── SEO ─────────────────────────────────────────── */}
-      <Helmet>
-        <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/" />
-        <meta
-          name="description"
-          content="Bem-vindo ao BeginsProject. Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
-        />
-        <meta name="keywords" content="BeginsProject, Lucas Begins, Projeto Begins, Lucas Begins Blog, Revista Retro, Games Retro, Cultura Pop, Reviews de Jogos" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://lucasbegins.com.br/" />
-        <meta property="og:title" content="BeginsProject | Portal de Games e Cultura Pop" />
-        <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
-        <meta property="og:image" content="https://lucasbegins.com.br/og-image.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="BeginsProject | Portal de Games e Cultura Pop" />
-        <meta name="twitter:description" content="Reviews, nostalgia e cultura gamer brasileira." />
-        <meta name="twitter:image" content="https://lucasbegins.com.br/og-image.png" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "BeginsProject",
-            url: "https://lucasbegins.com.br/",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: "https://lucasbegins.com.br/?q={search_term_string}",
-              "query-input": "required name=search_term_string",
-            },
-          })}
-        </script>
-      </Helmet>
-
       {/* ── 1. HERO BENTO GRID: Carousel + Mais Acessados ─────────── */}
       {isLoadingFeatured && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />

@@ -49,6 +49,8 @@ export const PostSchema = z.object({
   imageUrl: z.string().optional().nullable(),
   videoUrl: z.string().optional().nullable(),
   imagePosition: z.string().catch('center'),
+  imageAspect: z.string().catch('original'),
+  originalImageUrl: z.string().optional().nullable(),
   slug: z.string().optional().nullable(),
   isFeatured: z.boolean().catch(false),
   isDraft: z.boolean().catch(false),

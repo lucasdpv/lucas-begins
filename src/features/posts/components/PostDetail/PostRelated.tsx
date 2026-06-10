@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Star } from "lucide-react";
 import { cn, slugify } from "../../../../lib/utils";
 import { Post } from "../../schemas";
@@ -47,7 +47,7 @@ export default function PostRelated({ posts, currentPostId, isDark, isPreview = 
               to={isPreview ? "#" : `/post/${p.slug || slugify(p.title)}`} 
               key={p.id} 
               className={cn("block group", isPreview && "cursor-default opacity-50 grayscale")}
-              onClick={(e) => isPreview && e.preventDefault()}
+              onClick={(e: React.MouseEvent) => isPreview && e.preventDefault()}
             >
               <div
                 className={cn(

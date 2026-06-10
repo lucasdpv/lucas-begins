@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn, splitTitle } from "../../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../../components/ui/Badge";
 import { Post } from "../../schemas";
@@ -9,19 +10,30 @@ interface PostHeroProps {
 
 export default function PostHero({ post, imgError }: PostHeroProps) {
   const { mainTitle, subtitle } = splitTitle(post.title);
+  
+  const aspectClass = 
+    post.imageAspect === '1:1' ? "aspect-square max-w-2xl mx-auto w-full" :
+    post.imageAspect === '4:5' ? "aspect-[4/5] max-w-xl mx-auto w-full" :
+    post.imageAspect === '16:9' ? "aspect-video w-full max-h-[550px]" :
+    "h-[350px] md:h-[550px] w-full"; // original / default
+
   return (
     <div
       className={cn(
-        "w-full h-[350px] md:h-[550px] rounded-none relative overflow-hidden flex items-center justify-center shadow-[6px_6px_0px_rgba(0,0,0,1)] border-2 border-black bg-gray-950 translate-z-0",
+        "rounded-none relative overflow-hidden flex items-center justify-center shadow-[6px_6px_0px_rgba(0,0,0,1)] border-2 border-black bg-gray-950 translate-z-0",
+        aspectClass,
         (!post.imageUrl || imgError) && `bg-gradient-to-br ${(post as any).gradient || 'from-gray-900 to-purple-900'}`
       )}
     >
       {post.imageUrl && !imgError && (
-        <img
+        <Image
           src={post.imageUrl}
           alt={post.title}
-          className="absolute inset-0 w-full h-full object-cover z-0"
+          className="object-cover"
           style={{ objectPosition: post.imagePosition || "center" }}
+          fill
+          priority
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px"
         />
       )}
       

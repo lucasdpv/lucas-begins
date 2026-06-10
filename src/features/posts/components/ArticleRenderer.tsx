@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import DOMPurify from "dompurify";
 import { cn } from "../../../lib/utils";
 import RetroSeparator from "../../../components/ui/RetroSeparator";
@@ -242,7 +243,7 @@ function ArticleImage({
       </figure>
 
       {/* Retro CRT Zoom Lightbox */}
-      {isZoomed && (
+      {isZoomed && typeof document !== "undefined" && createPortal(
         <div 
           onClick={() => setIsZoomed(false)}
           className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md cursor-zoom-out p-4 animate-in fade-in duration-300"
@@ -280,7 +281,8 @@ function ArticleImage({
               </span>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

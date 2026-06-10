@@ -1,6 +1,7 @@
 import React from "react";
+import Image from "next/image";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle } from "../../../lib/utils";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
@@ -145,6 +146,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           cardStyles.hoverShadowBrutalCompact
         )}
         onMouseEnter={handlePrefetch}
+        onTouchStart={handlePrefetch}
       >
         <Link 
           to={targetPath} 
@@ -161,12 +163,13 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           )}
         >
           {post.imageUrl && !imgError && (
-            <img
+            <Image
               src={post.imageUrl}
               alt={post.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               style={{ objectPosition: post.imagePosition || "center" }}
-              loading="lazy"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
             />
           )}
           <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-75 transition-opacity duration-300 z-10" />
@@ -241,6 +244,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           cardStyles.hoverShadowBrutal
         )}
         onMouseEnter={handlePrefetch}
+        onTouchStart={handlePrefetch}
       >
         <Link
           to={targetPath}
@@ -263,12 +267,13 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           )}
         >
           {post.imageUrl && !imgError && (
-            <img
+            <Image
               src={post.imageUrl}
               alt={post.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               style={{ objectPosition: post.imagePosition || "center" }}
-              loading="lazy"
+              fill
+              sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
             />
           )}
 
@@ -424,6 +429,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         cardStyles.hoverShadowBrutal
       )}
       onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
     >
       <Link
         to={targetPath}
@@ -438,12 +444,13 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         )}
       >
         {post.imageUrl && !imgError && (
-          <img
+          <Image
             src={post.imageUrl}
             alt={post.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             style={{ objectPosition: post.imagePosition || "center" }}
-            loading="lazy"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         )}
 

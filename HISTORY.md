@@ -4,6 +4,28 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v4.8.0] - The Next.js Server-Side SEO & Layout Polish Update
+*Data: 10 de Junho de 2026*
+
+### ⚡ Migração para Next.js & Server Components
+- **Integração com Next.js**: Migração da arquitetura Vite SPA e rotas client-side para o Next.js App Router.
+- **Requisições REST Resilientes**: Desacoplamento da busca de dados do Firestore no servidor usando rotas REST diretas, evitando quedas de servidor relacionadas a dependências gRPC no ambiente de Server Components (RSC).
+
+### 🌐 SEO Dinâmico & Crawlers
+- **Geração de Metadados Server-side**: Criação do método `generateMetadata` dinâmico em `[slug]/page.tsx` para prover títulos amigáveis, descrições personalizadas, links canônicos absolutos e imagens Open Graph (`og:image`).
+- **Sitemap Dinâmico**: Implementação de rota `/sitemap.xml` para expor automaticamente todos os artigos publicados para indexadores de busca.
+- **Configuração de Robots**: Configuração de `/robots.txt` para bloquear o rastreamento de páginas administrativas (como `/admin`, `/editor` e `/dashboard`).
+
+### 📐 Recorte e Aspecto de Imagens Dinâmico
+- **Correção de "Scroll Jump" nos Uploads**: Integração do `ImageCropper.tsx` com React Portals para injetar o modal de recorte diretamente no `document.body`, solucionando o bug onde a página sofria rolagem vertical abrupta ao selecionar um arquivo.
+- **Reversão do Aspecto Forçado**: Remoção do bloqueio fixo de proporção `16:9` no componente de upload de capa ([PostEditorPage.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/views/PostEditorPage.tsx#L257-L265)) e nos estilos, devolvendo a liberdade ao editor de escolher e salvar proporções variadas (Original, 1:1, 16:9, 4:5).
+- **Correção de Proporção no Mobile**: Ajuste do validador Zod ([schemas.ts](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/schemas.ts#L50-L55)) para usar `'original'` como fallback de aspecto de imagem de capa, restaurando o comportamento original em que imagens sem proporção travada se comportam como quadrado no celular e banner no computador.
+
+### 🧹 Limpeza de Cache de Post
+- **Invalidação Otimista no Salvamento**: Inclusão da invalidação automática da chave `['postBySlug']` no React Query ([usePostsQuery.ts](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/hooks/usePostsQuery.ts#L225-L232)) ao salvar/publicar alterações, forçando a página de detalhes a carregar dados novos instantaneamente.
+
+---
+
 ## 🩹 [v4.7.1] - The Vintage Card Footer & Reviews Polish Update
 *Data: 09 de Junho de 2026*
 

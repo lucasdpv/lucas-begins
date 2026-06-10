@@ -4,6 +4,7 @@ import { getCroppedImg, getProxiedUrl } from '../../lib/cropUtils';
 import { X, Check, ZoomIn, ZoomOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useThemeStore } from '../../store/useThemeStore';
+import { createPortal } from 'react-dom';
 
 interface ImageCropperProps {
   image: string;
@@ -11,6 +12,7 @@ interface ImageCropperProps {
   onCancel: () => void;
   aspect?: 'original' | '1:1' | '16:9' | '4:5';
   circular?: boolean;
+  lockAspect?: boolean;
 }
 
 export default function ImageCropper({ 
@@ -18,7 +20,8 @@ export default function ImageCropper({
   onCropComplete, 
   onCancel, 
   aspect = 'original', 
-  circular = false 
+  circular = false,
+  lockAspect = false
 }: ImageCropperProps) {
   const { isDark } = useThemeStore();
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -29,6 +32,11 @@ export default function ImageCropper({
   const [currentAspectSetting, setCurrentAspectSetting] = useState<'original' | '1:1' | '16:9' | '4:5'>(
     aspect
   );
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const calculatedAspect = 
     circular ? 1 :
@@ -75,7 +83,9 @@ export default function ImageCropper({
     }
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
       <div className={cn(
         "w-full max-w-2xl rounded-3xl border-4 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col",
@@ -192,6 +202,7 @@ export default function ImageCropper({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

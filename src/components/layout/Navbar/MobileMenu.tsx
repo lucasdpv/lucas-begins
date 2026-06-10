@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Image from "next/image";
+import { Link } from "@/lib/router-compat";
 import { 
   Gamepad2, 
   Sun, 
@@ -106,14 +107,13 @@ export default function MobileMenu({
             {currentUser && (
               <div className="flex flex-col gap-1 py-2 px-1 border-b border-white/10">
                 <div className="flex items-center gap-4 mb-2">
-                  <img 
+                  <Image 
                     src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))} 
                     alt="" 
                     className="w-12 h-12 rounded-full border border-purple-500/50 object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = getPixelAvatar(currentUser.id);
-                    }}
+                    width={48}
+                    height={48}
+                    unoptimized={true}
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-retro font-bold uppercase text-sm text-purple-400 truncate">{profile?.name || currentUser.name}</h4>

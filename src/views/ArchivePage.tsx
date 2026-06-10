@@ -1,14 +1,16 @@
+"use client";
+
 import React, { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gamepad2, ArrowLeft } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "@/lib/router-compat";
+import { useQueryClient } from "@tanstack/react-query";
 
 import PostCard from "../features/posts/components/PostCard";
 import PostSkeleton from "../features/posts/components/PostSkeleton";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { useAllPosts, usePosts } from "../features/posts/hooks/usePostsQuery";
+import { useAllPosts, usePosts, postKeys } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
@@ -18,6 +20,14 @@ export default function ArchivePage() {
   const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
+
+  // Ao montar, remove apenas a query de paginação infinita para começar do zero.
+  // Não reseta postKeys.lists() inteiro pois isso afetaria o admin panel (useAllPosts).
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: postKeys.list({ category: activeCategory, search: '' }) });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Aplica categoria vinda da HomePáge via state (sem alterar a store antes da animação de entrada)
   useEffect(() => {
@@ -26,17 +36,19 @@ export default function ArchivePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
   // Volta para home e sinaliza reset de categoria (a HomePage reseta após montar)
   const handleVoltar = () => {
     navigate("/", { state: { resetCategory: true } });
   };
 
   const isSearching = searchQuery.trim() !== "";
+  const isLocalMode = isSearching || activeCategory !== "Todos";
 
-  // 1. Busca Local Lazy (apenas quando há termo na pesquisa rápida)
-  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
+  // 1. Busca Local (quando há busca ou categoria selecionada)
+  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isLocalMode);
 
-  // 2. Paginação Baseada em Cursores Firestore (navegação por fases)
+  // 2. Paginação Baseada em Cursores Firestore (apenas se for Todos os posts)
   const {
     posts: paginatedPosts = [],
     isLoading: isLoadingPaginated,
@@ -46,13 +58,13 @@ export default function ArchivePage() {
   } = usePosts({ category: activeCategory });
 
   // Seleciona o set de posts ativo
-  const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+  const posts = isLocalMode ? (allPosts as Post[]) : (paginatedPosts as Post[]);
 
-  // Filtra em memória se estiver pesquisando
+  // Filtra em memória
   const { filteredPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
-  const currentPosts = isSearching ? filteredPosts : paginatedPosts;
-  const isLoading = isSearching ? isLoadingAll : isLoadingPaginated;
+  const currentPosts = isLocalMode ? filteredPosts : paginatedPosts;
+  const isLoading = isLocalMode ? isLoadingAll : isLoadingPaginated;
 
   // Reseta o scroll ao mudar a categoria
   useEffect(() => {
@@ -61,12 +73,6 @@ export default function ArchivePage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <Helmet>
-        <title>Todos os Artigos | BeginsProject</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/archive" />
-        <meta name="description" content="Arquivo completo de artigos, reviews e notícias do portal BeginsProject. Tudo sobre a cultura retro em um só lugar." />
-        <meta name="keywords" content="BeginsProject, Lucas Begins, Arquivo de Posts, Reviews de Games Retro, Notícias Retro Gaming" />
-      </Helmet>
 
       {/* Voltar */}
       <button
@@ -125,7 +131,7 @@ export default function ArchivePage() {
           </div>
 
           {/* Botão Retro de Carregar Mais (Cursor Paginação) */}
-          {!isSearching && hasNextPage && (
+          {!isLocalMode && hasNextPage && (
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => fetchNextPage()}

@@ -46,7 +46,15 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Initialize and load Google Translate Element API
   useEffect(() => {
     // 1. Determine initial language
-    const savedLang = localStorage.getItem("begins_lang") || "pt";
+    let savedLang = localStorage.getItem("begins_lang") || "pt";
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get("lang");
+      if (urlLang && ["pt", "en", "es", "fr", "ja", "de"].includes(urlLang)) {
+        savedLang = urlLang;
+        localStorage.setItem("begins_lang", urlLang);
+      }
+    }
     setLanguageState(savedLang);
     setGoogTransCookie(savedLang);
 

@@ -120,16 +120,17 @@ export const PostService = {
   },
 
   /**
-   * Busca os posts mais recentes.
+   * Busca os posts mais recentes (filtrando rascunhos).
    */
   async getLatestPosts(limitNumber: number = 5): Promise<Post[]> {
     const q = query(
       collection(db, COLLECTIONS.POSTS),
       orderBy("createdAt", "desc"),
-      limit(limitNumber)
+      limit(limitNumber + 10)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+    const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+    return posts.filter(p => !p.isDraft).slice(0, limitNumber);
   },
 
   /**

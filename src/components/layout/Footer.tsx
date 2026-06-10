@@ -1,6 +1,6 @@
 import React from "react";
 import { Gamepad2, ChevronRight, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { XIcon, ThreadsIcon, InstagramIcon } from "../icons/SocialIcons";
 import { useThemeStore } from "../../store/useThemeStore";
 import { cn } from "../../lib/utils";

@@ -37,7 +37,7 @@ export function useAllPosts(enabled = true) {
  * Hook principal de busca de posts com paginação infinita (usado na Home).
  * Compatibilizado com a assinatura esperada pelo HomePage.tsx
  */
-export function usePosts({ category = 'Todos', search = '' }: { category?: string, search?: string } = {}) {
+export function usePosts({ category = 'Todos', search = '', enabled = true }: { category?: string, search?: string, enabled?: boolean } = {}) {
   const query = useInfiniteQuery({
     queryKey: postKeys.list({ category, search }),
     queryFn: ({ pageParam }) => 
@@ -49,6 +49,7 @@ export function usePosts({ category = 'Todos', search = '' }: { category?: strin
     initialPageParam: null as any,
     getNextPageParam: (lastPage: any) => lastPage.lastDoc || undefined,
     staleTime: 1000 * 60 * 5,
+    enabled: enabled && category === 'Todos',
   });
 
   // Achatando as páginas de posts em um único array para facilitar o uso na UI
@@ -159,14 +160,21 @@ export function useUserCommentsCount(userId: string) {
 /**
  * Hook para buscar um único post por ID ou Slug.
  */
-export function usePost(idOrSlug: string, isSlug: boolean = false) {
+export function usePost(
+  idOrSlug: string,
+  isSlug: boolean = false,
+  options?: { enabled?: boolean; initialData?: Post; initialDataUpdatedAt?: number }
+) {
   return useQuery({
     queryKey: isSlug ? ['postBySlug', idOrSlug] : postKeys.detail(idOrSlug),
     queryFn: () => isSlug ? PostService.getPostBySlug(idOrSlug) : PostService.getPostById(idOrSlug),
-    enabled: !!idOrSlug,
+    enabled: options?.enabled !== undefined ? options.enabled : !!idOrSlug,
     staleTime: 1000 * 60 * 10,
+    initialData: options?.initialData,
+    initialDataUpdatedAt: options?.initialDataUpdatedAt,
   });
 }
+
 
 /**
  * Hook para criar um novo post.
@@ -180,6 +188,7 @@ export function useCreatePostMutation() {
     mutationFn: (post: Partial<Post>) => PostService.createPost(post as Post, currentUser),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       showToast("Post publicado com sucesso! 🚀");
     },
     onError: () => {
@@ -199,6 +208,7 @@ export function useDeletePostMutation() {
     mutationFn: (id: string) => PostService.deletePost(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       showToast("Post deletado permanentemente. 🗑️");
     },
     onError: () => {
@@ -219,6 +229,7 @@ export function useUpdatePostMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
       showToast("Post atualizado com sucesso! ✨");
     },
     onError: () => {
@@ -377,7 +388,7 @@ export function useCommentMutation() {
       trackEvent('post_commented', { post_id: variables.postId, user_id: variables.comment.authorId });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      // Não invalida postKeys.all — um novo comentário não precisa recarregar toda a listagem
       
       let msg = "Comentário enviado! 💬";
       if (variables.comment.authorId) {
@@ -418,9 +429,10 @@ export function useIncrementViewMutation() {
     mutationFn: ({ postId }: { postId: string }) => 
       PostService.incrementPostViews(postId),
     onSuccess: (_, variables) => {
+      // Invalida apenas o post e as queries de slug — não há necessidade de
+      // invalidar postKeys.all (lista completa) só para atualizar o contador de views
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
     }
   });
 }
@@ -513,7 +525,7 @@ export function useReplyCommentMutation() {
     onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      // Não invalida postKeys.all — uma nova resposta não precisa recarregar toda a listagem
       let msg = "Resposta enviada! 💬";
       if (variables.reply.authorId) {
         const result = await userService.addXP(variables.reply.authorId, 10);

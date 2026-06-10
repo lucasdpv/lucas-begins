@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Heart, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { AnimatePresence, motion } from "framer-motion";
 import { calculateReadingTime, cn, coverBgStyle, formatNumber, slugify, splitTitle } from "../../../lib/utils";
 import { CategoryBadge, ScoreBadge } from "../../../components/ui/Badge";
@@ -122,8 +123,18 @@ export default function Carousel({ posts }: CarouselProps) {
             exit="exit"
             transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="absolute inset-0"
-            style={coverBgStyle(currentPost.imageUrl, currentPost.imagePosition)}
           >
+            {currentPost.imageUrl && (
+              <Image
+                src={currentPost.imageUrl}
+                alt={currentPost.title}
+                className="object-cover"
+                style={{ objectPosition: currentPost.imagePosition || "center" }}
+                fill
+                priority={currentIndex === 0}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 66vw"
+              />
+            )}
             {/* Stretched link */}
             <Link
               to={`/post/${currentPost.slug || slugify(currentPost.title)}`}
