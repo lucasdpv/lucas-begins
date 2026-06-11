@@ -22,6 +22,11 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Next.js Image no Markdown**: Atualização do renderizador de posts (`ArticleRenderer.tsx`) para usar `<Image>` do Next.js.
 - **Prevenção de CLS**: Integrado resizes responsivos, controle inteligente de carregamento (`lazy`) e preservação dinâmica de aspect-ratio pós-carregamento (`onLoad`), evitando saltos visuais nos artigos.
 
+### 🎨 Ajuste de Modal e Backgrounds Globais
+- **Modal de Confirmação Fullscreen**: Modificado o `DeleteModal.tsx` para renderizar via React Portal (`createPortal`) direto no `document.body` com `z-[150]`, cobrindo de ponta a ponta a Navbar fixa e o Footer.
+- **Preenchimento de Viewport e Overscroll**: Correção no `index.css` aplicando as cores de fundo do tema diretamente nos seletores `html` e `body` com transição de 0.5s, eliminando faixas brancas externas ao rolar ou esticar a página.
+- **Regras Mescladas do Storage**: Atualização no `storage.rules` combinando validação de administrador no Firestore para uploads de posts e restrição de escrita por UID em avatares.
+
 ---
 
 ## 🚀 [v4.8.0] - The Next.js Server-Side SEO & Layout Polish Update

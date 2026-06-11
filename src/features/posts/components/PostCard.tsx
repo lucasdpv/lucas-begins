@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
 import { Link } from "@/lib/router-compat";
-import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle } from "../../../lib/utils";
+import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle, isValidImageUrl } from "../../../lib/utils";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
@@ -162,7 +162,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             !post.imageUrl && !imgError && post.gradient && `bg-gradient-to-br ${post.gradient}`
           )}
         >
-          {post.imageUrl && !imgError && (
+          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
             <Image
               src={post.imageUrl}
               alt={post.title}
@@ -266,7 +266,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             "w-32 sm:w-40 md:w-48 h-full relative overflow-hidden border-r-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0 bg-gray-950"
           )}
         >
-          {post.imageUrl && !imgError && (
+          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
             <Image
               src={post.imageUrl}
               alt={post.title}
@@ -443,7 +443,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           "w-full aspect-video relative overflow-hidden bg-gray-900 z-10 pointer-events-none shrink-0"
         )}
       >
-        {post.imageUrl && !imgError && (
+        {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
           <Image
             src={post.imageUrl}
             alt={post.title}

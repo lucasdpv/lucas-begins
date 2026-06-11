@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import DOMPurify from "dompurify";
 import Image from "next/image";
-import { cn } from "../../../lib/utils";
+import { cn, isValidImageUrl } from "../../../lib/utils";
 import RetroSeparator from "../../../components/ui/RetroSeparator";
 
 interface ArticleImageProps {
@@ -110,6 +110,10 @@ function ArticleImage({
       };
     };
 
+    if (!isValidImageUrl(src) || error) {
+      return null;
+    }
+
     return (
       <Image
         src={src}
@@ -161,13 +165,25 @@ function ArticleImage({
       isDark ? "bg-gray-900" : "bg-snes-mid"
     );
   };
-
   const containerClass = getContainerClass();
 
-  const aspectStyle = aspect && aspect !== 'original' ? {
-    aspectRatio: aspect.replace(':', '/'),
-    objectFit: 'cover' as const
-  } : {};
+  const getContainerStyle = () => {
+    if (aspect && aspect !== 'original') {
+      return {
+        aspectRatio: aspect.replace(':', '/'),
+      };
+    }
+    if (naturalAspect !== null) {
+      return {
+        aspectRatio: String(naturalAspect),
+      };
+    }
+    // Fallback para evitar colapso de altura antes da imagem carregar
+    return {
+      minHeight: "300px",
+      width: "100%",
+    };
+  };
 
   const getFigureClass = () => {
     let figureWidth = "w-full my-14";
@@ -195,29 +211,24 @@ function ArticleImage({
         className={getFigureClass()}
         onClick={() => !error && setIsZoomed(true)}
       >
-        <div className={containerClass}>
-          {!error ? (
+        <div className={containerClass} style={getContainerStyle()}>
+          {!error && isValidImageUrl(src) ? (
             <Image
               src={src}
               alt={alt || "Imagem do artigo"}
-              width={1200}
-              height={800}
+              fill
+              sizes="(max-width: 768px) 100vw, 800px"
               loading="lazy"
               onLoad={(e) => {
-                const { naturalWidth, naturalHeight } = e.currentTarget;
-                if (naturalWidth && naturalHeight) {
-                  setNaturalAspect(naturalWidth / naturalHeight);
+                const img = e.currentTarget;
+                if (img.naturalWidth && img.naturalHeight) {
+                  setNaturalAspect(img.naturalWidth / img.naturalHeight);
                 }
               }}
               onError={() => setError(true)}
-              style={aspectStyle}
               className={cn(
                 "pixelated block mx-auto",
-                aspect === 'original' 
-                  ? (naturalAspect !== null && naturalAspect < 1.2)
-                    ? "w-auto max-w-full h-auto max-h-[450px] md:max-h-[550px] object-contain" 
-                    : "w-full h-auto max-h-[500px] md:max-h-[600px] object-contain"
-                  : "w-full h-full object-cover"
+                aspect === 'original' ? "object-contain" : "object-cover"
               )}
             />
           ) : (

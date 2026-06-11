@@ -38,7 +38,7 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
       )}
       
       {/* CRT Scanline Overlay (Website visual identity restored) */}
-      <div className="absolute inset-0 scanline-overlay opacity-30 pointer-events-none z-[6]" />
+      <div className="absolute -inset-px scanline-overlay opacity-30 pointer-events-none z-[6]" />
       
       {imgError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 bg-black/60">
@@ -51,10 +51,10 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
           </p>
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
+      <div className="absolute -inset-px bg-gradient-to-t from-gray-950 via-gray-900/60 to-transparent z-[5]" />
       
       {/* Absolute Border Overlay to mask any jagged corners or image bleeding */}
-      <div className="absolute inset-0 rounded-none border-2 border-black pointer-events-none z-[12]" />
+      <div className="absolute -inset-px rounded-none border-2 border-black pointer-events-none z-[12]" />
 
       <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 md:p-12 text-white w-full z-[10] pointer-events-none text-left">
         <div className="flex flex-row flex-wrap justify-start items-center gap-2.5 mb-3 md:mb-6 pointer-events-auto">

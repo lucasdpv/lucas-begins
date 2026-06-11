@@ -2,10 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Função auxiliar para verificar se o usuário é administrador
+    // Função auxiliar para verificar se o usuário é administrador (pelo email na coleção admins)
     function isAdmin() {
       return request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
     }
 
     // Regras para a coleção de posts
@@ -40,6 +40,24 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Coleção de categorias
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Coleção de admins
+    match /admins/{email} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Coleção de mensagens (Contato)
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

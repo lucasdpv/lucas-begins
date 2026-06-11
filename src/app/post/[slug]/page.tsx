@@ -17,10 +17,12 @@ export async function generateStaticParams() {
       const docs = data.documents || [];
       return docs.map((doc: any) => {
         const fields = doc.fields || {};
+        // Filtra rascunhos para não gerar estaticamente no build
+        if (fields.isDraft?.booleanValue) return null;
         return {
           slug: fields.slug?.stringValue || ""
         };
-      }).filter((p: any) => p.slug !== "");
+      }).filter((p: any) => p !== null && p.slug !== "");
     }
   } catch (e) {
     console.error("Erro ao gerar parâmetros estáticos preliminares no build:", e);
