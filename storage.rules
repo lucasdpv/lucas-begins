@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Permite leitura pública de todas as mídias do blog
+    match /posts/{allPaths=**} {
+      allow read: if true;
+      // Apenas usuários autenticados (editores/autores) podem enviar imagens
+      allow write: if request.auth != null;
+    }
+    
+    // Avatares de usuários
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

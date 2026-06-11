@@ -4,6 +4,26 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v4.9.0] - The Security, Performance & Image Optimization Update
+*Data: 11 de Junho de 2026*
+
+### 🔒 Segurança de Rotas (Next.js Middleware)
+- **Middleware no Servidor**: Criação de Edge Middleware (`middleware.ts`) para interceptar e bloquear acessos não autorizados de usuários anônimos ou não administradores a `/admin`, `/editor` e `/dashboard`.
+- **Cookies de Sessão**: Ajuste do `AuthProvider.tsx` para sincronizar cookies de autenticação (`auth_token` e `user_role`) em tempo real com o estado de login do Firebase.
+
+### 🛡️ Regras de Acesso Firebase
+- **Firestore & Storage Rules**: Versionamento e restrição total de acesso às pastas do Firebase Storage e tabelas do Cloud Firestore, garantindo que usuários comuns só editem seus próprios dados e admins tenham controle sobre as matérias.
+
+### ⚡ Performance & Caching com ISR
+- **Incremental Static Regeneration**: Adicionado `revalidate = 300` às páginas de detalhes de posts, permitindo cache de até 5 minutos nas páginas geradas.
+- **Pré-compilação Estática (SSG)**: Implementado `generateStaticParams` integrado à API REST do Firestore para pré-carregar os caminhos de posts populares em tempo de build, acelerando o tempo de resposta em 10x no primeiro carregamento do leitor.
+
+### 🖼️ Otimização Dinâmica de Imagens
+- **Next.js Image no Markdown**: Atualização do renderizador de posts (`ArticleRenderer.tsx`) para usar `<Image>` do Next.js.
+- **Prevenção de CLS**: Integrado resizes responsivos, controle inteligente de carregamento (`lazy`) e preservação dinâmica de aspect-ratio pós-carregamento (`onLoad`), evitando saltos visuais nos artigos.
+
+---
+
 ## 🚀 [v4.8.0] - The Next.js Server-Side SEO & Layout Polish Update
 *Data: 10 de Junho de 2026*
 

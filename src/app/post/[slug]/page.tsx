@@ -5,6 +5,29 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const revalidate = 300; // Revalida no máximo a cada 5 minutos
+
+export async function generateStaticParams() {
+  const projectId = "lucas-begins";
+  try {
+    const queryUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/posts?pageSize=10`;
+    const response = await fetch(queryUrl);
+    if (response.ok) {
+      const data = await response.json();
+      const docs = data.documents || [];
+      return docs.map((doc: any) => {
+        const fields = doc.fields || {};
+        return {
+          slug: fields.slug?.stringValue || ""
+        };
+      }).filter((p: any) => p.slug !== "");
+    }
+  } catch (e) {
+    console.error("Erro ao gerar parâmetros estáticos preliminares no build:", e);
+  }
+  return [];
+}
+
 function parseFirestoreValue(value: any): any {
   if (!value) return null;
   if ('stringValue' in value) return value.stringValue;

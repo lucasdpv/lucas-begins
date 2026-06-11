@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import DOMPurify from "dompurify";
+import Image from "next/image";
 import { cn } from "../../../lib/utils";
 import RetroSeparator from "../../../components/ui/RetroSeparator";
 
@@ -110,15 +111,17 @@ function ArticleImage({
     };
 
     return (
-      <img
+      <Image
         src={src}
-        alt={alt}
+        alt={alt || "Imagem com formato"}
         onError={() => setError(true)}
         style={getShapeStyle()}
         className={cn(
           "pixelated animate-in fade-in duration-1000",
           layout === 'full' && "mx-auto block"
         )}
+        width={600}
+        height={600}
       />
     );
   }
@@ -194,11 +197,12 @@ function ArticleImage({
       >
         <div className={containerClass}>
           {!error ? (
-            <img
+            <Image
               src={src}
-              alt={alt}
+              alt={alt || "Imagem do artigo"}
+              width={1200}
+              height={800}
               loading="lazy"
-              decoding="async"
               onLoad={(e) => {
                 const { naturalWidth, naturalHeight } = e.currentTarget;
                 if (naturalWidth && naturalHeight) {
@@ -267,9 +271,11 @@ function ArticleImage({
             className="relative max-w-full max-h-[80vh] flex items-center justify-center p-2 bg-black/40 border-4 border-purple-500 shadow-[0_0_40px_rgba(168,85,247,0.5)]"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image container
           >
-            <img 
+            <Image 
               src={src} 
-              alt={alt} 
+              alt={alt || "Imagem ampliada"} 
+              width={1600}
+              height={1200}
               className="pixelated max-w-full max-h-[75vh] object-contain block"
             />
           </div>
