@@ -105,6 +105,29 @@ const getCategoryCardStyles = (category: string) => {
   }
 };
 
+const getCategoryColor = (category: string) => {
+  const norm = category?.toLowerCase().trim() || "";
+  if (norm.includes("review")) {
+    return { bg: "bg-yellow-500", text: "text-black", bgLight: "bg-yellow-400" };
+  }
+  if (norm.includes("dossi")) {
+    return { bg: "bg-blue-500", text: "text-white", bgLight: "bg-blue-500" };
+  }
+  if (norm.includes("retro")) {
+    return { bg: "bg-orange-500", text: "text-black", bgLight: "bg-orange-500" };
+  }
+  if (norm.includes("nostalgia")) {
+    return { bg: "bg-pink-500", text: "text-white", bgLight: "bg-pink-500" };
+  }
+  if (norm.includes("pop") || norm.includes("cultura")) {
+    return { bg: "bg-emerald-500", text: "text-white", bgLight: "bg-emerald-500" };
+  }
+  if (norm.includes("rpg") || norm.includes("mmo")) {
+    return { bg: "bg-cyan-500", text: "text-white", bgLight: "bg-cyan-500" };
+  }
+  return { bg: "bg-purple-500", text: "text-white", bgLight: "bg-purple-500" }; // default / especial
+};
+
 export default function PostCard({ post, variant = "default", showCategory = true }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
@@ -255,9 +278,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         {/* 1. Category Color Strip (Leftmost visual indicator) */}
         <div className={cn(
           "w-3 shrink-0 border-r-2 border-black",
-          post.category.toLowerCase().includes("reviews") ? "bg-yellow-500" :
-          post.category.toLowerCase().includes("dossi") ? "bg-blue-500" :
-          post.category.toLowerCase().includes("retro") ? "bg-orange-500" : "bg-purple-500"
+          getCategoryColor(post.category).bg
         )} />
 
         {/* 2. Visor / Image Box (Rectangular aspect ratio) */}
@@ -297,9 +318,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             <div className="flex items-center gap-2 overflow-hidden min-w-0">
               <span className={cn(
                 "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] shrink-0",
-                post.category.toLowerCase().includes("reviews") ? "bg-yellow-400 text-black" :
-                post.category.toLowerCase().includes("dossi") ? "bg-blue-500 text-white" :
-                post.category.toLowerCase().includes("retro") ? "bg-orange-500 text-black" : "bg-purple-500 text-white"
+                getCategoryColor(post.category).bgLight,
+                getCategoryColor(post.category).text
               )}>
                 {post.category}
               </span>
@@ -319,10 +339,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               <div className="flex flex-col gap-1 mb-1.5 sm:mb-2 shrink-0">
                 <h3 className={cn(
                   "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-[11px] sm:text-xs md:text-sm",
-                  post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-                  post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-                  post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-                  "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                  cardStyles.textHover,
                   isDark ? "text-white" : "text-gray-900"
                 )}>
                   {mainTitle}
@@ -337,10 +354,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             ) : (
               <h3 className={cn(
                 "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1.5 sm:mb-2 shrink-0",
-                post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-                post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-                post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-                "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                cardStyles.textHover,
                 isDark ? "text-white" : "text-gray-900"
               )}>
                 {subtitle}
