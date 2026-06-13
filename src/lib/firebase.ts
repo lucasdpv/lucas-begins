@@ -13,7 +13,6 @@ const requiredEnvVars = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const missingVars = Object.entries(requiredEnvVars)
@@ -27,7 +26,12 @@ if (missingVars.length > 0) {
   throw new Error(`Missing Firebase environment variables: ${missingVars.join(", ")}`);
 }
 
-const firebaseConfig = requiredEnvVars as Record<string, string>;
+const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID;
+
+const firebaseConfig = {
+  ...requiredEnvVars,
+  ...(measurementId ? { measurementId } : {}),
+} as Record<string, string>;
 
 // Inicializa Firebase de forma segura (evita re-inicialização no HMR do Next.js)
 import { getApps, getApp } from "firebase/app";
