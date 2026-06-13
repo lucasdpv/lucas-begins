@@ -143,11 +143,57 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: canonicalUrl,
       images: post?.imageUrl ? [{ url: post.imageUrl }] : undefined,
     },
+    twitter: {
+      card: "summary_large_image",
+      title: finalTitle,
+      description: postDesc,
+      images: post?.imageUrl ? [post.imageUrl] : [],
+    },
   };
 }
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   const post = await fetchPostBySlugOrId(slug);
-  return <PostDetailPage initialPost={post} />;
+
+  const postJsonLd = post ? {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt || post.title,
+    "image": post.imageUrl ? [post.imageUrl] : [],
+    "datePublished": post.createdAt || new Date().toISOString(),
+    "dateModified": post.updatedAt || post.createdAt || new Date().toISOString(),
+    "author": [
+      {
+        "@type": "Person",
+        "name": post.author?.name || "Anônimo",
+        "jobTitle": post.author?.role || undefined
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "BeginsProject",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://lucasbegins.com.br/favicon.svg"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://lucasbegins.com.br/post/${slug}`
+    }
+  } : null;
+
+  return (
+    <>
+      {postJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(postJsonLd) }}
+        />
+      )}
+      <PostDetailPage initialPost={post} />
+    </>
+  );
 }
