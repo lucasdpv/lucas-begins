@@ -48,7 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (user) {
           // 1. Busca inicial para garantir o Role (admin/user) e dados básicos
           const initialProfile = await userService.getUserProfile(user);
-          setCurrentUser(initialProfile as User);
+          const userObj = initialProfile as User;
+          setCurrentUser(userObj);
+
+          // Grava os cookies para o Middleware do Next.js
+          const token = await user.getIdToken();
+          const role = userObj.role || 'user';
+          document.cookie = `auth_token=${token}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+          document.cookie = `user_role=${role}; path=/; max-age=31536000; SameSite=Lax; Secure`;
 
           // 2. Escuta em tempo real para mudanças (XP, Level, Favorites, ReadPosts)
           // Isso garante a sincronização entre múltiplos dispositivos e abas
@@ -57,7 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (snapshot.exists()) {
               const data = snapshot.data();
               setCurrentUser(prev => {
-                if (!prev) return initialProfile as User;
+                if (!prev) return userObj;
+                const updatedRole = data.role || prev.role || 'user';
+                document.cookie = `user_role=${updatedRole}; path=/; max-age=31536000; SameSite=Lax; Secure`;
                 // Faz o merge dos dados do Firestore com os dados do Auth (como o Role)
                 return {
                   ...prev,
@@ -79,6 +88,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             unsubscribeProfile();
             unsubscribeProfile = null;
           }
+          // Limpa os cookies do Middleware
+          document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
+          document.cookie = "user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
           setCurrentUser(null);
         }
       } catch (err) {

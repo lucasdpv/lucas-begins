@@ -74,53 +74,97 @@ export const storage = getStorage(app);
 ---
 
 ## 4. Regras de Segurança (Firestore Rules)
-
-No Console do Firebase, você deve configurar quem tem permissão para ler ou escrever dados. Na aba **Firestore > Rules**, publique as seguintes regras para dar suporte seguro à nova arquitetura de comentários e posts:
+No Console do Firebase, você deve configurar quem tem permissão para ler ou escrever dados. Na aba **Firestore Database > Regras**, publique as seguintes regras atualizadas para a nova arquitetura do blog:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 📄 Coleção de Posts (com Subcoleção de Comentários):
-    match /posts/{postId} {
-      allow read: if true;
-      allow create, delete: if request.auth != null && 
+    // Função auxiliar para verificar se o usuário é administrador (pelo email na coleção admins)
+    function isAdmin() {
+      return request.auth != null && 
         exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
-      allow update: if request.auth != null || 
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']));
+    }
 
-      // 💬 Subcoleção de Comentários e Respostas (Defuso de 1MB):
+    // Regras para a coleção de posts
+    match /posts/{postId} {
+      // Qualquer um pode ler posts públicos
+      allow read: if resource.data.isDraft == false;
+      // Apenas administradores e autores autenticados podem ver rascunhos
+      allow read: if request.auth != null && 
+        (isAdmin() || resource.data.author.id == request.auth.uid);
+      
+      // Criar e Deletar posts: Apenas administradores
+      allow create, delete: if isAdmin();
+      
+      // Atualizar posts: Administradores podem atualizar tudo.
+      // Leitores anônimos só podem incrementar o contador de "views".
+      allow update: if isAdmin() || 
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']));
+         
+      // Subcoleção de comentários dos posts
       match /comments/{commentId} {
+        // Leitura pública de comentários
         allow read: if true;
-        allow write: if request.auth != null;
+        // Criação: Usuário logado salvando a si mesmo como autor
+        allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+        // Atualização/Exclusão: Apenas o dono do comentário ou Admin
+        allow update, delete: if request.auth != null && 
+          (resource.data.authorId == request.auth.uid || isAdmin());
       }
     }
-
-    // 🏷️ Coleção de Categorias:
-    match /categories/{catId} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
-    }
-
-    // 👑 Coleção de Admins:
-    match /admins/{email} {
-      allow read: if request.auth != null;
-      allow write: if false;
-    }
-
-    // 👤 Coleção de Usuários:
+    
+    // Coleção de perfis de usuário
     match /users/{userId} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // 📩 Coleção de Mensagens (Inbox/Contato):
+    // Coleção de categorias
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Coleção de admins
+    match /admins/{email} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Coleção de mensagens (Contato)
     match /messages/{messageId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
+```
+
+---
+
+## 5. Regras do Firebase Storage (Storage Rules)
+Na aba **Storage > Regras** do console, publique o conjunto de regras abaixo para controlar com segurança o upload de imagens de capa de posts e fotos de perfil:
+
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Imagens de Posts (Capa e Conteúdo)
+    match /posts/{allPaths=**} {
+      allow read: if true;
+      // Permite escrita apenas se o usuário for um administrador registrado no Firestore
+      allow write: if request.auth != null && 
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email));
+    }
+
+    // Avatares de Usuários
+    // Restringe para que cada usuário possa enviar e modificar apenas a sua própria pasta de avatar (uid)
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId; 
     }
   }
 }

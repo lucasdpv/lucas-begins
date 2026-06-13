@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Send, Loader2, Gamepad2, User, Mail, MessageSquare, ChevronRight } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
@@ -82,11 +83,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-[85vh] py-12 px-4 relative overflow-hidden flex flex-col items-center">
-      <Helmet>
-        <title>Quest Log: Contato | BeginsProject</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/contact" />
-        <meta name="description" content="Fale com o Player 1 do BeginsProject." />
-      </Helmet>
 
       {/* Efeito de Scanlines */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.04] z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />

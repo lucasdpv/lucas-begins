@@ -124,3 +124,13 @@ export function splitTitle(title: string | null | undefined): { mainTitle: strin
   return { mainTitle: "", subtitle: title.trim() };
 }
 
+/**
+ * Verifica se a URL da imagem é válida para o componente next/image.
+ * Deve iniciar com "/", "http://" ou "https://".
+ */
+export function isValidImageUrl(url?: string | null): boolean {
+  if (!url) return false;
+  const trimmed = url.trim();
+  return trimmed.startsWith("/") || trimmed.startsWith("http://") || trimmed.startsWith("https://");
+}
+

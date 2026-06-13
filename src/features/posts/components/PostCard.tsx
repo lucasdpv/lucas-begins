@@ -1,13 +1,16 @@
 import React from "react";
+import Image from "next/image";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
-import { Link } from "react-router-dom";
-import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle } from "../../../lib/utils";
+import { Link } from "@/lib/router-compat";
+import { calculateReadingTime, formatDate, cn, formatNumber, slugify, splitTitle, isValidImageUrl } from "../../../lib/utils";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
 import { useImageFallback } from "../../../hooks/useImageFallback";
 import { useUIStore } from "../../../store/useUIStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { PostService } from "../../../services/postService";
 import { Post } from "../schemas";
 
 interface PostCardProps {
@@ -102,6 +105,29 @@ const getCategoryCardStyles = (category: string) => {
   }
 };
 
+const getCategoryColor = (category: string) => {
+  const norm = category?.toLowerCase().trim() || "";
+  if (norm.includes("review")) {
+    return { bg: "bg-yellow-500", text: "text-black", bgLight: "bg-yellow-400" };
+  }
+  if (norm.includes("dossi")) {
+    return { bg: "bg-blue-500", text: "text-white", bgLight: "bg-blue-500" };
+  }
+  if (norm.includes("retro")) {
+    return { bg: "bg-orange-500", text: "text-black", bgLight: "bg-orange-500" };
+  }
+  if (norm.includes("nostalgia")) {
+    return { bg: "bg-pink-500", text: "text-white", bgLight: "bg-pink-500" };
+  }
+  if (norm.includes("pop") || norm.includes("cultura")) {
+    return { bg: "bg-emerald-500", text: "text-white", bgLight: "bg-emerald-500" };
+  }
+  if (norm.includes("rpg") || norm.includes("mmo")) {
+    return { bg: "bg-cyan-500", text: "text-white", bgLight: "bg-cyan-500" };
+  }
+  return { bg: "bg-purple-500", text: "text-white", bgLight: "bg-purple-500" }; // default / especial
+};
+
 export default function PostCard({ post, variant = "default", showCategory = true }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
@@ -111,6 +137,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const favoriteMutation = useFavoriteMutation();
   const imgError = useImageFallback(post.imageUrl ?? undefined);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
+  const queryClient = useQueryClient();
 
   const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
   const commentCount = post.commentsCount || post.comments?.length || 0;
@@ -121,6 +148,14 @@ export default function PostCard({ post, variant = "default", showCategory = tru
   const targetPath = `/post/${targetSlug}`;
   const cardStyles = getCategoryCardStyles(post.category);
   const { mainTitle, subtitle } = splitTitle(post.title);
+
+  const handlePrefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["postBySlug", targetSlug],
+      queryFn: () => PostService.getPostBySlug(targetSlug),
+      staleTime: 1000 * 60 * 10,
+    });
+  };
 
   // Variant Compact: Design Card Contido
   if (isCompact) {
@@ -133,6 +168,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             : "bg-white border-black text-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:border-black",
           cardStyles.hoverShadowBrutalCompact
         )}
+        onMouseEnter={handlePrefetch}
+        onTouchStart={handlePrefetch}
       >
         <Link 
           to={targetPath} 
@@ -148,13 +185,14 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             !post.imageUrl && !imgError && post.gradient && `bg-gradient-to-br ${post.gradient}`
           )}
         >
-          {post.imageUrl && !imgError && (
-            <img
+          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
+            <Image
               src={post.imageUrl}
               alt={post.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               style={{ objectPosition: post.imagePosition || "center" }}
-              loading="lazy"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
             />
           )}
           <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-75 transition-opacity duration-300 z-10" />
@@ -228,6 +266,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             : "bg-white text-gray-900",
           cardStyles.hoverShadowBrutal
         )}
+        onMouseEnter={handlePrefetch}
+        onTouchStart={handlePrefetch}
       >
         <Link
           to={targetPath}
@@ -238,9 +278,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
         {/* 1. Category Color Strip (Leftmost visual indicator) */}
         <div className={cn(
           "w-3 shrink-0 border-r-2 border-black",
-          post.category.toLowerCase().includes("reviews") ? "bg-yellow-500" :
-          post.category.toLowerCase().includes("dossi") ? "bg-blue-500" :
-          post.category.toLowerCase().includes("retro") ? "bg-orange-500" : "bg-purple-500"
+          getCategoryColor(post.category).bg
         )} />
 
         {/* 2. Visor / Image Box (Rectangular aspect ratio) */}
@@ -249,13 +287,14 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             "w-32 sm:w-40 md:w-48 h-full relative overflow-hidden border-r-2 border-black flex items-center justify-center z-10 pointer-events-none shrink-0 bg-gray-950"
           )}
         >
-          {post.imageUrl && !imgError && (
-            <img
+          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
+            <Image
               src={post.imageUrl}
               alt={post.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               style={{ objectPosition: post.imagePosition || "center" }}
-              loading="lazy"
+              fill
+              sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
             />
           )}
 
@@ -279,9 +318,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             <div className="flex items-center gap-2 overflow-hidden min-w-0">
               <span className={cn(
                 "text-[8px] font-retro font-black uppercase tracking-widest px-1.5 py-0.5 border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] shrink-0",
-                post.category.toLowerCase().includes("reviews") ? "bg-yellow-400 text-black" :
-                post.category.toLowerCase().includes("dossi") ? "bg-blue-500 text-white" :
-                post.category.toLowerCase().includes("retro") ? "bg-orange-500 text-black" : "bg-purple-500 text-white"
+                getCategoryColor(post.category).bgLight,
+                getCategoryColor(post.category).text
               )}>
                 {post.category}
               </span>
@@ -301,10 +339,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               <div className="flex flex-col gap-1 mb-1.5 sm:mb-2 shrink-0">
                 <h3 className={cn(
                   "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-[11px] sm:text-xs md:text-sm",
-                  post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-                  post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-                  post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-                  "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                  cardStyles.textHover,
                   isDark ? "text-white" : "text-gray-900"
                 )}>
                   {mainTitle}
@@ -319,10 +354,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             ) : (
               <h3 className={cn(
                 "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-[15px] mb-1.5 sm:mb-2 shrink-0",
-                post.category.toLowerCase().includes("reviews") ? "group-hover:text-yellow-500 dark:group-hover:text-yellow-400" :
-                post.category.toLowerCase().includes("dossi") ? "group-hover:text-blue-500 dark:group-hover:text-blue-400" :
-                post.category.toLowerCase().includes("retro") ? "group-hover:text-orange-500 dark:group-hover:text-orange-400" :
-                "group-hover:text-purple-500 dark:group-hover:text-purple-400",
+                cardStyles.textHover,
                 isDark ? "text-white" : "text-gray-900"
               )}>
                 {subtitle}
@@ -410,6 +442,8 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           : "bg-white border-black text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:border-black",
         cardStyles.hoverShadowBrutal
       )}
+      onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
     >
       <Link
         to={targetPath}
@@ -423,13 +457,14 @@ export default function PostCard({ post, variant = "default", showCategory = tru
           "w-full aspect-video relative overflow-hidden bg-gray-900 z-10 pointer-events-none shrink-0"
         )}
       >
-        {post.imageUrl && !imgError && (
-          <img
+        {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
+          <Image
             src={post.imageUrl}
             alt={post.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             style={{ objectPosition: post.imagePosition || "center" }}
-            loading="lazy"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
           />
         )}
 

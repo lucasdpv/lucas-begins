@@ -1,6 +1,7 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { Shield } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useThemeStore } from "../store/useThemeStore";
 import { cn } from "../lib/utils";
@@ -14,11 +15,6 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div className={cn("max-w-4xl mx-auto space-y-12 animate-fade-in", isDark ? "text-gray-300" : "text-gray-700")}>
-      <Helmet>
-        <title>Política de Privacidade | BeginsProject</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/privacy" />
-        <meta name="description" content="Política de Privacidade do portal BeginsProject." />
-      </Helmet>
 
       <header className="text-center space-y-4">
         <div className="flex justify-center mb-6">

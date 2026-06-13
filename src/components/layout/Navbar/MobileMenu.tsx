@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Image from "next/image";
+import { Link } from "@/lib/router-compat";
 import { 
   Gamepad2, 
   Sun, 
@@ -80,18 +81,18 @@ export default function MobileMenu({
                   className={cn(
                     "p-2.5 rounded-xl border-2 transition-all overflow-hidden relative flex items-center justify-center w-11 h-11",
                     isDark 
-                      ? "border-purple-500/30 bg-gray-800 text-yellow-400" 
-                      : "border-purple-500/20 bg-purple-50 text-purple-600"
+                      ? "border-purple-500/30 bg-gray-800 text-purple-400" 
+                      : "border-purple-500/20 bg-purple-50 text-yellow-500"
                   )}
                 >
                   <motion.div
-                    key={isDark ? "sun-mobile" : "moon-mobile"}
+                    key={isDark ? "moon-mobile" : "sun-mobile"}
                     initial={{ y: 15, rotate: 90, opacity: 0 }}
                     animate={{ y: 0, rotate: 0, opacity: 1 }}
                     exit={{ y: -15, rotate: -90, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 350, damping: 15 }}
                   >
-                    {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                    {isDark ? <Moon size={20} /> : <Sun size={20} />}
                   </motion.div>
                 </button>
                 <button
@@ -106,14 +107,13 @@ export default function MobileMenu({
             {currentUser && (
               <div className="flex flex-col gap-1 py-2 px-1 border-b border-white/10">
                 <div className="flex items-center gap-4 mb-2">
-                  <img 
+                  <Image 
                     src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))} 
                     alt="" 
                     className="w-12 h-12 rounded-full border border-purple-500/50 object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = getPixelAvatar(currentUser.id);
-                    }}
+                    width={48}
+                    height={48}
+                    unoptimized={true}
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-retro font-bold uppercase text-sm text-purple-400 truncate">{profile?.name || currentUser.name}</h4>

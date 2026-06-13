@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Terminal, Home, RotateCcw, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import { useThemeStore } from "../store/useThemeStore";
 import { cn } from "../lib/utils";

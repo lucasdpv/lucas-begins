@@ -12,7 +12,7 @@ export const errorService = {
   handle: (error: any, context = "", toastFn: ((message: string, type: 'error' | 'success') => void) | null = null): string | null => {
     // Em desenvolvimento, podemos manter um log controlado, 
     // mas em produção isso poderia ser enviado para um serviço como Sentry.
-    const isDev = import.meta.env.DEV;
+    const isDev = process.env.NODE_ENV !== "production";
     
     let userMessage = `Ocorreu um erro inesperado ${context}.`;
     const errorCode = error?.code || error?.message;

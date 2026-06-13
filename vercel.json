@@ -1,23 +1,9 @@
 {
+  "framework": "nextjs",
   "rewrites": [
-    {
-      "source": "/post/:slug",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(whatsapp|facebook|twitter|linkedin|slack|discord|telegram).*"
-        }
-      ],
-      "destination": "/api/og?slug=:slug"
-    },
     {
       "source": "/firebase-storage/(.*)",
       "destination": "https://firebasestorage.googleapis.com/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

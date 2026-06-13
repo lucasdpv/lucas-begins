@@ -1,7 +1,8 @@
+"use client";
+
 import React, { useEffect, useCallback, useRef, useState } from "react";
 import { Gamepad2, ChevronRight, ChevronLeft, Coffee, FolderOpen } from "lucide-react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Link, useNavigate, useLocation } from "@/lib/router-compat";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
@@ -19,11 +20,22 @@ import {
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { cn, slugify, formatNumber, formatDate, calculateReadingTime, splitTitle } from "../lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { PostService } from "../services/postService";
 import { Post } from "../features/posts/schemas";
 
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
+  const queryClient = useQueryClient();
+
+  const handlePrefetch = useCallback((slug: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ["postBySlug", slug],
+      queryFn: () => PostService.getPostBySlug(slug),
+      staleTime: 1000 * 60 * 10,
+    });
+  }, [queryClient]);
 
   const playEjectSound = () => {
     try {
@@ -112,6 +124,8 @@ export default function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isDefaultView = activeCategory === "Todos" && searchQuery === "";
+
   // Reseta categoria ao voltar do arquivo (evita glitch de transição)
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
@@ -125,33 +139,34 @@ export default function HomePage() {
   }, [navigate]);
 
   // 1. Destaques (Carrossel) - Puxa no máximo 5 posts do Firestore
-  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts();
+  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
 
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
-  const { data: mostViewedPosts = [] } = useMostViewedPosts(5);
+  const { data: mostViewedPosts = [] } = useMostViewedPosts(5, isDefaultView);
 
   // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5);
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5, isDefaultView);
 
   // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
-  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3);
+  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3, isDefaultView);
 
   // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
-  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3);
+  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3, isDefaultView);
 
   // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
-  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15);
+  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
 
-  // 5. Busca Otimizada (Híbrida) - Só faz o download completo se houver texto na busca
+  // 5. Busca Otimizada (Híbrida) - Faz o download se houver busca ou se alguma categoria estiver selecionada
   const isSearching = searchQuery.trim() !== "";
-  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isSearching);
+  const isLocalMode = isSearching || activeCategory !== "Todos";
+  const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isLocalMode);
 
   // 6. Grid Principal Otimizado - Se não estiver buscando, usa a paginação nativa (leve!)
   const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({ 
     category: activeCategory 
   });
 
-  const posts = isSearching ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+  const posts = isLocalMode ? (allPosts as Post[]) : (paginatedPosts as Post[]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -163,7 +178,7 @@ export default function HomePage() {
     searchQuery
   );
 
-  const isDefaultView = activeCategory === "Todos" && searchQuery === "";
+  // isDefaultView definition moved up to prevent ReferenceError
 
   // Definição das listas diretas sem deduplicação
   const carouselPosts = featuredPosts.slice(0, 5);
@@ -192,51 +207,18 @@ export default function HomePage() {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateScrollState]);
 
-  const gridPosts = isSearching 
+  const gridPosts = isLocalMode 
     ? filteredPosts.slice(0, 4) 
-    : isDefaultView 
-    ? latestPosts.slice(0, 4) 
-    : paginatedPosts.slice(0, 4);
+    : latestPosts.slice(0, 4);
 
   const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
 
-  const isLoadingPosts = isSearching ? isLoadingAll : isLoadingFeatured;
+  const isLoadingPosts = isLocalMode
+    ? isLoadingAll
+    : isLoadingLatest;
 
   return (
     <div className="flex flex-col gap-8 md:gap-12 relative">
-      {/* ── SEO ─────────────────────────────────────────── */}
-      <Helmet>
-        <title>BeginsProject | Portal de Games, Reviews e Cultura Pop</title>
-        <link rel="canonical" href="https://lucasbegins.com.br/" />
-        <meta
-          name="description"
-          content="Bem-vindo ao BeginsProject. Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive."
-        />
-        <meta name="keywords" content="BeginsProject, Lucas Begins, Projeto Begins, Lucas Begins Blog, Revista Retro, Games Retro, Cultura Pop, Reviews de Jogos" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://lucasbegins.com.br/" />
-        <meta property="og:title" content="BeginsProject | Portal de Games e Cultura Pop" />
-        <meta property="og:description" content="Reviews, nostalgia e cultura gamer. Onde a era de ouro dos videogames vive." />
-        <meta property="og:image" content="https://lucasbegins.com.br/og-image.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="BeginsProject | Portal de Games e Cultura Pop" />
-        <meta name="twitter:description" content="Reviews, nostalgia e cultura gamer brasileira." />
-        <meta name="twitter:image" content="https://lucasbegins.com.br/og-image.png" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "BeginsProject",
-            url: "https://lucasbegins.com.br/",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: "https://lucasbegins.com.br/?q={search_term_string}",
-              "query-input": "required name=search_term_string",
-            },
-          })}
-        </script>
-      </Helmet>
-
       {/* ── 1. HERO BENTO GRID: Carousel + Mais Acessados ─────────── */}
       {isLoadingFeatured && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
@@ -322,7 +304,10 @@ export default function HomePage() {
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || slugify(post.title)}`}
-                      onMouseEnter={() => setHoveredMaisLidosIndex(idx)}
+                      onMouseEnter={() => {
+                        setHoveredMaisLidosIndex(idx);
+                        handlePrefetch(post.slug || slugify(post.title));
+                      }}
                       className={cn(
                         "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
                         isDark ? "border-white/5" : "border-black/5"
@@ -402,6 +387,7 @@ export default function HomePage() {
                     <Link
                       key={post.id}
                       to={`/post/${targetSlug}`}
+                      onMouseEnter={() => handlePrefetch(targetSlug)}
                       className={cn(
                         "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
                         isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
@@ -660,6 +646,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredRetrocafeIndex(i);
                               playClickSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             <Link
@@ -894,6 +881,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredDossieIndex(i);
                               playClickSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             {/* Salient folder tab */}
@@ -1084,6 +1072,7 @@ export default function HomePage() {
                             onMouseEnter={() => {
                               setHoveredReviewsIndex(i);
                               playEjectSound();
+                              handlePrefetch(targetSlug);
                             }}
                           >
                             <Link

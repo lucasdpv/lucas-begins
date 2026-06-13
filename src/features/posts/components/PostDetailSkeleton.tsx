@@ -1,13 +1,9 @@
 import React from "react";
 import { cn } from "../../../lib/utils";
 
-interface PostDetailSkeletonProps {
-  isDark?: boolean;
-}
-
-export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) {
-  const skeletonColor = isDark ? "bg-gray-800" : "bg-gray-200";
-  const accentColor = isDark ? "bg-gray-700" : "bg-gray-300";
+export default function PostDetailSkeleton() {
+  const skeletonColor = "bg-gray-200 dark:bg-gray-800";
+  const accentColor = "bg-gray-300 dark:bg-gray-700";
 
   return (
     <div
@@ -41,10 +37,7 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
       <div className="space-y-12 mt-12">
 
         {/* — Barra Autor + Ações — */}
-        <div className={cn(
-          "flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b-4",
-          isDark ? "border-gray-800" : "border-gray-200"
-        )}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b-4 border-gray-200 dark:border-gray-800">
           {/* Autor */}
           <div className="flex items-center gap-4">
             <div className={cn("w-14 h-14 rounded-none border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", skeletonColor)} />
@@ -63,16 +56,10 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
         </div>
 
         {/* — SYNOPSIS box com label flutuante — */}
-        <div className={cn(
-          "relative p-8 pt-12 rounded-none border-4",
-          isDark ? "bg-gray-800/40 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]" : "bg-white border-purple-400 shadow-[4px_4px_0_rgba(168,85,247,0.4)]"
-        )}>
+        <div className="relative p-8 pt-12 rounded-none border-4 bg-white dark:bg-gray-800/40 border-purple-400 dark:border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.4)]">
           {/* Label flutuante */}
           <div className="absolute -top-6 left-8">
-            <div className={cn(
-              "w-32 h-9 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)]",
-              isDark ? "bg-purple-700" : "bg-purple-500"
-            )} />
+            <div className="w-32 h-9 border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] bg-purple-500 dark:bg-purple-700" />
           </div>
           {/* Linhas do excerpt */}
           <div className="space-y-3">
@@ -104,28 +91,25 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
 
         {/* — Separador ● ● ● — */}
         <div className="flex items-center gap-4 py-2">
-          <div className={cn("flex-1 border-t-4 border-dashed", isDark ? "border-gray-700" : "border-gray-300")} />
-          <div className={cn("w-12 h-5 rounded border-2", skeletonColor, isDark ? "border-gray-700" : "border-gray-300")} />
-          <div className={cn("flex-1 border-t-4 border-dashed", isDark ? "border-gray-700" : "border-gray-300")} />
+          <div className="flex-1 border-t-4 border-dashed border-gray-300 dark:border-gray-700" />
+          <div className={cn("w-12 h-5 rounded border-2 border-gray-300 dark:border-gray-700", skeletonColor)} />
+          <div className="flex-1 border-t-4 border-dashed border-gray-300 dark:border-gray-700" />
         </div>
 
         {/* — Próximas Fases — */}
         <div>
           {/* Título da seção */}
           <div className="flex items-center gap-3 mb-6 md:mb-8">
-            <div className={cn("w-6 h-6 md:w-7 md:h-7 rounded", isDark ? "bg-yellow-600/40" : "bg-yellow-400")} />
+            <div className="w-6 h-6 md:w-7 md:h-7 rounded bg-yellow-400 dark:bg-yellow-600/40" />
             <div className={cn("w-44 h-6 md:h-8 rounded", accentColor)} />
-            <div className={cn("w-24 h-5 rounded border", skeletonColor, isDark ? "border-purple-700" : "border-purple-300")} />
+            <div className={cn("w-24 h-5 rounded border border-purple-300 dark:border-purple-700", skeletonColor)} />
           </div>
           {/* Grid de 3 cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div 
                 key={i}
-                className={cn(
-                  "flex flex-col h-56 rounded-none border-2 border-black overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)]",
-                  isDark ? "bg-[#1f1d35]" : "bg-white"
-                )}
+                className="flex flex-col h-56 rounded-none border-2 border-black overflow-hidden shadow-[6px_6px_0px_rgba(0,0,0,1)] bg-white dark:bg-[#1f1d35]"
               >
                 <div className={cn("w-full aspect-video shrink-0 relative overflow-hidden bg-gray-900", skeletonColor)} />
                 <div className="p-4 flex flex-col flex-grow gap-2">
@@ -138,20 +122,17 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
         </div>
 
         {/* — Seção Comunidade (Comentários) — */}
-        <div className={cn("pt-12 border-t-4", isDark ? "border-gray-800" : "border-gray-300")}>
+        <div className="pt-12 border-t-4 border-gray-300 dark:border-gray-800">
           {/* Título */}
           <div className="flex items-center gap-3 mb-10">
-            <div className={cn("w-8 h-8 rounded", isDark ? "bg-purple-700/40" : "bg-purple-200")} />
+            <div className="w-8 h-8 rounded bg-purple-200 dark:bg-purple-700/40" />
             <div className={cn("w-48 h-8 rounded", accentColor)} />
           </div>
           {/* Formulário de comentário */}
-          <div className={cn(
-            "mb-12 p-8 border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)]",
-            isDark ? "bg-gray-800" : "bg-gray-100"
-          )}>
-            <div className={cn("w-full h-28 mb-5 rounded-none border-2", isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-300")} />
+          <div className="mb-12 p-8 border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] bg-gray-100 dark:bg-gray-800">
+            <div className="w-full h-28 mb-5 rounded-none border-2 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700" />
             <div className="flex justify-end">
-              <div className={cn("w-28 h-12 border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]", isDark ? "bg-purple-700/40" : "bg-purple-400/40")} />
+              <div className="w-28 h-12 border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] bg-purple-400/40 dark:bg-purple-700/40" />
             </div>
           </div>
           {/* Lista de comentários */}
@@ -159,10 +140,7 @@ export default function PostDetailSkeleton({ isDark }: PostDetailSkeletonProps) 
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className={cn(
-                  "p-6 border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)]",
-                  isDark ? "bg-gray-800" : "bg-gray-100"
-                )}
+                className="p-6 border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] bg-gray-100 dark:bg-gray-800"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className={cn("w-24 h-4 rounded", accentColor)} />

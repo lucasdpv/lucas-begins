@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Image from "next/image";
+import { Link } from "@/lib/router-compat";
 import { ShieldCheck, LogOut } from "lucide-react";
 import { cn, getPixelAvatar } from "../../../lib/utils";
 
@@ -59,14 +60,13 @@ export default function NavUserMenu({
         title="Meu QG"
       >
         <div className="relative shrink-0">
-          <img
+          <Image
             src={profile?.avatar || (currentUser.avatar ? currentUser.avatar : getPixelAvatar(currentUser.id))}
             alt=""
             className="w-8 h-8 rounded-[10px] border border-purple-500/30 object-cover transition-all group-hover:border-purple-500"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = getPixelAvatar(currentUser.id);
-            }}
+            width={32}
+            height={32}
+            unoptimized={true}
           />
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
         </div>

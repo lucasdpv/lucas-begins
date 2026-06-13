@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { X, Gamepad2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useUIStore } from "../../../store/useUIStore";

@@ -14,7 +14,13 @@ export function usePostsFilter(posts: Post[], category = "Todos", search = "") {
   const filteredPosts = useMemo(() => {
     const basePosts = posts.filter((post) => {
       if (post.isDraft) return false;
-      return category === "Todos" || post.category === category;
+      if (category === "Todos") return true;
+      const normalize = (cat: string) => 
+        cat.toLowerCase()
+           .normalize("NFD")
+           .replace(/[\u0300-\u036f]/g, "")
+           .replace(/s$/, "");
+      return normalize(post.category) === normalize(category);
     });
 
     const trimmedSearch = search.trim();
@@ -29,7 +35,8 @@ export function usePostsFilter(posts: Post[], category = "Todos", search = "") {
         { name: "category", weight: 0.2 },
         { name: "tags", weight: 0.2 }
       ],
-      threshold: 0.35,
+      threshold: 0.2,
+      minMatchCharLength: 2,
       ignoreLocation: true
     });
 

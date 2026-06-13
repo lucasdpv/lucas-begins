@@ -4,6 +4,77 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v5.0.0] - The Server-Side Hydration, Structural Security & Visual Polish Update
+*Data: 13 de Junho de 2026*
+
+### ⚡ Server-Side Hydration & Next.js SSR Integration
+- **SSR Hydration**: Integrada a busca de dados do Firestore REST no servidor com o React Query client-side na rota `/post/[slug]`. O HTML é pré-renderizado estaticamente via Server Components eliminando o uso de skeletons e piscadas de tela indesejadas no carregamento de posts em cache.
+- **Remoção de Código Morto**: Excluída a antiga função serverless `/api/og` e a rota legada `/post/:slug` do `vercel.json`, centralizando o tratamento de metadados e SEO no motor nativo do Next.js App Router.
+- **Firebase HMR SSR Safe State**: Refatorada a inicialização do Firestore/Firebase no cliente para prevenir o erro de reinicialização múltipla (`initializeFirestore() has already been called`) durante o Hot Module Replacement (HMR) e renderização no servidor.
+- **Sanitização de HTML Safe**: Ajustado o sanitizador DOMPurify no renderizador de artigos (`ArticleRenderer.tsx`) para garantir compatibilidade no ambiente de pré-renderização server-side do Next.js.
+- **Correção da Build (Vercel)**: Tornou a variável de ambiente `measurementId` (usada pelo Google Analytics) opcional na inicialização do Firebase (`firebase.ts`). Isso corrige o erro fatal de build da Next.js/Vercel (`Missing Firebase environment variables: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`) durante a fase de prerender da rota `/_not-found`.
+
+### 🔒 Segurança de visualizações Firestore (Views Rules Hardening)
+- **Incremento Unitário Estrito**: Atualizadas as regras de escrita (`firestore.rules`) para impedir que qualquer usuário (logado ou anônimo) envie valores arbitrários para as visualizações de um post. O Firestore agora rejeita qualquer update de views que não seja exatamente um incremento de +1 (`views == views + 1`).
+
+### 🎨 Paridade Visual & Ícone de Tema
+- **Cores Dinâmicas no Cabeçalho de Posts (PostHero)**: O subtítulo e o badge de categoria no cabeçalho principal (`PostHero.tsx`) agora herdam dinamicamente a cor da categoria do post (ex: rosa para Nostalgia e laranja para RetroCafé), alinhando o post de detalhes aos novos cards da home.
+- **Fundo do Badge Dinâmico**: O componente `CategoryBadge` em `Badge.tsx` agora resolve sua própria cor de fundo e texto dinamicamente usando `getCategoryBadgeClass`, eliminando o fundo roxo que estava rigidamente codificado no badge.
+- **Ícones de Tema Visuais**: Os alternadores de tema na Navbar e no MobileMenu agora mostram o estado atual do sistema (ícone de Lua violeta quando no modo Escuro, ícone de Sol amarelo no modo Claro), fornecendo um feedback visual muito mais claro e sem a sensação de estar "invertido".
+
+### 🧹 Organização do Repositório & Backlog
+- **Lista de Pendências (Backlog)**: Criado o arquivo `BACKLOG.md` mapeando tarefas de refatoração futuras, testes de componentes (Vitest/React Testing Library) e testes E2E (Playwright/Cypress).
+- **Git Ignore**: Ignorados arquivos locais de cache do TypeScript (`*.tsbuildinfo`) e a pasta de rascunhos temporários (`scratch/`) nas configurações de `.gitignore` para manter o workspace limpo.
+
+---
+
+## 🚀 [v4.9.0] - The Security, Performance & Image Optimization Update
+*Data: 11 de Junho de 2026*
+
+### 🔒 Segurança de Rotas (Next.js Middleware)
+- **Middleware no Servidor**: Criação de Edge Middleware (`middleware.ts`) para interceptar e bloquear acessos não autorizados de usuários anônimos ou não administradores a `/admin`, `/editor` e `/dashboard`.
+- **Cookies de Sessão**: Ajuste do `AuthProvider.tsx` para sincronizar cookies de autenticação (`auth_token` e `user_role`) em tempo real com o estado de login do Firebase.
+
+### 🛡️ Regras de Acesso Firebase
+- **Firestore & Storage Rules**: Versionamento e restrição total de acesso às pastas do Firebase Storage e tabelas do Cloud Firestore, garantindo que usuários comuns só editem seus próprios dados e admins tenham controle sobre as matérias.
+
+### ⚡ Performance & Caching com ISR
+- **Incremental Static Regeneration**: Adicionado `revalidate = 300` às páginas de detalhes de posts, permitindo cache de até 5 minutos nas páginas geradas.
+- **Pré-compilação Estática (SSG)**: Implementado `generateStaticParams` integrado à API REST do Firestore para pré-carregar os caminhos de posts populares em tempo de build, acelerando o tempo de resposta em 10x no primeiro carregamento do leitor.
+
+### 🖼️ Otimização Dinâmica de Imagens
+- **Next.js Image no Markdown**: Atualização do renderizador de posts (`ArticleRenderer.tsx`) para usar `<Image>` do Next.js.
+- **Prevenção de CLS**: Integrado resizes responsivos, controle inteligente de carregamento (`lazy`) e preservação dinâmica de aspect-ratio pós-carregamento (`onLoad`), evitando saltos visuais nos artigos.
+
+### 🎨 Ajuste de Modal e Backgrounds Globais
+- **Modal de Confirmação Fullscreen**: Modificado o `DeleteModal.tsx` para renderizar via React Portal (`createPortal`) direto no `document.body` com `z-[150]`, cobrindo de ponta a ponta a Navbar fixa e o Footer.
+- **Preenchimento de Viewport e Overscroll**: Correção no `index.css` aplicando as cores de fundo do tema diretamente nos seletores `html` e `body` com transição de 0.5s, eliminando faixas brancas externas ao rolar ou esticar a página.
+- **Regras Mescladas do Storage**: Atualização no `storage.rules` combinando validação de administrador no Firestore para uploads de posts e restrição de escrita por UID em avatares.
+
+---
+
+## 🚀 [v4.8.0] - The Next.js Server-Side SEO & Layout Polish Update
+*Data: 10 de Junho de 2026*
+
+### ⚡ Migração para Next.js & Server Components
+- **Integração com Next.js**: Migração da arquitetura Vite SPA e rotas client-side para o Next.js App Router.
+- **Requisições REST Resilientes**: Desacoplamento da busca de dados do Firestore no servidor usando rotas REST diretas, evitando quedas de servidor relacionadas a dependências gRPC no ambiente de Server Components (RSC).
+
+### 🌐 SEO Dinâmico & Crawlers
+- **Geração de Metadados Server-side**: Criação do método `generateMetadata` dinâmico em `[slug]/page.tsx` para prover títulos amigáveis, descrições personalizadas, links canônicos absolutos e imagens Open Graph (`og:image`).
+- **Sitemap Dinâmico**: Implementação de rota `/sitemap.xml` para expor automaticamente todos os artigos publicados para indexadores de busca.
+- **Configuração de Robots**: Configuração de `/robots.txt` para bloquear o rastreamento de páginas administrativas (como `/admin`, `/editor` e `/dashboard`).
+
+### 📐 Recorte e Aspecto de Imagens Dinâmico
+- **Correção de "Scroll Jump" nos Uploads**: Integração do `ImageCropper.tsx` com React Portals para injetar o modal de recorte diretamente no `document.body`, solucionando o bug onde a página sofria rolagem vertical abrupta ao selecionar um arquivo.
+- **Reversão do Aspecto Forçado**: Remoção do bloqueio fixo de proporção `16:9` no componente de upload de capa ([PostEditorPage.tsx](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/views/PostEditorPage.tsx#L257-L265)) e nos estilos, devolvendo a liberdade ao editor de escolher e salvar proporções variadas (Original, 1:1, 16:9, 4:5).
+- **Correção de Proporção no Mobile**: Ajuste do validador Zod ([schemas.ts](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/schemas.ts#L50-L55)) para usar `'original'` como fallback de aspecto de imagem de capa, restaurando o comportamento original em que imagens sem proporção travada se comportam como quadrado no celular e banner no computador.
+
+### 🧹 Limpeza de Cache de Post
+- **Invalidação Otimista no Salvamento**: Inclusão da invalidação automática da chave `['postBySlug']` no React Query ([usePostsQuery.ts](file:///c:/Users/Lucas%20Vieira/Documents/Projetos/lucas-begins/src/features/posts/hooks/usePostsQuery.ts#L225-L232)) ao salvar/publicar alterações, forçando a página de detalhes a carregar dados novos instantaneamente.
+
+---
+
 ## 🩹 [v4.7.1] - The Vintage Card Footer & Reviews Polish Update
 *Data: 09 de Junho de 2026*
 

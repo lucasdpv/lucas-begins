@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import DOMPurify from "dompurify";
-import { cn } from "../../../lib/utils";
+import { cn, isValidImageUrl } from "../../../lib/utils";
 import RetroSeparator from "../../../components/ui/RetroSeparator";
 
 interface ArticleImageProps {
@@ -108,10 +109,14 @@ function ArticleImage({
       };
     };
 
+    if (!isValidImageUrl(src) || error) {
+      return null;
+    }
+
     return (
       <img
         src={src}
-        alt={alt}
+        alt={alt || "Imagem com formato"}
         onError={() => setError(true)}
         style={getShapeStyle()}
         className={cn(
@@ -157,7 +162,6 @@ function ArticleImage({
       isDark ? "bg-gray-900" : "bg-snes-mid"
     );
   };
-
   const containerClass = getContainerClass();
 
   const aspectStyle = aspect && aspect !== 'original' ? {
@@ -192,10 +196,10 @@ function ArticleImage({
         onClick={() => !error && setIsZoomed(true)}
       >
         <div className={containerClass}>
-          {!error ? (
+          {!error && isValidImageUrl(src) ? (
             <img
               src={src}
-              alt={alt}
+              alt={alt || "Imagem do artigo"}
               loading="lazy"
               decoding="async"
               onLoad={(e) => {
@@ -242,7 +246,7 @@ function ArticleImage({
       </figure>
 
       {/* Retro CRT Zoom Lightbox */}
-      {isZoomed && (
+      {isZoomed && typeof document !== "undefined" && createPortal(
         <div 
           onClick={() => setIsZoomed(false)}
           className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md cursor-zoom-out p-4 animate-in fade-in duration-300"
@@ -268,7 +272,7 @@ function ArticleImage({
           >
             <img 
               src={src} 
-              alt={alt} 
+              alt={alt || "Imagem ampliada"} 
               className="pixelated max-w-full max-h-[75vh] object-contain block"
             />
           </div>
@@ -280,7 +284,8 @@ function ArticleImage({
               </span>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
@@ -381,10 +386,21 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       processed = processed.replace(id, linkHtml);
     });
     
-    return DOMPurify.sanitize(processed, { 
-      ALLOWED_TAGS: ['strong', 'em', 'a'], 
-      ALLOWED_ATTR: ['class', 'href', 'target', 'rel']
-    });
+    // Helper de higienização seguro para SSR e Client-Side
+    const sanitizeHtml = (html: string) => {
+      if (typeof window !== "undefined") {
+        const purify = (DOMPurify as any).default || DOMPurify;
+        if (purify && typeof purify.sanitize === "function") {
+          return purify.sanitize(html, {
+            ALLOWED_TAGS: ['strong', 'em', 'a'], 
+            ALLOWED_ATTR: ['class', 'href', 'target', 'rel']
+          });
+        }
+      }
+      return html;
+    };
+
+    return sanitizeHtml(processed);
   };
 
   // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo

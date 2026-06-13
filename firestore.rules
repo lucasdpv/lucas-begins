@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Função auxiliar para verificar se o usuário é administrador (pelo email na coleção admins)
+    function isAdmin() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // Regras para a coleção de posts
+    match /posts/{postId} {
+      // Qualquer um pode ler posts públicos
+      allow read: if resource.data.isDraft == false;
+      // Apenas administradores e autores autenticados podem ver rascunhos
+      allow read: if request.auth != null && 
+        (isAdmin() || resource.data.author.id == request.auth.uid);
+      
+      // Criar e Deletar posts: Apenas administradores
+      allow create, delete: if isAdmin();
+      
+      // Atualizar posts: Administradores podem atualizar tudo.
+      // Leitores anônimos só podem incrementar o contador de "views".
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) &&
+        request.resource.data.views == resource.data.views + 1
+      );
+        
+      // Subcoleção de comentários dos posts
+      match /comments/{commentId} {
+        // Leitura pública de comentários
+        allow read: if true;
+        // Criação: Usuário logado salvando a si mesmo como autor
+        allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+        // Atualização/Exclusão: Apenas o dono do comentário ou Admin
+        allow update, delete: if request.auth != null && 
+          (resource.data.authorId == request.auth.uid || isAdmin());
+      }
+    }
+    
+    // Coleção de perfis de usuário
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Coleção de categorias
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Coleção de admins
+    match /admins/{email} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Coleção de mensagens (Contato)
+    match /messages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

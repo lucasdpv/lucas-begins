@@ -1,8 +1,10 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@/lib/router-compat";
 import { ArrowLeft } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import { cn, slugify } from "../lib/utils";
+import { useTranslation } from "../context/TranslationContext";
 
 // Stores & Hooks
 import { useAuth } from "../context/AuthProvider";
@@ -40,9 +42,10 @@ import { USER_ROLES } from "../constants";
 
 interface PostDetailPageProps {
   previewPost?: Post;
+  initialPost?: Post;
 }
 
-export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
+export default function PostDetailPage({ previewPost, initialPost }: PostDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { setIsLoginModalOpen } = useUIStore();
@@ -63,12 +66,34 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const deleteReplyMutation = useDeleteReplyMutation();
   const likeReplyMutation = useLikeReplyMutation();
 
-  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true);
-  const { data: postById, isLoading: isLoadingId } = usePost(slug || "", false);
-  
+  // Busca o post pelo slug via React Query (com cache de 10min)
+  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true, {
+    initialData: initialPost
+  });
+
+  // Fallback por ID só roda se slug não achou nada
+  const slugResolved = !isLoadingSlug;
+  const { data: postById, isLoading: isLoadingId } = usePost(
+    slug || "",
+    false,
+    { enabled: slugResolved && !postBySlug && !!slug }
+  );
+
   const post = previewPost || postBySlug || postById;
 
-  const isFetchingLocal = isLoadingSlug || isLoadingId;
+  // Skeleton com delay: só mostra após 300ms sem dados.
+  // Se o post estiver em cache (prefetch no hover/touch), aparece instantaneamente
+  // e esse estado nunca chega a true — transição completamente sem skeleton.
+  const isFetchingLocal = isLoadingSlug || (!postBySlug && isLoadingId);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  useEffect(() => {
+    if (!isFetchingLocal || post) {
+      setShowSkeleton(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSkeleton(true), 300);
+    return () => clearTimeout(timer);
+  }, [isFetchingLocal, post]);
 
   const [commentText, setCommentText] = useState("");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -103,12 +128,18 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
     }
   }, [post?.id, previewPost, incrementViewMutation, currentUser?.id, authLoading]);
 
-  if ((isLoadingPopular || isFetchingLocal) && !post) {
+  // Skeleton com delay — não interrompe transições quando há cache
+  if (showSkeleton && !post) {
     return (
       <div className="py-20">
-        <PostDetailSkeleton isDark={isDark} />
+        <PostDetailSkeleton />
       </div>
     );
+  }
+
+  // Enquanto aguarda sem mostrar skeleton (dado chegando do cache)
+  if (isFetchingLocal && !post && !showSkeleton) {
+    return null;
   }
 
   const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
@@ -118,9 +149,6 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   if (!post || (isPostDraft && !isAdmin && !isPreview)) {
     return (
       <div className="animate-in fade-in max-w-5xl mx-auto py-20 text-center">
-        <Helmet>
-          <title>Não Encontrado | BeginsProject</title>
-        </Helmet>
         <h1 className="font-retro text-4xl mb-4">Post não encontrado</h1>
         <button onClick={() => navigate("/")} className="text-purple-500 underline font-retro">Voltar ao início</button>
       </div>
@@ -147,31 +175,8 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
 
   const isFavorited = profile?.favorites?.includes(post.id) || false;
   
-  const postCanonicalUrl = `https://lucasbegins.com.br/post/${slug || post.slug || (post.title ? slugify(post.title) : "")}`;
-
   return (
-    <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-full relative">
-      <Helmet>
-        <title>{post.title ? `${post.title} | BeginsProject` : "Matéria | BeginsProject"}</title>
-        <meta name="description" content={post.excerpt || "Leia mais sobre este incrível artigo retro."} />
-        
-        {/* OpenGraph / Facebook */}
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={postCanonicalUrl} />
-        <meta property="og:title" content={post.title || "BeginsProject"} />
-        <meta property="og:description" content={post.excerpt || ""} />
-        <meta property="og:site_name" content="BeginsProject" />
-        {post.imageUrl && <meta property="og:image" content={post.imageUrl} />}
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={postCanonicalUrl} />
-        <meta name="twitter:title" content={post.title || "BeginsProject"} />
-        <meta name="twitter:description" content={post.excerpt || ""} />
-        {post.imageUrl && <meta name="twitter:image" content={post.imageUrl} />}
-        
-        <link rel="canonical" href={postCanonicalUrl} />
-      </Helmet>
+    <article className="w-full relative">
 
       {/* Voltar */}
       <button
@@ -198,7 +203,7 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
           imgError={imgError} 
         />
 
-        <div id="article-content" className="space-y-12">
+        <div id="article-content" className="space-y-12 w-full">
           <PostActions 
             post={post}
             currentUser={currentUser}

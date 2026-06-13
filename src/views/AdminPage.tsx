@@ -1,5 +1,5 @@
 import { ArrowLeft, Plus, Settings } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import { cn } from "../lib/utils";
 
