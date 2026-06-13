@@ -42,9 +42,10 @@ import { USER_ROLES } from "../constants";
 
 interface PostDetailPageProps {
   previewPost?: Post;
+  initialPost?: Post;
 }
 
-export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
+export default function PostDetailPage({ previewPost, initialPost }: PostDetailPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { setIsLoginModalOpen } = useUIStore();
@@ -66,7 +67,9 @@ export default function PostDetailPage({ previewPost }: PostDetailPageProps) {
   const likeReplyMutation = useLikeReplyMutation();
 
   // Busca o post pelo slug via React Query (com cache de 10min)
-  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true);
+  const { data: postBySlug, isLoading: isLoadingSlug } = usePost(slug || "", true, {
+    initialData: initialPost
+  });
 
   // Fallback por ID só roda se slug não achou nada
   const slugResolved = !isLoadingSlug;

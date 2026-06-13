@@ -148,6 +148,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  void slug;
-  return <PostDetailPage />;
+  const post = await fetchPostBySlugOrId(slug);
+  return <PostDetailPage initialPost={post} />;
 }
