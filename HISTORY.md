@@ -12,6 +12,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Remoção de Código Morto**: Excluída a antiga função serverless `/api/og` e a rota legada `/post/:slug` do `vercel.json`, centralizando o tratamento de metadados e SEO no motor nativo do Next.js App Router.
 - **Firebase HMR SSR Safe State**: Refatorada a inicialização do Firestore/Firebase no cliente para prevenir o erro de reinicialização múltipla (`initializeFirestore() has already been called`) durante o Hot Module Replacement (HMR) e renderização no servidor.
 - **Sanitização de HTML Safe**: Ajustado o sanitizador DOMPurify no renderizador de artigos (`ArticleRenderer.tsx`) para garantir compatibilidade no ambiente de pré-renderização server-side do Next.js.
+- **Correção da Build (Vercel)**: Tornou a variável de ambiente `measurementId` (usada pelo Google Analytics) opcional na inicialização do Firebase (`firebase.ts`). Isso corrige o erro fatal de build da Next.js/Vercel (`Missing Firebase environment variables: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`) durante a fase de prerender da rota `/_not-found`.
 
 ### 🔒 Segurança de visualizações Firestore (Views Rules Hardening)
 - **Incremento Unitário Estrito**: Atualizadas as regras de escrita (`firestore.rules`) para impedir que qualquer usuário (logado ou anônimo) envie valores arbitrários para as visualizações de um post. O Firestore agora rejeita qualquer update de views que não seja exatamente um incremento de +1 (`views == views + 1`).
