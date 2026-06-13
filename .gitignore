@@ -26,3 +26,9 @@ dist-ssr
 # Next.js
 .next/
 out/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Temporary scratch folder
+scratch/
