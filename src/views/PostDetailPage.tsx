@@ -203,7 +203,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
           imgError={imgError} 
         />
 
-        <div id="article-content" className="space-y-12">
+        <div id="article-content" className="max-w-5xl mx-auto space-y-12 w-full">
           <PostActions 
             post={post}
             currentUser={currentUser}

@@ -386,10 +386,21 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       processed = processed.replace(id, linkHtml);
     });
     
-    return DOMPurify.sanitize(processed, { 
-      ALLOWED_TAGS: ['strong', 'em', 'a'], 
-      ALLOWED_ATTR: ['class', 'href', 'target', 'rel']
-    });
+    // Helper de higienização seguro para SSR e Client-Side
+    const sanitizeHtml = (html: string) => {
+      if (typeof window !== "undefined") {
+        const purify = (DOMPurify as any).default || DOMPurify;
+        if (purify && typeof purify.sanitize === "function") {
+          return purify.sanitize(html, {
+            ALLOWED_TAGS: ['strong', 'em', 'a'], 
+            ALLOWED_ATTR: ['class', 'href', 'target', 'rel']
+          });
+        }
+      }
+      return html;
+    };
+
+    return sanitizeHtml(processed);
   };
 
   // Primeira passagem: encontrar os índices de primeiro elemento e primeiro parágrafo

@@ -29,20 +29,31 @@ if (missingVars.length > 0) {
 
 const firebaseConfig = requiredEnvVars as Record<string, string>;
 
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
+// Inicializa Firebase de forma segura (evita re-inicialização no HMR do Next.js)
+import { getApps, getApp } from "firebase/app";
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Exporta serviços para uso no App
 export const auth = getAuth(app);
 
 // Configuração de cache para performance e offline
-// No momento, vamos usar apenas cache em memória para evitar travamentos em escritas pesadas
-export const db = initializeFirestore(app, {
-  localCache: memoryLocalCache() 
-});
+// No momento, vamos usar apenas cache em memória para evitar travamentos em escritas pesadas.
+// Tratamos a reinicialização segura de forma que se já existir uma instância ela seja retornada.
+import { getFirestore } from "firebase/firestore";
+let firestoreDb;
+try {
+  firestoreDb = initializeFirestore(app, {
+    localCache: memoryLocalCache() 
+  });
+} catch (e) {
+  firestoreDb = getFirestore(app);
+}
+
+export const db = firestoreDb;
 
 // Firebase Storage
 export const storage = getStorage(app);
 
 // Google
 export const googleProvider = new GoogleAuthProvider();
+
