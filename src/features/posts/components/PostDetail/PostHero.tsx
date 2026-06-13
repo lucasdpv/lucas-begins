@@ -72,9 +72,16 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
             </h1>
             <span className={cn(
               "font-sans text-sm sm:text-lg md:text-xl leading-snug drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] font-medium",
-              post.category.toLowerCase().includes("reviews") ? "text-amber-400" :
-              post.category.toLowerCase().includes("dossi") ? "text-blue-400" :
-              post.category.toLowerCase().includes("retro") ? "text-orange-400" : "text-purple-400"
+              (() => {
+                const cat = post.category.toLowerCase();
+                if (cat.includes("review")) return "text-amber-400";
+                if (cat.includes("dossi")) return "text-blue-400";
+                if (cat.includes("retro")) return "text-orange-400";
+                if (cat.includes("nostalgia")) return "text-pink-400";
+                if (cat.includes("pop") || cat.includes("cultura")) return "text-emerald-400";
+                if (cat.includes("rpg") || cat.includes("mmo")) return "text-cyan-400";
+                return "text-purple-400";
+              })()
             )}>
               {subtitle}
             </span>
