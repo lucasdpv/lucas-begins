@@ -26,7 +26,7 @@ if (missingVars.length > 0) {
   throw new Error(`Missing Firebase environment variables: ${missingVars.join(", ")}`);
 }
 
-const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID;
+const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || process.env.VITE_FIREBASE_MEASUREMENT_ID || process.env.VITE_MEASUREMENT_ID;
 
 const firebaseConfig = {
   ...requiredEnvVars,
