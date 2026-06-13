@@ -4,6 +4,29 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v5.0.0] - The Server-Side Hydration, Structural Security & Visual Polish Update
+*Data: 13 de Junho de 2026*
+
+### ⚡ Server-Side Hydration & Next.js SSR Integration
+- **SSR Hydration**: Integrada a busca de dados do Firestore REST no servidor com o React Query client-side na rota `/post/[slug]`. O HTML é pré-renderizado estaticamente via Server Components eliminando o uso de skeletons e piscadas de tela indesejadas no carregamento de posts em cache.
+- **Remoção de Código Morto**: Excluída a antiga função serverless `/api/og` e a rota legada `/post/:slug` do `vercel.json`, centralizando o tratamento de metadados e SEO no motor nativo do Next.js App Router.
+- **Firebase HMR SSR Safe State**: Refatorada a inicialização do Firestore/Firebase no cliente para prevenir o erro de reinicialização múltipla (`initializeFirestore() has already been called`) durante o Hot Module Replacement (HMR) e renderização no servidor.
+- **Sanitização de HTML Safe**: Ajustado o sanitizador DOMPurify no renderizador de artigos (`ArticleRenderer.tsx`) para garantir compatibilidade no ambiente de pré-renderização server-side do Next.js.
+
+### 🔒 Segurança de visualizações Firestore (Views Rules Hardening)
+- **Incremento Unitário Estrito**: Atualizadas as regras de escrita (`firestore.rules`) para impedir que qualquer usuário (logado ou anônimo) envie valores arbitrários para as visualizações de um post. O Firestore agora rejeita qualquer update de views que não seja exatamente um incremento de +1 (`views == views + 1`).
+
+### 🎨 Paridade Visual & Ícone de Tema
+- **Cores Dinâmicas no Cabeçalho de Posts (PostHero)**: O subtítulo e o badge de categoria no cabeçalho principal (`PostHero.tsx`) agora herdam dinamicamente a cor da categoria do post (ex: rosa para Nostalgia e laranja para RetroCafé), alinhando o post de detalhes aos novos cards da home.
+- **Fundo do Badge Dinâmico**: O componente `CategoryBadge` em `Badge.tsx` agora resolve sua própria cor de fundo e texto dinamicamente usando `getCategoryBadgeClass`, eliminando o fundo roxo que estava rigidamente codificado no badge.
+- **Ícones de Tema Visuais**: Os alternadores de tema na Navbar e no MobileMenu agora mostram o estado atual do sistema (ícone de Lua violeta quando no modo Escuro, ícone de Sol amarelo no modo Claro), fornecendo um feedback visual muito mais claro e sem a sensação de estar "invertido".
+
+### 🧹 Organização do Repositório & Backlog
+- **Lista de Pendências (Backlog)**: Criado o arquivo `BACKLOG.md` mapeando tarefas de refatoração futuras, testes de componentes (Vitest/React Testing Library) e testes E2E (Playwright/Cypress).
+- **Git Ignore**: Ignorados arquivos locais de cache do TypeScript (`*.tsbuildinfo`) e a pasta de rascunhos temporários (`scratch/`) nas configurações de `.gitignore` para manter o workspace limpo.
+
+---
+
 ## 🚀 [v4.9.0] - The Security, Performance & Image Optimization Update
 *Data: 11 de Junho de 2026*
 
