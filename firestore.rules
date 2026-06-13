@@ -21,8 +21,10 @@ service cloud.firestore {
       
       // Atualizar posts: Administradores podem atualizar tudo.
       // Leitores anônimos só podem incrementar o contador de "views".
-      allow update: if isAdmin() || 
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']));
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) &&
+        request.resource.data.views == resource.data.views + 1
+      );
         
       // Subcoleção de comentários dos posts
       match /comments/{commentId} {
