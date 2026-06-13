@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import DOMPurify from "dompurify";
-import Image from "next/image";
 import { cn, isValidImageUrl } from "../../../lib/utils";
 import RetroSeparator from "../../../components/ui/RetroSeparator";
 
@@ -115,7 +114,7 @@ function ArticleImage({
     }
 
     return (
-      <Image
+      <img
         src={src}
         alt={alt || "Imagem com formato"}
         onError={() => setError(true)}
@@ -124,8 +123,6 @@ function ArticleImage({
           "pixelated animate-in fade-in duration-1000",
           layout === 'full' && "mx-auto block"
         )}
-        width={600}
-        height={600}
       />
     );
   }
@@ -167,23 +164,10 @@ function ArticleImage({
   };
   const containerClass = getContainerClass();
 
-  const getContainerStyle = () => {
-    if (aspect && aspect !== 'original') {
-      return {
-        aspectRatio: aspect.replace(':', '/'),
-      };
-    }
-    if (naturalAspect !== null) {
-      return {
-        aspectRatio: String(naturalAspect),
-      };
-    }
-    // Fallback para evitar colapso de altura antes da imagem carregar
-    return {
-      minHeight: "300px",
-      width: "100%",
-    };
-  };
+  const aspectStyle = aspect && aspect !== 'original' ? {
+    aspectRatio: aspect.replace(':', '/'),
+    objectFit: 'cover' as const
+  } : {};
 
   const getFigureClass = () => {
     let figureWidth = "w-full my-14";
@@ -211,24 +195,28 @@ function ArticleImage({
         className={getFigureClass()}
         onClick={() => !error && setIsZoomed(true)}
       >
-        <div className={containerClass} style={getContainerStyle()}>
+        <div className={containerClass}>
           {!error && isValidImageUrl(src) ? (
-            <Image
+            <img
               src={src}
               alt={alt || "Imagem do artigo"}
-              fill
-              sizes="(max-width: 768px) 100vw, 800px"
               loading="lazy"
+              decoding="async"
               onLoad={(e) => {
-                const img = e.currentTarget;
-                if (img.naturalWidth && img.naturalHeight) {
-                  setNaturalAspect(img.naturalWidth / img.naturalHeight);
+                const { naturalWidth, naturalHeight } = e.currentTarget;
+                if (naturalWidth && naturalHeight) {
+                  setNaturalAspect(naturalWidth / naturalHeight);
                 }
               }}
               onError={() => setError(true)}
+              style={aspectStyle}
               className={cn(
                 "pixelated block mx-auto",
-                aspect === 'original' ? "object-contain" : "object-cover"
+                aspect === 'original' 
+                  ? (naturalAspect !== null && naturalAspect < 1.2)
+                    ? "w-auto max-w-full h-auto max-h-[450px] md:max-h-[550px] object-contain" 
+                    : "w-full h-auto max-h-[500px] md:max-h-[600px] object-contain"
+                  : "w-full h-full object-cover"
               )}
             />
           ) : (
@@ -282,11 +270,9 @@ function ArticleImage({
             className="relative max-w-full max-h-[80vh] flex items-center justify-center p-2 bg-black/40 border-4 border-purple-500 shadow-[0_0_40px_rgba(168,85,247,0.5)]"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image container
           >
-            <Image 
+            <img 
               src={src} 
               alt={alt || "Imagem ampliada"} 
-              width={1600}
-              height={1200}
               className="pixelated max-w-full max-h-[75vh] object-contain block"
             />
           </div>
