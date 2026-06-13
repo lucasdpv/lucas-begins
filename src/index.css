@@ -105,7 +105,7 @@ html.light body {
   margin-right: 2rem;
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
-  max-width: 36%;
+  max-width: 340px; /* Evita que a imagem flutuante fique excessivamente grande em telas largas */
   width: 34%;
   shape-outside: rect(0, 100%, 100%, 0);
 }
@@ -115,7 +115,7 @@ html.light body {
   margin-left: 2rem;
   margin-bottom: 1.5rem;
   margin-top: 0.5rem;
-  max-width: 36%;
+  max-width: 340px; /* Evita que a imagem flutuante fique excessivamente grande em telas largas */
   width: 34%;
   shape-outside: rect(0, 100%, 100%, 0);
 }
