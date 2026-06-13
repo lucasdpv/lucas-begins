@@ -40,8 +40,9 @@ const getCategoryBadgeClass = (category: string) => {
 };
 
 export function CategoryBadge({ children, size = "sm", className }: BadgeProps) {
+  const categoryColorClass = typeof children === "string" ? getCategoryBadgeClass(children) : "bg-purple-600 text-white";
   return (
-    <span className={cn("bg-purple-600 text-white font-retro font-bold uppercase tracking-widest rounded-none border-2 border-black transition-all", retroSizes[size], className)}>
+    <span className={cn("font-retro font-bold uppercase tracking-widest rounded-none border-2 border-black transition-all", categoryColorClass, retroSizes[size], className)}>
       {children}
     </span>
   );
