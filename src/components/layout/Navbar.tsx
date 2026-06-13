@@ -187,18 +187,18 @@ export default function Navbar() {
                 onClick={toggleTheme} 
                 className={cn(
                   "p-2 transition-all active:scale-90 hover:bg-purple-500/10 border-2 border-transparent hover:border-purple-500/20 overflow-hidden relative flex items-center justify-center w-9 h-9",
-                  isDark ? "text-yellow-400" : "text-purple-600"
+                  isDark ? "text-purple-400" : "text-yellow-500"
                 )}
-                title="Trocar Tema"
+                title={isDark ? "Mudar para Modo Claro" : "Mudar para Modo Escuro"}
               >
                 <motion.div
-                  key={isDark ? "sun" : "moon"}
+                  key={isDark ? "moon" : "sun"}
                   initial={{ y: 15, rotate: 90, opacity: 0 }}
                   animate={{ y: 0, rotate: 0, opacity: 1 }}
                   exit={{ y: -15, rotate: -90, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 350, damping: 15 }}
                 >
-                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                  {isDark ? <Moon size={18} /> : <Sun size={18} />}
                 </motion.div>
               </button>
 
