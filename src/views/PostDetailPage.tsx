@@ -132,7 +132,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   if (showSkeleton && !post) {
     return (
       <div className="py-20">
-        <PostDetailSkeleton isDark={isDark} />
+        <PostDetailSkeleton />
       </div>
     );
   }
