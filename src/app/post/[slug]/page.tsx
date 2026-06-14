@@ -1,5 +1,12 @@
 import { Metadata } from "next";
 import PostDetailPage from "../../../views/PostDetailPage";
+import {
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_ALT,
+  DEFAULT_TWITTER_CARD,
+  SITE_NAME,
+  SITE_URL,
+} from "../../../lib/siteMetadata";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -139,6 +146,24 @@ function cleanAndTruncateContent(content: string, maxLength = 160): string {
   return clean.substring(0, maxLength).trim() + "...";
 }
 
+function toIsoDate(value: any): string | undefined {
+  if (!value) return undefined;
+  if (typeof value === "string") {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+  }
+  if (typeof value?.toDate === "function") {
+    const parsed = value.toDate();
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+  }
+  if (typeof value === "object" && typeof value.seconds === "number") {
+    const parsed = new Date(value.seconds * 1000);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await fetchPostBySlugOrId(slug);
@@ -155,9 +180,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? cleanAndTruncateContent(post.content, 160) 
     : "Leia este artigo completo no BeginsProject.";
   const postDesc = post ? (post.excerpt || fallbackDesc) : "Leia este artigo completo no BeginsProject.";
-  
-  const finalTitle = `${postTitle} | BeginsProject`;
-  const canonicalUrl = `https://lucasbegins.com.br/post/${slug}`;
+
+  const finalTitle = `${postTitle} | ${SITE_NAME}`;
+  const canonicalUrl = `/post/${slug}`;
+  const imageUrl = post?.imageUrl || DEFAULT_OG_IMAGE;
+  const keywords = [
+    postTitle,
+    post?.category,
+    ...(post?.tags || []),
+    SITE_NAME,
+  ].filter(Boolean) as string[];
 
   return {
     title: finalTitle,
@@ -165,18 +197,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: canonicalUrl,
     },
+    keywords,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-snippet": -1,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+      },
+    },
     openGraph: {
       title: finalTitle,
       description: postDesc,
       type: "article",
       url: canonicalUrl,
-      images: post?.imageUrl ? [{ url: post.imageUrl }] : undefined,
+      siteName: SITE_NAME,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post?.title || DEFAULT_OG_IMAGE_ALT,
+        },
+      ],
+      publishedTime: toIsoDate(post?.createdAt),
+      modifiedTime: toIsoDate(post?.updatedAt) || toIsoDate(post?.createdAt),
     },
     twitter: {
-      card: "summary_large_image",
+      card: DEFAULT_TWITTER_CARD,
       title: finalTitle,
       description: postDesc,
-      images: post?.imageUrl ? [post.imageUrl] : [],
+      images: [imageUrl],
     },
   };
 }
@@ -206,15 +260,15 @@ export default async function Page({ params }: Props) {
     ],
     "publisher": {
       "@type": "Organization",
-      "name": "BeginsProject",
+      "name": SITE_NAME,
       "logo": {
         "@type": "ImageObject",
-        "url": "https://lucasbegins.com.br/favicon.svg"
+        "url": `${SITE_URL}/favicon.svg`
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://lucasbegins.com.br/post/${slug}`
+      "@id": `${SITE_URL}/post/${slug}`
     }
   } : null;
 

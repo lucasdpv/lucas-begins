@@ -28,6 +28,7 @@ import { Post } from "../features/posts/schemas";
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const queryClient = useQueryClient();
+  const [isSecondarySectionsReady, setIsSecondarySectionsReady] = useState(false);
 
   const handlePrefetch = useCallback((slug: string) => {
     queryClient.prefetchQuery({
@@ -126,6 +127,35 @@ export default function HomePage() {
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
 
+  useEffect(() => {
+    let cancelled = false;
+    const markReady = () => {
+      if (!cancelled) {
+        setIsSecondarySectionsReady(true);
+      }
+    };
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(markReady, { timeout: 1200 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(id);
+      };
+    }
+
+    const timer = setTimeout(markReady, 900);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const shouldLoadSecondary = isDefaultView && isSecondarySectionsReady;
+
   // Reseta categoria ao voltar do arquivo (evita glitch de transição)
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
@@ -142,16 +172,16 @@ export default function HomePage() {
   const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
 
   // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
-  const { data: mostViewedPosts = [] } = useMostViewedPosts(5, isDefaultView);
+  const { data: mostViewedPosts = [] } = useMostViewedPosts(5, shouldLoadSecondary);
 
   // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5, isDefaultView);
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5, shouldLoadSecondary);
 
   // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
-  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3, isDefaultView);
+  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3, shouldLoadSecondary);
 
   // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
-  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3, isDefaultView);
+  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3, shouldLoadSecondary);
 
   // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
   const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
@@ -507,7 +537,7 @@ export default function HomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
               >
-                <PostCard post={post} variant="vintage" />
+                <PostCard post={post} variant="vintage" priority={i < 2} />
               </motion.div>
             ))}
           </div>

@@ -17,6 +17,7 @@ interface PostCardProps {
   post: Post;
   variant?: "default" | "compact" | "vintage";
   showCategory?: boolean;
+  priority?: boolean;
 }
 
 const getCategoryCardStyles = (category: string) => {
@@ -128,7 +129,7 @@ const getCategoryColor = (category: string) => {
   return { bg: "bg-purple-500", text: "text-white", bgLight: "bg-purple-500" }; // default / especial
 };
 
-export default function PostCard({ post, variant = "default", showCategory = true }: PostCardProps) {
+export default function PostCard({ post, variant = "default", showCategory = true, priority = false }: PostCardProps) {
   const { isDark } = useThemeStore();
   const { currentUser } = useAuth();
   const { setIsLoginModalOpen } = useUIStore();
@@ -193,6 +194,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               style={{ objectPosition: post.imagePosition || "center" }}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
+              priority={priority}
             />
           )}
           <div className="absolute inset-0 scanline-overlay opacity-30 group-hover:opacity-75 transition-opacity duration-300 z-10" />
@@ -295,6 +297,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
               style={{ objectPosition: post.imagePosition || "center" }}
               fill
               sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+              priority={priority}
             />
           )}
 
@@ -465,6 +468,7 @@ export default function PostCard({ post, variant = "default", showCategory = tru
             style={{ objectPosition: post.imagePosition || "center" }}
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
+            priority={priority}
           />
         )}
 

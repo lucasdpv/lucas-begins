@@ -1,6 +1,6 @@
 # 📜 Documentação Técnica — BeginsProject
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v5.0.0** (Next.js & Server-Side Hydration Update).
+Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v5.1.1** (Next.js, AdSense Fix & LCP Optimization Update).
 
 ---
 
@@ -33,6 +33,10 @@ Localizado em `src/store/`, gerencia estados que não precisam de persistência 
 
 ### 3. Context API (Autenticação)
 - **`AuthProvider`**: Envolve a aplicação para prover o estado do Firebase Auth (`currentUser`) e métodos de login/logout, além de sincronizar os cookies de sessão (`auth_token`, `user_role`) para o middleware do servidor.
+
+### 4. Carregamento Progressivo & Otimizações LCP (v5.1.1)
+- **Lazy Queries / Progressive Loading (HomePage)**: As consultas abaixo da dobra como `mostViewedPosts`, `reviewPosts`, `dossiePosts` e `retrocafePosts` têm seu carregamento postergado até que a thread principal do navegador esteja livre (`requestIdleCallback` com fallback de `setTimeout` de 900ms–1200ms). Isso reduz as consultas simultâneas na inicialização do portal de 6 para 2.
+- **Otimização LCP (Largest Contentful Paint)**: O prop `priority` de eager-loading é aplicado nos primeiros post cards exibidos nas grades principais da HomePage, ArchivePage e DashboardPage, instruindo o navegador a pré-carregar as imagens acima da dobra imediatamente. Adicionalmente, a primeira imagem inserida no corpo da matéria via `ArticleRenderer.tsx` é renderizada com `loading="eager"` para evitar atrasos na métrica LCP em matérias curtas.
 
 ---
 
@@ -103,4 +107,4 @@ A estética do portal segue um Neo-Brutalismo clássico retro-gaming:
 - **Web Audio API**: Geração de som 8-bit e digital para cliques e interações com abas e pastas do site.
 
 ---
-**Documentação atualizada em: 13 de Junho de 2026.**
+**Documentação atualizada em: 14 de Junho de 2026.**
