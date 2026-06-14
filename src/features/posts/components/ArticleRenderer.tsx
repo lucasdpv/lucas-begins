@@ -16,6 +16,7 @@ interface ArticleImageProps {
   aspect?: 'original' | '1:1' | '16:9' | '4:5';
   frameStyle?: 'normal' | 'crt' | 'sticker' | 'none';
   scanlines?: boolean;
+  priority?: boolean;
 }
 
 /**
@@ -32,7 +33,8 @@ function ArticleImage({
   wrapDirection = 'up',
   aspect = 'original',
   frameStyle = 'normal',
-  scanlines = true
+  scanlines = true,
+  priority = false
 }: ArticleImageProps) {
   const [error, setError] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -119,6 +121,7 @@ function ArticleImage({
         alt={alt || "Imagem com formato"}
         onError={() => setError(true)}
         style={getShapeStyle()}
+        loading={priority ? "eager" : "lazy"}
         className={cn(
           "pixelated animate-in fade-in duration-1000",
           layout === 'full' && "mx-auto block"
@@ -200,7 +203,7 @@ function ArticleImage({
             <img
               src={src}
               alt={alt || "Imagem do artigo"}
-              loading="lazy"
+              loading={priority ? "eager" : "lazy"}
               decoding="async"
               onLoad={(e) => {
                 const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -341,6 +344,8 @@ interface ArticleRendererProps {
 export default function ArticleRenderer({ content, isDark }: ArticleRendererProps) {
   if (!content) return null;
   const lines = content.split('\n');
+
+  let imageCount = 0;
 
   const formatInline = (text: string) => {
     const links: Record<string, { url: string, label: string }> = {};
@@ -564,6 +569,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
         i++;
       }
 
+      const isPriority = imageCount === 0;
+      if (rowImage) imageCount++;
+
       renderedLines.push(
         <div key={i} className={cn(
           "my-12 flex flex-col md:flex-row gap-10 items-center clear-both",
@@ -571,7 +579,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
         )}>
           {rowImage && (
             <div className="w-full md:w-[45%] shrink-0">
-              <ArticleImage src={rowImage.src} alt={rowImage.alt} isDark={isDark} />
+              <ArticleImage src={rowImage.src} alt={rowImage.alt} isDark={isDark} priority={isPriority} />
             </div>
           )}
           <div className="flex-1 min-w-0 overflow-hidden">
@@ -598,6 +606,9 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       const frameMatch = line.match(/\{#frame-(normal|crt|sticker|none)\}/);
       const scanlinesMatch = line.includes('{#scanlines-false}');
       
+      const isPriority = imageCount === 0;
+      imageCount++;
+
       renderedLines.push(
         <ArticleImage 
           key={i} 
@@ -612,6 +623,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
           aspect={(aspectMatch?.[1] as any) || 'original'}
           frameStyle={(frameMatch?.[1] as any) || 'normal'}
           scanlines={!scanlinesMatch}
+          priority={isPriority}
         />
       );
       i++;

@@ -4,6 +4,19 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v5.1.1] - The AdSense data-nscript Tag Resolution & Progressive Loading Performance Update
+*Data: 14 de Junho de 2026*
+
+### ⚡ Correção do Google AdSense
+- **Remoção do data-nscript**: Substituído o componente `<Script>` do Next.js por uma tag HTML `<script>` padrão no `layout.tsx` para carregar o Google AdSense. Isso impede que o Next.js injete o atributo interno `data-nscript`, eliminando o erro de validação do console do AdSense.
+
+### ⚡ Otimização de Imagens (LCP) & Carregamento Progressivo
+- **Priorização de Imagens LCP**: Adicionado suporte para o prop `priority` no `PostCard.tsx` e ativado nas primeiras postagens renderizadas na `HomePage.tsx` (2 primeiros cards), `ArchivePage.tsx` (3 primeiros cards) e `DashboardPage.tsx` (3 primeiros cards). Isso garante que as imagens acima da dobra sejam pré-carregadas imediatamente pelo navegador.
+- **Priorização Automática de Artigos**: Atualizado o `ArticleRenderer.tsx` para carregar com `loading="eager"` (prioridade máxima) a primeira imagem encontrada no corpo do post, otimizando o LCP em posts curtos.
+- **Desacoplamento e Carregamento Preguiçoso de Queries**: Restaurado e expandido o carregamento progressivo de dados via o hook `isSecondarySectionsReady` na `HomePage.tsx` (usando `requestIdleCallback`/`setTimeout`). As consultas secundárias de `mostViewedPosts` (Mais Lidos), `reviewPosts` (Reviews), `dossiePosts` (Dossiês) e `retrocafePosts` (RetroCafé) agora são postergadas até o navegador ficar ocioso, reduzindo as consultas simultâneas na inicialização do portal de 6 para apenas 2.
+
+---
+
 ## 🚀 [v5.1.0] - The Dynamic SEO Description, Analytics Recovery & Portal Modal Update
 *Data: 14 de Junho de 2026*
 

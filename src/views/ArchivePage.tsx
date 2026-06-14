@@ -114,7 +114,7 @@ export default function ArchivePage() {
         <div className="flex flex-col gap-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
-              {currentPosts.map((post) => (
+              {currentPosts.map((post, idx) => (
                 <motion.div
                   key={post.id}
                   layout
@@ -124,7 +124,7 @@ export default function ArchivePage() {
                   transition={{ duration: 0.2 }}
                   className="h-full"
                 >
-                  <PostCard post={post} variant="default" />
+                  <PostCard post={post} variant="default" priority={idx < 3} />
                 </motion.div>
               ))}
             </AnimatePresence>

@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "../lib/siteMetadata";
 
-const BASE_URL = "https://lucasbegins.com.br";
+const BASE_URL = SITE_URL;
 
 function parseFirestoreValue(value: any): any {
   if (!value) return null;

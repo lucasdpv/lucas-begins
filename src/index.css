@@ -27,10 +27,9 @@ html.light body {
    conforme o tema (dark / light)
    ============================================================ */
 :root {
-  /* Injetado pelo next/font no <html> via layout.tsx (Chakra Petch + Inter).
-     Fallback para garantir que funciona mesmo sem o next/font carregado. */
-  --font-retro: 'Chakra Petch', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  /* Stacks locais para não depender de download de fontes no build. */
+  --font-retro: "Chakra Petch", "Trebuchet MS", "Arial Narrow", sans-serif;
+  --font-body: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 
   /* Tokens do tema retro (padrão: dark) */
   --retro-border-color: #a855f7;
