@@ -4,6 +4,20 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v5.1.0] - The Dynamic SEO Description, Analytics Recovery & Portal Modal Update
+*Data: 14 de Junho de 2026*
+
+### ⚡ SEO Inteligente & Rastreamento Recuperado
+- **Restauração de Rastreamento e Monetização**: Reintegradas as chaves de verificação de propriedade do Google Search Console e Yandex, a tag do Google AdSense e o script do Google Analytics 4 (GA4) diretamente no `layout.tsx` do Next.js via metadados nativos e `<Script>` otimizado. Isso previne perda de métricas e anúncios após a migração do Vite.
+- **Resumo Automático de Matérias (Fallback SEO)**: Adicionado um algoritmo que limpa marcações de Markdown (links, títulos, imagens, etc.) do conteúdo da matéria para extrair os primeiros 160 caracteres, servindo como descrição dinâmica para o Google e redes sociais caso o autor não preencha o resumo.
+- **Prerendering Estático de Alta Escala**: Aumentado o limite de compilação estática (`generateStaticParams`) de 10 para até 100 posts, garantindo que todo o acervo histórico de matérias seja pré-renderizado estaticamente em tempo de build para tempos de resposta instantâneos.
+
+### 🎨 Bug Fix: Share Modal Fullscreen Portal
+- **React Portal no ShareModal**: Refatorado o `ShareModal.tsx` utilizando `createPortal` para renderizar o modal no `document.body` e alterado o índice de profundidade para `z-[150]`. Isso soluciona o bug do modal encolhido e com fundo escuro cortado causado pelo contexto de animação (`transform`) do container principal da página, alinhando-se ao comportamento do `DeleteModal` e `LoginModal`.
+- **Prevenção de Crash de SSR**: Corrigido o acesso direto ao objeto global `window.location.href` movendo-o para um estado reativo atualizado em `useEffect` somente após o carregamento client-side, eliminando quebras na compilação do Next.js.
+
+---
+
 ## 🚀 [v5.0.0] - The Server-Side Hydration, Structural Security & Visual Polish Update
 *Data: 13 de Junho de 2026*
 
