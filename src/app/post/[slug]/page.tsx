@@ -10,7 +10,8 @@ export const revalidate = 300; // Revalida no máximo a cada 5 minutos
 export async function generateStaticParams() {
   const projectId = "lucas-begins";
   try {
-    const queryUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/posts?pageSize=10`;
+    // Busca até 100 posts públicos para pre-gerar estaticamente na hora do build
+    const queryUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/posts?pageSize=100`;
     const response = await fetch(queryUrl);
     if (response.ok) {
       const data = await response.json();
@@ -116,6 +117,28 @@ async function fetchPostBySlugOrId(slugOrId: string): Promise<any> {
   return null;
 }
 
+/**
+ * Remove marcações do markdown e limita o tamanho do texto para gerar
+ * descrições de SEO otimizadas e limpas para os buscadores.
+ */
+function cleanAndTruncateContent(content: string, maxLength = 160): string {
+  if (!content) return "";
+  let clean = content
+    .replace(/^##\s+(.+)$/gm, "$1") // Remove títulos H2
+    .replace(/^---$/gm, "") // Remove divisores
+    .replace(/:::[\w-]+(?:\{#[^}]+\})?/g, "") // Remove blocos especiais
+    .replace(/@\[youtube\]\([^)]+\)/g, "") // Remove embeds do YouTube
+    .replace(/!\[([^\]]*)\]\([^)]+\)(?:\{#[^}]+\})*/g, "$1") // Remove imagens preservando a legenda se houver
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove negritos
+    .replace(/\*([^*]+)\*/g, "$1") // Remove itálicos
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove links preservando o texto descritivo
+    .replace(/\s+/g, " ") // Normaliza múltiplos espaços e quebras de linha
+    .trim();
+
+  if (clean.length <= maxLength) return clean;
+  return clean.substring(0, maxLength).trim() + "...";
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await fetchPostBySlugOrId(slug);
@@ -126,7 +149,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .join(" ");
 
   const postTitle = post ? post.title : titleFromSlug;
-  const postDesc = post ? (post.excerpt || "Leia este artigo completo no BeginsProject.") : "Leia este artigo completo no BeginsProject.";
+  
+  // Melhora a descrição usando o resumo do post (excerpt) ou gerando um a partir do conteúdo limpo do artigo
+  const fallbackDesc = post && post.content 
+    ? cleanAndTruncateContent(post.content, 160) 
+    : "Leia este artigo completo no BeginsProject.";
+  const postDesc = post ? (post.excerpt || fallbackDesc) : "Leia este artigo completo no BeginsProject.";
+  
   const finalTitle = `${postTitle} | BeginsProject`;
   const canonicalUrl = `https://lucasbegins.com.br/post/${slug}`;
 
@@ -156,11 +185,15 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const post = await fetchPostBySlugOrId(slug);
 
+  const dynamicDesc = post 
+    ? (post.excerpt || (post.content ? cleanAndTruncateContent(post.content, 160) : post.title))
+    : "Leia este artigo completo no BeginsProject.";
+
   const postJsonLd = post ? {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title,
-    "description": post.excerpt || post.title,
+    "description": dynamicDesc,
     "image": post.imageUrl ? [post.imageUrl] : [],
     "datePublished": post.createdAt || new Date().toISOString(),
     "dateModified": post.updatedAt || post.createdAt || new Date().toISOString(),

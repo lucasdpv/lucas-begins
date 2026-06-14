@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, MessageCircle, Copy, Share2, Download, Link as LinkIcon, Loader2 } from 'lucide-react';
 import { Post } from '../../features/posts/schemas';
 import { useUIStore } from '../../store/useUIStore';
@@ -17,11 +18,17 @@ interface ShareModalProps {
 export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModalProps) {
   const { showToast } = useUIStore();
   const { currentUser } = useAuth();
-  const postUrl = window.location.href;
+  const [postUrl, setPostUrl] = useState('');
   const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
 
   const [shortUrl, setShortUrl] = useState<string | null>(null);
   const [isLoadingShortUrl, setIsLoadingShortUrl] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && typeof window !== 'undefined') {
+      setPostUrl(window.location.href);
+    }
+  }, [isOpen]);
 
   // Fecha com Esc
   useEffect(() => {
@@ -131,10 +138,10 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
     }
   };
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -272,4 +279,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
       )}
     </AnimatePresence>
   );
+
+  if (typeof window === "undefined") return null;
+  return createPortal(modalContent, document.body);
 }
