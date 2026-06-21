@@ -4,6 +4,17 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v5.1.2] - Server Hydration Comments, Hydration Mismatch & Dynamic Sitemap Fix
+*Data: 21 de Junho de 2026*
+
+### ⚡ Correção de Comentários no Carregamento
+- **placeholderData no usePost**: Alterado o hook de busca de detalhes do post (`usePost` em `usePostsQuery.ts`) para usar `placeholderData` no lugar de `initialData`. Isso corrige o bug em que os comentários ficavam ausentes ao recarregar a página (devido ao `initialPost` gerado pelo SSR do Next.js via API REST não conter a subcoleção de comentários e ser cacheado como "fresco" pelo React Query devido ao `staleTime`). Agora, os dados do SSR servem de placeholder e a consulta real é realizada em segundo plano no cliente pelo SDK do Firebase.
+
+### ⚡ SEO e Correção de Erros de Hidratação
+- **Supressão de Hydration Warnings**: Adicionado `suppressHydrationWarning` na tag `<html>` do `layout.tsx` global para evitar falhas de hidratação e mensagens de erro causadas por extensões do navegador (como gerenciadores de senhas ou ferramentas criptográficas que injetam atributos como `data-bry-content-script-syngular`).
+- **Remoção de Sitemaps Estáticos**: Removidos os arquivos estáticos obsoletos `public/sitemap.xml` e `public/robots.txt` para que o Next.js possa servir corretamente as rotas dinâmicas configuradas em `sitemap.ts` e `robots.ts`.
+- **Redirecionamento 301**: Ajustado o redirecionamento de domínios na Vercel de temporário (307) para permanente (301) e da versão `www` para a versão raiz, resolvendo conflitos de indexação no Google Search Console.
+
 ## 🚀 [v5.1.1] - The AdSense data-nscript Tag Resolution & Progressive Loading Performance Update
 *Data: 14 de Junho de 2026*
 

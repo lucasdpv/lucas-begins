@@ -170,8 +170,7 @@ export function usePost(
     queryFn: () => isSlug ? PostService.getPostBySlug(idOrSlug) : PostService.getPostById(idOrSlug),
     enabled: options?.enabled !== undefined ? options.enabled : !!idOrSlug,
     staleTime: 1000 * 60 * 10,
-    initialData: options?.initialData,
-    initialDataUpdatedAt: options?.initialDataUpdatedAt,
+    placeholderData: options?.initialData,
   });
 }
 
