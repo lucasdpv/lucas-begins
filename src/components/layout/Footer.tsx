@@ -1,5 +1,6 @@
 import React from "react";
-import { Gamepad2, ChevronRight, Heart } from "lucide-react";
+import Image from "next/image";
+import { ChevronRight, Heart } from "lucide-react";
 import { Link } from "@/lib/router-compat";
 import { XIcon, ThreadsIcon, InstagramIcon } from "../icons/SocialIcons";
 import { useThemeStore } from "../../store/useThemeStore";
@@ -23,7 +24,13 @@ export default function Footer() {
         {/* Linha 1: Marca + Sociais */}
         <div className="flex items-center justify-between mb-4">
           <Link to="/" className="flex items-center gap-2 cursor-pointer w-fit">
-            <Gamepad2 className={cn("w-6 h-6 shrink-0", isDark ? "text-purple-400" : "text-purple-600")} />
+            <Image
+              src="/icon-bp.png"
+              alt="BeginsProject Logo"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain shrink-0"
+            />
             <span className="font-retro font-bold text-xl tracking-wider uppercase notranslate" translate="no">
               <span className={isDark ? "text-white" : "text-black"}>Begins</span>
               <span className={isDark ? "text-purple-400" : "text-purple-600"}>Project</span>
@@ -78,7 +85,13 @@ export default function Footer() {
       <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between mb-4">
         {/* Marca */}
         <Link to="/" className="flex items-center gap-2 group cursor-pointer shrink-0">
-          <Gamepad2 className={cn("w-7 h-7 shrink-0 hover:rotate-12 transition-transform", isDark ? "text-purple-400" : "text-purple-600")} />
+          <Image
+            src="/icon-bp.png"
+            alt="BeginsProject Logo"
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain shrink-0 hover:rotate-12 transition-transform"
+          />
           <h2 className="font-retro font-bold text-2xl tracking-wider uppercase drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)] notranslate" translate="no">
             <span className={isDark ? "text-white" : "text-black"}>Begins</span>
             <span className={isDark ? "text-purple-400" : "text-purple-600"}>Project</span>

@@ -1,7 +1,7 @@
 import React from "react";
+import Image from "next/image";
 import { Link } from "@/lib/router-compat";
 import { 
-  Gamepad2, 
   Search, 
   Moon, 
   Sun, 
@@ -81,7 +81,13 @@ export default function Navbar() {
             <div className="flex items-center gap-2 group shrink-0 pr-4 border-r-2 border-purple-500/10">
               <Link to="/" className="flex items-center gap-3" onClick={() => { handleCategorySelect("Todos"); setSearchQuery(""); }}>
                 <div className="relative">
-                  <Gamepad2 className={cn("w-8 h-8 transition-transform group-hover:-rotate-12", isDark ? "text-purple-400" : "text-purple-600")} />
+                  <Image
+                    src="/icon-bp.png"
+                    alt="BeginsProject Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain transition-transform group-hover:-rotate-12"
+                  />
                   <div className="absolute -inset-1 bg-purple-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <h1 className={cn(

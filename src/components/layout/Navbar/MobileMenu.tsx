@@ -2,7 +2,6 @@ import React from "react";
 import Image from "next/image";
 import { Link } from "@/lib/router-compat";
 import { 
-  Gamepad2, 
   Sun, 
   Moon, 
   X, 
@@ -72,7 +71,13 @@ export default function MobileMenu({
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Gamepad2 className="text-purple-500" />
+                <Image
+                  src="/icon-bp.png"
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 object-contain"
+                />
                 <span className="font-retro font-bold text-xl uppercase">Menu</span>
               </div>
               <div className="flex items-center gap-3">
