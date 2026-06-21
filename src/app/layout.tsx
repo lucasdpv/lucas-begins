@@ -70,7 +70,8 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body>
