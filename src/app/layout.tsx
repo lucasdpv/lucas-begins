@@ -71,6 +71,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body>
         {/* Google Analytics 4 */}
