@@ -15,7 +15,18 @@ export const metadata = {
   alternates: {
     canonical: "/",
   },
-  keywords: ["games", "reviews", "nostalgia gamer", "cultura pop", "retro gaming"],
+  keywords: [
+    "games",
+    "reviews",
+    "nostalgia gamer",
+    "cultura pop",
+    "retro gaming",
+    "análise de jogos",
+    "dossiês",
+    "artigos sobre videogames",
+    "retroCafé",
+    "história dos games",
+  ],
   openGraph: {
     title: `${SITE_NAME} | Portal de Games, Reviews e Cultura Pop`,
     description: SITE_DESCRIPTION,

@@ -52,7 +52,12 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   const { currentUser, authLoading } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
+  const [isHydrated, setIsHydrated] = useState(false);
   
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   const { data: popularPosts = [], isLoading: isLoadingPopular } = usePopularPosts(4);
 
   const likeMutation = useLikeMutation();
@@ -79,7 +84,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
     { enabled: slugResolved && !postBySlug && !!slug }
   );
 
-  const post = previewPost || postBySlug || postById;
+  const post = previewPost || postBySlug || postById || initialPost;
 
   // Skeleton com delay: só mostra após 300ms sem dados.
   // Se o post estiver em cache (prefetch no hover/touch), aparece instantaneamente
@@ -137,8 +142,14 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
     );
   }
 
-  // Enquanto aguarda sem mostrar skeleton (dado chegando do cache)
+  // Enquanto aguarda sem mostrar skeleton (dado chegando do cache ou SSR)
+  // Não mostrar "não encontrado" durante hidratação se há initialPost
   if (isFetchingLocal && !post && !showSkeleton) {
+    return null;
+  }
+
+  // Não mostrar erro durante hidratação se há initialPost
+  if (!isHydrated && initialPost) {
     return null;
   }
 

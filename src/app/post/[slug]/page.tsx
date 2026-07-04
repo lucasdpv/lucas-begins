@@ -280,7 +280,7 @@ export default async function Page({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(postJsonLd) }}
         />
       )}
-      <PostDetailPage initialPost={post} />
+      <PostDetailPage initialPost={post || undefined} />
     </>
   );
 }
