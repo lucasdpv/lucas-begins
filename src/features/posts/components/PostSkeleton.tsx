@@ -7,18 +7,17 @@ interface PostSkeletonProps {
 }
 
 /**
- * Skeleton do PostCard refatorado para espelhar fielmente cada variante:
- * - vintage: horizontal card com color strip, thumbnail, content block
- * - default: vertical card com aspect-video thumb + conteúdo
- * - compact: vertical menor com thumb 32/40 de altura
+ * Skeleton do PostCard no estilo Cyber-Editorial Streaming:
+ * - rounded-2xl, border-white/[0.08], bg-[#121024]/90
  */
-export default function PostSkeleton({ isDark, variant = "default" }: PostSkeletonProps) {
-  const cardBg    = isDark ? "bg-[#1f1d35]" : "bg-white";
-  const shimmer   = isDark ? "bg-gray-700/70" : "bg-gray-200";
-  const shimmerDim = isDark ? "bg-gray-800/80" : "bg-gray-100";
-  const border    = "border-2 border-black";
+export default function PostSkeleton({ isDark = true, variant = "default" }: PostSkeletonProps) {
+  const cardBg = isDark
+    ? "bg-[#121024]/90 border-white/[0.08] shadow-[0_14px_34px_-12px_rgba(0,0,0,0.65)]"
+    : "bg-white border-slate-200/80 shadow-sm";
+  const shimmer = isDark ? "bg-white/[0.07]" : "bg-slate-200";
+  const shimmerDim = isDark ? "bg-white/[0.04]" : "bg-slate-100";
 
-  // ── VINTAGE variant ─────────────────────────────────────────
+  // ── VINTAGE variant (Horizontal Card em Recém-Adicionados) ──
   if (variant === "vintage") {
     return (
       <div
@@ -26,69 +25,54 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
         aria-busy="true"
         aria-label="Carregando artigo..."
         className={cn(
-          "flex items-stretch h-[176px] sm:h-[190px] md:h-[200px] rounded-none",
-          border,
-          "shadow-[4px_4px_0px_rgba(0,0,0,1)]",
+          "flex items-stretch h-[180px] sm:h-[195px] md:h-[210px] rounded-2xl border overflow-hidden",
           cardBg
         )}
       >
-        {/* Category color strip — same w-3 as PostCard */}
-        <div className={cn("w-3 shrink-0 border-r-2 border-black animate-pulse", shimmer)} />
+        {/* Left Gradient Accent Bar */}
+        <div className="w-1.5 shrink-0 bg-purple-500/40 animate-pulse" />
 
-        {/* Thumbnail — same sizes as PostCard w-32 sm:w-40 md:w-48 */}
-        <div className={cn(
-          "w-32 sm:w-40 md:w-48 h-full relative overflow-hidden border-r-2 border-black shrink-0 animate-pulse",
-          isDark ? "bg-gray-900" : "bg-gray-300"
-        )}>
-          {/* Scanline overlay to match real card */}
-          <div className="absolute inset-0 scanline-overlay opacity-[0.06] pointer-events-none" />
-        </div>
+        {/* Thumbnail */}
+        <div
+          className={cn(
+            "w-36 sm:w-44 md:w-52 xl:w-64 2xl:w-72 h-full shrink-0 animate-pulse",
+            isDark ? "bg-white/[0.04]" : "bg-slate-200"
+          )}
+        />
 
-        {/* Content block — mimics the p-3 sm:py-3 sm:px-4 layout */}
-        <div className="flex flex-col flex-grow pt-2 pb-3 px-3 sm:pt-3 sm:pb-3.5 sm:px-4 min-w-0">
-          {/* Header row: category badge + date (left) | reading-time (right) */}
-          <div className="flex items-center justify-between mb-1.5 sm:mb-2 shrink-0">
+        {/* Content */}
+        <div className="flex flex-col flex-grow p-3.5 sm:p-4 md:p-5 min-w-0">
+          <div className="flex items-center justify-between mb-2.5 shrink-0">
             <div className="flex items-center gap-2">
-              {/* Category badge — same border+shadow style */}
-              <div className={cn(
-                "w-14 h-4 rounded-none border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] animate-pulse",
-                shimmer
-              )} />
-              <div className={cn("w-16 h-3 rounded-none animate-pulse", shimmerDim)} />
+              <div className={cn("w-16 h-4 rounded-full animate-pulse", shimmer)} />
+              <div className={cn("w-20 h-3 rounded-md animate-pulse", shimmerDim)} />
             </div>
-            <div className={cn("w-10 h-3 rounded-none animate-pulse", shimmerDim)} />
+            <div className={cn("w-12 h-3 rounded-md animate-pulse", shimmerDim)} />
           </div>
 
-          {/* Title — 2 lines, font-retro */}
-          <div className="space-y-1.5 mb-1.5 sm:mb-2 shrink-0">
-            <div className={cn("w-full h-4 rounded-none animate-pulse", shimmer)} />
-            <div className={cn("w-4/5 h-4 rounded-none animate-pulse", shimmer)} />
+          <div className="space-y-2 mb-2.5 shrink-0">
+            <div className={cn("w-4/5 h-4 rounded-md animate-pulse", shimmer)} />
+            <div className={cn("w-3/5 h-3.5 rounded-md animate-pulse", shimmerDim)} />
           </div>
 
-          {/* Excerpt — hidden on mobile, visible sm+ */}
-          <div className="hidden lg:block mb-1 shrink-0">
-            <div className={cn("w-full h-3 rounded-none animate-pulse", shimmerDim)} />
+          <div className="hidden lg:block space-y-1.5 mb-2 shrink-0">
+            <div className={cn("w-full h-3 rounded-md animate-pulse", shimmerDim)} />
+            <div className={cn("w-2/3 h-3 rounded-md animate-pulse", shimmerDim)} />
           </div>
 
-          {/* Footer: views/comments (left) | action buttons (right) */}
-          <div className={cn(
-            "mt-auto pt-2 border-t flex items-center justify-between shrink-0",
-            isDark ? "border-white/5" : "border-black/5"
-          )}>
-            <div className="flex items-center gap-2.5">
-              <div className={cn("w-8 h-3.5 rounded-none animate-pulse", shimmerDim)} />
-              <div className={cn("w-8 h-3.5 rounded-none animate-pulse", shimmerDim)} />
+          <div
+            className={cn(
+              "mt-auto pt-2.5 border-t flex items-center justify-between shrink-0",
+              isDark ? "border-white/[0.06]" : "border-slate-100"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <div className={cn("w-9 h-3.5 rounded-md animate-pulse", shimmerDim)} />
+              <div className={cn("w-9 h-3.5 rounded-md animate-pulse", shimmerDim)} />
             </div>
-            <div className="flex gap-1.5">
-              {/* Action icon buttons — same w-6 h-6 border as PostCard */}
-              <div className={cn(
-                "w-6 h-6 rounded-none border border-black/20 dark:border-white/20 animate-pulse",
-                shimmerDim
-              )} />
-              <div className={cn(
-                "w-6 h-6 rounded-none border border-black/20 dark:border-white/20 animate-pulse",
-                shimmerDim
-              )} />
+            <div className="flex gap-2">
+              <div className={cn("w-7 h-7 rounded-lg animate-pulse", shimmerDim)} />
+              <div className={cn("w-7 h-7 rounded-lg animate-pulse", shimmerDim)} />
             </div>
           </div>
         </div>
@@ -96,101 +80,82 @@ export default function PostSkeleton({ isDark, variant = "default" }: PostSkelet
     );
   }
 
-  // ── COMPACT variant ──────────────────────────────────────────
+  // ── COMPACT variant ──
   if (variant === "compact") {
     return (
       <div
         role="status"
         aria-busy="true"
         aria-label="Carregando artigo..."
-        className={cn(
-          "flex flex-col h-full rounded-none",
-          border,
-          "shadow-[4px_4px_0px_rgba(0,0,0,1)]",
-          cardBg
-        )}
+        className={cn("flex flex-col h-full rounded-2xl border overflow-hidden", cardBg)}
       >
-        {/* Thumbnail */}
-        <div className={cn(
-          "w-full h-32 sm:h-40 relative overflow-hidden border-b border-black/10 dark:border-white/5 shrink-0 animate-pulse",
-          isDark ? "bg-gray-900" : "bg-gray-300"
-        )}>
-          <div className="absolute inset-0 scanline-overlay opacity-[0.06] pointer-events-none" />
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col flex-grow p-3">
-          <div className="space-y-1.5 mb-2">
-            <div className={cn("w-full h-3.5 rounded-none animate-pulse", shimmer)} />
-            <div className={cn("w-3/4 h-3.5 rounded-none animate-pulse", shimmer)} />
+        <div
+          className={cn(
+            "w-full h-36 sm:h-40 shrink-0 animate-pulse",
+            isDark ? "bg-white/[0.04]" : "bg-slate-200"
+          )}
+        />
+        <div className="flex flex-col flex-grow p-4">
+          <div className="space-y-2 mb-3">
+            <div className={cn("w-full h-4 rounded-md animate-pulse", shimmer)} />
+            <div className={cn("w-3/4 h-3.5 rounded-md animate-pulse", shimmerDim)} />
           </div>
-          <div className={cn(
-            "mt-auto pt-2 border-t flex items-center justify-between",
-            isDark ? "border-white/5" : "border-black/5"
-          )}>
-            <div className={cn("w-16 h-2.5 rounded-none animate-pulse", shimmerDim)} />
-            <div className={cn("w-8 h-3 rounded-none animate-pulse", shimmerDim)} />
+          <div
+            className={cn(
+              "mt-auto pt-2.5 border-t flex items-center justify-between",
+              isDark ? "border-white/[0.06]" : "border-slate-100"
+            )}
+          >
+            <div className={cn("w-16 h-3 rounded-md animate-pulse", shimmerDim)} />
+            <div className={cn("w-10 h-3 rounded-md animate-pulse", shimmerDim)} />
           </div>
         </div>
       </div>
     );
   }
 
-  // ── DEFAULT variant ──────────────────────────────────────────
+  // ── DEFAULT variant (Catálogo Completo) ──
   return (
     <div
       role="status"
       aria-busy="true"
       aria-label="Carregando artigo..."
-      className={cn(
-        "flex flex-col h-full rounded-none",
-        border,
-        "shadow-[6px_6px_0px_rgba(0,0,0,1)]",
-        cardBg
-      )}
+      className={cn("flex flex-col h-full rounded-2xl border overflow-hidden", cardBg)}
     >
-      {/* Thumbnail — aspect-video like the real card */}
-      <div className={cn(
-        "w-full aspect-video relative overflow-hidden shrink-0 animate-pulse",
-        isDark ? "bg-gray-900" : "bg-gray-300"
-      )}>
-        <div className="absolute inset-0 scanline-overlay opacity-20 pointer-events-none" />
-        {/* Category pill placeholder — bottom-left */}
-        <div className="absolute bottom-3 left-3">
-          <div className={cn(
-            "w-20 h-5 rounded-none border border-black shadow-[1px_1px_0px_rgba(0,0,0,1)] animate-pulse",
-            isDark ? "bg-gray-700" : "bg-gray-400"
-          )} />
+      <div
+        className={cn(
+          "w-full aspect-video relative overflow-hidden shrink-0 animate-pulse",
+          isDark ? "bg-white/[0.04]" : "bg-slate-200"
+        )}
+      >
+        <div className="absolute top-3.5 left-3.5">
+          <div className={cn("w-20 h-5 rounded-full animate-pulse", shimmer)} />
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col flex-grow p-4">
-        {/* Date */}
-        <div className={cn("w-24 h-2.5 rounded-none mb-2 animate-pulse", shimmerDim)} />
+      <div className="flex flex-col flex-grow p-5">
+        <div className={cn("w-28 h-3 rounded-md mb-2.5 animate-pulse", shimmerDim)} />
 
-        {/* Title — 2 lines */}
-        <div className="space-y-2 mb-2.5">
-          <div className={cn("w-full h-5 rounded-none animate-pulse", shimmer)} />
-          <div className={cn("w-3/4 h-5 rounded-none animate-pulse", shimmer)} />
+        <div className="space-y-2 mb-3">
+          <div className={cn("w-full h-5 rounded-md animate-pulse", shimmer)} />
+          <div className={cn("w-3/4 h-4 rounded-md animate-pulse", shimmerDim)} />
         </div>
 
-        {/* Excerpt */}
-        <div className="space-y-1.5 mb-4">
-          <div className={cn("w-full h-3 rounded-none animate-pulse", shimmerDim)} />
-          <div className={cn("w-5/6 h-3 rounded-none animate-pulse", shimmerDim)} />
+        <div className="space-y-1.5 mb-5">
+          <div className={cn("w-full h-3 rounded-md animate-pulse", shimmerDim)} />
+          <div className={cn("w-5/6 h-3 rounded-md animate-pulse", shimmerDim)} />
         </div>
 
-        {/* Footer */}
-        <div className={cn(
-          "mt-auto pt-3 border-t flex items-center justify-between",
-          isDark ? "border-white/5" : "border-black/5"
-        )}>
-          <div className={cn("w-14 h-3 rounded-none animate-pulse", shimmerDim)} />
-          <div className="flex items-center gap-3">
-            <div className={cn("w-8 h-3 rounded-none animate-pulse", shimmerDim)} />
-            <div className={cn("w-8 h-3 rounded-none animate-pulse", shimmerDim)} />
-            <div className={cn("w-8 h-3 rounded-none animate-pulse", shimmerDim)} />
+        <div
+          className={cn(
+            "mt-auto pt-3.5 border-t flex items-center justify-between",
+            isDark ? "border-white/[0.06]" : "border-slate-100"
+          )}
+        >
+          <div className={cn("w-16 h-3 rounded-md animate-pulse", shimmerDim)} />
+          <div className="flex items-center gap-2.5">
+            <div className={cn("w-9 h-3.5 rounded-md animate-pulse", shimmerDim)} />
+            <div className={cn("w-9 h-3.5 rounded-md animate-pulse", shimmerDim)} />
           </div>
         </div>
       </div>

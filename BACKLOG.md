@@ -1,59 +1,45 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.0.0)
 
-Este arquivo lista as oportunidades de melhoria técnica, segurança, cobertura de testes e otimizações arquiteturais identificadas durante a revisão geral do projeto (pós-migração para Next.js).
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.0.0 (Cyber-Editorial & Streaming Geek Redesign)**.
 
 ---
 
-## 🔒 1. Segurança & Banco de Dados (Firebase)
+## 🎨 1. Design System & Interface (Próximos Passos)
 
-- [ ] **Deploy da Regra Estrita de Visualizações**
-  * **Objetivo**: Aplicar a regra estrita de incremento unitário para as visualizações no Firestore em produção.
+- [ ] **Refatoração Completa do Modo Claro / Modo Escuro (Theme Engine v2)**
+  * **Contexto**: Na v6.0.0, o botão de alternância de tema foi ocultado temporariamente e o portal foi travado em `isDark: true` (`useThemeStore.ts`) para garantir 100% de fidelidade na estética Cyber-Editorial escura.
+  * **Objetivo**: Projetar um **Modo Claro Editorial** dedicado (com variáveis CSS semânticas para superfícies, sombras, bordas e contrastes de badges) em vez de inversões simples de classes, reativando o seletor quando ambos os temas estiverem perfeitos.
+- [ ] **Modernização Visual do Painel Admin (`AdminDashboard.tsx`) e Editor de Posts (`PostEditorPage.tsx`)**
+  * **Objetivo**: Aplicar o mesmo acabamento Cyber-Editorial (`#121024`, `border-white/[0.08]`, `rounded-2xl`) às abas internas do Painel Administrativo e à tela de criação/edição de matérias (atualmente funcionais e restritas a administradores).
+- [ ] **Revisão de Conteúdo no Firestore (Via Painel Admin)**
+  * **Objetivo**: Corrigir pequenos erros de digitação em subtítulos antigos cadastrados no Firestore (ex.: *"Batman no SNES"* — `"DEFENIU"` → `"DEFINIU"`, `"JUSS"` → `"JUS"`) e reenviar a imagem de capa da matéria *"Diablo 4 Lord of Hatred"* caso o link externo antigo esteja expirado.
+
+---
+
+## 🔒 2. Segurança & Banco de Dados (Firebase)
+
+- [ ] **Deploy da Regra Estrita de Visualizações (`firestore.rules`)**
+  * **Objetivo**: Garantir que a regra local de incremento unitário estrito (`views == views + 1`) esteja publicada no ambiente de produção do Firebase.
   * **Ação**: Executar `firebase deploy --only firestore:rules`.
-  * **Status**: Localmente configurado em `firestore.rules`.
 - [ ] **Restrição de Origens no CORS (`cors.json`)**
-  * **Objetivo**: Substituir o wildcard `*` por origens seguras em produção para proteger os uploads e requisições do Firebase Storage.
-  * **Ação**: Modificar `cors.json` para expor apenas `https://lucasbegins.com.br`, as URLs de preview do Vercel e `http://localhost:3000`.
+  * **Objetivo**: Substituir o wildcard `*` por origens seguras em produção (`https://lucasbegins.com.br`, previews da Vercel e `http://localhost:3000`).
 
 ---
 
-## 🛠️ 2. Qualidade de Código & Linting (ESLint 9)
+## 🛠️ 3. Qualidade de Código, Limpeza de Legado & Linting
 
-- [ ] **Migração do ESLint para Padrão Next.js**
-  * **Objetivo**: Ativar a verificação de código automática (lint) sobre arquivos TypeScript (`.ts`, `.tsx`), que hoje estão sendo ignorados pelo arquivo herdado do Vite.
-  * **Ação**: Atualizar o `eslint.config.js` para utilizar a estrutura Flat Config suportada pela dependência `eslint-config-next`.
-  * **Exemplo de Configuração**:
-    ```javascript
-    import { FlatCompat } from "@eslint/eslintrc";
-    // ... importar configs de Flat Compat e estender 'next/core-web-vitals'
-    ```
+- [ ] **Remoção de Dependências Legadas da Migração Vite → Next.js**
+  * **Objetivo**: Remover pacotes residuais que não são mais necessários no Next.js 16 App Router (`react-helmet-async`, `react-router-dom`, `vite`, `@vitejs/plugin-react` em `package.json`) após migrar os últimos imports internos para o `router-compat.tsx` nativo.
+- [ ] **Migração do ESLint 9 para Padrão Next.js (`eslint.config.js`)**
+  * **Objetivo**: Ativar linting completo em arquivos `.ts` e `.tsx` com `eslint-config-next`.
+- [ ] **Padronização de Variáveis de Ambiente (`NEXT_PUBLIC_`)**
+  * **Objetivo**: Remover o fallback de variáveis antigas `VITE_` no `next.config.mjs` após confirmar que todas as chaves na Vercel utilizam `NEXT_PUBLIC_`.
 
 ---
 
-## 🧪 3. Cobertura de Testes
+## 🧪 4. Cobertura de Testes Automatizados
 
-- [ ] **Testes Unitários de Renderização de Artigos**
-  * **Objetivo**: Garantir que as marcações customizadas criadas no editor de posts (ex: `:::pullquote`, `:::info-box`, `:::columns-2`, `@[youtube]`) renderizem as tags HTML esperadas.
-  * **Ação**: Criar `src/features/posts/components/ArticleRenderer.test.tsx` utilizando `@testing-library/react`.
-- [ ] **Mock de Serviços e Queries (MSW)**
-  * **Objetivo**: Testar hooks como `usePost` e mutações offline sem precisar chamar o banco real.
-  * **Ação**: Configurar o **Mock Service Worker (MSW)** ou o Firebase Local Emulator Suite para simular respostas do banco durante a execução do `npm run test`.
-- [ ] **Testes de Integração E2E (End-to-End)**
-  * **Objetivo**: Evitar regressões em fluxos críticos do sistema.
-  * **Ação**: Configurar o **Playwright** ou **Cypress** para testar fluxos como:
-    * Login de Administrador.
-    * Fluxo de criação e salvamento de rascunhos/posts no editor.
-    * Envio e exclusão de comentários/respostas.
-
----
-
-## ⚡ 4. Otimização de Performance & Arquitetura
-
-- [ ] **Otimização de Imagens no Corpo dos Artigos**
-  * **Objetivo**: Retornar ao uso da tag `<Image>` do Next.js no corpo das matérias sem sofrer com o colapso de containers no layout float.
-  * **Ação**:
-    1. Alterar o editor de posts para armazenar as dimensões (largura/altura original) de cada imagem inserida no Firestore.
-    2. Modificar o subcomponente `ArticleImage` em `ArticleRenderer.tsx` para passar essas dimensões ao `<Image width={...} height={...}>` do Next.js.
-    3. Remover a tag `<img>` nativa, recuperando a compressão automática e as taxas de entrega otimizadas do Next.js Image Optimizer.
-- [ ] **Depreciação de Prefixo de Variáveis Legadas (`VITE_`)**
-  * **Objetivo**: Simplificar o ecossistema de variáveis de ambiente.
-  * **Ação**: Migrar todas as configurações no painel da Vercel para o prefixo `NEXT_PUBLIC_` e remover a injeção duplicada e remapeamento no `next.config.js`.
+- [ ] **Testes Unitários do `ArticleRenderer.tsx` (Vitest + Testing Library)**
+  * **Objetivo**: Validar a renderização de blocos customizados (`:::pullquote`, `:::info-box`, `:::columns-2`, `@[youtube]`, molduras `{#frame-crt}`).
+- [ ] **Testes E2E de Fluxos Críticos (Playwright)**
+  * **Objetivo**: Cobrir busca na Navbar, leitura de artigos, envio de comentários e publicação no editor.

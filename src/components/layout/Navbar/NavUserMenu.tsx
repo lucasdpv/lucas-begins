@@ -17,45 +17,48 @@ export default function NavUserMenu({
   profile,
   onLogout,
   onLoginClick,
-  isDark
+  isDark,
 }: NavUserMenuProps) {
   if (!currentUser) {
     return (
-      <button 
-        onClick={onLoginClick} 
+      <button
+        type="button"
+        onClick={onLoginClick}
         className={cn(
-          "px-5 py-2 rounded-xl font-retro font-black text-[10px] uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 border",
-          isDark 
-            ? "bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500 hover:text-white" 
-            : "bg-purple-600/5 border-purple-500/20 text-purple-600 hover:bg-purple-600 hover:text-white"
+          "px-5 py-2.5 rounded-xl font-retro font-black text-xs uppercase tracking-widest leading-none transition-all hover:scale-105 active:scale-95 border cursor-pointer",
+          isDark
+            ? "bg-purple-500/15 border-purple-500/35 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.2)]"
+            : "bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-600 hover:text-white"
         )}
       >
-        LOGIN
+        Login
       </button>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
-      {currentUser.role === 'admin' && (
-        <Link 
-          to="/admin" 
+    <div className="flex items-center gap-2">
+      {currentUser.role === "admin" && (
+        <Link
+          to="/admin"
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all group hover:bg-white/5 shrink-0",
-            isDark ? "text-purple-400" : "text-purple-600"
+            "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all group hover:bg-white/[0.05] shrink-0",
+            isDark ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
           )}
           title="Painel Administrativo"
         >
-          <ShieldCheck size={18} className="transition-transform group-hover:scale-110 shrink-0" />
-          <span className="hidden 2xl:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Painel</span>
+          <ShieldCheck size={17} className="transition-transform group-hover:scale-110 shrink-0" />
+          <span className="hidden xl:block font-retro text-xs font-black uppercase tracking-widest leading-none whitespace-nowrap">
+            Painel
+          </span>
         </Link>
       )}
 
-      <Link 
-        to="/dashboard" 
+      <Link
+        to="/dashboard"
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all group hover:bg-white/5 shrink-0",
-          isDark ? "text-purple-400" : "text-purple-600"
+          "flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all group hover:bg-white/[0.05] shrink-0",
+          isDark ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
         )}
         title="Meu QG"
       >
@@ -70,21 +73,24 @@ export default function NavUserMenu({
           />
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
         </div>
-        <span className="hidden 2xl:block font-retro text-xs font-black uppercase tracking-widest whitespace-nowrap">Meu QG</span>
+        <span className="hidden xl:block font-retro text-xs font-black uppercase tracking-widest leading-none whitespace-nowrap">
+          Meu QG
+        </span>
       </Link>
-      
+
       {/* Divider */}
-      <div className={cn("w-px h-5 shrink-0", isDark ? "bg-white/10" : "bg-black/10")} />
+      <div className={cn("w-px h-5 shrink-0 mx-0.5", isDark ? "bg-white/10" : "bg-black/10")} />
 
       <button
+        type="button"
         onClick={onLogout}
         className={cn(
-          "p-2 rounded-xl transition-all group hover:bg-red-500/10",
+          "p-2 rounded-xl transition-all group hover:bg-red-500/10 cursor-pointer",
           isDark ? "text-red-400" : "text-red-500"
         )}
         title="Sair"
       >
-        <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
+        <LogOut size={17} className="group-hover:translate-x-0.5 transition-transform" />
       </button>
     </div>
   );

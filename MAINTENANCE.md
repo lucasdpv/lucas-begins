@@ -1,61 +1,43 @@
-# 🔧 Guia de Manutenção — BeginsProject (v3.0.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.0.0)
 
-Este documento é o seu manual de operações para manter a economia de jogo e a integridade do banco de dados do portal.
+Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 
 ---
 
 ## 🔐 Gestão de Administradores & Roles
 
-Diferente da versão anterior, a segurança agora é baseada em **Roles** (Papéis) dentro do documento do usuário na coleção `users`.
+A segurança de rotas (no cliente e no `middleware.ts` do Next.js) é baseada em **Roles** dentro do documento do usuário na coleção `users` do Cloud Firestore.
 
 ### Como promover um usuário a Admin:
-1. Acesse o **Firestore Database**.
+1. Acesse o **Firebase Console > Firestore Database**.
 2. Localize o usuário na coleção `users` (pelo UID ou e-mail).
 3. Altere o campo `role` de `"user"` para `"admin"`.
-4. Isso desbloqueia automaticamente o acesso ao Painel Admin e todas as ferramentas de edição.
+4. No próximo carregamento, o botão **Painel** ficará visível na Navbar e as rotas `/admin` e `/editor` serão liberadas pelo middleware.
 
 ---
 
-## 🛠️ Ferramentas Administrativas (Painel de Controle)
+## 📰 Publicação, Proporções de Capa & Títulos Compostos
 
-A partir da Versão 2.0 foi introduzida a aba **"Ferramentas"** no Painel Admin, eliminando a necessidade de scripts manuais.
-
-### 📊 Normalização de Visualizações
-Se as visualizações de um post parecerem irreais (ex: 10.000 views para 2 likes), use esta ferramenta:
-1. Vá em **Admin > Ferramentas**.
-2. Clique em **"Executar Reset"**.
-3. O sistema recalculará as views de todos os posts usando uma fórmula baseada em engajamento real + fator aleatório retro.
-4. **Performance**: O processo é executado em paralelo e leva poucos segundos.
+- **Split Title Automático**: Ao cadastrar um post com `:` (ou ` - `) no título — ex: `Chrono Trigger: A história do RPG perfeito` — o portal separa automaticamente o **Título Principal** (em destaque com `font-retro`) e o **Subtítulo** (colorido dinamicamente conforme a categoria).
+- **Proporções de Imagem**: No editor de posts (`PostEditorPage.tsx`), você pode escolher entre `original`, `16:9`, `1:1` e `4:5`, além de molduras especiais (`normal`, `crt`, `sticker`, `none`) nos blocos de imagem do artigo.
+- **Suporte a GIFs**: Imagens `.gif` são enviadas diretamente ao Firebase Storage sem compressão WebP para preservar a animação.
 
 ---
 
 ## 🎮 Gestão de Gamificação (XP & Level)
 
-O progresso dos usuários é armazenado nos campos `xp` e `level` da coleção `users`.
-
-### Recuperação de XP:
-Se um usuário relatar perda de nível ou XP:
-1. Verifique o histórico de edições de perfil no Firestore.
-2. O sistema de proteção (v3.0.0) impede sobrescritas, mas em caso de falha, você pode editar manualmente os campos `xp` e `level` para restaurar o progresso do jogador.
-
----
-
-## 🧹 Versionamento de Migração
-A constante que controla a limpeza de cache e scripts de inicialização agora reside em:
-`src/constants.ts` -> `MIGRATION_VERSION`.
-
-Ao subir uma versão que mude drasticamente a estrutura do banco:
-1. Altere o valor de `MIGRATION_VERSION` (ex: de `v2.0` para `v2.1`).
-2. Isso forçará a limpeza de `localStorage` e re-sincronização para todos os usuários.
+O progresso dos leitores é salvo nos campos `xp` e `level` da coleção `users`:
+- **Ler Artigo**: +10 XP
+- **Curtir**: +5 XP
+- **Favoritar**: +15 XP
+- **Comentar**: +20 XP
+- **Responder Comentário**: +10 XP
 
 ---
 
-## 💾 Backups & Segurança
-O Firebase não possui backups automáticos no plano Spark.
-- **Exportação**: Utilize o Google Cloud Console para exportações programadas se o banco crescer muito.
-- **Zod Schemas**: Todos os dados salvos passam pela validação do `src/features/posts/schemas.ts`. Se adicionar um campo novo no Firestore, atualize o Schema ou o dado será ignorado pela interface.
+## 💾 Segurança & Validação
+- **Regras de Views (`firestore.rules`)**: Atualizações anônimas de visualizações são permitidas apenas se alterarem exclusivamente o campo `views` com incremento estrito de `+1`.
+- **Zod Schemas (`src/features/posts/schemas.ts`)**: Todos os posts passam por validação Zod com fallbacks seguros. Se adicionar um novo campo aos posts no Firestore, lembre-se de incluí-lo no `PostSchema`.
 
 ---
-
-> [!TIP]
-> O sistema possui um `SystemInitializer.tsx` que garante que as coleções básicas existam. Se deletar o banco por engano, basta abrir o site logado como admin que a estrutura básica será recriada.
+**Atualizado em: 30 de Outubro de 2026 (v6.0.0).**

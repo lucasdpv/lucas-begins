@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { STORAGE_KEYS } from '../constants';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { STORAGE_KEYS } from "../constants";
 
 interface ThemeState {
   isDark: boolean;
@@ -9,12 +9,16 @@ interface ThemeState {
 
 export const useThemeStore = create<ThemeState>()(
   persist(
-    (set) => ({
+    () => ({
       isDark: true,
-      toggleTheme: () => set((state) => ({ isDark: !state.isDark })),
+      toggleTheme: () => {},
     }),
     {
       name: STORAGE_KEYS.THEME,
+      merge: (_persistedState, currentState) => ({
+        ...currentState,
+        isDark: true,
+      }),
     }
   )
 );

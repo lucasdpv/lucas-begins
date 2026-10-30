@@ -1,110 +1,77 @@
-# 📜 Documentação Técnica — BeginsProject
+# 📜 Documentação Técnica — BeginsProject (v6.0.0)
 
-Este documento detalha a arquitetura de software, o sistema de design e as decisões de engenharia da versão **v5.1.1** (Next.js, AdSense Fix & LCP Optimization Update).
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.0.0**.
 
 ---
 
 ## 🚀 Tecnologias Core
-- **Frontend**: React 19 + Next.js 16 (App Router + Server Components) + TypeScript.
-- **Roteamento & Renderização**: Server-Side Rendering (SSR) híbrido com Incremental Static Regeneration (ISR) e Static Site Generation (SSG).
-- **Estilização**: Tailwind CSS (Design Neo-Brutalist Clássico).
-- **Backend**: Firebase (Firestore + Auth + Storage).
+- **Frontend & SSR**: React 19 + Next.js 16 (App Router + Server Components) + TypeScript 6.
+- **Roteamento & Renderização**: Server-Side Rendering (SSR) híbrido com Incremental Static Regeneration (`revalidate = 300`) e Static Site Generation (`generateStaticParams`).
+- **Estilização**: Tailwind CSS + CSS Moderno (`interpolate-size`, `text-wrap: balance/pretty`, `content-visibility: auto`, Scroll-Driven Animations).
+- **Backend**: Firebase (Cloud Firestore + Authentication + Cloud Storage).
 - **Gerenciamento de Dados**: TanStack Query v5 (React Query).
-- **Estado Global**: Zustand (UI/Tema) + Context API (Auth).
-- **Animações**: Framer Motion (transitions, dropdowns, lightbox).
-- **Busca Aproximada**: Fuse.js (tolerância a erros e acentuação).
-- **Síntese de Áudio**: Web Audio API (geração de efeitos sonoros nativos sem arquivos de mídia).
+- **Estado Global**: Zustand v5 (`useUIStore`, `useThemeStore`) + Context API (`AuthProvider`).
+- **Animações**: Framer Motion + GPU-accelerated CSS transitions.
+- **Busca Instantânea**: Fuse.js (tolerância a erros de digitação e acentuação na Spotlight Search Bar da Navbar).
+- **Síntese de Áudio**: Web Audio API (efeitos sonoros retrô sintetizados nativamente sem arquivos externos).
 
 ---
 
-## ⚙️ Arquitetura de Estado e Renderização Híbrida
+## 🎨 Design System v6.0: Cyber-Editorial + Streaming Geek
 
-O projeto foi migrado de um SPA puramente client-side (Vite) para um Framework Fullstack (Next.js), trazendo grandes otimizações:
+Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-brutalistas em favor de uma estética **Cyber-Editorial + Streaming Geek** inspirada em plataformas modernas (*Netflix*, *Crunchyroll*, *Apple TV+*, *Polygon*, *The Verge*):
 
-### 1. SSR & Hydration (Páginas de Posts)
-- Na rota `/post/[slug]`, os dados do post são buscados diretamente no servidor usando as APIs REST do Firestore. O HTML é pré-renderizado estaticamente (SSG) no build usando `generateStaticParams`.
-- O Next.js atualiza o cache das páginas a cada 5 minutos usando ISR (`revalidate = 300`).
-- No lado do cliente, o TanStack Query é inicializado usando o estado hidratado (`initialPost`), proporcionando carregamento instantâneo e zero oscilações de layout.
+### 1. Paleta, Superfícies & Container Widescreen
+- **Backdrop Cinematográfico**: Fundo escuro profundo (`#090812`) com malha radial sutil e superfícies translúcidas (`#121024/90` com `backdrop-blur-xl`).
+- **Bordas & Arredondamentos**: Bordas finas translúcidas (`border-white/[0.08]` a `border-white/[0.12]`) e cantos arredondados suaves (`rounded-2xl` e `rounded-3xl`).
+- **Container Widescreen (`.layout-container`)**: Definido em `src/index.css` com `max-width: 1760px` e paddings laterais responsivos, aproveitando monitores Full HD e Ultrawide na Navbar, `<main>` e Footer.
+- **Identidade de Marca**: Logotipo `BEGINSPROJECT` acompanhado do subtítulo oficial **`GAMES · ANIMES · NOSTALGIA`** na Navbar, MobileMenu e Footer.
+- **Modo Escuro Padrão (`useThemeStore.ts`)**: O tema escuro está fixado como padrão (`isDark: true`) enquanto a futura refatoração dedicada do sistema de temas Claro/Escuro está planejada no backlog.
 
-### 2. Zustand (Estado de Interface)
-Localizado em `src/store/`, gerencia estados que não precisam de persistência no banco:
-- **`useUIStore`**: Controla busca, categoria ativa, modais e sistema de Toasts.
-- **`useThemeStore`**: Gerencia a alternância entre os temas **Dark** (Lua violeta) e **SNES/Light** (Sol amarelo).
+### 2. Efeito TV Ambilight (Extensão de Luz da Cena)
+- Implementado em `src/features/posts/components/Carousel.tsx` e `src/features/posts/components/PostDetail/PostHero.tsx`.
+- Utiliza uma projeção de dupla camada (`-z-10 pointer-events-none`) sem `overflow-hidden`:
+  - **Camada 1 (Wall Wash Longo)**: `-inset-6 md:-inset-12 lg:-inset-16 blur-[70px] md:blur-[110px] saturate-[1.85] scale-105`.
+  - **Camada 2 (Edge Halo Curto)**: `-inset-2 md:-inset-4 blur-[32px] md:blur-[48px] saturate-[1.6]`.
+- Na troca de slides do carrossel, a luz ambiente realiza um crossfade suave de `1400ms` sincronizado com a nova arte.
 
-### 3. Context API (Autenticação)
-- **`AuthProvider`**: Envolve a aplicação para prover o estado do Firebase Auth (`currentUser`) e métodos de login/logout, além de sincronizar os cookies de sessão (`auth_token`, `user_role`) para o middleware do servidor.
+### 3. Trilho "Top 5 Em Alta Hoje" (`.netflix-rank`)
+- Numerais gigantes posicionados à esquerda de cada poster (`1` a `5`).
+- Em repouso, exibem contorno roxo translúcido; no `:hover` do card (`.group:hover .netflix-rank`), preenchem-se com **dourado sólido (`#fbbf24`)**, contorno `#fef08a` e *drop-shadow* âmbar luminoso.
 
-### 4. Carregamento Progressivo & Otimizações LCP (v5.1.1)
-- **Lazy Queries / Progressive Loading (HomePage)**: As consultas abaixo da dobra como `mostViewedPosts`, `reviewPosts`, `dossiePosts` e `retrocafePosts` têm seu carregamento postergado até que a thread principal do navegador esteja livre (`requestIdleCallback` com fallback de `setTimeout` de 900ms–1200ms). Isso reduz as consultas simultâneas na inicialização do portal de 6 para 2.
-- **Otimização LCP (Largest Contentful Paint)**: O prop `priority` de eager-loading é aplicado nos primeiros post cards exibidos nas grades principais da HomePage, ArchivePage e DashboardPage, instruindo o navegador a pré-carregar as imagens acima da dobra imediatamente. Adicionalmente, a primeira imagem inserida no corpo da matéria via `ArticleRenderer.tsx` é renderizada com `loading="eager"` para evitar atrasos na métrica LCP em matérias curtas.
-
----
-
-## 📂 Estrutura de Pastas (Modular)
-
-O projeto segue uma arquitetura híbrida de Next.js App Router e pastas modulares por features:
-
-### `src/app/`
-- Rotas oficiais do Next.js (Server Components). Proporciona roteamento de arquivos físicos, geração de metadados de SEO nativos e scripts de injeção JSON-LD.
-
-### `src/views/`
-- Componentes de visualização de páginas clientes (ex: `PostDetailPage.tsx`, `PostEditorPage.tsx`), contendo as regras de hooks e interações.
-
-### `src/features/`
-- **`admin/`**: Contém componentes exclusivos do painel (Tabs, Inbox) e o hook `useAdminActions`.
-- **`posts/`**: Componentes de PostCard, Carousel, Skeletons, renderizador de posts e os hooks de consulta de posts e categorias.
-- **`auth/`**: Componentes de Login e proteção de rotas.
-
-### `src/services/`
-- **`PostService.ts`**: Abstração pura do Firestore (métodos REST e SDK).
-- **`userService.ts`**: Lógica de gamificação (XP), favoritos e perfis.
-- **`uploadService.ts`**: Upload de imagens para o Firebase Storage com conversão automática para WebP (com exceção de GIFs).
+### 4. Modern Web Platform Enhancements
+- **Tipografia Equilibrada**: `text-wrap: balance` em títulos (`h1`–`h4`) e `text-wrap: pretty` em parágrafos de leitura (`.article-paragraph`, `.magazine-article`).
+- **Barra de Leitura via Portal (`PostDetailPage.tsx`)**: Renderizada via `createPortal(..., document.body)` no topo real do viewport (`z-[100]`) com suporte a CSS Scroll-Driven Animations (`animation-timeline: scroll(root block)`).
+- **Animação Intrínseca do Índice de Capítulos**: Uso de `interpolate-size: allow-keywords` e `calc-size(auto, size)` na classe `.toc-collapsible`.
+- **Content-Visibility Below-the-Fold**: Seções inferiores utilizam `.deferred-below-fold` (`content-visibility: auto; contain-intrinsic-size: auto 520px`).
 
 ---
 
-## 🖼️ Sistema de Imagens Premium & Renderização de Artigos
+## ⚙️ Arquitetura de Dados & Recomendações Dinâmicas
 
-### Proporções & Molduras no BlockEditor
-O editor de blocos suporta configuração visual de cada bloco de imagem:
-- **Aspect**: `original`, `1:1`, `16:9`, `4:5` - serializados no Markdown como `{#aspect-X}`.
-- **Frame Style**: `normal`, `crt`, `sticker`, `none` - serializados como `{#frame-Y}`.
-- **Scanlines**: `true/false` - serializado como `{#scanlines-false}`.
+### 1. SSR & Hydration (`/post/[slug]`)
+- Os dados iniciais do post são buscados no servidor via Firestore REST API e passados como `placeholderData` ao TanStack Query no cliente, garantindo SEO completo + atualização em tempo real de comentários e interações pelo SDK do Firebase.
 
-### Renderização e Float (ArticleRenderer)
-Para evitar o colapso de containers em layouts flutuantes (floats laterais onde o texto contorna a imagem), o `ArticleRenderer.tsx` utiliza tags nativas `<img>` de HTML, garantindo medição física de proporção de forma fluida.
-- **Lightbox de Zoom**: Zoom full-screen nativo com backdrop blur e scanlines ao clicar em imagens do artigo.
+### 2. Recomendações Dinâmicas ("Continue Explorando")
+- Em `PostDetailPage.tsx` e `PostRelated.tsx`, o sistema combina três fontes desduplicadas:
+  - `usePostsByCategory(post.category, 8)` (mesmo universo/categoria);
+  - `useLatestPosts(12)` (lançamentos recentes);
+  - `usePopularPosts(12)` (mais curtidos).
+- Um algoritmo `seededShuffle` determinístico por `currentPostId` seleciona automaticamente uma combinação única para cada matéria (priorizando 2 títulos da mesma categoria + 1 variado), além de oferecer o botão interativo **"Outras Sugestões"** para sortear novas matérias sem recarregar a página.
 
-### CORS Proxy para Corte de Imagens Remotas
-Para evitar erros de canvas tainted no canvas do ImageCropper, usamos um proxy local no Next.js:
-- Rewrite no `vercel.json` mapeando `/firebase-storage` para `https://firebasestorage.googleapis.com`.
-
----
-
-## 🎮 Gamificação e Regras de Negócio
-
-### Sistema de XP
-Os usuários ganham XP por interações:
-- **Ler Artigo**: +10 XP
-- **Curtir**: +5 XP
-- **Comentar**: +20 XP
-- **Favoritar**: +15 XP
-- **Responder Comentário**: +10 XP
-
-### Novo Mecanismo de Visualizações e Segurança (v5.0.0)
-A contagem de visualizações é executada de forma atômica utilizando `increment(1)` no Firestore:
-- **LocalStorage**: Artigos já lidos são registrados localmente no cliente (`retro_viewed_posts`) para evitar incrementos redundantes.
-- **Segurança Firestore rules**: As regras de escrita anônimas no Firestore (`firestore.rules`) foram blindadas de forma estrita. Atualizações sem login no campo de views só são autorizadas se alterarem **exclusivamente** o campo `views` e se o incremento for **exatamente +1** (`request.resource.data.views == resource.data.views + 1`), prevenindo manipulação arbitrária de números.
+### 3. Carregamento Progressivo & LCP (`HomePage.tsx`)
+- Consultas secundárias abaixo da dobra (`mostViewedPosts`, `reviewPosts`, `dossiePosts`, `retrocafePosts`) aguardam `requestIdleCallback` para liberar a thread principal na abertura do site.
+- A primeira imagem do carrossel (`idx === 0`) e a capa do artigo (`PostHero.tsx`) utilizam `priority` e `fetchPriority="high"`.
 
 ---
 
-## 🎨 Design System: Neo-Brutalist Clássico & Temático
+## 📂 Estrutura de Pastas
 
-A estética do portal segue um Neo-Brutalismo clássico retro-gaming:
-- **Cantos Retos**: Ausência completa de cantos arredondados (`rounded-none`).
-- **Bordas Pretas & Sombras 2D Offset**: Uso de `border-2 border-black` com sombras brutalistas offset (`shadow-[4px_4px_0px_rgba(0,0,0,1)]`).
-- **Cores por Categoria**: Títulos, subtítulos e badges exibem dinamicamente as cores de sua categoria (amarelo para reviews, azul para dossiês, laranja para retrocafé, rosa para nostalgia, ciano para RPG/MMO e esmeralda para cultura pop), tanto nos cards da home quanto no PostHero de detalhe.
-- **Alternador de Tema (Fixo)**: O botão de tema na Navbar e no MobileMenu reflete o estado atual (Lua violeta no Dark Mode, Sol amarelo no Light Mode).
-- **Web Audio API**: Geração de som 8-bit e digital para cliques e interações com abas e pastas do site.
+- **`src/app/`**: Rotas do Next.js App Router, metadados dinâmicos (`generateMetadata`), `sitemap.ts` e `robots.ts`.
+- **`src/views/`**: Páginas principais (`HomePage`, `ArchivePage`, `PostDetailPage`, `AboutPage`, `ContactPage`, `DashboardPage`, `PrivacyPolicyPage`, `NotFoundPage`, `PostEditorPage`, `AdminDashboard`).
+- **`src/features/posts/`**: `Carousel`, `PostCard`, `ArticleRenderer`, `PostDetail/` (`PostHero`, `PostActions`, `PostVerdict`, `PostAuthorBox`, `PostRelated`, `PostComments`), Skeletons e hooks do React Query (`usePostsQuery.ts`).
+- **`src/components/layout/`**: `Navbar`, `Footer` e subcomponentes (`NavCategoryMenu`, `NavUserMenu`, `MobileMenu`).
+- **`src/components/ui/`**: `Badge`, `LanguageSelector`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`, `ImageUpload`, `ImageCropper`.
 
 ---
-**Documentação atualizada em: 14 de Junho de 2026.**
+**Documentação atualizada em: 30 de Outubro de 2026 (v6.0.0).**

@@ -433,9 +433,22 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
 
     // 1. Heading
     if (line.startsWith('## ')) {
+      const rawHeading = line.slice(3).trim();
+      const headingId = `sec-${rawHeading
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")}`;
       renderedLines.push(
-        <h2 key={i} className={cn("font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro clear-both", isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700')}
-            dangerouslySetInnerHTML={{ __html: formatInline(line.slice(3).trim()) }}
+        <h2
+          key={i}
+          id={headingId}
+          className={cn(
+            "scroll-mt-28 font-retro font-bold text-2xl md:text-3xl uppercase mt-12 mb-5 pb-3 border-b-2 tracking-wide text-glow-retro clear-both",
+            isDark ? 'border-purple-500 text-purple-300' : 'border-purple-400 text-purple-700'
+          )}
+          dangerouslySetInnerHTML={{ __html: formatInline(rawHeading) }}
         />
       );
       i++;

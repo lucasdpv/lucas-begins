@@ -2,7 +2,6 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../../lib/utils";
-import { BRUTAL_DESIGN } from "../../../constants";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
 
 interface NavCategoryMenuProps {
@@ -20,77 +19,87 @@ export default function NavCategoryMenu({
   isOpen,
   setIsOpen,
   onSelect,
-  isDark
+  isDark,
 }: NavCategoryMenuProps) {
   return (
     <div className="relative">
       <button
+        type="button"
         className={cn(
-          "px-3 py-2 font-retro font-bold uppercase tracking-widest transition-all text-sm flex items-center gap-2 rounded-xl",
+          "px-3.5 py-2 font-retro font-black text-xs uppercase tracking-widest leading-none transition-all flex items-center gap-1.5 rounded-xl cursor-pointer",
           isOpen
-            ? (isDark ? "text-purple-500 bg-purple-500/10" : "text-snes-dark bg-snes-input")
-            : (isDark ? "hover:text-purple-500" : "hover:text-snes-dark hover:bg-snes-surface")
+            ? isDark
+              ? "text-purple-400 bg-purple-500/10"
+              : "text-purple-700 bg-purple-50"
+            : isDark
+            ? "text-slate-200 hover:text-purple-400 hover:bg-white/[0.04]"
+            : "text-slate-700 hover:text-purple-700 hover:bg-slate-100"
         )}
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
       >
-        Categorias <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
+        <span>Categorias</span>
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", isOpen && "rotate-180 text-purple-400")} />
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
+            initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-            className="absolute top-full left-0 mt-0 pt-4 w-[480px] z-50"
+            exit={{ opacity: 0, y: 10, scale: 0.97 }}
+            transition={{ duration: 0.18 }}
+            className="absolute top-full left-0 mt-0 pt-3 w-[480px] z-50"
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
           >
-            {/* Ponteiro (Triângulo) */}
-            <div className={cn(
-              "absolute top-2 left-8 w-4 h-4 rotate-45 border-l-4 border-t-4 z-10",
-              isDark ? "bg-gray-800 border-purple-500" : "bg-white border-purple-200"
-            )} />
-
-            <div className={cn(
-              "overflow-hidden p-5 grid grid-cols-2 gap-4 relative",
-              BRUTAL_DESIGN.ROUNDED, BRUTAL_DESIGN.BORDER_THICK, BRUTAL_DESIGN.SHADOW,
-              isDark ? "bg-gray-800" : "bg-white"
-            )}>
-              {["Todos", ...categories].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => onSelect(cat)}
-                  className={cn(
-                    "group flex items-center gap-3.5 p-3 rounded-2xl border-2 border-transparent transition-all text-left w-full",
-                    activeCategory === cat
-                      ? (isDark ? "bg-purple-600 text-white shadow-lg" : "bg-snes-dark text-white shadow-lg")
-                      : isDark
-                        ? "hover:bg-purple-500/10 text-gray-300"
-                        : "hover:bg-snes-input text-snes-accent"
-                  )}
-                >
-                  <div className={cn(
-                    "w-10 h-10 shrink-0 flex items-center justify-center transition-all duration-300",
-                    BRUTAL_DESIGN.ROUNDED_MODERN, BRUTAL_DESIGN.BORDER,
-                    activeCategory === cat ? "bg-white/20 border-white/40" : isDark ? "bg-gray-700 border-white/5" : "bg-gray-100 border-black/5",
-                    "group-hover:scale-110"
-                  )}>
-                    <div className="opacity-80 group-hover:opacity-100">
-                      {getCategoryIcon(cat, 18)}
+            <div
+              className={cn(
+                "overflow-hidden p-4 grid grid-cols-2 gap-2.5 relative rounded-2xl border backdrop-blur-2xl",
+                isDark
+                  ? "bg-[#121024]/95 border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.85)]"
+                  : "bg-white/95 border-slate-200/90 shadow-2xl"
+              )}
+            >
+              {["Todos", ...categories].map((cat) => {
+                const isActive = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => onSelect(cat)}
+                    className={cn(
+                      "group flex items-center gap-3 p-3 rounded-xl border transition-all text-left w-full cursor-pointer",
+                      isActive
+                        ? "bg-purple-600 text-white border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.35)]"
+                        : isDark
+                        ? "border-transparent hover:border-white/10 hover:bg-white/[0.05] text-slate-200"
+                        : "border-transparent hover:border-slate-200 hover:bg-purple-50/60 text-slate-800"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-9 h-9 shrink-0 flex items-center justify-center rounded-xl border transition-all duration-300 group-hover:scale-105",
+                        isActive
+                          ? "bg-white/20 border-white/30 text-white"
+                          : isDark
+                          ? "bg-white/[0.05] border-white/10 text-purple-400"
+                          : "bg-slate-100 border-slate-200 text-purple-600"
+                      )}
+                    >
+                      {getCategoryIcon(cat, 17)}
                     </div>
-                  </div>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="font-retro font-bold text-xs uppercase tracking-wider truncate">
-                      {cat}
-                    </span>
-                    <span className="text-[9px] opacity-50 font-bold uppercase tracking-tight">
-                      Explorar
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-retro font-bold text-xs uppercase tracking-wider truncate">
+                        {cat}
+                      </span>
+                      <span className="text-[9px] opacity-60 font-mono uppercase tracking-wider mt-0.5">
+                        Explorar setor
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </motion.div>
         )}

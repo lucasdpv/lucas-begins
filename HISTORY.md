@@ -4,6 +4,38 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v6.0.0] - The Cyber-Editorial & Streaming Geek Redesign Update
+*Data: 30 de Outubro de 2026*
+
+### 🎬 Redesign Completo: Cyber-Editorial + Streaming Geek
+- **Nova Identidade Global (`src/index.css`, `Navbar.tsx`, `Footer.tsx`)**: Transição completa do antigo visual neo-brutalista de bordas pretas grossas para uma estética **Cyber-Editorial + Streaming Geek** (inspirada em *Netflix*, *Crunchyroll*, *Polygon* e *The Verge*), com fundo escuro cinematográfico (`#090812`), superfícies translúcidas (`#121024/90`), bordas finas (`border-white/[0.08]`) e cantos arredondados (`rounded-2xl` / `rounded-3xl`).
+- **Assinatura Oficial da Marca (`GAMES · ANIMES · NOSTALGIA`)**: Adicionado o subtítulo `GAMES · ANIMES · NOSTALGIA` sob o logotipo `BEGINSPROJECT` na Navbar, no MobileMenu e no Footer.
+- **Expansão Widescreen Desktop (`.layout-container`)**: Novo container fluido com `max-width: 1760px` em `ClientLayoutWrapper.tsx`, `Navbar.tsx` e `Footer.tsx` para aproveitar monitores Full HD e Ultrawide, exibindo 6 cards em *Recém-Adicionados* e até 4 colunas no *Catálogo Completo* (`2xl:grid-cols-4`).
+- **Padronização da Navbar & Correção da Busca**: Tipografia unificada em 100% dos itens da Navbar (`font-retro font-black text-xs uppercase tracking-widest`), barra de busca central ampla (`flex-1 max-w-md xl:max-w-lg 2xl:max-w-xl`) e dropdown de resultados com largura mínima garantida (`minWidth: 420px`) tanto para usuários logados quanto deslogados.
+- **Modo Escuro Fixo Temporário (`useThemeStore.ts`)**: Ocultado o botão de alternância de tema claro/escuro e fixado `isDark: true` até a futura refatoração dedicada do sistema de temas.
+
+### 🌈 Billboard Hero com Efeito TV Ambilight & Crossfade Cinematográfico
+- **Extensão de Luz da Cena (Ambilight)**: Substituído o container recortado por uma projeção Ambilight em dupla camada sem `overflow-hidden` (`blur-[110px] saturate-[1.85] -inset-16` + `blur-[48px] saturate-[1.6] -inset-4`) tanto no `Carousel.tsx` quanto no `PostHero.tsx`, espalhando organicamente as cores reais da arte pelo ambiente escuro.
+- **Transição Contínua sem Piscar**: Camadas de imagem pré-montadas no `Carousel.tsx` com crossfade suave de `1100ms`, efeito *Ken Burns* sutil (`scale-100` vs `scale-[1.04]`), transição de texto com leve desfoque e dock de miniaturas estável no canto inferior direito.
+
+### 🔥 Trilho "Top 5 Em Alta Hoje" & Séries Originais (`HomePage.tsx`)
+- **Numerais Estilo Top 10 (`.netflix-rank`)**: Números gigantes vazados à esquerda dos posters que se preenchem com **dourado sólido (`#fbbf24`)** e brilho âmbar ao passar o mouse, além de fallback gracioso de gradiente (`onError`) para imagens indisponíveis.
+- **Séries & Coleções Originais**:
+  - **RetroCafé**: Posters verticais `3:4` estilo série original (`EPISÓDIO #01`) com aura laranja reativa.
+  - **Dossiês**: Cards widescreen confidenciais (`ARQUIVO #01`) com feixe de laser azul no hover.
+  - **Reviews**: Vitrine de vereditos com nota em destaque e máscara de gradiente suave sobre a arte do jogo.
+
+### 🔄 Recomendações Dinâmicas & Polimento de Artigos (`PostDetailPage.tsx`)
+- **"Continue Explorando" Dinâmico (`PostRelated.tsx`)**: Pool inteligente combinando matérias da mesma categoria (`usePostsByCategory`), recentes (`useLatestPosts(12)`) e populares (`usePopularPosts(12)`), embaralhados de forma única por artigo (`seededShuffle`) + botão interativo **"Outras Sugestões"**.
+- **Barra de Progresso de Leitura via Portal**: Movida para `createPortal(..., document.body)` com fundo transparente e remoção do `transform` residual em `@keyframes pageEnter`, corrigindo o bug onde a barra cortava o botão `← VOLTAR AO CATÁLOGO`.
+- **Box do Autor e Veredito Responsivos (`PostAuthorBox.tsx`, `PostVerdict.tsx`)**: Removido o `line-clamp-2` que cortava a bio do autor em telas portáteis/mobile e aplicado layout responsivo empilhado (`flex-col sm:flex-row`).
+
+### 🦴 Atualização Completa de Skeletons, Páginas Internas & Overlays
+- **Skeletons Cyber-Editoriais**: `CarouselSkeleton.tsx`, `PostSkeleton.tsx` e `PostDetailSkeleton.tsx` atualizados para `rounded-2xl`/`rounded-3xl` e `border-white/[0.08]`.
+- **Páginas Internas & Modais**: `ArchivePage.tsx`, `AboutPage.tsx`, `ContactPage.tsx`, `DashboardPage.tsx`, `PrivacyPolicyPage.tsx`, `NotFoundPage.tsx`, `AuthGate.tsx`, `ShareModal.tsx`, `LoginModal.tsx`, `CookieConsent.tsx`, `BackToTop.tsx` e `Toast.tsx` atualizados para o novo Design System.
+
+---
+
 ## 🚀 [v5.1.2] - Server Hydration Comments, Hydration Mismatch & Dynamic Sitemap Fix
 *Data: 21 de Junho de 2026*
 

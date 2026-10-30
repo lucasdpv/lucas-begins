@@ -34,8 +34,8 @@ const PROVIDERS: Provider[] = [
     key: "google",
     label: "Entrar com Google",
     icon: GoogleIcon,
-    lightStyle: "bg-snes-surface text-snes-accent border-snes-mid hover:bg-snes-input",
-    darkStyle: "bg-white text-gray-900 border-gray-300 hover:bg-gray-100",
+    lightStyle: "bg-slate-900 text-white border-slate-800 hover:bg-purple-600",
+    darkStyle: "bg-white text-slate-950 border-white/20 hover:bg-purple-600 hover:text-white shadow-[0_10px_25px_rgba(255,255,255,0.12)]",
   },
 ];
 
@@ -47,14 +47,14 @@ export default function LoginModal() {
 
   const handlers: Record<string, () => void> = { google: login };
 
-  // Fechar com Escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsLoginModalOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsLoginModalOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [setIsLoginModalOpen]);
 
-  // Fechar ao clicar fora
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) setIsLoginModalOpen(false);
   };
@@ -63,65 +63,60 @@ export default function LoginModal() {
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}
+      className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
     >
       <div
         className={cn(
-          "w-full max-w-md rounded-3xl overflow-hidden retro-card relative",
-          isDark ? "bg-gray-900 border-purple-500" : "bg-snes-surface border-snes-dark"
+          "w-full max-w-md rounded-3xl overflow-hidden border relative backdrop-blur-2xl shadow-[0_32px_80px_-15px_rgba(0,0,0,0.9)]",
+          isDark ? "bg-[#121024] border-white/[0.1]" : "bg-white border-slate-200"
         )}
       >
-        {/* Header decorativo */}
-        <div className="relative bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-700 p-8 pb-6 overflow-hidden">
-          {/* Scanline overlay para efeito retro */}
-          <div className="absolute inset-0 scanline-overlay opacity-30 pointer-events-none" />
-          {/* Circles decorativos */}
-          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 pointer-events-none" />
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
-
-
+        <div className="relative bg-gradient-to-br from-purple-700/90 via-[#1a1338] to-[#121024] p-8 pb-6 overflow-hidden border-b border-white/[0.08]">
+          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-purple-500/20 blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-amber-400/10 blur-xl pointer-events-none" />
 
           <div className="relative flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center mb-4 shadow-[4px_4px_0px_rgba(0,0,0,0.3)]">
-              <Gamepad2 className="w-8 h-8 text-yellow-300" />
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center mb-4 shadow-[0_0_24px_rgba(168,85,247,0.4)]">
+              <Gamepad2 className="w-7 h-7 text-amber-300" />
             </div>
-            <h2 className="font-retro font-bold text-3xl uppercase tracking-tight text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,0.5)]">
+            <h2 className="font-retro font-black text-2xl md:text-3xl uppercase tracking-tight text-white">
               Press Start
             </h2>
-            <p className="text-purple-200 text-sm mt-1 font-medium">
+            <p className="text-purple-200/80 text-xs font-mono uppercase tracking-widest mt-1.5">
               Faça login para desbloquear tudo
             </p>
           </div>
 
           <button
             onClick={() => setIsLoginModalOpen(false)}
-            className="absolute top-4 right-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 z-50 cursor-pointer active:scale-90 shadow-lg"
+            className="absolute top-4 right-4 p-2.5 rounded-xl bg-white/[0.06] hover:bg-white/15 text-slate-300 hover:text-white transition-all border border-white/10 z-50 cursor-pointer active:scale-90"
             aria-label="Fechar"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Corpo */}
-        <div className="p-8 space-y-4">
-          {/* Benefícios */}
-          <div className={cn("grid grid-cols-3 gap-3 p-4 rounded-2xl text-center mb-2", isDark ? "bg-gray-800/60" : "bg-gray-50")}>
+        <div className="p-6 sm:p-8 space-y-5">
+          <div
+            className={cn(
+              "grid grid-cols-3 gap-3 p-4 rounded-2xl border text-center",
+              isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-100"
+            )}
+          >
             {[
               { emoji: "❤️", label: "Curtir posts" },
               { emoji: "💬", label: "Comentar" },
               { emoji: "⭐", label: "Salvar favor." },
             ].map((b) => (
-              <div key={b.label} className="flex flex-col items-center gap-1">
-                <span className="text-2xl">{b.emoji}</span>
-                <span className={cn("text-[10px] font-bold uppercase font-retro tracking-wide", isDark ? "text-gray-400" : "text-gray-500")}>
+              <div key={b.label} className="flex flex-col items-center gap-1.5">
+                <span className="text-xl">{b.emoji}</span>
+                <span className="text-[10px] font-bold uppercase font-retro tracking-wider text-slate-300">
                   {b.label}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Botões de login */}
           <div className="space-y-3">
             {PROVIDERS.map(({ key, label, icon: IconComponent, lightStyle, darkStyle }) => (
               <button
@@ -130,30 +125,34 @@ export default function LoginModal() {
                   try {
                     await handlers[key]?.();
                     setIsLoginModalOpen(false);
-                  } catch (err) {
+                  } catch {
                     // Erro já tratado no Provider
                   }
                 }}
                 className={cn(
-                  "w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold text-base transition-all duration-150 border-2 retro-button",
+                  "w-full flex items-center gap-4 px-5 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 border cursor-pointer active:scale-[0.98]",
                   isDark ? darkStyle : lightStyle
                 )}
               >
                 <IconComponent className="w-5 h-5 shrink-0" />
-                <span className="flex-1 text-left font-retro uppercase tracking-wide text-sm">
+                <span className="flex-1 text-left font-retro font-black uppercase tracking-widest text-xs">
                   {label}
                 </span>
               </button>
             ))}
           </div>
 
-          {/* Privacy Disclaimer */}
-          <div className="pt-2 text-center">
-            <p className={cn("text-[10px] uppercase font-retro tracking-wider opacity-60", isDark ? "text-gray-400" : "text-gray-500")}>
+          <div className="pt-1 text-center">
+            <p className="text-[10px] uppercase font-retro tracking-wider text-slate-400">
               Ao entrar, você concorda com a nossa{" "}
-              <Link to="/privacy" onClick={() => setIsLoginModalOpen(false)} className="text-purple-500 hover:underline font-bold">
+              <Link
+                to="/privacy"
+                onClick={() => setIsLoginModalOpen(false)}
+                className="text-purple-400 hover:underline font-bold"
+              >
                 Política de Privacidade
-              </Link>.
+              </Link>
+              .
             </p>
           </div>
         </div>

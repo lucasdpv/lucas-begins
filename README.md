@@ -1,8 +1,8 @@
-# 🕹️ BeginsProject - Retro Gaming Journal (v4.3.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.0.0)
 
-> **"A essência dos 16-bits em uma experiência web de alta fidelidade, agora com alma de RPG."**
+> **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
-O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gaming. Na versão 4.3.0, o portal recebe uma revisão completa dos skeletons de carregamento — o `CarouselSkeleton` e o `PostSkeleton` agora espelham fielmente a estrutura, bordas, gradientes e proporções dos componentes reais, eliminando shifts de layout e oferecendo uma experiência de carregamento visualmente coerente com o design Neo-Brutalist do portal.
+O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.0.0**, o portal recebe um redesign completo **Cyber-Editorial + Streaming Geek** (inspirado em *Netflix*, *Crunchyroll*, *Polygon* e *The Verge*), com projeção de luz ambiente estilo **TV Ambilight**, layout widescreen (`1760px`), transições cinematográficas e recomendações dinâmicas por universo.
 
 ---
 
@@ -10,85 +10,73 @@ O **BeginsProject** é um jornal digital de luxo dedicado à cultura retro gamin
 
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
--   **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Configuração do ambiente e arquitetura TypeScript.
--   **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação e ferramentas admin.
--   **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Detalhes sobre TanStack Query, Zustand e Estrutura de Features.
--   **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Tutorial passo a passo para integrar seu próprio backend.
+- **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.0.0`).
+- **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
+- **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
+- **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
+- **[📋 Backlog Técnico](./BACKLOG.md)**: Próximos passos planejados (refatoração futura do Light/Dark Mode, testes e infraestrutura).
+- **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
 
 ---
 
-## ✨ Destaques da Versão 4.3.0 (Skeleton Fidelity Update)
+## ✨ Destaques da Versão 6.0.0 (Cyber-Editorial & Streaming Geek Redesign)
 
-### 🦴 Skeletons Fiéis ao Design Real
-- **CarouselSkeleton Redesenhado**: Espelha agora a estrutura exata do carrossel — `border-2 border-black shadow-[6px_6px_0px]`, gradiente cinematográfico `from-gray-950`, overlay de scanlines CRT, placeholder do badge de categoria, título em 2 linhas, excerpt, meta row (♥ · ⏱), setas de navegação e dots de progresso no container correto.
-- **Sidebar "Mais Lidos" no Skeleton**: A coluna lateral desktop do skeleton agora inclui os 5 itens com placeholder amber para os números de ranking, linhas de título e views — idêntico ao painel real.
-- **PostSkeleton Vintage Fiel**: A variante `vintage` replica o color strip lateral (`w-3 border-r-2 border-black`), thumbnail com scanlines, badge de categoria com `border + shadow-[1px_1px_0px]`, e botões de ação quadrados (`w-6 h-6`) — eliminando layout shift no carregamento do feed.
-- **Animação `shimmer-sweep`**: Adicionada keyframe e utility class global em `index.css` para o efeito de varredura de luz nos placeholders do hero do carousel.
+### 🌈 Billboard Hero Cinematográfico com Efeito TV Ambilight
+- **Extensão de Luz da Cena (Ambilight)**: Projeção luminosa em dupla camada sem recorte (`blur-[110px] saturate-[1.85]`) atrás do carrossel principal (`Carousel.tsx`) e da capa das matérias (`PostHero.tsx`), espalhando as cores reais de cada arte pelo fundo escuro (`#090812`).
+- **Crossfade Ultra-Suave (`1100ms`–`1400ms`)**: Camadas de imagem pré-montadas com transição contínua, efeito *Ken Burns* sutil e dock de miniaturas fixo no canto inferior direito com barra de progresso ao vivo.
 
----
+### 🎬 Trilhos de Streaming & Expansão Widescreen (`1760px`)
+- **Container Widescreen (`.layout-container`)**: Aproveitamento total de monitores Full HD e Ultrawide (`max-width: 1760px`) na Navbar, conteúdo principal e Footer.
+- **Top 5 Em Alta Hoje**: Trilho horizontal com numerais gigantes vazados (`.netflix-rank`) que se preenchem com **dourado sólido (`#fbbf24`)** e *glow* âmbar ao passar o mouse.
+- **Séries & Coleções Originais**:
+  - **RetroCafé**: Posters verticais `3:4` estilo série original (`EPISÓDIO #01`) com aura laranja reativa.
+  - **Dossiês**: Cards widescreen confidenciais (`ARQUIVO #01`) com feixe de laser azul no hover.
+  - **Reviews**: Vitrine de análises com nota em destaque e máscara de gradiente suave.
 
-## ✨ Destaques da Versão 4.2.0 (Clean & Precise Horizontal Feed)
+### 🔄 Recomendações Dinâmicas ("Continue Explorando")
+- **Pool Inteligente por Universo**: Combina matérias da mesma categoria (`usePostsByCategory`), lançamentos recentes (`useLatestPosts`) e populares (`usePopularPosts`) com embaralhamento determinístico por artigo (`seededShuffle`) + botão interativo **"Outras Sugestões"** para sortear novas recomendações em tempo real.
 
-- **Feed Vintage Limpo**: Redesenhada a variante `vintage` dos cards horizontais — remoção de barcode, scanner-beam e textos técnicos redundantes para um visual editorial premium.
-- **Home em 2 Colunas**: Grid de Últimas Notícias reduzido de 3 para 2 colunas no desktop, garantindo ~500px de largura por card.
-
----
-
-## ✨ Destaques da Versão 4.1.0 (Retro-Modern Visual Decks)
-
-### 🎨 Redesign Visual da Homepage (Retro-Gaming Decks)
-- **RetroCafé (Banca de Revistas)**: Seção estilizada como capas de revistas de videogame físicas dos anos 90, com logotipo, preço simulado em Cruzeiros (Cr$), código de barras e elevação 3D brutalista.
-- **Dossiês (Arquivo Confidencial)**: Cards estilizados como pastas manila com clipes metálicos, abas de categoria numeradas, carimbo vermelho "CLASSIFICADO", fotos Polaroid (proporção 4:3) e animação interativa de scanner a laser azul no hover.
-- **Reviews (Decks com Fade)**: Cards horizontais integrados onde a arte do jogo (65% de largura) se funde suavemente à área de texto (50% de largura) usando uma máscara de gradiente de 70% de largura. A nota agora é exibida em um badge metálico dourado 3D de destaque.
-
-### 🔊 Feedback Sonoro Retrô Nativo
-- Adicionado sistema de efeitos sonoros 8-bit sintetizados via **Web Audio API** (sem arquivos de áudio externos), gerando bipes clássicos de interface de forma instantânea nas interações do menu.
+### 🦴 Fidelidade Total de Skeletons & Páginas Internas
+- **100% dos Skeletons e Páginas Atualizados**: `CarouselSkeleton`, `PostSkeleton`, `PostDetailSkeleton`, `ArchivePage` (*Catálogo Completo*), `PostDetailPage`, `AboutPage`, `ContactPage`, `DashboardPage` (*Meu QG*), `PrivacyPolicyPage`, `NotFoundPage` e modais/overlays (`LoginModal`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`) padronizados no acabamento Cyber-Editorial (`rounded-2xl`/`rounded-3xl`, `border-white/[0.08]`, glassmorphism).
 
 ---
 
-## ✨ Destaques da Versão 4.0.0 (Neo-Brutalist Classic)
+## 🛠️ Stack Tecnológica
 
-- **Cantos Retos 90°**: Conversão global para a estética retro pura usando `rounded-none` em todos os cards, modais e botões.
-- **Bordas Fortes e Sombras Offset**: Bordas pretas sólidas e sombras brutas 2D com elevação responsiva no hover.
-- **Fundo Mais Lidos com Imagem Dinâmica**: Efeito de hover na lista "Mais Lidos" que projeta e suaviza a imagem do post correspondente no fundo direito da seção com máscara gradiente `mask-image`.
-
----
-
-## 🛠️ Tecnologias de Elite
-
--   **React 19** + **Vite** + **TypeScript**
--   **Firebase** (Auth & Firestore Database)
--   **TanStack React Query v5** (Data Fetching & Cache)
--   **Zustand** (State Management: UI & Theme)
--   **Tailwind CSS** + **Modern Brutalist Design**
--   **Zod** (Validation & Type Safety)
--   **Lucide Icons**
+- **Next.js 16 (App Router + SSR/ISR)** + **React 19** + **TypeScript 6**
+- **Firebase** (Authentication, Cloud Firestore & Storage)
+- **TanStack React Query v5** (Cache, Prefetching & Progressive Loading)
+- **Zustand v5** (Gerenciamento de Estado: UI & Tema)
+- **Tailwind CSS** + **Framer Motion** (Design System Cyber-Editorial + Streaming Geek)
+- **Zod v4** + **DOMPurify** (Validação de Schemas & Sanitização SSR-Safe)
 
 ---
 
 ## 🚀 Como Executar
 
-1.  **Clone e Instale:**
-    ```bash
-    git clone https://github.com/lucasdpv/begins-project.git
-    cd begins-project
-    npm install
-    ```
+1. **Clone e Instale:**
+   ```bash
+   git clone https://github.com/lucasdpv/begins-project.git
+   cd begins-project
+   npm install
+   ```
 
-2.  **Variáveis de Ambiente:**
-    Crie um arquivo `.env` na raiz com suas credenciais do Firebase:
-    ```env
-    VITE_FIREBASE_API_KEY=...
-    VITE_FIREBASE_AUTH_DOMAIN=...
-    VITE_FIREBASE_PROJECT_ID=...
-    ```
+2. **Variáveis de Ambiente (`.env.local`):**
+   Configure suas credenciais do Firebase no arquivo `.env.local`:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=...
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+   ```
 
-3.  **Inicie o Motor:**
-    ```bash
-    npm run dev
-    ```
+3. **Inicie o Servidor de Desenvolvimento:**
+   ```bash
+   npm run dev
+   ```
+   Acesse `http://localhost:3000`.
 
 ---
 
 **Desenvolvido com 💜 por Lucas Vieira.**
-*"Insert Coin to Continue"*
+*"Games · Animes · Nostalgia"*

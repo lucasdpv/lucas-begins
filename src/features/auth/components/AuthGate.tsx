@@ -9,14 +9,6 @@ interface AuthGateProps {
   className?: string;
 }
 
-/**
- * AuthGate — exibido em ações que exigem autenticação.
- * 
- * Variantes:
- *  - "inline"  : pequeno chip/tooltip, ideal para botões de curtir
- *  - "banner"  : banner horizontal compacto, ideal antes de seções
- *  - "section" : bloco grande centralizado para seções de comentários
- */
 export default function AuthGate({ variant = "inline", className }: AuthGateProps) {
   const { isDark } = useThemeStore();
   const { setIsLoginModalOpen } = useUIStore();
@@ -24,12 +16,13 @@ export default function AuthGate({ variant = "inline", className }: AuthGateProp
   if (variant === "inline") {
     return (
       <button
+        type="button"
         onClick={() => setIsLoginModalOpen(true)}
         className={cn(
-          "flex items-center justify-center gap-1.5 h-8 px-2 md:px-3 md:h-9 text-[9px] md:text-[10px] font-retro font-bold uppercase tracking-wider rounded-none border-2 transition-all hover:scale-105 active:scale-95 shrink-0",
+          "flex items-center justify-center gap-1.5 h-8 px-3 text-[10px] font-retro font-black uppercase tracking-wider rounded-xl border transition-all hover:scale-105 active:scale-95 shrink-0 cursor-pointer",
           isDark
-            ? "bg-gray-800/40 border-purple-500/50 text-purple-400/80 hover:bg-purple-600 hover:text-white hover:border-black shadow-[2px_2px_0px_rgba(168,85,247,0.2)]"
-            : "bg-purple-50/50 border-purple-300/50 text-purple-600/80 hover:bg-purple-600 hover:text-white hover:border-black shadow-[2px_2px_0px_rgba(147,51,234,0.1)]",
+            ? "bg-purple-500/15 border-purple-500/35 text-purple-300 hover:bg-purple-600 hover:text-white"
+            : "bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-600 hover:text-white",
           className
         )}
         title="Faça login para interagir"
@@ -44,25 +37,23 @@ export default function AuthGate({ variant = "inline", className }: AuthGateProp
     return (
       <div
         className={cn(
-          "flex items-center justify-between gap-4 px-6 py-4 rounded-none border-2 border-dashed",
-          isDark ? "bg-gray-800/60 border-purple-500/30" : "bg-purple-50 border-purple-200",
+          "flex items-center justify-between gap-4 px-6 py-4 rounded-2xl border",
+          isDark
+            ? "bg-[#121024]/90 border-white/10"
+            : "bg-purple-50 border-purple-200",
           className
         )}
       >
         <div className="flex items-center gap-3">
-          <Gamepad2 className={cn("w-6 h-6 shrink-0", isDark ? "text-purple-400" : "text-purple-500")} />
-          <p className={cn("text-sm font-bold font-retro uppercase tracking-wide", isDark ? "text-gray-300" : "text-gray-700")}>
+          <Gamepad2 className="w-6 h-6 shrink-0 text-purple-400" />
+          <p className="text-sm font-bold font-retro uppercase tracking-wide text-slate-200">
             Faça login para curtir e comentar
           </p>
         </div>
         <button
+          type="button"
           onClick={() => setIsLoginModalOpen(true)}
-          className={cn(
-            "shrink-0 px-5 py-2 rounded-none font-retro text-xs font-bold uppercase tracking-wider border-2 retro-button transition-all",
-            isDark
-              ? "bg-purple-600 text-white border-black hover:bg-purple-500"
-              : "bg-purple-600 text-white border-black hover:bg-purple-700"
-          )}
+          className="shrink-0 px-5 py-2.5 rounded-xl font-retro text-xs font-black uppercase tracking-widest bg-purple-600 hover:bg-purple-500 text-white border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.35)] transition-all cursor-pointer"
         >
           Entrar
         </button>
@@ -70,45 +61,38 @@ export default function AuthGate({ variant = "inline", className }: AuthGateProp
     );
   }
 
-  // variant === "section" (comentários)
+  // variant === "section"
   return (
     <div
       className={cn(
-        "py-16 px-8 text-center rounded-none border-4 border-dashed space-y-6",
-        isDark ? "border-gray-700 bg-gray-800/40" : "border-purple-200 bg-purple-50/50",
+        "py-14 px-8 text-center rounded-3xl border space-y-5",
+        isDark
+          ? "border-white/[0.08] bg-[#121024]/90 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+          : "border-slate-200 bg-white shadow-md",
         className
       )}
     >
-      <div className="relative inline-flex items-center justify-center w-24 h-24 mx-auto">
-        <div className={cn("absolute inset-0 rounded-full animate-pulse opacity-20", isDark ? "bg-purple-500" : "bg-purple-400")} />
-        <Gamepad2 className={cn("w-12 h-12 relative z-10", isDark ? "text-purple-400" : "text-purple-500")} />
+      <div className="relative inline-flex items-center justify-center w-20 h-20 mx-auto rounded-2xl bg-purple-500/15 border border-purple-500/30">
+        <Gamepad2 className="w-10 h-10 text-purple-400" />
       </div>
 
       <div>
-        <p className="font-retro font-bold text-2xl uppercase tracking-wide mb-2">
+        <p className="font-retro font-black text-2xl uppercase tracking-wide mb-2 text-white">
           Entre para Comentar
         </p>
-        <p className={cn("text-base font-medium max-w-xs mx-auto leading-relaxed", isDark ? "text-gray-400" : "text-gray-500")}>
-          Faça login para participar da discussão, curtir respostas e fazer parte da comunidade.
+        <p className="text-sm md:text-base font-medium max-w-md mx-auto leading-relaxed text-slate-400">
+          Faça login para participar da discussão, curtir respostas e interagir com a comunidade Begins.
         </p>
       </div>
 
       <button
+        type="button"
         onClick={() => setIsLoginModalOpen(true)}
-        className={cn(
-          "inline-flex items-center gap-3 px-8 py-4 rounded-none font-retro font-bold text-lg uppercase tracking-wider border-2 retro-button transition-all hover:scale-105 active:scale-95",
-          isDark
-            ? "bg-purple-600 text-white border-black hover:bg-purple-500"
-            : "bg-purple-600 text-white border-black hover:bg-purple-700"
-        )}
+        className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-retro font-black text-sm uppercase tracking-widest bg-purple-600 hover:bg-purple-500 text-white border border-purple-400/50 shadow-[0_10px_30px_rgba(168,85,247,0.4)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
       >
-        <Lock className="w-5 h-5" />
+        <Lock className="w-4 h-4" />
         Fazer Login Agora
       </button>
-
-      <p className={cn("text-xs font-medium opacity-50", isDark ? "text-gray-400" : "text-gray-500")}>
-        It's dangerous to go alone! Take this.
-      </p>
     </div>
   );
 }

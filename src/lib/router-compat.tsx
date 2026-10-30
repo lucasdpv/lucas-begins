@@ -18,17 +18,25 @@ export function Link({ to, children, ...props }: any) {
 
 /**
  * Hook useNavigate compatível com react-router-dom
+ * Suporta passagem de state em memória via sessionStorage para manter compatibilidade com Next.js App Router
  */
 export function useNavigate() {
   const router = useRouter();
   
   return (to: any, options?: any) => {
-    // Se "to" for um número (como -1 para voltar), usamos router.back()
     if (typeof to === "number") {
       if (to === -1) {
         router.back();
       }
       return;
+    }
+
+    if (typeof window !== "undefined") {
+      if (options?.state) {
+        sessionStorage.setItem("__router_compat_state__", JSON.stringify(options.state));
+      } else {
+        sessionStorage.removeItem("__router_compat_state__");
+      }
     }
 
     if (options?.replace) {
@@ -46,11 +54,23 @@ export function useLocation() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  let state: any = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("__router_compat_state__");
+      if (raw) {
+        state = JSON.parse(raw);
+      }
+    } catch {
+      state = {};
+    }
+  }
+
   // Simula o objeto location do react-router-dom
   return {
     pathname: pathname || "/",
     search: searchParams ? `?${searchParams.toString()}` : "",
-    state: {}, // Next.js não suporta state em memória diretamente, mas mantemos o objeto vazio para evitar quebras
+    state,
   };
 }
 

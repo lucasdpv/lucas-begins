@@ -1,84 +1,56 @@
-# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor
+# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.0.0)
 
-Este guia foi criado para que você entenda rapidamente como o projeto funciona e como você pode contribuir de forma eficiente.
-
----
-
-## 🌟 1. Visão Geral e Estética
-O **BeginsProject** não é apenas um blog; é uma experiência visual. Nossa estética é focada no **Retro-Hardware**, com sombras sólidas, bordas grossas e efeitos de *scanline*.
-
-- **Temas**: Temos um modo Escuro (padrão) e um modo Claro ("Lavender Retro" inspirado no SNES).
-- **UX**: Interações devem ser rápidas, com micro-animações e feedback visual imediato (Optimistic UI).
+Este guia foi criado para que você entenda rapidamente como o **BeginsProject** funciona e como contribuir mantendo a consistência visual e arquitetural do portal.
 
 ---
 
-## 🛠️ 2. Stack Tecnológica (The "Modern Powerhouse")
-*   **Core**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/) + **TypeScript** (6.0+).
-*   **Data Fetching & Cache**: [@tanstack/react-query](https://tanstack.com/query/latest) (Nossa fonte da verdade para dados do Firebase).
-*   **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (Gerencia UI Store e Theme Store de forma ultra-veloz).
-*   **Backend**: [Firebase](https://firebase.google.com/) (Firestore para dados, Auth para login).
-*   **Estilo**: [Tailwind CSS](https://tailwindcss.com/) + **CSS Variables** (Sistema de temas Modern Brutalist).
-*   **Validation**: [Zod](https://zod.dev/) (Garante que os dados do Firestore respeitem nossos Schemas).
+## 🌟 1. Visão Geral e Estética (Cyber-Editorial + Streaming Geek)
+O **BeginsProject** é um portal dedicado a **Games, Animes e Nostalgia**. Nossa identidade visual combina a imersão de plataformas de streaming (*Netflix*, *Crunchyroll*, *Apple TV+*) com o acabamento de revistas digitais modernas (*Polygon*, *The Verge*):
+
+- **Fundo & Superfícies**: Backdrop escuro cinematográfico (`#090812`), cards em `#121024/90` com `backdrop-blur-xl`, bordas finas translúcidas (`border-white/[0.08]`) e cantos arredondados (`rounded-2xl` / `rounded-3xl`).
+- **TV Ambilight**: O carrossel de destaque e a capa das matérias projetam as cores da arte no ambiente ao redor em camadas difusas (`blur-[110px]`).
+- **Layout Widescreen**: Utilizamos a classe `.layout-container` (`max-width: 1760px`) para aproveitar telas grandes sem espaços laterais desperdiçados.
+- **Tema**: Atualmente o portal opera exclusivamente no **Modo Escuro** (`isDark: true` fixado em `useThemeStore.ts`) até a futura refatoração dedicada do sistema de temas Claro/Escuro.
 
 ---
 
-## 📂 3. Estrutura de Pastas (v3.0.0)
-Seguimos uma organização modular para facilitar a manutenção:
+## 🛠️ 2. Stack Tecnológica
+- **Core**: [Next.js 16 (App Router)](https://nextjs.org/) + [React 19](https://react.dev/) + **TypeScript 6**.
+- **Data Fetching & Cache**: [@tanstack/react-query v5](https://tanstack.com/query/latest).
+- **State Management**: [Zustand v5](https://zustand-demo.pmnd.rs/) (`useUIStore`, `useThemeStore`).
+- **Backend**: [Firebase](https://firebase.google.com/) (Cloud Firestore, Authentication e Storage).
+- **Estilização & Motion**: [Tailwind CSS](https://tailwindcss.com/) + [Framer Motion](https://www.framer.com/motion/).
+- **Validação**: [Zod v4](https://zod.dev/).
+
+---
+
+## 📂 3. Estrutura de Pastas (v6.0.0)
 
 ```text
 src/
-├── features/       # Módulos de domínio (ex: posts)
-│   └── posts/      # Components, hooks (React Query) e Schemas (Zod) do domínio
-├── services/       # Camada de Dados (Funções puras que chamam o Firestore)
-├── hooks/          # Hooks globais e utilitários (ex: useUserQuery)
+├── app/            # Rotas Next.js App Router (SSR, Metadata, Sitemap, Robots)
+├── views/          # Views completas das páginas (HomePage, ArchivePage, PostDetailPage, etc.)
+├── features/       # Módulos de domínio
+│   ├── posts/      # Carousel, PostCard, ArticleRenderer, PostDetail/*, Skeletons, hooks e schemas
+│   ├── auth/       # LoginModal, AuthGate, ProtectedRoute
+│   └── admin/      # Painel de Controle, Tabs e ações administrativas
+├── services/       # Camada de Dados (postService, userService, uploadService)
 ├── components/
-│   ├── ui/         # Componentes base (Botões, Cards, Skeletons)
-│   └── layout/     # Navbar, Footer, ProtectedRoute
+│   ├── ui/         # Componentes base (Badge, ShareModal, CookieConsent, BackToTop, Toast)
+│   └── layout/     # Navbar, Footer, MobileMenu, NavCategoryMenu, NavUserMenu
 ├── store/          # Zustand Stores (useUIStore, useThemeStore)
-├── context/        # AuthProvider (Gerenciamento de sessão Firebase)
-├── pages/          # Páginas completas (agora em .tsx)
-└── lib/            # Utilitários, configurações do Firebase e Zod schemas
+├── context/        # AuthProvider (Sessão Firebase + Cookies p/ Middleware)
+└── lib/            # Utilitários, router-compat, Firebase init e helpers
 ```
 
 ---
 
-## 🎨 4. O Sistema de Design (Modern Brutalist)
-**Identidade Visual**: Bordas sólidas de 4px, sombras pretas puras e paleta SNES (Roxo, Amarelo, Cinza).
-
-*   **Classes Utilitárias**: Use `BRUTAL_DESIGN` (em `src/constants.ts`) para sombras e bordas padronizadas.
-*   **Responsividade**: O projeto é mobile-first. Teste sempre em resoluções de 375px.
-
----
-
-## 🧠 5. Fluxo de Trabalho (O "Novo Jeito BeginsProject")
-
-### A. Adicionando dados:
-1.  Defina o Schema Zod em `src/features/[feature]/schemas.ts`.
-2.  Crie a função de chamada em `src/services/`.
-3.  Crie o Hook do React Query em `src/features/[feature]/hooks/`.
-4.  Consuma usando `{ data, isLoading } = useMyHook()`.
-
-### B. Autenticação & Roles:
-O acesso é gerido pelo `AuthProvider`. O `ProtectedRoute` verifica se o usuário tem o `role === 'admin'` para áreas sensíveis.
-*   **Dashboard**: Acessível para todos os usuários logados (`role: user`).
-
-### C. SEO & Helmet:
-Continuamos usando `react-helmet-async`. Cada página deve definir seu SEO logo no início do componente.
-
----
-
-## 🚀 6. Como Rodar o Projeto
-1.  Instale as dependências: `npm install`
-2.  Crie um arquivo `.env.local` baseado no `.env.example` com as chaves do Firebase.
-3.  Inicie o servidor: `npm run dev`
-
----
-
-## 📝 7. Próximos Desafios (Onde Atuar?)
-*   **Migração TypeScript**: Estamos movendo o projeto gradualmente para TS.
-*   **Performance**: Melhorar o carregamento de imagens pesadas no blog.
-*   **Novas Features**: Implementar um sistema de "Reações" em tempo real nos posts.
+## 🚀 4. Como Rodar o Projeto
+1. Instale as dependências: `npm install`
+2. Configure o arquivo `.env.local` com as chaves `NEXT_PUBLIC_FIREBASE_*`.
+3. Inicie o servidor Next.js: `npm run dev`
+4. Acesse `http://localhost:3000`.
 
 ---
 > [!TIP]
-> Em caso de dúvida sobre a arquitetura, leia o arquivo [DOCUMENTATION.md](./DOCUMENTATION.md). Para manutenção do banco, veja [MAINTENANCE.md](./MAINTENANCE.md).
+> Para detalhes de arquitetura e Design System, consulte [DOCUMENTATION.md](./DOCUMENTATION.md). Para acompanhar o que já foi feito e os próximos passos, veja [MODERNIZATION_PLAN.md](./MODERNIZATION_PLAN.md) e [BACKLOG.md](./BACKLOG.md).

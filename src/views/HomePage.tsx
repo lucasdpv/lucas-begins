@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useEffect, useCallback, useRef, useState } from "react";
-import { Gamepad2, ChevronRight, ChevronLeft, Coffee, FolderOpen } from "lucide-react";
+import {
+  Gamepad2,
+  ChevronRight,
+  ChevronLeft,
+  Coffee,
+  FolderOpen,
+  Flame,
+  Sparkles,
+  Star,
+  Eye,
+} from "lucide-react";
 import { Link, useNavigate, useLocation } from "@/lib/router-compat";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
@@ -10,69 +20,72 @@ import PostSkeleton from "../features/posts/components/PostSkeleton";
 import CarouselSkeleton from "../features/posts/components/CarouselSkeleton";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
-import { 
-  useAllPosts, 
-  useFeaturedPosts, 
-  useMostViewedPosts, 
-  usePostsByCategory, 
+import {
+  useAllPosts,
+  useFeaturedPosts,
+  useMostViewedPosts,
+  usePostsByCategory,
   usePosts,
-  useLatestPosts
+  useLatestPosts,
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
-import { cn, slugify, formatNumber, formatDate, calculateReadingTime, splitTitle } from "../lib/utils";
+import {
+  cn,
+  slugify,
+  formatNumber,
+  formatDate,
+  calculateReadingTime,
+  splitTitle,
+} from "../lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { PostService } from "../services/postService";
 import { Post } from "../features/posts/schemas";
-
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const queryClient = useQueryClient();
   const [isSecondarySectionsReady, setIsSecondarySectionsReady] = useState(false);
 
-  const handlePrefetch = useCallback((slug: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ["postBySlug", slug],
-      queryFn: () => PostService.getPostBySlug(slug),
-      staleTime: 1000 * 60 * 10,
-    });
-  }, [queryClient]);
+  const handlePrefetch = useCallback(
+    (slug: string) => {
+      queryClient.prefetchQuery({
+        queryKey: ["postBySlug", slug],
+        queryFn: () => PostService.getPostBySlug(slug),
+        staleTime: 1000 * 60 * 10,
+      });
+    },
+    [queryClient]
+  );
 
   const playEjectSound = () => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const now = ctx.currentTime;
-      
-      // Retro chime synth select tone
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = "triangle";
-      osc.frequency.setValueAtTime(659.25, now); // E5
-      osc.frequency.setValueAtTime(987.77, now + 0.04); // B5
-      
-      gain.gain.setValueAtTime(0.04, now);
+      osc.frequency.setValueAtTime(659.25, now);
+      osc.frequency.setValueAtTime(987.77, now + 0.04);
+      gain.gain.setValueAtTime(0.03, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
       osc.stop(now + 0.12);
-    } catch (e) {
-      console.log("Audio API not supported or allowed", e);
+    } catch {
+      // ignore audio block
     }
   };
-
 
   const retrocafeRef = useRef<HTMLDivElement>(null);
   const dossieRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
-  const mostViewedMobileRef = useRef<HTMLDivElement>(null);
+  const mostViewedRef = useRef<HTMLDivElement>(null);
 
   const [retrocafeScroll, setRetrocafeScroll] = useState({ left: false, right: true });
   const [dossieScroll, setDossieScroll] = useState({ left: false, right: true });
   const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
   const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
-  const [hoveredMaisLidosIndex, setHoveredMaisLidosIndex] = useState<number>(0);
   const [hoveredRetrocafeIndex, setHoveredRetrocafeIndex] = useState<number | null>(null);
   const [hoveredDossieIndex, setHoveredDossieIndex] = useState<number | null>(null);
   const [hoveredReviewsIndex, setHoveredReviewsIndex] = useState<number | null>(null);
@@ -83,45 +96,50 @@ export default function HomePage() {
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
       osc.type = "sine";
       osc.frequency.setValueAtTime(800, now);
       osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
-      
-      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.setValueAtTime(0.03, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-      
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
       osc.stop(now + 0.08);
-    } catch (e) {
-      // Audio context block
+    } catch {
+      // ignore
     }
   }, []);
 
+  const updateScrollState = useCallback(
+    (
+      ref: React.RefObject<HTMLDivElement | null>,
+      setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>
+    ) => {
+      if (ref.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = ref.current;
+        setScroll({
+          left: scrollLeft > 5,
+          right: scrollLeft < scrollWidth - clientWidth - 10,
+        });
+      }
+    },
+    []
+  );
 
-  const updateScrollState = useCallback((ref: React.RefObject<HTMLDivElement | null>, setScroll: React.Dispatch<React.SetStateAction<{ left: boolean; right: boolean }>>) => {
-    if (ref.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = ref.current;
-      setScroll({
-        left: scrollLeft > 5,
-        right: scrollLeft < scrollWidth - clientWidth - 10
-      });
-    }
-  }, []);
+  const scrollContainer = useCallback(
+    (ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
+      if (ref.current) {
+        const scrollAmount = ref.current.clientWidth * 0.85;
+        ref.current.scrollBy({
+          left: direction === "left" ? -scrollAmount : scrollAmount,
+          behavior: "smooth",
+        });
+      }
+    },
+    []
+  );
 
-  const scrollContainer = useCallback((ref: React.RefObject<HTMLDivElement | null>, direction: "left" | "right") => {
-    if (ref.current) {
-      const scrollAmount = ref.current.clientWidth;
-      ref.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth"
-      });
-    }
-  }, []);
-
-  const { activeCategory, searchQuery, setActiveCategory } = useUIStore();
+  const { activeCategory, searchQuery, setActiveCategory, setSearchQuery } = useUIStore();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -130,24 +148,17 @@ export default function HomePage() {
   useEffect(() => {
     let cancelled = false;
     const markReady = () => {
-      if (!cancelled) {
-        setIsSecondarySectionsReady(true);
-      }
+      if (!cancelled) setIsSecondarySectionsReady(true);
     };
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
+    if (typeof window === "undefined") return;
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(markReady, { timeout: 1200 });
+      const id = window.requestIdleCallback(markReady, { timeout: 900 });
       return () => {
         cancelled = true;
         window.cancelIdleCallback(id);
       };
     }
-
-    const timer = setTimeout(markReady, 900);
+    const timer = setTimeout(markReady, 600);
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -156,44 +167,46 @@ export default function HomePage() {
 
   const shouldLoadSecondary = isDefaultView && isSecondarySectionsReady;
 
-  // Reseta categoria ao voltar do arquivo (evita glitch de transição)
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
       setActiveCategory("Todos");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const goToCategory = useCallback((category: string) => {
-    navigate("/archive", { state: { category } });
-  }, [navigate]);
+  const goToCategory = useCallback(
+    (category: string) => {
+      setActiveCategory(category);
+      navigate("/archive", { state: { category } });
+    },
+    [navigate, setActiveCategory]
+  );
 
-  // 1. Destaques (Carrossel) - Puxa no máximo 5 posts do Firestore
   const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
-
-  // 2. Mais Vistos - Puxa no máximo 5 posts mais lidos do Firestore
   const { data: mostViewedPosts = [] } = useMostViewedPosts(5, shouldLoadSecondary);
-
-  // 3. Reviews - Puxa no máximo 5 posts mais recentes da categoria Reviews
-  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory("Reviews", 5, shouldLoadSecondary);
-
-  // 4. Dossiês - Puxa no máximo 3 posts mais recentes da categoria Dossiês
-  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory("Dossiês", 3, shouldLoadSecondary);
-
-  // 4.5. RetroCafé - Puxa no máximo 3 posts mais recentes da categoria RetroCafé
-  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory("RetroCafé", 3, shouldLoadSecondary);
-
-  // 4.7. Últimos Posts para Feed Limpo (sem repetições na Home padrão)
+  const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory(
+    "Reviews",
+    5,
+    shouldLoadSecondary
+  );
+  const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory(
+    "Dossiês",
+    3,
+    shouldLoadSecondary
+  );
+  const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory(
+    "RetroCafé",
+    3,
+    shouldLoadSecondary
+  );
   const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
 
-  // 5. Busca Otimizada (Híbrida) - Faz o download se houver busca ou se alguma categoria estiver selecionada
   const isSearching = searchQuery.trim() !== "";
   const isLocalMode = isSearching || activeCategory !== "Todos";
   const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isLocalMode);
 
-  // 6. Grid Principal Otimizado - Se não estiver buscando, usa a paginação nativa (leve!)
-  const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({ 
-    category: activeCategory 
+  const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({
+    category: activeCategory,
   });
 
   const posts = isLocalMode ? (allPosts as Post[]) : (paginatedPosts as Post[]);
@@ -202,15 +215,8 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeCategory, searchQuery]);
 
-  const { filteredPosts } = usePostsFilter(
-    posts,
-    activeCategory,
-    searchQuery
-  );
+  const { filteredPosts } = usePostsFilter(posts, activeCategory, searchQuery);
 
-  // isDefaultView definition moved up to prevent ReferenceError
-
-  // Definição das listas diretas sem deduplicação
   const carouselPosts = featuredPosts.slice(0, 5);
   const displayRetrocafe = retrocafePosts.slice(0, 3);
   const displayDossie = dossiePosts.slice(0, 3);
@@ -221,7 +227,7 @@ export default function HomePage() {
       updateScrollState(retrocafeRef, setRetrocafeScroll);
       updateScrollState(dossieRef, setDossieScroll);
       updateScrollState(reviewsRef, setReviewsScroll);
-      updateScrollState(mostViewedMobileRef, setMostViewedScroll);
+      updateScrollState(mostViewedRef, setMostViewedScroll);
     }, 400);
     return () => clearTimeout(timer);
   }, [displayRetrocafe, displayDossie, displayReviews, mostViewedPosts, updateScrollState]);
@@ -231,239 +237,137 @@ export default function HomePage() {
       updateScrollState(retrocafeRef, setRetrocafeScroll);
       updateScrollState(dossieRef, setDossieScroll);
       updateScrollState(reviewsRef, setReviewsScroll);
-      updateScrollState(mostViewedMobileRef, setMostViewedScroll);
+      updateScrollState(mostViewedRef, setMostViewedScroll);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [updateScrollState]);
 
-  const gridPosts = isLocalMode 
-    ? filteredPosts.slice(0, 4) 
-    : latestPosts.slice(0, 4);
-
-  const activeMaisLidosPost = mostViewedPosts[hoveredMaisLidosIndex] || mostViewedPosts[0];
-
-  const isLoadingPosts = isLocalMode
-    ? isLoadingAll
-    : isLoadingLatest;
+  const gridPosts = isLocalMode ? filteredPosts.slice(0, 6) : latestPosts.slice(0, 6);
+  const isLoadingPosts = isLocalMode ? isLoadingAll : isLoadingLatest;
 
   return (
-    <div className="flex flex-col gap-8 md:gap-12 relative">
-      {/* ── 1. HERO BENTO GRID: Carousel + Mais Acessados ─────────── */}
+    <div className="flex flex-col gap-10 md:gap-14 relative">
+      {/* ── 1. BILLBOARD HERO PANORÂMICO (NETFLIX / CRUNCHYROLL STYLE) ── */}
       {isLoadingFeatured && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
       ) : isDefaultView && posts.length > 0 ? (
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10">
-          {/* CÉLULA 1: Carousel Destaque (ocupa 2 colunas) */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.7)]" : "bg-purple-600")} />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow")}>
-                  Em Destaque
-                </h2>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                  Seleção Editorial
-                </p>
-              </div>
-            </div>
-            <Carousel posts={carouselPosts} isDark={isDark} />
-          </div>
-
-          {/* CÉLULA 2: Mais Lidos (ocupa 1 coluna) */}
-          <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
-              <div>
-                <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
-                  Mais Lidos
-                </h2>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                  Em Alta no Portal
-                </p>
-              </div>
-            </div>
-            
-            <div
-              className={cn(
-                "h-full lg:flex-1 p-6 rounded-none flex flex-col relative overflow-hidden transition-all duration-300 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]",
-                isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
-              )}
-              onMouseLeave={() => setHoveredMaisLidosIndex(0)}
-            >
-              {isDark && (
-                <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none z-0" />
-              )}
-              
-              {/* Background Image Fade on Right Half */}
-              {activeMaisLidosPost?.imageUrl && (
-                <div
-                  key={activeMaisLidosPost.id}
-                  className={cn(
-                    "absolute right-0 top-0 bottom-0 w-1/2 bg-cover bg-center pointer-events-none transition-all duration-500 z-0 animate-bg-fade",
-                    isDark ? "opacity-20" : "opacity-[0.12]"
-                  )}
-                  style={{
-                    backgroundImage: `url(${activeMaisLidosPost.imageUrl})`,
-                    maskImage: "linear-gradient(to right, transparent, black)",
-                    WebkitMaskImage: "linear-gradient(to right, transparent, black)",
-                  }}
-                />
-              )}
-
-              <div className="flex flex-col justify-between h-full relative z-10 gap-3">
-                {mostViewedPosts.length === 0 ? (
-                  [1, 2, 3, 4, 5].map((i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        "flex items-start gap-4 py-2.5 border-b last:border-0 last:pb-0 border-dashed animate-pulse",
-                        isDark ? "border-white/5" : "border-black/5"
-                      )}
-                    >
-                      <div className={cn("min-w-[32px] h-8 rounded-none shrink-0", isDark ? "bg-amber-400/20" : "bg-amber-200/60")} />
-                      <div className="flex-1 space-y-2 min-w-0">
-                        <div className={cn("w-full h-3 rounded-none", isDark ? "bg-gray-800" : "bg-gray-200")} />
-                        <div className={cn("w-4/5 h-3 rounded-none", isDark ? "bg-gray-800" : "bg-gray-200")} />
-                        <div className={cn("w-20 h-2 rounded-none", isDark ? "bg-gray-900" : "bg-gray-150")} />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  mostViewedPosts.map((post, idx) => (
-                    <Link
-                      key={post.id}
-                      to={`/post/${post.slug || slugify(post.title)}`}
-                      onMouseEnter={() => {
-                        setHoveredMaisLidosIndex(idx);
-                        handlePrefetch(post.slug || slugify(post.title));
-                      }}
-                      className={cn(
-                        "flex items-center gap-4 cursor-pointer group py-2.5 border-b last:border-0 last:pb-0 transition-all duration-300 hover:translate-x-1.5",
-                        isDark ? "border-white/5" : "border-black/5"
-                      )}
-                    >
-                      <span className={cn(
-                        "text-2xl font-retro font-black trending-number min-w-[32px] select-none",
-                        isDark ? "text-amber-400/85 text-glow-amber" : "text-amber-500/70"
-                      )}>
-                        {(idx + 1).toString().padStart(2, "0")}
-                      </span>
-
-                      <div className="flex-1 min-w-0">
-                        <h4 className={cn(
-                          "font-bold text-xs md:text-sm leading-snug line-clamp-2 transition-colors duration-300",
-                          isDark ? "text-white group-hover:text-purple-300" : "text-snes-accent group-hover:text-purple-700"
-                        )}>
-                          {post.title}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-1 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          <span>{formatNumber(post.views || 0)} views</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
+        <section className="w-full">
+          <Carousel posts={carouselPosts} isDark={isDark} />
         </section>
       ) : null}
 
-      {/* ── MOBILE/TABLET MAIS LIDOS ── */}
+      {/* ── 2. TOP 5 EM ALTA HOJE (NETFLIX TOP 10 RAIL) ── */}
       {isDefaultView && (
-        <div className="lg:hidden flex flex-col gap-4">
-          {/* Divisor sutil entre Carrossel e Mais Lidos no mobile */}
-          <div className={cn("h-px mb-6 -mt-2", isDark ? "bg-white/5" : "bg-black/10")} />
-
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.7)]" : "bg-amber-500")} />
-            <div>
-              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-amber")}>
-                Mais Lidos
-              </h2>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                Em Alta no Portal
-              </p>
+        <section className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                <Flame className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none">
+                  Top 5 Em Alta Hoje
+                </h2>
+                <p className="text-[10px] font-mono uppercase tracking-[0.25em] mt-1 text-slate-400">
+                  Os títulos mais acessados pela comunidade
+                </p>
+              </div>
             </div>
           </div>
 
           <div className="relative group/scroll-container w-full">
             <div
-              ref={mostViewedMobileRef}
-              onScroll={() => updateScrollState(mostViewedMobileRef, setMostViewedScroll)}
-              className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory w-full"
+              ref={mostViewedRef}
+              onScroll={() => updateScrollState(mostViewedRef, setMostViewedScroll)}
+              className="flex lg:grid lg:grid-cols-5 overflow-x-auto lg:overflow-visible gap-4 pb-3 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full rail-edge-fade"
             >
-              {mostViewedPosts.length === 0 ? (
-                [1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "relative h-[148px] rounded-none border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always animate-pulse",
-                      isDark ? "bg-[#1f1d35]" : "bg-gray-100"
-                    )}
-                  >
-                    <div className="space-y-2">
-                      <div className={cn("w-full h-3 rounded-none", isDark ? "bg-gray-700" : "bg-gray-300")} />
-                      <div className={cn("w-4/5 h-3 rounded-none", isDark ? "bg-gray-700" : "bg-gray-300")} />
-                      <div className={cn("w-20 h-2 rounded-none", isDark ? "bg-gray-800" : "bg-gray-250")} />
-                    </div>
-                  </div>
-                ))
-              ) : (
-                mostViewedPosts.map((post, idx) => {
-                  const targetSlug = post.slug || slugify(post.title);
-                  return (
-                    <Link
-                      key={post.id}
-                      to={`/post/${targetSlug}`}
-                      onMouseEnter={() => handlePrefetch(targetSlug)}
+              {mostViewedPosts.length === 0
+                ? [1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
                       className={cn(
-                        "relative h-[148px] rounded-none overflow-hidden border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all duration-300 group/item flex flex-col justify-end p-4 w-[85%] sm:w-[calc(50%-8px)] shrink-0 snap-start snap-always hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_rgba(168,85,247,1)] hover:border-black focus:outline-none",
-                        isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                        "h-[185px] rounded-2xl border animate-pulse w-[250px] lg:w-auto shrink-0 snap-start",
+                        isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-200/60 border-slate-200"
                       )}
-                    >
-                      {/* Imagem */}
-                      {post.imageUrl ? (
-                        <img
-                          src={post.imageUrl}
-                          alt={post.title}
-                          className="absolute inset-0 w-full h-full object-cover opacity-80 dark:opacity-70 transition-all duration-500 group-hover/item:scale-105 group-hover/item:opacity-90"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-700/20 to-orange-900/30" />
-                      )}
-                      {/* Gradiente */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                    />
+                  ))
+                : mostViewedPosts.slice(0, 5).map((post, idx) => {
+                    const targetSlug = post.slug || slugify(post.title);
+                    const { mainTitle, subtitle } = splitTitle(post.title);
+                    return (
+                      <Link
+                        key={post.id}
+                        to={`/post/${targetSlug}`}
+                        onMouseEnter={() => handlePrefetch(targetSlug)}
+                        className="group relative flex items-end w-[255px] sm:w-[270px] lg:w-auto h-[190px] xl:h-[215px] shrink-0 snap-start snap-always focus:outline-none pl-7"
+                      >
+                        {/* Giant Netflix-Style Rank Number on Left */}
+                        <span className="netflix-rank absolute left-0 bottom-1 text-[105px] sm:text-[118px] z-20 pointer-events-none select-none">
+                          {idx + 1}
+                        </span>
 
-                      {/* Rank Number overlay */}
-                      <div className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded font-retro font-black text-base bg-black/75 border border-amber-400/60 text-amber-400 backdrop-blur-sm shadow-[0_0_8px_rgba(251,191,36,0.25)] group-hover/item:bg-amber-400 group-hover/item:text-black transition-all duration-300">
-                        {(idx + 1).toString().padStart(2, "0")}
-                      </div>
+                        {/* Poster Card */}
+                        <div
+                          className={cn(
+                            "relative w-full h-full rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col justify-end p-4 z-10 group-hover:-translate-y-1.5",
+                            isDark
+                              ? "bg-[#141226] border-white/[0.1] group-hover:border-amber-400/50 shadow-[0_14px_32px_-10px_rgba(0,0,0,0.8)] group-hover:shadow-[0_18px_40px_-10px_rgba(245,158,11,0.3)]"
+                              : "bg-slate-900 border-slate-200 group-hover:border-amber-500 shadow-md"
+                          )}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/75 via-[#181336] to-[#090812]" />
+                          {post.imageUrl ? (
+                            <img
+                              src={post.imageUrl}
+                              alt={post.title}
+                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900 to-slate-950" />
+                          )}
 
-                      {/* Conteúdo */}
-                      <div className="relative z-10 space-y-1">
-                        <h4 className="font-bold text-sm sm:text-base text-white group-hover/item:text-amber-300 transition-colors leading-snug line-clamp-2">
-                          {post.title}
-                        </h4>
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-white/50">
-                          <span>{formatNumber(post.views || 0)} views</span>
-                          <span>·</span>
-                          <span>{formatDate(post.createdAt, post.date ?? undefined)}</span>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent" />
+
+                          {/* Category Top Tag */}
+                          <div className="absolute top-3 right-3 z-20">
+                            <span className="text-[8px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-black/65 text-amber-300 border border-white/10 backdrop-blur-md">
+                              {post.category}
+                            </span>
+                          </div>
+
+                          <div className="relative z-20 space-y-1 pl-3">
+                            <h3 className="font-retro font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors leading-snug line-clamp-2 uppercase">
+                              {mainTitle || subtitle}
+                            </h3>
+                            <div className="flex items-center gap-2 text-[9px] font-mono uppercase tracking-wider text-slate-300/80">
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3 h-3 text-amber-400" />
+                                {formatNumber(post.views || 0)}
+                              </span>
+                              <span>·</span>
+                              <span>
+                                {calculateReadingTime(post.content || "").replace(
+                                  " min de leitura",
+                                  " min"
+                                )}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })
-              )}
+                      </Link>
+                    );
+                  })}
             </div>
 
-            {/* Setinhas de navegação/feedback visual no Mobile */}
             {mostViewedScroll.left && (
               <button
-                onClick={() => scrollContainer(mostViewedMobileRef, "left")}
-                className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                onClick={() => scrollContainer(mostViewedRef, "left")}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-30 flex lg:hidden items-center justify-center w-9 h-9 rounded-full bg-black/75 text-white border border-white/15 backdrop-blur-md"
                 aria-label="Deslizar esquerda"
               >
                 <ChevronLeft className="w-5 h-5 text-amber-400" />
@@ -471,101 +375,104 @@ export default function HomePage() {
             )}
             {mostViewedScroll.right && (
               <button
-                onClick={() => scrollContainer(mostViewedMobileRef, "right")}
-                className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
+                onClick={() => scrollContainer(mostViewedRef, "right")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-30 flex lg:hidden items-center justify-center w-9 h-9 rounded-full bg-black/75 text-white border border-white/15 backdrop-blur-md"
                 aria-label="Deslizar direita"
               >
                 <ChevronRight className="w-5 h-5 text-amber-400" />
               </button>
             )}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ── 3. FEED DE NOTÍCIAS: Bento Grid de 3 Colunas ── */}
+      {/* ── 4. RECÉM-ADICIONADOS AO CATÁLOGO (ÚLTIMAS NOTÍCIAS) ── */}
       <section className="flex flex-col gap-6">
-        {/* Feed Header */}
-        <div className={cn(
-          "flex items-center justify-between pb-5",
-          isDark ? "border-b border-white/5" : "border-b border-black/10"
-        )}>
-          <div className="flex items-center gap-3">
-            <div className={cn("w-1.5 self-stretch rounded-none shrink-0", isDark ? "bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" : "bg-blue-600")} />
-            <div>
-              <h2 className={cn("font-retro text-2xl md:text-3xl font-black uppercase tracking-wide leading-none", isDark && "text-glow-blue")}>
+        <div className="flex items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none truncate">
                 {isLoadingPosts
-                  ? "Carregando..."
+                  ? "Sincronizando Catálogo..."
                   : searchQuery
                   ? `Resultados: "${searchQuery}"`
                   : activeCategory !== "Todos"
-                  ? activeCategory
-                  : "Últimas Notícias"}
+                  ? `Setor: ${activeCategory}`
+                  : "Recém-Adicionados"}
               </h2>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                Mais Recentes do Portal
+              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 text-slate-400 truncate">
+                Novos lançamentos, análises e especiais do portal
               </p>
             </div>
           </div>
-          {!isLoadingPosts && isDefaultView && (
+
+          {!isLoadingPosts && (
             <Link
               to="/archive"
               className={cn(
-                "flex items-center gap-1.5 px-3.5 py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-xl transition-all duration-200 hover:translate-x-0.5",
+                "flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-full transition-all duration-200 hover:translate-x-0.5 shrink-0",
                 isDark
-                  ? "border-blue-500/30 text-blue-400 hover:border-blue-400/50 hover:text-blue-300 bg-blue-500/5"
-                  : "border-blue-500/20 text-blue-600 hover:border-blue-600 hover:bg-blue-50/50"
+                  ? "border-white/10 text-slate-300 hover:border-purple-400/50 hover:text-white bg-white/[0.03]"
+                  : "border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 bg-white"
               )}
             >
-              Ver Todos <ChevronRight className="w-3.5 h-3.5" />
+              Explorar Tudo <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           )}
         </div>
 
-        {/* Feed Content: Clean 2-Column Grid */}
-        {(isSearching ? isLoadingAll : (isLoadingLatest || isLoadingPaginated)) ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
+        {(isSearching ? isLoadingAll : isLoadingLatest || isLoadingPaginated) ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <PostSkeleton key={i} isDark={isDark} variant="vintage" />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
+                transition={{ delay: i * 0.04, type: "spring", stiffness: 110 }}
               >
                 <PostCard post={post} variant="vintage" priority={i < 2} />
               </motion.div>
             ))}
           </div>
         ) : (
-          <div className={cn("p-12 text-center rounded-none border-2 border-dashed border-black/10 dark:border-white/10", isDark ? "bg-gray-800/20" : "bg-snes-surface/10")}>
+          <div
+            className={cn(
+              "p-12 text-center rounded-2xl border border-dashed",
+              isDark ? "border-white/10 bg-white/[0.02]" : "border-slate-300 bg-white"
+            )}
+          >
             <Gamepad2 className="w-12 h-12 mx-auto mb-3 opacity-30 text-purple-500 animate-pulse" />
-            <p className="font-retro font-bold uppercase text-sm">Nenhum artigo encontrado.</p>
+            <p className="font-retro font-bold uppercase text-sm">Nenhum título encontrado neste setor.</p>
           </div>
         )}
       </section>
 
-      {/* ── 2. ROW 2: RetroCafé / Dossiês / Reviews ─────────── */}
+      {/* ── 5. SÉRIES & COLEÇÕES ORIGINAIS (RETROCAFÉ / DOSSIÊS / REVIEWS) ── */}
       {isDefaultView && (
-        <section className="flex flex-col gap-0">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 xl:gap-10 text-left lg:items-stretch lg:grid-rows-1">
-
+        <section className="flex flex-col gap-10 deferred-below-fold">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-7 text-left lg:items-stretch">
             {/* ── ESQUERDA (2/3): RetroCafé + Dossiês ── */}
-            <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-6 xl:gap-10 lg:flex-1">
-
-              {/* ── RetroCafé ── */}
-              <div 
+            <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-8 lg:flex-1">
+              {/* ── COLEÇÃO 1: RETROCAFÉ (POSTERS VERTICAIS ESTILO STREAMING / REVISTA) ── */}
+              <div
                 className={cn(
-                  "order-2 lg:order-none px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10",
-                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                  "order-2 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10",
+                  isDark
+                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
                 onMouseLeave={() => setHoveredRetrocafeIndex(null)}
               >
-                {/* Background Image transition */}
+                {/* Ambient Hover Backdrop */}
                 <AnimatePresence>
                   {hoveredRetrocafeIndex !== null && displayRetrocafe[hoveredRetrocafeIndex] && (
                     <motion.div
@@ -576,81 +483,66 @@ export default function HomePage() {
                       transition={{ duration: 0.4 }}
                       className="absolute inset-0 z-0 pointer-events-none"
                     >
-                      <div 
+                      <div
                         className={cn(
-                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500",
-                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
+                          "absolute inset-0 bg-cover bg-center blur-2xl scale-110 transition-all duration-700",
+                          isDark ? "opacity-25" : "opacity-10"
                         )}
                         style={{
                           backgroundImage: `url(${displayRetrocafe[hoveredRetrocafeIndex].imageUrl})`,
                         }}
                       />
-                      
-                      {/* Tint overlay matching section theme */}
-                      <div className={cn(
-                        "absolute inset-0 mix-blend-color",
-                        isDark ? "bg-orange-950/40" : "bg-orange-100/30"
-                      )} />
-                      
-                      {/* CRT and Dot Matrix grid pattern overlay */}
-                      <div className="absolute inset-0 scanline-overlay opacity-30" />
-                      
-                      <div 
-                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
-                        style={{
-                          backgroundImage: isDark
-                            ? "radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0)"
-                            : "radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 0)",
-                          backgroundSize: "16px 16px"
-                        }}
-                      />
-                      
-                      {/* Radial gradient mask to focus visual center */}
-                      <div 
-                        className="absolute inset-0"
-                        style={{
-                          background: isDark
-                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
-                            : "radial-gradient(circle, transparent 20%, white 90%)"
-                        }}
+                      <div
+                        className={cn(
+                          "absolute inset-0",
+                          isDark
+                            ? "bg-gradient-to-t from-[#110f22] via-[#110f22]/80 to-[#110f22]/60"
+                            : "bg-gradient-to-t from-white via-white/85 to-white/70"
+                        )}
                       />
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-
-
-                {/* Cabeçalho */}
-                <div className="flex items-center justify-between relative z-10">
+                {/* Header */}
+                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title"
+                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("RetroCafé")}
                   >
-                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.7)] group-hover/title:shadow-[0_0_15px_rgba(249,115,22,0.9)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                        RetroCafé
-                      </h2>
-                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                        Crônicas
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 shadow-[0_0_20px_rgba(249,115,22,0.15)]">
+                      <Coffee className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors">
+                          RetroCafé
+                        </h2>
+                        <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/25">
+                          Série Original
+                        </span>
+                      </div>
+                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
+                        Crônicas & Memórias Geek
                       </p>
                     </div>
                   </div>
-                  {/* Linha pontilhada conectora para preencher o espaço */}
-                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-orange-500/20 dark:border-orange-400/15 self-center" />
-                  {/* Informações de Status retro no cabeçalho */}
-                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-orange-500/80 dark:text-orange-400/80 select-none text-right">
-                    <span className="font-bold tracking-wider">[ RETRO JOURNALISM SYSTEM // RC-012 ]</span>
-                    <span className="opacity-60">EDITIONS INDEX: 3/3 READY</span>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => goToCategory("RetroCafé")}
+                    className="px-3 py-1.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                  >
+                    Ver todos <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
-                {/* Cards RetroCafé */}
+                {/* Cards RetroCafé (Vertical Streaming Posters) */}
                 <div className="relative group/scroll-container w-full z-10">
-                  <div 
-                    ref={retrocafeRef} 
+                  <div
+                    ref={retrocafeRef}
                     onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
-                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
+                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {isLoadingRetrocafe ? (
                       [1, 2, 3].map((idx) => (
@@ -659,6 +551,7 @@ export default function HomePage() {
                     ) : displayRetrocafe.length > 0 ? (
                       displayRetrocafe.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
+                        const { mainTitle, subtitle } = splitTitle(post.title);
                         return (
                           <motion.div
                             key={post.id}
@@ -666,11 +559,11 @@ export default function HomePage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
-                              "w-[280px] sm:w-[260px] md:w-[280px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
+                              "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
                               hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
-                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
+                                ? "opacity-65 scale-[0.98]"
                                 : hoveredRetrocafeIndex === i
-                                ? "scale-[1.03] z-10"
+                                ? "scale-[1.02] z-10"
                                 : ""
                             )}
                             onMouseEnter={() => {
@@ -681,211 +574,123 @@ export default function HomePage() {
                           >
                             <Link
                               to={`/post/${targetSlug}`}
-                              className={cn(
-                                "relative aspect-[3/4] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none transition-all duration-300",
-                                isDark
-                                  ? "bg-gray-900 text-gray-100 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
-                                  : "bg-white text-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(249,115,22,1)]"
-                              )}
+                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-orange-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(249,115,22,0.35)]"
                             >
-                              {/* Capa background image */}
                               {post.imageUrl && (
                                 <img
                                   src={post.imageUrl}
                                   alt={post.title}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                                   loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                  }}
                                 />
                               )}
-                              {/* Color gradient to make text readable and pop */}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/75 z-10" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
-                              {/* Scanline overlay */}
-                              <div className="absolute inset-0 scanline-overlay opacity-25 z-10 pointer-events-none" />
-
-                              {/* Magazine Header Bar */}
-                              <div className="relative z-20 p-3 flex justify-between items-center border-b border-white/10 bg-black/60 backdrop-blur-sm">
-                                <span className="text-[10px] font-bold text-orange-400">ED. #0{i + 1}</span>
-                                <span className="text-[9px] font-mono text-gray-400 uppercase">MAI 2026</span>
+                              {/* Top Glass Pill Bar */}
+                              <div className="relative z-20 p-3.5 flex justify-between items-center">
+                                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-retro font-black uppercase tracking-wider bg-orange-500 text-slate-950 shadow">
+                                  EPISÓDIO #0{i + 1}
+                                </span>
+                                <span className="text-[9px] font-mono text-slate-200 bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+                                  {calculateReadingTime(post.content || "").replace(
+                                    " min de leitura",
+                                    " MIN"
+                                  )}
+                                </span>
                               </div>
 
-                              {/* Main Headline Content */}
-                              <div className="relative z-20 p-4 mt-auto flex flex-col gap-2">
-                                {/* Subhead tag */}
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
-                                    {formatDate(post.createdAt, post.date ?? undefined)}
-                                  </span>
-                                </div>
+                              {/* Bottom Poster Content */}
+                              <div className="relative z-20 p-4 mt-auto flex flex-col gap-1.5">
+                                <span className="text-[10px] font-mono text-orange-300/90 uppercase tracking-wider">
+                                  {formatDate(post.createdAt, post.date ?? undefined)}
+                                </span>
 
-                                {/* Mega Headline title */}
-                                {(() => {
-                                  const { mainTitle, subtitle } = splitTitle(post.title);
-                                  return mainTitle ? (
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="font-retro font-black uppercase text-[10px] tracking-wider text-orange-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                                        {mainTitle}
-                                      </span>
-                                      <h3 className="font-retro font-black uppercase text-sm md:text-base text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                        {subtitle}
-                                      </h3>
-                                    </div>
-                                  ) : (
-                                    <h3 className="font-retro font-black uppercase text-base md:text-lg text-white leading-tight line-clamp-3 group-hover:text-yellow-300 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                                {mainTitle ? (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="font-retro font-black uppercase text-xs tracking-wider text-orange-400 drop-shadow">
+                                      {mainTitle}
+                                    </span>
+                                    <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-2 group-hover:text-orange-200 transition-colors drop-shadow">
                                       {subtitle}
                                     </h3>
-                                  );
-                                })()}
-
-                                {/* Barcode and Views at the bottom */}
-                                <div className="flex items-end justify-between mt-2 pt-2 border-t border-white/10">
-                                  {/* Simulado Barcode */}
-                                  <div className="flex items-center gap-0.5 h-4 bg-white/90 p-0.5 border border-black select-none">
-                                    {[1, 2, 1, 3, 1, 2, 4, 1, 2, 3].map((width, idx) => (
-                                      <div
-                                        key={idx}
-                                        className="bg-black h-full"
-                                        style={{ width: `${width}px` }}
-                                      />
-                                    ))}
                                   </div>
+                                ) : (
+                                  <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-3 group-hover:text-orange-200 transition-colors drop-shadow">
+                                    {subtitle}
+                                  </h3>
+                                )}
 
-                                  <div className="flex flex-col items-end text-[9px] text-gray-400 font-bold uppercase">
-                                    <span>READING TIME: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
-                                    <span className="text-orange-400 font-retro tracking-wide">{formatNumber(post.views || 0)} VIEWS</span>
-                                  </div>
+                                <div className="flex items-center justify-between pt-2.5 mt-1 border-t border-white/10 text-[10px] font-mono text-slate-300">
+                                  <span className="flex items-center gap-1">
+                                    <Eye className="w-3 h-3 text-orange-400" />
+                                    {formatNumber(post.views || 0)} views
+                                  </span>
+                                  <span className="text-orange-400 font-retro font-bold group-hover:translate-x-0.5 transition-transform">
+                                    LER →
+                                  </span>
                                 </div>
                               </div>
                             </Link>
                           </motion.div>
                         );
                       })
-                    ) : (
-                      <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
-                        <Coffee className="w-8 h-8 opacity-40 animate-pulse text-orange-500" />
-                        <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum cartucho de RetroCafé inserido no slot</span>
-                      </div>
-                    )}
+                    ) : null}
                   </div>
-
-                  {/* Setinhas de navegação/feedback visual no Mobile */}
-                  {retrocafeScroll.left && (
-                    <button
-                      onClick={() => scrollContainer(retrocafeRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar esquerda"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-orange-400" />
-                    </button>
-                  )}
-                  {retrocafeScroll.right && (
-                    <button
-                      onClick={() => scrollContainer(retrocafeRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar direita"
-                    >
-                      <ChevronRight className="w-5 h-5 text-orange-400" />
-                    </button>
-                  )}
                 </div>
               </div>
 
-
-
-              {/* ── Dossiês ── */}
-              <div 
+              {/* ── COLEÇÃO 2: DOSSIÊS (ARQUIVOS CONFIDENCIAIS CYBER-EDITORIAL) ── */}
+              <div
                 className={cn(
-                  "order-3 lg:order-none px-4 pb-4 pt-5 border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:flex-1",
-                  isDark ? "bg-[#1f1d35] text-gray-100" : "bg-white text-gray-900"
+                  "order-3 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10 lg:flex-1",
+                  isDark
+                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
               >
-                {/* Background Image transition */}
-                <AnimatePresence>
-                  {hoveredDossieIndex !== null && displayDossie[hoveredDossieIndex] && (
-                    <motion.div
-                      key={displayDossie[hoveredDossieIndex].id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute inset-0 z-0 pointer-events-none"
-                    >
-                      <div 
-                        className={cn(
-                          "absolute inset-0 bg-cover bg-center pointer-events-none transition-all duration-500 filter sepia brightness-[0.7] contrast-[1.2] hue-rotate-[180deg]",
-                          isDark ? "opacity-[0.25]" : "opacity-[0.14]"
-                        )}
-                        style={{
-                          backgroundImage: `url(${displayDossie[hoveredDossieIndex].imageUrl})`,
-                        }}
-                      />
-                      
-                      {/* Tint overlay matching section theme */}
-                      <div className={cn(
-                        "absolute inset-0 mix-blend-color",
-                        isDark ? "bg-blue-950/45" : "bg-blue-100/30"
-                      )} />
-                      
-                      {/* CRT and Blueprint line grid pattern overlay */}
-                      <div className="absolute inset-0 scanline-overlay opacity-30" />
-                      
-                      <div 
-                        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
-                        style={{
-                          backgroundImage: isDark
-                            ? "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)"
-                            : "linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)",
-                          backgroundSize: "20px 20px"
-                        }}
-                      />
-                      
-                      {/* Radial gradient mask to focus visual center */}
-                      <div 
-                        className="absolute inset-0"
-                        style={{
-                          background: isDark
-                            ? "radial-gradient(circle, transparent 20%, #1f1d35 90%)"
-                            : "radial-gradient(circle, transparent 20%, white 90%)"
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-
-
-                {/* Cabeçalho */}
-                <div className="flex items-center justify-between relative z-10">
+                {/* Header */}
+                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title"
+                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("Dossiês")}
                   >
-                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)] group-hover/title:shadow-[0_0_15px_rgba(59,130,246,0.9)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-blue-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
-                        Dossiês
-                      </h2>
-                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                        Reportagens Especiais
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
+                      <FolderOpen className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-sky-400 transition-colors">
+                          Dossiês
+                        </h2>
+                        <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                          Documentários & Lore
+                        </span>
+                      </div>
+                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
+                        Documentários & Lore de Franquias
                       </p>
                     </div>
                   </div>
-                  {/* Linha pontilhada conectora para preencher o espaço */}
-                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-blue-500/20 dark:border-blue-400/15 self-center" />
-                  {/* Informações de Status retro no cabeçalho */}
-                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-blue-500/80 dark:text-blue-400/80 select-none text-right">
-                    <span className="font-bold tracking-wider">[ DECK CLASSIFIED SYSTEM // DE-084 ]</span>
-                    <span className="opacity-60">DECODING DECK INDEX... READY</span>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => goToCategory("Dossiês")}
+                    className="px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                  >
+                    Ver todos <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
                 {/* Cards Dossiês */}
                 <div className="relative group/scroll-container w-full z-10">
-                  <div 
-                    ref={dossieRef} 
+                  <div
+                    ref={dossieRef}
                     onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-4 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full pt-4 lg:items-start"
+                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
                   >
                     {isLoadingDossies ? (
                       [1, 2, 3].map((idx) => (
@@ -894,196 +699,179 @@ export default function HomePage() {
                     ) : displayDossie.length > 0 ? (
                       displayDossie.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
+                        const { mainTitle, subtitle } = splitTitle(post.title);
                         return (
                           <motion.div
                             key={post.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                            className={cn(
-                              "w-[280px] sm:w-[260px] md:w-[280px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300 relative",
-                              hoveredDossieIndex !== null && hoveredDossieIndex !== i
-                                ? "opacity-50 scale-[0.96] blur-[0.4px]"
-                                : hoveredDossieIndex === i
-                                ? "scale-[1.03] z-10"
-                                : ""
-                            )}
+                            className="w-[260px] sm:w-[275px] lg:w-auto shrink-0 snap-start snap-always"
                             onMouseEnter={() => {
                               setHoveredDossieIndex(i);
                               playClickSound();
                               handlePrefetch(targetSlug);
                             }}
                           >
-                            {/* Salient folder tab */}
-                            <div className={cn(
-                              "absolute -top-4.5 left-4 px-3 py-0.5 border-t-2 border-x-2 border-black rounded-t-sm text-[9px] font-retro font-bold uppercase tracking-wider text-black select-none z-10 transition-colors duration-300",
-                              hoveredDossieIndex === i
-                                ? "bg-[#f1e0c5] dark:bg-[#d6be90]"
-                                : "bg-[#e3cb9f] dark:bg-[#c2aa78]"
-                            )}>
-                              DOSSIÊ #0{i + 1}
-                            </div>
-
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative h-[370px] lg:h-[320px] xl:h-[370px] border-2 border-black flex flex-col justify-between overflow-hidden cursor-pointer group rounded-none p-4 transition-all duration-300 text-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_rgba(59,130,246,1)]",
-                                hoveredDossieIndex === i
-                                  ? "bg-[#ebd5ad] dark:bg-[#cbb284]"
-                                  : "bg-[#e2cba0] dark:bg-[#c2aa78]"
+                                "relative h-full rounded-2xl border flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1.5",
+                                isDark
+                                  ? "bg-[#151329] border-white/[0.08] hover:border-sky-400/50 shadow-[0_14px_32px_-12px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.28)]"
+                                  : "bg-slate-50 border-slate-200 hover:border-sky-400 shadow-sm"
                               )}
                             >
-                              {/* Laser scan line overlay */}
-                              <div className="absolute h-0.5 w-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)] top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30" />
+                              {/* Laser scanner beam on hover */}
+                              <div className="absolute h-0.5 w-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,1)] top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30" />
 
-                              {/* Paperclip */}
-                              <div className="absolute top-2.5 left-6 w-3.5 h-8 bg-slate-400 border border-slate-600 rounded-full opacity-90 z-20 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] transform -rotate-12 select-none" />
-
-                              {/* Polaroid photo frame */}
-                              <div className="relative w-full aspect-[4/3] border-2 border-black bg-white p-2.5 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1.5deg] z-10 shrink-0 overflow-hidden select-none">
+                              {/* Widescreen Media Header */}
+                              <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-950 shrink-0">
                                 {post.imageUrl && (
                                   <img
                                     src={post.imageUrl}
                                     alt={post.title}
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                                     loading="lazy"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
                                   />
                                 )}
-                                <div className="absolute inset-0 scanline-overlay opacity-15 pointer-events-none" />
-                                
-                                {/* Photo tape or label */}
-                                <div className="mt-1.5 text-[5.5px] font-mono text-center text-gray-500 tracking-wider leading-none">
-                                  ANEXO_FOTO_REGISTRO_0{i + 1}.PNG
-                                </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#151329] via-transparent to-black/30 opacity-85" />
+                                <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest bg-sky-500/25 text-sky-300 border border-sky-400/40 backdrop-blur-md">
+                                  ARQUIVO #0{i + 1}
+                                </span>
+                                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-mono text-slate-200 bg-black/60 border border-white/10 backdrop-blur-md">
+                                  {calculateReadingTime(post.content || "").replace(
+                                    " min de leitura",
+                                    " MIN"
+                                  )}
+                                </span>
                               </div>
 
-                              {/* Manila page details (typewriter style) */}
-                              <div className="relative z-10 font-mono text-black mt-3 flex-grow flex flex-col justify-between">
-                                <div className="space-y-2">
-                                  {/* Confidencial stamp */}
-                                  <div className="inline-block border border-red-600 text-red-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rotate-[-3deg] select-none border-dashed leading-none animate-pulse">
-                                    ★ CLASSIFICADO ★
-                                  </div>
-                                  {(() => {
-                                    const { mainTitle, subtitle } = splitTitle(post.title);
-                                    return mainTitle ? (
-                                      <div className="flex flex-col gap-0.5">
-                                        <span className="font-mono text-[8px] uppercase tracking-wider text-blue-800 font-black">
-                                          {mainTitle}
-                                        </span>
-                                        <h3 className="font-bold text-xs lg:text-[11px] xl:text-xs uppercase tracking-tight leading-snug line-clamp-2 text-black">
-                                          {subtitle}
-                                        </h3>
-                                      </div>
-                                    ) : (
-                                      <h3 className="font-bold text-sm lg:text-xs xl:text-sm uppercase tracking-tight leading-snug line-clamp-2 text-black">
+                              {/* Content */}
+                              <div className="p-4 flex-1 flex flex-col justify-between gap-3">
+                                <div>
+                                  {mainTitle ? (
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="font-retro text-xs uppercase tracking-wider text-sky-400 font-black line-clamp-1">
+                                        {mainTitle}
+                                      </span>
+                                      <h3
+                                        className={cn(
+                                          "font-retro font-bold text-sm leading-snug line-clamp-2 uppercase group-hover:text-sky-300 transition-colors",
+                                          isDark ? "text-white" : "text-slate-900"
+                                        )}
+                                      >
                                         {subtitle}
                                       </h3>
-                                    );
-                                  })()}
+                                    </div>
+                                  ) : (
+                                    <h3
+                                      className={cn(
+                                        "font-retro font-bold text-sm leading-snug line-clamp-2 uppercase group-hover:text-sky-300 transition-colors",
+                                        isDark ? "text-white" : "text-slate-900"
+                                      )}
+                                    >
+                                      {subtitle}
+                                    </h3>
+                                  )}
+                                  {post.excerpt && (
+                                    <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
+                                      {post.excerpt}
+                                    </p>
+                                  )}
                                 </div>
 
-                                <div className="text-[10px] lg:text-[9px] xl:text-[10px] text-gray-800 font-bold space-y-0.5 mt-2 pt-2 border-t border-black/15">
-                                  <div>DATA REGISTRO: {formatDate(post.createdAt, post.date ?? undefined)}</div>
-                                  <div className="flex items-center justify-between text-blue-800 dark:text-blue-900 font-retro tracking-wider">
-                                    <span>LEITURA: {calculateReadingTime(post.content || "").replace(" min de leitura", " MIN")}</span>
-                                    <span>{formatNumber(post.views || 0)} VIEWS</span>
-                                  </div>
+                                <div
+                                  className={cn(
+                                    "flex items-center justify-between pt-2.5 border-t text-[10px] font-mono",
+                                    isDark
+                                      ? "border-white/[0.06] text-slate-400"
+                                      : "border-slate-200 text-slate-500"
+                                  )}
+                                >
+                                  <span className="flex items-center gap-1">
+                                    <Eye className="w-3 h-3 text-sky-400" />
+                                    {formatNumber(post.views || 0)} views
+                                  </span>
+                                  <span className="text-sky-400 font-retro font-bold group-hover:translate-x-0.5 transition-transform">
+                                    ABRIR →
+                                  </span>
                                 </div>
                               </div>
                             </Link>
                           </motion.div>
                         );
                       })
-                    ) : (
-                      <div className={cn("col-span-3 p-8 rounded-none border-2 border-dashed flex flex-col items-center justify-center min-h-[140px] text-center gap-3 border-black/20 dark:border-white/20", isDark ? "bg-[#1f1d35] text-slate-400" : "bg-white text-slate-500")}>
-                        <FolderOpen className="w-8 h-8 opacity-40 animate-pulse text-blue-500" />
-                        <span className="text-xs font-retro uppercase tracking-wider font-bold">Nenhum dossiê secreto decodificado até o momento</span>
-                      </div>
-                    )}
+                    ) : null}
                   </div>
-
-                  {/* Setinhas de navegação/feedback visual no Mobile */}
-                  {dossieScroll.left && (
-                    <button
-                      onClick={() => scrollContainer(dossieRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar esquerda"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-blue-400" />
-                    </button>
-                  )}
-                  {dossieScroll.right && (
-                    <button
-                      onClick={() => scrollContainer(dossieRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar direita"
-                    >
-                      <ChevronRight className="w-5 h-5 text-blue-400" />
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* ── DIREITA (1/3): Reviews ── */}
+            {/* ── DIREITA (1/3): VEREDITO / REVIEWS ── */}
             <div className="order-1 lg:order-none flex flex-col gap-5 lg:contents">
-              {/* Divisor sutil acima de Reviews no mobile */}
-              <div className={cn("h-px lg:hidden", isDark ? "bg-white/5" : "bg-black/10")} />
-
-              <div 
+              <div
                 className={cn(
-                  "relative overflow-hidden transition-all duration-300 flex flex-col gap-3 rounded-none z-10 lg:col-span-1 lg:h-full",
-                  "border-0 shadow-none bg-transparent px-0 pb-0 pt-0 lg:border-2 lg:border-black lg:shadow-[6px_6px_0px_rgba(0,0,0,1)] lg:px-4 lg:pb-4 lg:pt-5",
-                  isDark ? "text-gray-100 lg:bg-[#1f1d35]" : "text-gray-900 lg:bg-white"
+                  "p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10 lg:col-span-1 lg:h-full",
+                  isDark
+                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
                 onMouseLeave={() => setHoveredReviewsIndex(null)}
               >
-
-
-                {/* Cabeçalho */}
-                <div className="flex items-center justify-between relative z-10 px-4 lg:px-0">
+                {/* Header */}
+                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title"
+                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("Reviews")}
                   >
-                    <div className="w-1.5 self-stretch rounded-none shrink-0 bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.7)] group-hover/title:shadow-[0_0_15px_rgba(234,179,8,0.9)] transition-all" />
-                    <div>
-                      <h2 className={cn("font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-yellow-400 transition-colors", isDark ? "text-white" : "text-snes-accent")}>
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                      <Star className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-amber-400 transition-colors">
                         Reviews
                       </h2>
-                      <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-0.5 text-slate-500">
-                        Análises com Nota
+                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
+                        Vereditos & Notas Oficiais
                       </p>
                     </div>
                   </div>
-                  {/* Linha pontilhada conectora para preencher o espaço */}
-                  <div className="hidden sm:block flex-1 mx-6 border-b-2 border-dashed border-yellow-500/20 dark:border-yellow-400/15 self-center" />
-                  {/* Informações de Status retro no cabeçalho */}
-                  <div className="hidden sm:flex flex-col items-end font-mono text-[8px] text-yellow-500/80 dark:text-yellow-400/80 select-none text-right">
-                    <span className="font-bold tracking-wider">[ DECK REVIEW SYSTEM // REV-005 ]</span>
-                    <span className="opacity-60">DECK CONNECTED... READY</span>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => goToCategory("Reviews")}
+                    className="px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                  >
+                    Ver todos <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
-                {/* Cards Reviews */}
-                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10 pt-2 px-4 lg:px-0">
+                {/* Cards Reviews — Full-Bleed Cinematic Banners */}
+                <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10">
                   <div
                     ref={reviewsRef}
                     onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex lg:flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
+                    className="flex lg:flex lg:flex-col gap-3.5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
                   >
                     {isLoadingReviews ? (
                       [1, 2, 3, 4, 5].map((idx) => (
-                        <div key={idx} className={cn("w-full h-[112px] animate-pulse border-2 border-dashed rounded-none shrink-0 snap-start snap-always", isDark ? "border-white/10 bg-gray-900" : "border-snes-mid/40 bg-[#f5f4f7]")} />
+                        <div
+                          key={idx}
+                          className={cn(
+                            "w-full h-[112px] animate-pulse rounded-2xl border shrink-0",
+                            isDark ? "border-white/10 bg-white/[0.03]" : "border-slate-200 bg-slate-100"
+                          )}
+                        />
                       ))
                     ) : displayReviews.length > 0 ? (
                       displayReviews.map((post, i) => {
                         const targetSlug = post.slug || slugify(post.title);
                         const isHovered = hoveredReviewsIndex === i;
-                        const isAnyHovered = hoveredReviewsIndex !== null;
-
-                        const cardBgClass = isDark ? "bg-[#141226] text-white" : "bg-white text-zinc-900";
+                        const { mainTitle, subtitle } = splitTitle(post.title);
 
                         return (
                           <motion.div
@@ -1091,14 +879,7 @@ export default function HomePage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                            className={cn(
-                              "w-full sm:w-[calc(50%-8px)] lg:w-full h-[148px] lg:h-0 lg:flex-1 lg:min-h-[96px] xl:min-h-[112px] shrink-0 snap-start snap-always transition-all duration-300 relative",
-                              isAnyHovered && !isHovered
-                                ? "opacity-65 scale-[0.99] blur-[0.2px]"
-                                : isHovered
-                                ? "lg:-translate-y-0.5 lg:translate-x-0.5 z-20"
-                                : ""
-                            )}
+                            className="w-[270px] sm:w-[300px] lg:w-full h-[152px] lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-start snap-always transition-all duration-300 relative"
                             onMouseEnter={() => {
                               setHoveredReviewsIndex(i);
                               playEjectSound();
@@ -1108,139 +889,82 @@ export default function HomePage() {
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full flex items-stretch overflow-hidden cursor-pointer rounded-none transition-all duration-300 border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]",
-                                cardBgClass,
-                                isHovered 
-                                  ? "border-yellow-500 shadow-[4px_4px_0px_rgba(234,179,8,1)]" 
-                                  : "border-black"
+                                "relative w-full h-full flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden cursor-pointer rounded-2xl border transition-all duration-300 group bg-[#141226]",
+                                isDark ? "border-white/[0.1]" : "border-slate-200/90",
+                                isHovered
+                                  ? "border-amber-400/60 shadow-[0_14px_34px_-8px_rgba(245,158,11,0.35)] -translate-y-0.5"
+                                  : "shadow-[0_10px_26px_-10px_rgba(0,0,0,0.75)]"
                               )}
                             >
-                              {/* 1. Left Side: Content Booklet (50% width) */}
-                              <div className="w-[50%] p-3 flex flex-col justify-between relative z-20 min-w-0">
-                                <div>
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">
-                                      OFFICIAL REVIEW
-                                    </span>
-                                    {/* Scanline dot status */}
-                                    <span className={cn(
-                                      "w-1 h-1 rounded-full",
-                                      isHovered ? "bg-yellow-400 animate-ping" : "bg-yellow-500/60"
-                                    )} />
+                              {/* Full-Bleed Artwork with Rich Cinematic Vignette */}
+                              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/40 via-[#16142b] to-[#090812]" />
+                              {post.imageUrl && (
+                                <img
+                                  src={post.imageUrl}
+                                  alt={post.title}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                  }}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                                />
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/70 to-black/30 z-10" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-[#090812]/90 via-[#090812]/45 to-transparent z-10" />
+
+                              {/* Top Row: Veredito Pill + Score Badge */}
+                              <div className="relative z-20 flex items-center justify-between gap-2 w-full">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-md text-[8px] font-mono font-bold uppercase tracking-widest text-amber-300">
+                                  <span
+                                    className={cn(
+                                      "w-1.5 h-1.5 rounded-full",
+                                      isHovered ? "bg-amber-400 animate-ping" : "bg-amber-400"
+                                    )}
+                                  />
+                                  Veredito Begins
+                                </span>
+
+                                {post.score && (
+                                  <div
+                                    className={cn(
+                                      "inline-flex items-center gap-1 text-slate-950 px-2.5 py-0.5 rounded-full font-retro font-black text-xs bg-gradient-to-r from-amber-300 to-yellow-400 shadow-[0_4px_14px_rgba(0,0,0,0.6)] transition-transform duration-300 shrink-0",
+                                      isHovered ? "scale-105" : ""
+                                    )}
+                                  >
+                                    ★ {post.score}
                                   </div>
-
-                                  {(() => {
-                                    const { mainTitle, subtitle } = splitTitle(post.title);
-                                    return mainTitle ? (
-                                      <div className="flex flex-col gap-0.5 mt-1.5">
-                                        <h4
-                                          className="font-retro font-bold text-sm lg:text-xs xl:text-sm leading-snug line-clamp-2 transition-colors duration-300"
-                                          style={{ textShadow: isDark ? "2px 2px 0px rgba(0,0,0,0.9)" : "2px 2px 0px rgba(0,0,0,0.25)" }}
-                                        >
-                                          <span className={cn(
-                                            isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
-                                          )}>
-                                            {mainTitle}
-                                          </span>
-                                        </h4>
-                                        <span
-                                          className={cn(
-                                            "font-sans text-[11px] lg:text-[10px] xl:text-[11px] leading-tight opacity-80 mt-0.5",
-                                            isDark ? "text-gray-300" : "text-gray-650"
-                                          )}
-                                          style={{ textShadow: isDark ? "1px 1px 0px rgba(0,0,0,0.8)" : "none" }}
-                                        >
-                                          {subtitle}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <h4
-                                        className="font-retro font-bold text-sm lg:text-[13px] xl:text-sm leading-snug line-clamp-2 mt-1.5 transition-colors duration-300"
-                                        style={{ textShadow: isDark ? "2px 2px 0px rgba(0,0,0,0.9)" : "2px 2px 0px rgba(0,0,0,0.2)" }}
-                                      >
-                                        <span className={cn(
-                                          isHovered ? "text-yellow-600 dark:text-yellow-400" : ""
-                                        )}>
-                                          {subtitle}
-                                        </span>
-                                      </h4>
-                                    );
-                                  })()}
-                                </div>
-
-                                {/* Footer details (Score badge only) */}
-                                <div className="pt-1.5 mt-1.5 flex justify-start">
-                                  {post.score && (
-                                    <div className={cn(
-                                      "inline-flex items-center gap-1 text-black px-3 py-1 font-retro font-black text-[13px] sm:text-sm lg:text-xs xl:text-sm border-2 border-black shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] bg-gradient-to-br from-yellow-300 via-yellow-400 to-amber-500 uppercase tracking-wider select-none leading-none transition-all duration-300",
-                                      isHovered ? "from-yellow-200 via-yellow-300 to-amber-400 scale-110 -translate-y-1 shadow-[3.5px_3.5px_0px_rgba(0,0,0,1)] border-yellow-500" : ""
-                                    )}>
-                                      ★ {post.score}
-                                    </div>
-                                  )}
-                                </div>
+                                )}
                               </div>
 
-                              {/* 2. Right Side: Game Artwork with Fade-out (absolute inset-0) */}
-                              {post.imageUrl && (
-                                <div className="absolute inset-0 select-none z-10 overflow-hidden">
-                                  <img
-                                    src={post.imageUrl}
-                                    alt={post.title}
-                                    loading="lazy"
-                                    className="absolute right-0 top-0 bottom-0 w-[70%] h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                  />
-                                  {/* Fade gradient overlay that blends into the background */}
-                                  <div 
-                                    className="absolute inset-0 z-10 pointer-events-none"
-                                    style={{
-                                      background: isDark
-                                        ? "linear-gradient(to right, #141226 0%, #141226 38%, rgba(20, 18, 38, 0.4) 70%, transparent 100%)"
-                                        : "linear-gradient(to right, #ffffff 0%, #ffffff 38%, rgba(255, 255, 255, 0.4) 70%, transparent 100%)"
-                                    }}
-                                  />
-                                  
-                                  {/* Retro scanline overlay on image area */}
-                                  <div className="absolute inset-0 scanline-overlay opacity-[0.18] pointer-events-none z-10" />
-                                </div>
-                              )}
+                              {/* Bottom Row: Full-Width Title & Subtitle */}
+                              <div className="relative z-20 mt-auto w-full pt-2">
+                                {mainTitle ? (
+                                  <div className="flex flex-col gap-0.5">
+                                    <h4 className="font-retro font-black text-xs sm:text-sm leading-tight line-clamp-1 uppercase text-amber-300 group-hover:text-amber-200 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                      {mainTitle}
+                                    </h4>
+                                    <span className="font-sans font-semibold text-xs leading-snug line-clamp-2 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                      {subtitle}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <h4 className="font-retro font-bold text-xs sm:text-sm leading-snug line-clamp-2 uppercase text-white group-hover:text-amber-300 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                    {subtitle}
+                                  </h4>
+                                )}
+                              </div>
                             </Link>
                           </motion.div>
                         );
                       })
-                    ) : (
-                      <div className="flex items-center justify-center py-12">
-                        <span className="text-sm font-retro uppercase text-gray-500">Sem Reviews Recentes</span>
-                      </div>
-                    )}
+                    ) : null}
                   </div>
-
-                  {reviewsScroll.left && (
-                    <button
-                      onClick={() => scrollContainer(reviewsRef, "left")}
-                      className="absolute left-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar esquerda"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-yellow-400" />
-                    </button>
-                  )}
-                  {reviewsScroll.right && (
-                    <button
-                      onClick={() => scrollContainer(reviewsRef, "right")}
-                      className="absolute right-2 top-[calc(50%-8px)] -translate-y-1/2 z-20 flex lg:hidden items-center justify-center w-8 h-8 rounded-full bg-black/70 dark:bg-black/90 text-white border border-white/20 active:scale-90 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.5)] cursor-pointer hover:bg-black/80"
-                      aria-label="Deslizar direita"
-                    >
-                      <ChevronRight className="w-5 h-5 text-yellow-400" />
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
           </div>
         </section>
       )}
-
     </div>
   );
 }
-

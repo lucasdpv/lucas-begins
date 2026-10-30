@@ -74,7 +74,7 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
 
         {/* Animação CSS pura: key no div causa remount no React a cada rota,
             disparando @keyframes pageEnter definido no index.css */}
-        <main className="max-w-7xl mx-auto px-4 py-8 md:py-12 flex-1 w-full">
+        <main className="layout-container py-6 md:py-10 flex-1">
           <div key={pathname} className="page-enter">
             {children}
           </div>
