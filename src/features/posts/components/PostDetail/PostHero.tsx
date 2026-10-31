@@ -44,7 +44,7 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
 
       <div
         className={cn(
-          "w-full h-full rounded-2xl md:rounded-3xl relative overflow-hidden flex items-center justify-center border border-white/[0.1] shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)] bg-[#090812] translate-z-0",
+          "w-full h-full rounded-2xl md:rounded-3xl relative overflow-hidden flex items-center justify-center border border-white/[0.1] shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)] bg-[#090812] transform-gpu",
           (!post.imageUrl || imgError) &&
             `bg-gradient-to-br ${(post as any).gradient || "from-slate-900 to-purple-950"}`
         )}
@@ -98,7 +98,7 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
                     if (cat.includes("review")) return "text-amber-300";
                     if (cat.includes("dossi")) return "text-sky-300";
                     if (cat.includes("retro")) return "text-orange-300";
-                    if (cat.includes("nostalgia")) return "text-pink-300";
+                    if (cat.includes("anime") || cat.includes("nostalgia")) return "text-pink-300";
                     if (cat.includes("pop") || cat.includes("cultura")) return "text-emerald-300";
                     if (cat.includes("rpg") || cat.includes("mmo")) return "text-cyan-300";
                     return "text-purple-300";

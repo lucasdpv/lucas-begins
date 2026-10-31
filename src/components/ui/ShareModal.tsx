@@ -170,7 +170,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
               {/* Preview Card */}
               <div className="p-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.03]">
                 <div className="flex gap-3.5 items-center">
-                  <div className="w-18 h-18 rounded-xl border border-white/10 shrink-0 overflow-hidden bg-purple-950/60">
+                  <div className="w-20 h-20 rounded-xl border border-white/10 shrink-0 overflow-hidden bg-purple-950/60">
                     {post.imageUrl ? (
                       <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
                     ) : (
@@ -247,7 +247,7 @@ export default function ShareModal({ isOpen, onClose, post, isDark }: ShareModal
                   onClick={shareSystem}
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-purple-500/30 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer",
-                    !isAdmin ? "col-span-2" : ""
+                    isAdmin ? "col-span-2" : ""
                   )}
                 >
                   <Share2 className="w-6 h-6" />

@@ -24,16 +24,28 @@ const AUTOPLAY_INTERVAL = 7000;
 export default function Carousel({ posts }: CarouselProps) {
   const { isDark } = useThemeStore();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [hoveredThumbIndex, setHoveredThumbIndex] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
 
-  const goTo = useCallback((idx: number) => {
-    setCurrentIndex(idx);
-    setProgress(0);
-  }, []);
+  const goTo = useCallback(
+    (idx: number) => {
+      if (idx === currentIndex) return;
+      setPreviousIndex(currentIndex);
+      setCurrentIndex(idx);
+    },
+    [currentIndex]
+  );
+
+  // Só ficam montados o slide atual, o anterior (fade-out), o próximo (pré-carregado)
+  // e a miniatura sob o mouse — evita decodificar e desfocar todas as artes ao mesmo tempo.
+  const isSlideMounted = (idx: number) =>
+    idx === currentIndex ||
+    idx === previousIndex ||
+    idx === (currentIndex + 1) % posts.length ||
+    idx === hoveredThumbIndex;
 
   const next = useCallback(() => {
     const nextIdx = (currentIndex + 1) % posts.length;
@@ -45,25 +57,14 @@ export default function Carousel({ posts }: CarouselProps) {
     goTo(prevIdx);
   }, [currentIndex, posts.length, goTo]);
 
-  useEffect(() => {
-    if (isPaused || posts.length <= 1) {
-      if (progressRef.current) clearInterval(progressRef.current);
-      return;
-    }
-    setProgress(0);
-    progressRef.current = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          next();
-          return 0;
-        }
-        return p + 100 / (AUTOPLAY_INTERVAL / 50);
-      });
-    }, 50);
-    return () => {
-      if (progressRef.current) clearInterval(progressRef.current);
-    };
-  }, [isPaused, next, posts.length, currentIndex]);
+  // Autoplay: a barra de progresso é uma animação CSS pura (sem setState a cada frame).
+  // O avanço de slide acontece no `onAnimationEnd` da barra visível. Isso evita
+  // re-renderizar o carrossel 20x/s, o que conflitava com o Google Translate
+  // (texto piscando entre PT e o idioma traduzido).
+  const progressStyle: React.CSSProperties = {
+    animation: `carousel-progress ${AUTOPLAY_INTERVAL}ms linear forwards`,
+    animationPlayState: isPaused ? "paused" : "running",
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -100,32 +101,39 @@ export default function Carousel({ posts }: CarouselProps) {
       {isDark && (
         <div className="absolute inset-0 pointer-events-none -z-10" aria-hidden="true">
           {posts.map((post, idx) => {
-            if (!post.imageUrl) return null;
+            if (!post.imageUrl || !isSlideMounted(idx)) return null;
             const isActive = idx === currentIndex;
+            const glowImage = (
+              <Image
+                src={post.imageUrl}
+                alt=""
+                fill
+                sizes="96px"
+                quality={40}
+                className="object-cover"
+                style={{ objectPosition: post.imagePosition || "center" }}
+              />
+            );
             return (
               <React.Fragment key={`ambilight-${post.id}`}>
                 {/* Camada 1: Projeção Ampla de Parede (Wall Wash Longo) */}
                 <div
                   className={cn(
-                    "absolute -inset-6 md:-inset-12 lg:-inset-16 rounded-[3.5rem] bg-cover bg-center blur-[70px] md:blur-[110px] saturate-[1.85] scale-105 transition-opacity duration-[1400ms] ease-out will-change-[opacity]",
+                    "absolute -inset-6 md:-inset-12 lg:-inset-16 rounded-[3.5rem] overflow-hidden blur-[70px] md:blur-[110px] saturate-[1.85] scale-105 transition-opacity duration-[1400ms] ease-out",
                     isActive ? "opacity-45" : "opacity-0"
                   )}
-                  style={{
-                    backgroundImage: `url(${post.imageUrl})`,
-                    backgroundPosition: post.imagePosition || "center",
-                  }}
-                />
+                >
+                  {glowImage}
+                </div>
                 {/* Camada 2: Halo de Borda Próximo (Intensa nas extremidades da tela) */}
                 <div
                   className={cn(
-                    "absolute -inset-2 md:-inset-4 rounded-[2.5rem] bg-cover bg-center blur-[32px] md:blur-[48px] saturate-[1.6] transition-opacity duration-[1100ms] ease-out will-change-[opacity]",
+                    "absolute -inset-2 md:-inset-4 rounded-[2.5rem] overflow-hidden blur-[32px] md:blur-[48px] saturate-[1.6] transition-opacity duration-[1100ms] ease-out",
                     isActive ? "opacity-35" : "opacity-0"
                   )}
-                  style={{
-                    backgroundImage: `url(${post.imageUrl})`,
-                    backgroundPosition: post.imagePosition || "center",
-                  }}
-                />
+                >
+                  {glowImage}
+                </div>
               </React.Fragment>
             );
           })}
@@ -149,13 +157,14 @@ export default function Carousel({ posts }: CarouselProps) {
         <div className="relative w-full h-[400px] sm:h-[460px] md:h-[560px] lg:h-[600px] xl:h-[640px] 2xl:h-[680px] overflow-hidden bg-[#090812]">
           {/* 1. Camadas de Imagem Pré-Montadas (Crossfade + Ken Burns Suave sem piscar) */}
           {posts.map((post, idx) => {
+            if (!isSlideMounted(idx)) return null;
             const isActive = idx === currentIndex;
             return (
               <div
                 key={post.id}
                 aria-hidden={!isActive}
                 className={cn(
-                  "absolute inset-0 transition-all duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[opacity,transform]",
+                  "absolute inset-0 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
                   isActive ? "opacity-100 scale-100 z-[1]" : "opacity-0 scale-[1.04] z-0 pointer-events-none"
                 )}
               >
@@ -231,6 +240,8 @@ export default function Carousel({ posts }: CarouselProps) {
                             ? "text-sky-300"
                             : currentPost.category.toLowerCase().includes("retro")
                             ? "text-orange-300"
+                            : currentPost.category.toLowerCase().includes("anime")
+                            ? "text-pink-300"
                             : "text-purple-300"
                         )}
                       >
@@ -290,6 +301,8 @@ export default function Carousel({ posts }: CarouselProps) {
                         e.stopPropagation();
                         goTo(idx);
                       }}
+                      onMouseEnter={() => setHoveredThumbIndex(idx)}
+                      onMouseLeave={() => setHoveredThumbIndex(null)}
                       className={cn(
                         "relative w-28 xl:w-36 h-16 xl:h-20 rounded-xl overflow-hidden transition-all duration-500 ease-out cursor-pointer group/thumb focus:outline-none text-left bg-purple-950/60",
                         isActive
@@ -299,14 +312,12 @@ export default function Carousel({ posts }: CarouselProps) {
                       aria-label={`Selecionar destaque: ${post.title}`}
                     >
                       {post.imageUrl ? (
-                        <img
+                        <Image
                           src={post.imageUrl}
                           alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-105"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
+                          fill
+                          sizes="144px"
+                          className="object-cover transition-transform duration-700 ease-out group-hover/thumb:scale-105"
                         />
                       ) : (
                         <div className="w-full h-full bg-purple-950" />
@@ -318,8 +329,10 @@ export default function Carousel({ posts }: CarouselProps) {
                       {isActive && (
                         <div className="absolute bottom-0 inset-x-0 h-1 bg-white/25">
                           <div
-                            className="h-full bg-gradient-to-r from-purple-400 to-amber-300 transition-[width] duration-75 ease-linear"
-                            style={{ width: `${progress}%` }}
+                            key={`thumb-progress-${currentIndex}`}
+                            className="h-full w-0 bg-gradient-to-r from-purple-400 to-amber-300"
+                            style={progressStyle}
+                            onAnimationEnd={next}
                           />
                         </div>
                       )}
@@ -379,8 +392,10 @@ export default function Carousel({ posts }: CarouselProps) {
                   >
                     {isActive && (
                       <div
-                        className="absolute inset-y-0 left-0 bg-purple-400 transition-[width] duration-75 ease-linear"
-                        style={{ width: `${progress}%` }}
+                        key={`dot-progress-${currentIndex}`}
+                        className="absolute inset-y-0 left-0 w-0 bg-purple-400"
+                        style={progressStyle}
+                        onAnimationEnd={next}
                       />
                     )}
                   </button>

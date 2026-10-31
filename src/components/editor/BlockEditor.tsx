@@ -239,7 +239,7 @@ function BlockItem({ block, idx, blocks, isDark, updateBlock, removeBlock, moveB
                     placeholder="Escreva seu texto aqui..."
                     className={cn(
                       "w-full bg-black/20 outline-none p-8 text-lg leading-relaxed font-medium rounded-2xl border-2 border-transparent focus:border-purple-500/20 transition-all min-h-[150px] resize-y",
-                      "break-all whitespace-pre-wrap overflow-wrap-anywhere",
+                      "break-all whitespace-pre-wrap [overflow-wrap:anywhere]",
                       isDark ? "text-gray-300" : "text-gray-800"
                     )}
                   />

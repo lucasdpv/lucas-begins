@@ -14,6 +14,7 @@ export const SITE_KEYWORDS = [
   "retro gaming",
   "Dossiês",
   "RetroCafé",
+  "animes",
 ];
 
 export const DEFAULT_OG_IMAGE = "/og-image.png";

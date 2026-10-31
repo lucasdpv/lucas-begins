@@ -4,6 +4,47 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🧭 [v6.1.0] - The Categories, Chapters & Performance Update
+*Data: 31 de Outubro de 2026*
+
+### 🗂️ Reestruturação das Categorias (11 → 4)
+- **Novas categorias oficiais**: `Reviews`, `Dossiê`, `Animes & TV` e `RetroCafé`. As antigas (`Especial`, `Nostalgia`, `Cultura Pop`, `RPG & MMO`, `Retro`, `Notícias`, `Tech & Futuro`, `Artigos`) foram descontinuadas.
+- **Migração dos dados**: As 37 matérias reais foram reclassificadas no Firestore (Reviews 7 · Dossiê 10 · Animes & TV 10 · RetroCafé 10). As 3 matérias de teste vindas do antigo `mockData.ts` (SNK NeoGeo, Soulslike, Mídia Física) ficam marcadas para exclusão manual.
+- **Fonte única no código (`src/features/posts/utils/categoryInfo.ts`)**: `SITE_CATEGORIES`, descrição de cada categoria (`getCategoryDescription`) e frase curta (`getCategoryTagline`). Navbar, MobileMenu, Catálogo, filtro do Painel e editor de posts deixaram de ler a coleção `categories` do Firestore.
+- **Descrição da categoria**: Ao abrir uma categoria no Catálogo ou na Home (`Setor: …`), um texto curto explica o que o leitor vai encontrar ali.
+- **Identidade visual**: `Animes & TV` ganhou cor rosa e ícone de TV; `RetroCafé` passou a usar o ícone de xícara. Os ícones das seções da Home agora são os mesmos do menu de categorias.
+
+### 📚 Pílula Flutuante de Capítulos (`ChapterPill.tsx`)
+- Quando o índice de capítulos sai da tela, uma pílula flutuante aparece no canto inferior esquerdo com anel de progresso, `Capítulo X de Y` e o nome do capítulo atual. Ao clicar, abre a lista de capítulos (lidos, atual e próximos) para navegação rápida.
+- Renderizada via `createPortal(..., document.body)` para não ser afetada pelo `transform` da animação de entrada das páginas.
+
+### 🧹 Remoções
+- **Tradução automática (Google Translate)**: Removidos `TranslationContext`, `LanguageSelector` e os estilos `goog-te-*`. O widget reescrevia o DOM controlado pelo React, causando a tela "tremendo" entre PT e o idioma escolhido e o seletor travado em `PT`. Leitores podem usar a tradução nativa do navegador.
+- **Barra de progresso de leitura**: Removida a "EXP Bar" do topo e o texto `LEITURA: X%` do índice (atualizava a cada evento de scroll e conflitava com a tradução).
+- **Seed & limpeza automática**: Removidos `SystemInitializer`, `SeedData.ts`, `CleanUp.ts` e `mockData.ts`. O `cleanupDuplicates` rodava no navegador do admin e apagava silenciosamente matérias com títulos repetidos.
+- **Catálogo**: Removida a barra de ordenação (Recentes / Mais lidos / Curtidos / Notas) e o link "Catálogo" do rodapé.
+- **Dossiês**: Removido o feixe de laser azul animado no hover dos cards.
+
+### 🎨 Interface
+- **Catálogo (`ArchivePage.tsx`)**: Removido o campo de busca próprio (redundante com a busca da Navbar), fileira de categorias sem caixa/rótulo, 8 matérias por página (duas fileiras completas) e correção de plural ("1 título encontrado"). Título da página atualizado para "Catálogo Completo".
+- **Menu de Categorias (`NavCategoryMenu.tsx`)**: Lista em coluna única com a frase de cada categoria, sem o item "Todos".
+- **Cards de Dossiê na Home**: Mesmo visual de pôster dos cards do RetroCafé, nas cores azuis do Dossiê.
+- **Recém-Adicionados**: Exibe 4 matérias em vez de 6.
+- **Alinhamento de cabeçalhos**: Ícones sempre na linha do título, com o subtítulo alinhado abaixo do título (Home, Catálogo, Continue Explorando e Comentários).
+
+### 🐛 Correções
+- **Modal de compartilhar**: A miniatura usava `w-18 h-18`, classes inexistentes no Tailwind 3.4, e a imagem estourava o modal. Corrigida também a grade de botões, que deixava um espaço vazio.
+- **Classes Tailwind inválidas**: Corrigidas classes que não geravam CSS (`group-hover:scale-108` nos cards, `active:scale-98`, `py-0.2`, `sm:w-18`/`md:w-22` no veredito, tons como `yellow-350`/`red-450` e outras), restaurando o zoom das imagens ao passar o mouse.
+- **Selo de Dossiê**: `CategoryBadge` não reconhecia "Dossiê" no singular e exibia roxo em vez de azul.
+- **Editor**: Matérias novas podiam começar com categoria vazia enquanto as categorias carregavam do Firestore.
+
+### ⚡ Performance
+- **Carrossel (`Carousel.tsx`)**: Só ficam montados o slide atual, o anterior, o próximo e o da miniatura sob o mouse (antes, 5 imagens grandes + 10 camadas com desfoque pesado). O Ambilight usa uma versão de 96px da arte e as miniaturas usam imagens otimizadas de 144px.
+- **Fundo global (`ClientLayoutWrapper.tsx`)**: As 3 manchas de luz com `blur` de 110–130px e `animate-pulse` infinito foram trocadas por gradientes radiais estáticos.
+- **Home**: Removida uma consulta paginada ao Firestore que não era exibida e reduzida a busca de recentes de 15 para 4 matérias.
+
+---
+
 ## 🚀 [v6.0.0] - The Cyber-Editorial & Streaming Geek Redesign Update
 *Data: 30 de Outubro de 2026*
 

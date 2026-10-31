@@ -493,7 +493,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
               "mt-5 text-right relative z-10 animate-in slide-in-from-right-4 duration-700",
               isDark ? "text-purple-400" : "text-purple-700"
             )}>
-              <span className="inline-block w-6 h-0.5 bg-current vertical-middle mr-2 opacity-30" />
+              <span className="inline-block w-6 h-0.5 bg-current align-middle mr-2 opacity-30" />
               <cite className="font-retro text-xs md:text-sm uppercase tracking-widest not-italic font-bold">
                 {author}
               </cite>

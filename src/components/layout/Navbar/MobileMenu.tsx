@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn, getPixelAvatar } from "../../../lib/utils";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
 import { InstagramIcon, ThreadsIcon, XIcon } from "../../icons/SocialIcons";
-import LanguageSelector from "../../ui/LanguageSelector";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -230,11 +229,6 @@ export default function MobileMenu({
                 <Star size={20} className="text-amber-400" /> Contatos
               </Link>
             </nav>
-
-            {/* Idioma do Sistema */}
-            <div className="py-3 border-t border-b border-white/[0.08]">
-              <LanguageSelector isMobileLayout={true} onLanguageChange={onClose} />
-            </div>
 
             {/* Social Links */}
             <div className="mt-auto pt-4">

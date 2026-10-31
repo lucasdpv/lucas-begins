@@ -88,7 +88,7 @@ export default function TabSystem({ isDark }: TabSystemProps) {
           <button
             onClick={handleSyncComments}
             disabled={isSyncing || isResetting || isNormalizing}
-            className={buttonClass("bg-yellow-400 hover:bg-yellow-350")}
+            className={buttonClass("bg-yellow-400 hover:bg-yellow-300")}
           >
             <RefreshCw className={cn("w-4 h-4", isSyncing && "animate-spin")} />
             {isSyncing ? "Sincronizando..." : "Sincronizar"}
@@ -108,7 +108,7 @@ export default function TabSystem({ isDark }: TabSystemProps) {
           <button
             onClick={handleNormalizeViews}
             disabled={isSyncing || isResetting || isNormalizing}
-            className={buttonClass("bg-blue-400 hover:bg-blue-350")}
+            className={buttonClass("bg-blue-400 hover:bg-blue-300")}
           >
             <BarChart2 className={cn("w-4 h-4", isNormalizing && "animate-spin")} />
             {isNormalizing ? "Processando..." : "Normalizar"}
@@ -128,7 +128,7 @@ export default function TabSystem({ isDark }: TabSystemProps) {
           <button
             onClick={handleResetMetrics}
             disabled={isSyncing || isResetting || isNormalizing}
-            className={buttonClass("bg-red-500 hover:bg-red-450 !text-white")}
+            className={buttonClass("bg-red-500 hover:bg-red-400 !text-white")}
           >
             <RotateCcw className={cn("w-4 h-4", isResetting && "animate-spin")} />
             {isResetting ? "Limpando..." : "Zerar Tudo"}

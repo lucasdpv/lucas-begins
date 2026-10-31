@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../../lib/utils";
 import { getCategoryIcon } from "../../../features/posts/utils/categoryIcons";
+import { getCategoryTagline } from "../../../features/posts/utils/categoryInfo";
 
 interface NavCategoryMenuProps {
   categories: string[];
@@ -49,19 +50,19 @@ export default function NavCategoryMenu({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="absolute top-full left-0 mt-0 pt-3 w-[480px] z-50"
+            className="absolute top-full left-0 mt-0 pt-3 w-72 z-50"
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
           >
             <div
               className={cn(
-                "overflow-hidden p-4 grid grid-cols-2 gap-2.5 relative rounded-2xl border backdrop-blur-2xl",
+                "overflow-hidden p-2 flex flex-col gap-1 relative rounded-2xl border backdrop-blur-2xl",
                 isDark
                   ? "bg-[#121024]/95 border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.85)]"
                   : "bg-white/95 border-slate-200/90 shadow-2xl"
               )}
             >
-              {["Todos", ...categories].map((cat) => {
+              {categories.map((cat) => {
                 const isActive = activeCategory === cat;
                 return (
                   <button
@@ -69,7 +70,7 @@ export default function NavCategoryMenu({
                     type="button"
                     onClick={() => onSelect(cat)}
                     className={cn(
-                      "group flex items-center gap-3 p-3 rounded-xl border transition-all text-left w-full cursor-pointer",
+                      "group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left w-full cursor-pointer",
                       isActive
                         ? "bg-purple-600 text-white border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.35)]"
                         : isDark
@@ -93,9 +94,7 @@ export default function NavCategoryMenu({
                       <span className="font-retro font-bold text-xs uppercase tracking-wider truncate">
                         {cat}
                       </span>
-                      <span className="text-[9px] opacity-60 font-mono uppercase tracking-wider mt-0.5">
-                        Explorar setor
-                      </span>
+                      <span className="text-[11px] opacity-60 mt-0.5 truncate">{getCategoryTagline(cat)}</span>
                     </div>
                   </button>
                 );

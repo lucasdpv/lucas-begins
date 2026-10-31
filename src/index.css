@@ -432,38 +432,10 @@ blockquote p {
   transform: scale(1.08);
 }
 
-body {
-  top: 0px !important;
-  position: static !important;
-}
-
-.goog-logo-link {
-  display: none !important;
-}
-
-.goog-te-gadget {
-  color: transparent !important;
-  font-size: 0px !important;
-}
-
-.goog-te-banner-frame.skiptranslate,
-.goog-te-banner-frame,
-#goog-gt-tt,
-.goog-te-balloon-frame,
-iframe.goog-te-banner-frame,
-.goog-tooltip,
-.goog-tooltip:hover,
-#google_translate_element,
-iframe.skiptranslate,
-.skiptranslate,
-div.skiptranslate,
-[class*="VIpgJd-ZVi9od"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-.goog-te-combo {
-  display: none !important;
+/* Barra de progresso do autoplay do Carousel (animação CSS pura, sem re-render do React) */
+@keyframes carousel-progress {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 
 .retro-scrollbar::-webkit-scrollbar {
@@ -522,16 +494,6 @@ div.skiptranslate,
   animation: metallicShine 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes scannerBeam {
-  0% { top: 0%; }
-  50% { top: 100%; }
-  100% { top: 0%; }
-}
-
-.animate-scanner-beam {
-  animation: scannerBeam 3s ease-in-out infinite;
-}
-
 .font-stamp {
   font-family: 'Courier New', Courier, monospace;
 }
@@ -541,26 +503,6 @@ div.skiptranslate,
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
-}
-
-/* ============================================================
-   Modern Web Guidance: Scroll-Driven EXP Bar, Intrinsic Sizing
-   & Content-Visibility Below the Fold
-   ============================================================ */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    @keyframes grow-exp-progress {
-      from { transform: scaleX(0); }
-      to { transform: scaleX(1); }
-    }
-
-    .exp-scroll-bar {
-      width: 100% !important;
-      transform-origin: 0 50%;
-      animation: grow-exp-progress auto linear;
-      animation-timeline: scroll(root block);
-    }
-  }
 }
 
 .toc-collapsible {

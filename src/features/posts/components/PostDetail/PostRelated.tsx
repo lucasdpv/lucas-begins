@@ -84,18 +84,18 @@ export default function PostRelated({
     <div className="space-y-10 pt-6 border-t border-white/[0.08]">
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
               <h3 className="font-retro font-black text-xl md:text-2xl uppercase tracking-wide text-white leading-none">
                 Continue Explorando
               </h3>
-              <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-400 mt-1">
-                Recomendações dinâmicas por universo & catálogo
-              </p>
             </div>
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-400 mt-1 pl-12">
+              Recomendações dinâmicas por universo & catálogo
+            </p>
           </div>
 
           {validPosts.length > 3 && !isPreview && (
@@ -135,7 +135,7 @@ export default function PostRelated({
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                     }}
-                    className="relative z-[1] w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                    className="relative z-[1] w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                   />
                 ) : null}
                 <div className="absolute inset-0 z-[2] bg-gradient-to-t from-[#121024] via-transparent to-transparent opacity-80" />

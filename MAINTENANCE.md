@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — BeginsProject (v6.0.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.1.0)
 
 Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 
@@ -21,6 +21,30 @@ A segurança de rotas (no cliente e no `middleware.ts` do Next.js) é baseada em
 - **Split Title Automático**: Ao cadastrar um post com `:` (ou ` - `) no título — ex: `Chrono Trigger: A história do RPG perfeito` — o portal separa automaticamente o **Título Principal** (em destaque com `font-retro`) e o **Subtítulo** (colorido dinamicamente conforme a categoria).
 - **Proporções de Imagem**: No editor de posts (`PostEditorPage.tsx`), você pode escolher entre `original`, `16:9`, `1:1` e `4:5`, além de molduras especiais (`normal`, `crt`, `sticker`, `none`) nos blocos de imagem do artigo.
 - **Suporte a GIFs**: Imagens `.gif` são enviadas diretamente ao Firebase Storage sem compressão WebP para preservar a animação.
+- **Capítulos**: Cada linha `## Título` no conteúdo vira um capítulo no índice da matéria e na pílula flutuante de capítulos. Matérias com 2 ou mais capítulos exibem ambos.
+
+---
+
+## 🗂️ Categorias
+
+O portal usa 4 categorias oficiais, definidas no código em `src/features/posts/utils/categoryInfo.ts`:
+
+| Categoria | O que entra |
+|---|---|
+| **Reviews** | Análise de um jogo, com nota |
+| **Dossiê** | A história de um jogo, console ou franquia |
+| **Animes & TV** | Animes, desenhos, tokusatsus e TV |
+| **RetroCafé** | Crônicas, opiniões, memórias e novidades do próprio portal |
+
+- **Para publicar**: escolha a categoria no editor; a lista já vem restrita às 4 oficiais.
+- **Para criar uma nova categoria**: adicione o nome em `SITE_CATEGORIES`, a descrição em `CATEGORY_DESCRIPTIONS` e a frase em `CATEGORY_TAGLINES` (`categoryInfo.ts`). Depois defina ícone (`categoryIcons.tsx`) e cores (`Badge.tsx`, `PostCard.tsx`, `PostHero.tsx`, `Carousel.tsx`, `ArchivePage.tsx`); sem isso, a categoria aparece com o roxo padrão.
+- **Para renomear uma categoria**: além do código, é preciso atualizar o campo `category` de todas as matérias que a usam no Firestore.
+- A coleção `categories` do Firestore não controla mais o site; ela só aparece na aba "Categorias" do Painel.
+
+---
+
+## 🧪 Dados de Teste
+- O portal não cria mais posts nem categorias automaticamente (os antigos `SeedData.ts`, `CleanUp.ts` e `SystemInitializer` foram removidos na v6.1.0). Conteúdo de teste deve ser criado e apagado manualmente pelo Painel.
 
 ---
 
@@ -40,4 +64,4 @@ O progresso dos leitores é salvo nos campos `xp` e `level` da coleção `users`
 - **Zod Schemas (`src/features/posts/schemas.ts`)**: Todos os posts passam por validação Zod com fallbacks seguros. Se adicionar um novo campo aos posts no Firestore, lembre-se de incluí-lo no `PostSchema`.
 
 ---
-**Atualizado em: 30 de Outubro de 2026 (v6.0.0).**
+**Atualizado em: 31 de Outubro de 2026 (v6.1.0).**

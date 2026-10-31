@@ -20,6 +20,7 @@ import TabProfile from "../features/admin/components/TabProfile";
 import TabInbox from "../features/admin/components/TabInbox";
 import DeleteModal from "../features/admin/components/DeleteModal";
 import TabSystem from "../features/admin/components/TabSystem";
+import { SITE_CATEGORIES } from "../features/posts/utils/categoryInfo";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ export default function AdminPage() {
             {/* Badge de Admin absoluto flutuando acima, alinhado exatamente com o início do texto do título */}
             <div className="absolute -top-7 md:-top-9 left-[60px] md:left-[80px] flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 md:px-4 py-1 bg-purple-600/10 border border-purple-500/30 rounded-full">
-                <Settings size={12} className="text-purple-500 animate-spin-slow" />
+                <Settings size={12} className="text-purple-500 animate-[spin_3s_linear_infinite]" />
                 <span className="font-retro text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-purple-500">Admin Mode Active</span>
               </div>
             </div>
@@ -115,7 +116,7 @@ export default function AdminPage() {
         {adminTab === "posts" && (
           <TabPosts 
             posts={posts}
-            categories={categories}
+            categories={SITE_CATEGORIES}
             isLoading={isLoadingPosts}
             isDark={isDark}
             onEdit={(id) => navigate(`/editor/${id}`)}

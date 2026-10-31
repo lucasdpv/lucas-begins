@@ -16,6 +16,8 @@ const getCategoryBadgeClass = (category: string) => {
   switch (norm) {
     case "reviews":
       return "bg-amber-500 dark:bg-amber-400 text-black";
+    case "dossiê":
+    case "dossie":
     case "dossiês":
     case "dossies":
       return "bg-blue-600 dark:bg-blue-500 text-white";
@@ -25,6 +27,7 @@ const getCategoryBadgeClass = (category: string) => {
       return "bg-orange-500 dark:bg-orange-400 text-white";
     case "especial":
       return "bg-purple-600 dark:bg-purple-500 text-white";
+    case "animes & tv":
     case "nostalgia":
       return "bg-pink-600 dark:bg-pink-500 text-white";
     case "cultura pop":

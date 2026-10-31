@@ -139,9 +139,6 @@ export default function Footer() {
               isDark ? "text-slate-400" : "text-slate-600"
             )}
           >
-            <Link to="/archive" className="hover:text-purple-400 transition-colors flex items-center gap-1.5">
-              <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Catálogo
-            </Link>
             <Link to="/about" className="hover:text-purple-400 transition-colors flex items-center gap-1.5">
               <ChevronRight className="w-3.5 h-3.5 text-purple-500" /> Sobre Nós
             </Link>

@@ -6,20 +6,20 @@ import {
 } from "../../lib/siteMetadata";
 
 export const metadata = {
-  title: "Dossiê de Fases e Artigos",
-  description: "Explore o arquivo completo de posts do BeginsProject. Filtre por categorias como Reviews, Dossiês, RetroCafé e muito mais.",
+  title: "Catálogo Completo",
+  description: "Explore o arquivo completo de posts do BeginsProject. Filtre por Reviews, Dossiês, Animes & TV e RetroCafé.",
   alternates: {
     canonical: "/archive",
   },
   openGraph: {
-    title: `Dossiê de Fases e Artigos | ${SITE_NAME}`,
-    description: "Explore o arquivo completo de posts do BeginsProject. Filtre por categorias como Reviews, Dossiês, RetroCafé e muito mais.",
+    title: `Catálogo Completo | ${SITE_NAME}`,
+    description: "Explore o arquivo completo de posts do BeginsProject. Filtre por Reviews, Dossiês, Animes & TV e RetroCafé.",
     images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: DEFAULT_TWITTER_CARD,
-    title: `Dossiê de Fases e Artigos | ${SITE_NAME}`,
-    description: "Explore o arquivo completo de posts do BeginsProject. Filtre por categorias como Reviews, Dossiês, RetroCafé e muito mais.",
+    title: `Catálogo Completo | ${SITE_NAME}`,
+    description: "Explore o arquivo completo de posts do BeginsProject. Filtre por Reviews, Dossiês, Animes & TV e RetroCafé.",
     images: [DEFAULT_OG_IMAGE],
   },
 };

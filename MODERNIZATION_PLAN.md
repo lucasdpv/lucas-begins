@@ -1,14 +1,27 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.0.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.1.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.0.0 — The Cyber-Editorial & Streaming Geek Redesign Update`
-- **Status do Redesign Principal**: `Fase 7 Concluída e Documentada! ✅`
-- **Última Atualização**: 30 de Outubro de 2026
+- **Versão Atual**: `v6.1.0 — The Categories, Chapters & Performance Update`
+- **Status**: `Fase 8 Concluída e Documentada! ✅`
+- **Última Atualização**: 31 de Outubro de 2026
 - **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** sem borda recortada, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`) e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## 🧭 Fase 8 — Categorias, Capítulos & Performance (v6.1.0) (✅ CONCLUÍDA)
+- [x] **8.1. Categorias reduzidas de 11 para 4** (`Reviews`, `Dossiê`, `Animes & TV`, `RetroCafé`) com fonte única em `src/features/posts/utils/categoryInfo.ts`, descrições exibidas no Catálogo e na Home e matérias migradas no Firestore.
+- [x] **8.2. Pílula flutuante de capítulos** (`PostDetail/ChapterPill.tsx`) no lugar da barra de progresso de leitura.
+- [x] **8.3. Remoção da tradução via Google Translate** (`TranslationContext`, `LanguageSelector`), que conflitava com o React.
+- [x] **8.4. Remoção do seed/limpeza automática** (`SystemInitializer`, `SeedData`, `CleanUp`, `mockData`).
+- [x] **8.5. Catálogo, menu de categorias e cabeçalhos** simplificados e alinhados; cards de Dossiê no formato pôster.
+- [x] **8.6. Correção de classes Tailwind inexistentes** (inclui o bug da imagem no modal de compartilhar).
+- [x] **8.7. Performance**: carrossel com montagem sob demanda, fundo global sem desfoques animados e menos consultas ao Firestore na Home.
+
+> Pendências desta fase estão na seção **"0. Pendências da v6.1.0"** do [`BACKLOG.md`](./BACKLOG.md).
 
 ---
 

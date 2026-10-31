@@ -59,18 +59,18 @@ export default function PostComments({
 
   return (
     <section id="comments-section" className="pt-10 border-t border-white/[0.08]">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-          <MessageSquare className="w-5 h-5" />
-        </div>
-        <div>
+      <div className="mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+            <MessageSquare className="w-5 h-5" />
+          </div>
           <h3 className="font-retro text-2xl md:text-3xl uppercase font-black tracking-wide leading-none text-white">
             Comunidade ({formatNumber(post.commentsCount || post.comments?.length || 0)})
           </h3>
-          <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-400 mt-1">
-            Discussão & comentários dos leitores
-          </p>
         </div>
+        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-slate-400 mt-1 pl-12">
+          Discussão & comentários dos leitores
+        </p>
       </div>
 
       {currentUser ? (

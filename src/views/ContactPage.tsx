@@ -7,27 +7,19 @@ import { useUIStore } from "../store/useUIStore";
 import { contactService } from "../services/contactService";
 import { cn } from "../lib/utils";
 import { motion } from "framer-motion";
-import { useTranslation } from "../context/TranslationContext";
 
-const DIALOGUE_TRANSLATIONS: Record<string, string> = {
-  pt: "Fala galera!!! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova matéria? Envie sua mensagem abaixo e eu responderei em breve! 🎮",
-  en: "Hey guys!!! I'm Lucas, the Player 1 of this portal. Did you find a bug or want to propose a new stage? Send your message below and I will reply soon! 🎮",
-  es: "¡Hola a todos!!! Soy Lucas, el Player 1 de este portal. ¿Encontraste un error o quieres proponer una nueva fase? ¡Envía tu mensaje abajo y te responderé pronto! 🎮",
-  fr: "Salut tout le monde!!! Je suis Lucas, le Player 1 de ce portail. Vous avez trouvé un bug ou vous voulez proposer un nouveau niveau ? Envoyez votre message ci-dessous et je vous répondrai bientôt ! 🎮",
-  de: "Hallo Leute!!! Ich bin Lucas, der Player 1 dieses Portals. Habt ihr einen Bug gefunden oder wollt ihr ein neues Level vorschlagen? Sendet eure Nachricht unten und ich werde bald antworten! 🎮",
-  ja: "やあ、みんな！！！僕はルーカス、このポータルのプレイヤー1だよ。バグを見つけたか、新しいステージを提案したい？下にメッセージを送ね。すぐに返信するよ！🎮",
-};
+const DIALOGUE_TEXT =
+  "Fala galera!!! Eu sou o Lucas, o Player 1 deste portal. Você encontrou um bug ou quer propor uma nova matéria? Envie sua mensagem abaixo e eu responderei em breve! 🎮";
 
 export default function ContactPage() {
   const { isDark } = useThemeStore();
   const { showToast } = useUIStore();
-  const { language } = useTranslation();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dialogText, setDialogText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
-  const fullText = DIALOGUE_TRANSLATIONS[language] || DIALOGUE_TRANSLATIONS.pt;
+  const fullText = DIALOGUE_TEXT;
 
   useEffect(() => {
     let i = 0;
@@ -207,7 +199,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border border-purple-400/50 bg-purple-600 hover:bg-purple-500 font-retro text-sm font-black uppercase tracking-widest text-white shadow-[0_12px_30px_rgba(168,85,247,0.4)] hover:scale-[1.01] active:scale-98 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border border-purple-400/50 bg-purple-600 hover:bg-purple-500 font-retro text-sm font-black uppercase tracking-widest text-white shadow-[0_12px_30px_rgba(168,85,247,0.4)] hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

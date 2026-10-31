@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "@/lib/router-compat";
 import { ArrowLeft, Compass, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -38,6 +37,7 @@ import PostVerdict from "../features/posts/components/PostDetail/PostVerdict";
 import PostAuthorBox from "../features/posts/components/PostDetail/PostAuthorBox";
 import PostRelated from "../features/posts/components/PostDetail/PostRelated";
 import PostComments from "../features/posts/components/PostDetail/PostComments";
+import ChapterPill from "../features/posts/components/PostDetail/ChapterPill";
 
 import { Post } from "../features/posts/schemas";
 import { USER_ROLES } from "../constants";
@@ -114,9 +114,9 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
 
   const [commentText, setCommentText] = useState("");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [readProgress, setReadProgress] = useState(0);
   const [activeHeadingId, setActiveHeadingId] = useState<string>("");
   const [isTocOpen, setIsTocOpen] = useState(true);
+  const [isChapterPillVisible, setIsChapterPillVisible] = useState(false);
   const imgError = useImageFallback(post?.imageUrl ?? undefined);
   const hasIncremented = useRef(false);
 
@@ -139,16 +139,6 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
 
   useEffect(() => {
     const handleScroll = () => {
-      const articleEl = document.getElementById("article-content");
-      if (articleEl) {
-        const rect = articleEl.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const total = rect.height - windowHeight * 0.5;
-        const scrolled = -rect.top + windowHeight * 0.25;
-        const pct = total > 0 ? Math.min(100, Math.max(0, (scrolled / total) * 100)) : 0;
-        setReadProgress(pct);
-      }
-
       if (headings.length > 0) {
         let current = headings[0].id;
         for (const h of headings) {
@@ -162,6 +152,15 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
         }
         setActiveHeadingId(current);
       }
+
+      const toc = document.getElementById("post-toc");
+      const article = document.getElementById("article-content");
+      setIsChapterPillVisible(
+        !!toc &&
+          !!article &&
+          toc.getBoundingClientRect().bottom < 0 &&
+          article.getBoundingClientRect().bottom > window.innerHeight * 0.4
+      );
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -248,23 +247,6 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
 
   return (
     <article className="w-full max-w-[1520px] mx-auto relative">
-      {/* Barra de Progresso de Leitura ("EXP Bar") Fixa no Topo do Viewport via Portal */}
-      {!previewPost &&
-        isHydrated &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            className="fixed top-0 left-0 right-0 h-1 z-[100] bg-transparent pointer-events-none"
-            aria-hidden="true"
-          >
-            <div
-              className="exp-scroll-bar h-full w-full origin-left bg-gradient-to-r from-purple-600 via-fuchsia-500 to-amber-400 shadow-[0_0_12px_rgba(168,85,247,0.9)] transition-transform duration-150 ease-out"
-              style={{ transform: `scaleX(${readProgress / 100})` }}
-            />
-          </div>,
-          document.body
-        )}
-
       {/* Voltar */}
       <button
         onClick={() => {
@@ -331,6 +313,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
           {/* Capítulos da Matéria (Índice Retrátil em Largura Total) */}
           {headings.length >= 2 && (
             <div
+              id="post-toc"
               className={cn(
                 "rounded-2xl border overflow-hidden transition-all",
                 isDark
@@ -357,9 +340,6 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] font-bold text-purple-400 hidden sm:inline">
-                    LEITURA: {Math.round(readProgress)}%
-                  </span>
                   {isTocOpen ? (
                     <ChevronUp className="w-4 h-4 text-purple-400" />
                   ) : (
@@ -487,6 +467,15 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
           />
         </div>
       </div>
+
+      {!previewPost && (
+        <ChapterPill
+          headings={headings}
+          activeHeadingId={activeHeadingId}
+          isVisible={isChapterPillVisible}
+          isDark={isDark}
+        />
+      )}
 
       <ShareModal
         isOpen={isShareModalOpen}

@@ -77,7 +77,7 @@ export default function AboutSkeleton({ isDark }: AboutSkeletonProps) {
             {/* Blockquote simulation */}
             <div className={cn(
               "relative p-6 md:p-10 rounded-none border-4 space-y-3",
-              isDark ? "bg-purple-900/10 border-purple-600 shadow-[4px_4px_0_rgba(168,85,247,0.2)]" : "bg-purple-50 border-purple-550 shadow-[4px_4px_0_rgba(168,85,247,0.25)]"
+              isDark ? "bg-purple-900/10 border-purple-600 shadow-[4px_4px_0_rgba(168,85,247,0.2)]" : "bg-purple-50 border-purple-500 shadow-[4px_4px_0_rgba(168,85,247,0.25)]"
             )}>
               <SkeletonItem isDark={isDark} height="h-5" className="mx-auto w-11/12" />
               <SkeletonItem isDark={isDark} height="h-5" className="mx-auto w-3/4" />

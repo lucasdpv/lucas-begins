@@ -7,11 +7,7 @@
 export const STORAGE_KEYS = {
   THEME: "beginsproject_theme",
   DRAFT: "retro_blog_draft",
-  MIGRATION_VERSION: "retro_blog_migration_version",
 } as const;
-
-// Versão atual das migrações de dados
-export const MIGRATION_VERSION = "v2.0" as const;
 
 // Roles de usuário
 export const USER_ROLES = {
@@ -25,9 +21,6 @@ export const COLLECTIONS = {
   CATEGORIES: "categories",
   USERS: "users",
 } as const;
-
-// Paginação padrão
-export const POSTS_PER_PAGE = 6 as const;
 
 // Design System: Neo-Brutalist
 export const BRUTAL_DESIGN = {

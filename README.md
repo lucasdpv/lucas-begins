@@ -1,4 +1,4 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.0.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.1.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
@@ -11,12 +11,23 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.0.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.1.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
 - **[📋 Backlog Técnico](./BACKLOG.md)**: Próximos passos planejados (refatoração futura do Light/Dark Mode, testes e infraestrutura).
 - **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
+
+---
+
+## 🧭 Novidades da Versão 6.1.0
+
+- **4 categorias oficiais**: `Reviews`, `Dossiê`, `Animes & TV` e `RetroCafé`, definidas em `src/features/posts/utils/categoryInfo.ts`, cada uma com uma descrição exibida no Catálogo e na Home.
+- **Pílula flutuante de capítulos** (`ChapterPill.tsx`): navegação rápida entre os capítulos durante a leitura das matérias.
+- **Mais leve**: carrossel montando só os slides necessários, fundo sem desfoques animados e menos consultas ao Firestore na Home.
+- **Removido**: tradução automática via Google Translate (use a tradução nativa do navegador), barra de progresso de leitura e scripts de seed/limpeza automática.
+
+Detalhes completos no [Histórico de Versões](./HISTORY.md).
 
 ---
 
@@ -31,7 +42,7 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 - **Top 5 Em Alta Hoje**: Trilho horizontal com numerais gigantes vazados (`.netflix-rank`) que se preenchem com **dourado sólido (`#fbbf24`)** e *glow* âmbar ao passar o mouse.
 - **Séries & Coleções Originais**:
   - **RetroCafé**: Posters verticais `3:4` estilo série original (`EPISÓDIO #01`) com aura laranja reativa.
-  - **Dossiês**: Cards widescreen confidenciais (`ARQUIVO #01`) com feixe de laser azul no hover.
+  - **Dossiês**: Posters verticais no mesmo formato do RetroCafé, com aura azul (atualizado na v6.1.0).
   - **Reviews**: Vitrine de análises com nota em destaque e máscara de gradiente suave.
 
 ### 🔄 Recomendações Dinâmicas ("Continue Explorando")

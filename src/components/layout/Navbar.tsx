@@ -9,7 +9,7 @@ import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthProvider";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useUIStore } from "../../store/useUIStore";
-import { useCategories } from "../../features/posts/hooks/useCategoriesQuery";
+import { SITE_CATEGORIES } from "../../features/posts/utils/categoryInfo";
 import { useAllPosts } from "../../features/posts/hooks/usePostsQuery";
 import { useUserProfile } from "../../hooks/useUserQuery";
 import { useNavbar } from "./Navbar/useNavbar";
@@ -18,7 +18,6 @@ import { useNavbar } from "./Navbar/useNavbar";
 import NavCategoryMenu from "./Navbar/NavCategoryMenu";
 import NavUserMenu from "./Navbar/NavUserMenu";
 import MobileMenu from "./Navbar/MobileMenu";
-import LanguageSelector from "../ui/LanguageSelector";
 
 export default function Navbar() {
   const { setIsLoginModalOpen, searchQuery, activeCategory, setSearchQuery } = useUIStore();
@@ -26,7 +25,6 @@ export default function Navbar() {
   const { isDark, toggleTheme } = useThemeStore();
   const { currentUser, handleLogout } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
-  const { data: categories = [] } = useCategories();
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const searchContainerRef = React.useRef<HTMLDivElement>(null);
@@ -92,7 +90,6 @@ export default function Navbar() {
       .slice(0, 5);
   }, [allPosts, searchQuery]);
 
-  const activeCategories = categories;
 
   return (
     <>
@@ -149,7 +146,7 @@ export default function Navbar() {
 
             <nav className="hidden lg:flex items-center gap-1 whitespace-nowrap">
               <NavCategoryMenu
-                categories={activeCategories}
+                categories={SITE_CATEGORIES}
                 activeCategory={activeCategory}
                 isOpen={isCategoryMenuOpen}
                 setIsOpen={setIsCategoryMenuOpen}
@@ -360,10 +357,6 @@ export default function Navbar() {
 
             {/* Core Tools (Desktop Only) */}
             <div className="hidden lg:flex items-center gap-2">
-              <LanguageSelector />
-
-              <div className={cn("w-px h-5 mx-1 shrink-0", isDark ? "bg-white/10" : "bg-slate-200")} />
-
               <NavUserMenu
                 currentUser={currentUser}
                 profile={profile}
@@ -412,7 +405,7 @@ export default function Navbar() {
         profile={profile}
         handleLogout={handleLogout}
         onLoginClick={() => setIsLoginModalOpen(true)}
-        categories={activeCategories}
+        categories={SITE_CATEGORIES}
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         isCategoriesOpen={isMobileCategoriesOpen}

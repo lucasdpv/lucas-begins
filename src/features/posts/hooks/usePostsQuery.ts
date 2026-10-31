@@ -37,12 +37,12 @@ export function useAllPosts(enabled = true) {
  * Hook principal de busca de posts com paginação infinita (usado na Home).
  * Compatibilizado com a assinatura esperada pelo HomePage.tsx
  */
-export function usePosts({ category = 'Todos', search = '', enabled = true }: { category?: string, search?: string, enabled?: boolean } = {}) {
+export function usePosts({ category = 'Todos', search = '', enabled = true, pageSize = 6 }: { category?: string, search?: string, enabled?: boolean, pageSize?: number } = {}) {
   const query = useInfiniteQuery({
-    queryKey: postKeys.list({ category, search }),
-    queryFn: ({ pageParam }) => 
+    queryKey: [...postKeys.list({ category, search }), pageSize],
+    queryFn: ({ pageParam }) =>
       PostService.getPaginatedPosts(
-        6, 
+        pageSize,
         pageParam, 
         category !== 'Todos' ? category : undefined
       ),

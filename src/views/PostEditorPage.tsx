@@ -15,7 +15,7 @@ import { useAuth } from "../context/AuthProvider";
 import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { useCreatePostMutation, useUpdatePostMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
-import { useCategories } from "../features/posts/hooks/useCategoriesQuery";
+import { SITE_CATEGORIES } from "../features/posts/utils/categoryInfo";
 import BlockEditor from "../components/editor/BlockEditor";
 import ImageUpload from "../components/ui/ImageUpload";
 import { Helmet } from "react-helmet-async";
@@ -35,7 +35,7 @@ export default function PostEditorPage() {
   const navigate = useNavigate();
   const { showToast } = useUIStore();
   const { data: posts = [] } = useAllPosts(); 
-  const { data: categories = [] } = useCategories();
+  const categories = SITE_CATEGORIES;
   const { currentUser } = useAuth();
   const { isDark } = useThemeStore();
 
@@ -223,7 +223,7 @@ export default function PostEditorPage() {
                 className={inputClass}
                 placeholder="Ex: Silent Hill 2: Análise Completa..."
               />
-              <p className={cn("text-[11px] font-medium tracking-normal opacity-85", isDark ? "text-slate-400" : "text-gray-650")}>
+              <p className={cn("text-[11px] font-medium tracking-normal opacity-85", isDark ? "text-slate-400" : "text-gray-600")}>
                 💡 <strong>Dica Retro:</strong> Use <code>:</code> (dois pontos) para separar o título. A primeira parte será o nome do jogo/série e a segunda será a chamada da matéria.
               </p>
               {formData.title && (() => {

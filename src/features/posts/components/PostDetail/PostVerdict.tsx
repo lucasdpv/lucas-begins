@@ -34,7 +34,7 @@ export default function PostVerdict({ post, isDark }: PostVerdictProps) {
 
       <div className="flex items-start sm:items-center gap-4 sm:gap-6 md:gap-8 p-5 sm:p-6 md:p-8">
         <div className="relative shrink-0">
-          <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-22 md:h-22 rounded-2xl overflow-hidden border border-amber-400/50 bg-gradient-to-br from-amber-400/20 to-amber-600/10 text-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.25)] flex flex-col items-center justify-center select-none p-3 sm:p-4">
+          <div className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] md:w-[5.5rem] md:h-[5.5rem] rounded-2xl overflow-hidden border border-amber-400/50 bg-gradient-to-br from-amber-400/20 to-amber-600/10 text-amber-300 shadow-[0_0_25px_rgba(245,158,11,0.25)] flex flex-col items-center justify-center select-none p-3 sm:p-4">
             <span className="font-retro font-black text-2xl sm:text-3xl md:text-4xl leading-none">
               {post.score}
             </span>

@@ -13,6 +13,8 @@ import {
   Cpu,
   Gamepad2,
   Music,
+  Tv,
+  Coffee,
   Zap
 } from "lucide-react";
 
@@ -25,6 +27,8 @@ export const getCategoryIcon = (cat: string, size?: number) => {
   
   if (lowerCat === "todos") return <LayoutGrid size={iconSize} />;
   if (lowerCat.includes("dossiê")) return <BookOpen size={iconSize} />;
+  if (lowerCat.includes("anime")) return <Tv size={iconSize} />;
+  if (lowerCat.includes("café")) return <Coffee size={iconSize} />;
   if (lowerCat.includes("tempo")) return <Clock size={iconSize} />;
   if (lowerCat.includes("análise")) return <FileSearch size={iconSize} />;
   if (lowerCat.includes("artigo")) return <FileText size={iconSize} />;

@@ -13,7 +13,6 @@ import Toast from "./ui/Toast";
 import LoginModal from "../features/auth/components/LoginModal";
 import BackToTop from "./ui/BackToTop";
 import CookieConsent from "./ui/CookieConsent";
-import SystemInitializer from "./SystemInitializer";
 import NavigationProgress from "./ui/NavigationProgress";
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -56,16 +55,15 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
 
   return (
     <div className={`min-h-screen overflow-x-hidden font-body transition-colors duration-500 relative z-0 ${themeClasses}`}>
-      <SystemInitializer />
       <NavigationProgress />
       <Toast toast={toast} isDark={isDark} />
 
       {/* Ambient Glows Globais */}
       {isDark && (
         <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute top-[10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[120px] animate-pulse duration-[8000ms]" />
-          <div className="absolute top-[40%] right-[-5%] w-[550px] h-[550px] bg-blue-600/5 rounded-full blur-[130px] animate-pulse duration-[10000ms]" />
-          <div className="absolute top-[70%] left-[5%] w-[450px] h-[450px] bg-amber-500/3 rounded-full blur-[110px] animate-pulse duration-[12000ms]" />
+          <div className="absolute top-[10%] left-[-5%] w-[740px] h-[740px] -translate-x-[120px] -translate-y-[120px] bg-[radial-gradient(circle,rgba(147,51,234,0.05)_0%,transparent_68%)]" />
+          <div className="absolute top-[40%] right-[-5%] w-[810px] h-[810px] translate-x-[130px] -translate-y-[130px] bg-[radial-gradient(circle,rgba(37,99,235,0.05)_0%,transparent_68%)]" />
+          <div className="absolute top-[70%] left-[5%] w-[670px] h-[670px] -translate-x-[110px] -translate-y-[110px] bg-[radial-gradient(circle,rgba(245,158,11,0.03)_0%,transparent_68%)]" />
         </div>
       )}
 

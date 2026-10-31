@@ -1,13 +1,33 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.0.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.1.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.0.0 (Cyber-Editorial & Streaming Geek Redesign)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.1.0 (Categories, Chapters & Performance Update)**.
+
+---
+
+## 🗂️ 0. Pendências da v6.1.0
+
+- [ ] **Limpeza manual no Painel (Firestore)**
+  * Apagar as 3 matérias de teste herdadas do antigo `mockData.ts`: *SNK NeoGeo 2026*, *A Ascensão Contínua dos Soulslike* e *Mídia Física vs O Futuro Digital*.
+  * Apagar as 8 categorias antigas da coleção `categories`: Artigos, Especial, RPG & MMO, Notícias, Nostalgia, Tech & Futuro, Retro e Cultura Pop.
+- [ ] **Remover a aba "Categorias" do Painel (`TabCategories.tsx`)**
+  * **Contexto**: Desde a v6.1.0 as categorias são definidas no código (`categoryInfo.ts`); depois da limpeza acima, a aba perde a função.
+- [ ] **Centralizar cores e ícones por categoria**
+  * **Contexto**: O mapeamento por palavra-chave está duplicado em `Badge.tsx`, `PostCard.tsx`, `PostHero.tsx`, `Carousel.tsx`, `ArchivePage.tsx` e `categoryIcons.tsx`.
+  * **Objetivo**: Mover para `categoryInfo.ts`, de modo que adicionar uma categoria exija editar um único arquivo.
+- [ ] **Renderizar o conteúdo da matéria no servidor (SEO)**
+  * **Contexto**: `PostDetailPage.tsx` retorna `null` até a hidratação (`if (!isHydrated && initialPost) return null`), então o HTML do servidor chega sem o texto da matéria, apenas com metadados e JSON-LD.
+  * **Objetivo**: Renderizar o artigo já no HTML do servidor para melhorar indexação e avaliação do AdSense.
+- [ ] **Remover componente sem uso (`src/components/home/HomeEditorialSections.tsx`)**
+  * **Contexto**: Não é importado em nenhum lugar desde o redesign da v6.0.0.
+- [ ] **Tradução real (opcional, futuro)**
+  * **Objetivo**: Se houver público internacional, gerar uma versão em inglês das matérias no momento da publicação (DeepL/LLM), salvar no Firestore e servir em rotas `/en/...`, com `next-intl` para os textos da interface. Não reintroduzir widgets que reescrevem o DOM (Google Translate).
 
 ---
 
 ## 🎨 1. Design System & Interface (Próximos Passos)
 
 - [ ] **Refatoração Completa do Modo Claro / Modo Escuro (Theme Engine v2)**
-  * **Contexto**: Na v6.0.0, o botão de alternância de tema foi ocultado temporariamente e o portal foi travado em `isDark: true` (`useThemeStore.ts`) para garantir 100% de fidelidade na estética Cyber-Editorial escura.
+  * **Contexto**: Desde a v6.0.0, o botão de alternância de tema foi ocultado temporariamente e o portal foi travado em `isDark: true` (`useThemeStore.ts`) para garantir 100% de fidelidade na estética Cyber-Editorial escura.
   * **Objetivo**: Projetar um **Modo Claro Editorial** dedicado (com variáveis CSS semânticas para superfícies, sombras, bordas e contrastes de badges) em vez de inversões simples de classes, reativando o seletor quando ambos os temas estiverem perfeitos.
 - [ ] **Modernização Visual do Painel Admin (`AdminDashboard.tsx`) e Editor de Posts (`PostEditorPage.tsx`)**
   * **Objetivo**: Aplicar o mesmo acabamento Cyber-Editorial (`#121024`, `border-white/[0.08]`, `rounded-2xl`) às abas internas do Painel Administrativo e à tela de criação/edição de matérias (atualmente funcionais e restritas a administradores).

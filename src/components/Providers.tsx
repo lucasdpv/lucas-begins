@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "../context/AuthProvider";
-import { TranslationProvider } from "../context/TranslationContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -26,11 +25,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <AuthProvider>
-          <TranslationProvider>
-            {children}
-          </TranslationProvider>
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </HelmetProvider>
     </QueryClientProvider>
   );

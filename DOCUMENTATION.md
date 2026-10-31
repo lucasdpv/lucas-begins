@@ -1,6 +1,6 @@
-# 📜 Documentação Técnica — BeginsProject (v6.0.0)
+# 📜 Documentação Técnica — BeginsProject (v6.1.0)
 
-Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.0.0**.
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.1.0**.
 
 ---
 
@@ -30,10 +30,12 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 
 ### 2. Efeito TV Ambilight (Extensão de Luz da Cena)
 - Implementado em `src/features/posts/components/Carousel.tsx` e `src/features/posts/components/PostDetail/PostHero.tsx`.
-- Utiliza uma projeção de dupla camada (`-z-10 pointer-events-none`) sem `overflow-hidden`:
+- Utiliza uma projeção de dupla camada (`-z-10 pointer-events-none`) posicionada fora do container recortado do carrossel:
   - **Camada 1 (Wall Wash Longo)**: `-inset-6 md:-inset-12 lg:-inset-16 blur-[70px] md:blur-[110px] saturate-[1.85] scale-105`.
   - **Camada 2 (Edge Halo Curto)**: `-inset-2 md:-inset-4 blur-[32px] md:blur-[48px] saturate-[1.6]`.
 - Na troca de slides do carrossel, a luz ambiente realiza um crossfade suave de `1400ms` sincronizado com a nova arte.
+- **Performance (v6.1.0)**: O carrossel só monta o slide atual, o anterior (fade-out), o próximo (pré-carregado) e o da miniatura sob o mouse (`isSlideMounted`). As camadas de luz usam `next/image` com `sizes="96px"`, já que a arte é desfocada, e as miniaturas usam `sizes="144px"`.
+- **Cuidado ao evoluir**: desfoques grandes (`blur-[100px]+`) e animações infinitas em elementos grandes custam caro na GPU. Prefira gradientes radiais estáticos (como o fundo global em `ClientLayoutWrapper.tsx`) e nunca anime `top`/`left` em loop.
 
 ### 3. Trilho "Top 5 Em Alta Hoje" (`.netflix-rank`)
 - Numerais gigantes posicionados à esquerda de cada poster (`1` a `5`).
@@ -41,8 +43,8 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 
 ### 4. Modern Web Platform Enhancements
 - **Tipografia Equilibrada**: `text-wrap: balance` em títulos (`h1`–`h4`) e `text-wrap: pretty` em parágrafos de leitura (`.article-paragraph`, `.magazine-article`).
-- **Barra de Leitura via Portal (`PostDetailPage.tsx`)**: Renderizada via `createPortal(..., document.body)` no topo real do viewport (`z-[100]`) com suporte a CSS Scroll-Driven Animations (`animation-timeline: scroll(root block)`).
 - **Animação Intrínseca do Índice de Capítulos**: Uso de `interpolate-size: allow-keywords` e `calc-size(auto, size)` na classe `.toc-collapsible`.
+- **Pílula Flutuante de Capítulos (`PostDetail/ChapterPill.tsx`)**: Aparece quando o índice (`#post-toc`) sai da tela e some ao fim de `#article-content`. Mostra um anel de progresso por capítulo e abre a lista completa ao clicar. É renderizada via `createPortal(..., document.body)` porque a animação de entrada das páginas aplica `transform` em um ancestral, o que faria `position: fixed` rolar junto com o conteúdo.
 - **Content-Visibility Below-the-Fold**: Seções inferiores utilizam `.deferred-below-fold` (`content-visibility: auto; contain-intrinsic-size: auto 520px`).
 
 ---
@@ -59,7 +61,14 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
   - `usePopularPosts(12)` (mais curtidos).
 - Um algoritmo `seededShuffle` determinístico por `currentPostId` seleciona automaticamente uma combinação única para cada matéria (priorizando 2 títulos da mesma categoria + 1 variado), além de oferecer o botão interativo **"Outras Sugestões"** para sortear novas matérias sem recarregar a página.
 
-### 3. Carregamento Progressivo & LCP (`HomePage.tsx`)
+### 3. Categorias (`src/features/posts/utils/categoryInfo.ts`)
+- As categorias oficiais são definidas no código em `SITE_CATEGORIES`: `Reviews`, `Dossiê`, `Animes & TV` e `RetroCafé`.
+- O mesmo arquivo expõe `getCategoryDescription` (texto exibido no Catálogo e no cabeçalho `Setor: …` da Home) e `getCategoryTagline` (frase curta do menu de categorias). As chaves são normalizadas (sem acento, sem "s" final), então `Dossiê` e `Dossiês` resolvem para a mesma entrada.
+- Navbar, MobileMenu, `ArchivePage`, o filtro do Painel (`TabPosts`) e o editor (`PostEditorPage`) usam `SITE_CATEGORIES`. A coleção `categories` do Firestore só é usada pela aba "Categorias" do Painel.
+- Cores e ícones por categoria são resolvidos por palavra-chave em `categoryIcons.tsx`, `Badge.tsx`, `PostCard.tsx`, `PostHero.tsx`, `Carousel.tsx` e `ArchivePage.tsx`.
+- O campo `category` de cada post deve conter exatamente um dos nomes de `SITE_CATEGORIES`.
+
+### 4. Carregamento Progressivo & LCP (`HomePage.tsx`)
 - Consultas secundárias abaixo da dobra (`mostViewedPosts`, `reviewPosts`, `dossiePosts`, `retrocafePosts`) aguardam `requestIdleCallback` para liberar a thread principal na abertura do site.
 - A primeira imagem do carrossel (`idx === 0`) e a capa do artigo (`PostHero.tsx`) utilizam `priority` e `fetchPriority="high"`.
 
@@ -69,9 +78,14 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 
 - **`src/app/`**: Rotas do Next.js App Router, metadados dinâmicos (`generateMetadata`), `sitemap.ts` e `robots.ts`.
 - **`src/views/`**: Páginas principais (`HomePage`, `ArchivePage`, `PostDetailPage`, `AboutPage`, `ContactPage`, `DashboardPage`, `PrivacyPolicyPage`, `NotFoundPage`, `PostEditorPage`, `AdminDashboard`).
-- **`src/features/posts/`**: `Carousel`, `PostCard`, `ArticleRenderer`, `PostDetail/` (`PostHero`, `PostActions`, `PostVerdict`, `PostAuthorBox`, `PostRelated`, `PostComments`), Skeletons e hooks do React Query (`usePostsQuery.ts`).
+- **`src/features/posts/`**: `Carousel`, `PostCard`, `ArticleRenderer`, `PostDetail/` (`PostHero`, `PostActions`, `PostVerdict`, `PostAuthorBox`, `PostRelated`, `PostComments`, `ChapterPill`), Skeletons, hooks do React Query (`usePostsQuery.ts`) e utilitários de categoria (`utils/categoryInfo.ts`, `utils/categoryIcons.tsx`).
 - **`src/components/layout/`**: `Navbar`, `Footer` e subcomponentes (`NavCategoryMenu`, `NavUserMenu`, `MobileMenu`).
-- **`src/components/ui/`**: `Badge`, `LanguageSelector`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`, `ImageUpload`, `ImageCropper`.
+- **`src/components/ui/`**: `Badge`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`, `ImageUpload`, `ImageCropper`.
 
 ---
-**Documentação atualizada em: 30 de Outubro de 2026 (v6.0.0).**
+
+## 🌐 Idioma
+- O portal é publicado apenas em português (`lang="pt-BR"`). A tradução automática via Google Translate foi removida na v6.1.0 porque o widget reescreve nós de texto controlados pelo React, causando oscilação entre idiomas e estado inconsistente. Leitores podem usar a tradução nativa do navegador.
+
+---
+**Documentação atualizada em: 31 de Outubro de 2026 (v6.1.0).**

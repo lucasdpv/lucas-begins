@@ -60,7 +60,7 @@ const getCategoryCardStyles = (category: string) => {
       hoverGlow: "hover:border-orange-500/40 hover:shadow-[0_16px_40px_-12px_rgba(249,115,22,0.28)]",
     };
   }
-  if (norm.includes("nostalgia")) {
+  if (norm.includes("anime") || norm.includes("nostalgia")) {
     return {
       textHover: "group-hover:text-pink-500 dark:group-hover:text-pink-400",
       textLabel: "text-pink-600 dark:text-pink-400",
@@ -271,7 +271,7 @@ export default function PostCard({
             <Image
               src={post.imageUrl}
               alt={post.title}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
               style={{ objectPosition: post.imagePosition || "center" }}
               fill
               sizes="(max-width: 640px) 160px, (max-width: 1024px) 200px, 260px"

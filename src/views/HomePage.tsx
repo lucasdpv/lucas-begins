@@ -5,11 +5,8 @@ import {
   Gamepad2,
   ChevronRight,
   ChevronLeft,
-  Coffee,
-  FolderOpen,
   Flame,
   Sparkles,
-  Star,
   Eye,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "@/lib/router-compat";
@@ -25,10 +22,11 @@ import {
   useFeaturedPosts,
   useMostViewedPosts,
   usePostsByCategory,
-  usePosts,
   useLatestPosts,
 } from "../features/posts/hooks/usePostsQuery";
 import { usePostsFilter } from "../hooks/usePostsFilter";
+import { getCategoryDescription } from "../features/posts/utils/categoryInfo";
+import { getCategoryIcon } from "../features/posts/utils/categoryIcons";
 import {
   cn,
   slugify,
@@ -199,17 +197,13 @@ export default function HomePage() {
     3,
     shouldLoadSecondary
   );
-  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(15, isDefaultView);
+  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(4, isDefaultView);
 
   const isSearching = searchQuery.trim() !== "";
   const isLocalMode = isSearching || activeCategory !== "Todos";
   const { data: allPosts = [], isLoading: isLoadingAll } = useAllPosts(isLocalMode);
 
-  const { posts: paginatedPosts = [], isLoading: isLoadingPaginated } = usePosts({
-    category: activeCategory,
-  });
-
-  const posts = isLocalMode ? (allPosts as Post[]) : (paginatedPosts as Post[]);
+  const posts = allPosts as Post[];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -243,7 +237,7 @@ export default function HomePage() {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateScrollState]);
 
-  const gridPosts = isLocalMode ? filteredPosts.slice(0, 6) : latestPosts.slice(0, 6);
+  const gridPosts = isLocalMode ? filteredPosts.slice(0, 6) : latestPosts.slice(0, 4);
   const isLoadingPosts = isLocalMode ? isLoadingAll : isLoadingLatest;
 
   return (
@@ -251,7 +245,7 @@ export default function HomePage() {
       {/* ── 1. BILLBOARD HERO PANORÂMICO (NETFLIX / CRUNCHYROLL STYLE) ── */}
       {isLoadingFeatured && isDefaultView ? (
         <CarouselSkeleton isDark={isDark} />
-      ) : isDefaultView && posts.length > 0 ? (
+      ) : isDefaultView && carouselPosts.length > 0 ? (
         <section className="w-full">
           <Carousel posts={carouselPosts} isDark={isDark} />
         </section>
@@ -261,18 +255,18 @@ export default function HomePage() {
       {isDefaultView && (
         <section className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                <Flame className="w-5 h-5" />
-              </div>
-              <div>
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)] shrink-0">
+                  <Flame className="w-5 h-5" />
+                </div>
                 <h2 className="font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none">
                   Top 5 Em Alta Hoje
                 </h2>
-                <p className="text-[10px] font-mono uppercase tracking-[0.25em] mt-1 text-slate-400">
-                  Os títulos mais acessados pela comunidade
-                </p>
               </div>
+              <p className="text-[10px] font-mono uppercase tracking-[0.25em] mt-1 pl-12 text-slate-400">
+                Os títulos mais acessados pela comunidade
+              </p>
             </div>
           </div>
 
@@ -388,12 +382,16 @@ export default function HomePage() {
 
       {/* ── 4. RECÉM-ADICIONADOS AO CATÁLOGO (ÚLTIMAS NOTÍCIAS) ── */}
       <section className="flex flex-col gap-6">
-        <div className="flex items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
+                {!searchQuery && activeCategory !== "Todos" ? (
+                  getCategoryIcon(activeCategory, 18)
+                ) : (
+                  <Sparkles className="w-5 h-5" />
+                )}
+              </div>
               <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none truncate">
                 {isLoadingPosts
                   ? "Sincronizando Catálogo..."
@@ -403,10 +401,21 @@ export default function HomePage() {
                   ? `Setor: ${activeCategory}`
                   : "Recém-Adicionados"}
               </h2>
-              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 text-slate-400 truncate">
+            </div>
+            {!searchQuery && activeCategory !== "Todos" && getCategoryDescription(activeCategory) ? (
+              <p
+                className={cn(
+                  "text-sm leading-relaxed mt-2 pl-12 max-w-3xl",
+                  isDark ? "text-slate-300" : "text-slate-600"
+                )}
+              >
+                {getCategoryDescription(activeCategory)}
+              </p>
+            ) : (
+              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 pl-12 text-slate-400 truncate">
                 Novos lançamentos, análises e especiais do portal
               </p>
-            </div>
+            )}
           </div>
 
           {!isLoadingPosts && (
@@ -424,7 +433,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {(isSearching ? isLoadingAll : isLoadingLatest || isLoadingPaginated) ? (
+        {isLoadingPosts ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <PostSkeleton key={i} isDark={isDark} variant="vintage" />
@@ -507,25 +516,23 @@ export default function HomePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
+                    className="cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("RetroCafé")}
                   >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 shadow-[0_0_20px_rgba(249,115,22,0.15)]">
-                      <Coffee className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors">
-                          RetroCafé
-                        </h2>
-                        <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/25">
-                          Série Original
-                        </span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 shadow-[0_0_20px_rgba(249,115,22,0.15)]">
+                        {getCategoryIcon("RetroCafé", 20)}
                       </div>
-                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
-                        Crônicas & Memórias Geek
-                      </p>
+                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors">
+                        RetroCafé
+                      </h2>
+                      <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/25">
+                        Série Original
+                      </span>
                     </div>
+                    <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
+                      Crônicas & Memórias Geek
+                    </p>
                   </div>
 
                   <button
@@ -580,7 +587,7 @@ export default function HomePage() {
                                 <img
                                   src={post.imageUrl}
                                   alt={post.title}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                   loading="lazy"
                                   onError={(e) => {
                                     e.currentTarget.style.display = "none";
@@ -655,30 +662,28 @@ export default function HomePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
-                    onClick={() => goToCategory("Dossiês")}
+                    className="cursor-pointer group/title min-w-0 flex-1"
+                    onClick={() => goToCategory("Dossiê")}
                   >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
-                      <FolderOpen className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-sky-400 transition-colors">
-                          Dossiês
-                        </h2>
-                        <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/25">
-                          Documentários & Lore
-                        </span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
+                        {getCategoryIcon("Dossiê", 20)}
                       </div>
-                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
-                        Documentários & Lore de Franquias
-                      </p>
+                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-sky-400 transition-colors">
+                        Dossiês
+                      </h2>
+                      <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                        Documentários & Lore
+                      </span>
                     </div>
+                    <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
+                      Documentários & Lore de Franquias
+                    </p>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => goToCategory("Dossiês")}
+                    onClick={() => goToCategory("Dossiê")}
                     className="px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
                   >
                     Ver todos <ChevronRight className="w-3.5 h-3.5" />
@@ -706,7 +711,14 @@ export default function HomePage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
-                            className="w-[260px] sm:w-[275px] lg:w-auto shrink-0 snap-start snap-always"
+                            className={cn(
+                              "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
+                              hoveredDossieIndex !== null && hoveredDossieIndex !== i
+                                ? "opacity-65 scale-[0.98]"
+                                : hoveredDossieIndex === i
+                                ? "scale-[1.02] z-10"
+                                : ""
+                            )}
                             onMouseEnter={() => {
                               setHoveredDossieIndex(i);
                               playClickSound();
@@ -715,34 +727,23 @@ export default function HomePage() {
                           >
                             <Link
                               to={`/post/${targetSlug}`}
-                              className={cn(
-                                "relative h-full rounded-2xl border flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 hover:-translate-y-1.5",
-                                isDark
-                                  ? "bg-[#151329] border-white/[0.08] hover:border-sky-400/50 shadow-[0_14px_32px_-12px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.28)]"
-                                  : "bg-slate-50 border-slate-200 hover:border-sky-400 shadow-sm"
-                              )}
+                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-sky-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.35)]"
                             >
-                              {/* Laser scanner beam on hover */}
-                              <div className="absolute h-0.5 w-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,1)] top-0 left-0 animate-scanner-beam pointer-events-none opacity-0 group-hover:opacity-100 z-30" />
+                              {post.imageUrl && (
+                                <img
+                                  src={post.imageUrl}
+                                  alt={post.title}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                  }}
+                                />
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
-                              {/* Widescreen Media Header */}
-                              <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-950 shrink-0">
-                                {post.imageUrl && (
-                                  <img
-                                    src={post.imageUrl}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
-                                    loading="lazy"
-                                    onError={(e) => {
-                                      e.currentTarget.style.display = "none";
-                                    }}
-                                  />
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#151329] via-transparent to-black/30 opacity-85" />
-                                <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest bg-sky-500/25 text-sky-300 border border-sky-400/40 backdrop-blur-md">
-                                  ARQUIVO #0{i + 1}
-                                </span>
-                                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-mono text-slate-200 bg-black/60 border border-white/10 backdrop-blur-md">
+                              <div className="relative z-20 p-3.5 flex justify-end items-center">
+                                <span className="text-[9px] font-mono text-slate-200 bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/10">
                                   {calculateReadingTime(post.content || "").replace(
                                     " min de leitura",
                                     " MIN"
@@ -750,54 +751,33 @@ export default function HomePage() {
                                 </span>
                               </div>
 
-                              {/* Content */}
-                              <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                                <div>
-                                  {mainTitle ? (
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="font-retro text-xs uppercase tracking-wider text-sky-400 font-black line-clamp-1">
-                                        {mainTitle}
-                                      </span>
-                                      <h3
-                                        className={cn(
-                                          "font-retro font-bold text-sm leading-snug line-clamp-2 uppercase group-hover:text-sky-300 transition-colors",
-                                          isDark ? "text-white" : "text-slate-900"
-                                        )}
-                                      >
-                                        {subtitle}
-                                      </h3>
-                                    </div>
-                                  ) : (
-                                    <h3
-                                      className={cn(
-                                        "font-retro font-bold text-sm leading-snug line-clamp-2 uppercase group-hover:text-sky-300 transition-colors",
-                                        isDark ? "text-white" : "text-slate-900"
-                                      )}
-                                    >
+                              <div className="relative z-20 p-4 mt-auto flex flex-col gap-1.5">
+                                <span className="text-[10px] font-mono text-sky-300/90 uppercase tracking-wider">
+                                  {formatDate(post.createdAt, post.date ?? undefined)}
+                                </span>
+
+                                {mainTitle ? (
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="font-retro font-black uppercase text-xs tracking-wider text-sky-400 drop-shadow">
+                                      {mainTitle}
+                                    </span>
+                                    <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-2 group-hover:text-sky-200 transition-colors drop-shadow">
                                       {subtitle}
                                     </h3>
-                                  )}
-                                  {post.excerpt && (
-                                    <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
-                                      {post.excerpt}
-                                    </p>
-                                  )}
-                                </div>
+                                  </div>
+                                ) : (
+                                  <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-3 group-hover:text-sky-200 transition-colors drop-shadow">
+                                    {subtitle}
+                                  </h3>
+                                )}
 
-                                <div
-                                  className={cn(
-                                    "flex items-center justify-between pt-2.5 border-t text-[10px] font-mono",
-                                    isDark
-                                      ? "border-white/[0.06] text-slate-400"
-                                      : "border-slate-200 text-slate-500"
-                                  )}
-                                >
+                                <div className="flex items-center justify-between pt-2.5 mt-1 border-t border-white/10 text-[10px] font-mono text-slate-300">
                                   <span className="flex items-center gap-1">
                                     <Eye className="w-3 h-3 text-sky-400" />
                                     {formatNumber(post.views || 0)} views
                                   </span>
                                   <span className="text-sky-400 font-retro font-bold group-hover:translate-x-0.5 transition-transform">
-                                    ABRIR →
+                                    LER →
                                   </span>
                                 </div>
                               </div>
@@ -825,20 +805,20 @@ export default function HomePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
                   <div
-                    className="flex items-center gap-3 cursor-pointer group/title min-w-0 flex-1"
+                    className="cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("Reviews")}
                   >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
-                      <Star className="w-5 h-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                        {getCategoryIcon("Reviews", 20)}
+                      </div>
                       <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-amber-400 transition-colors">
                         Reviews
                       </h2>
-                      <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 text-slate-400">
-                        Vereditos & Notas Oficiais
-                      </p>
                     </div>
+                    <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
+                      Vereditos & Notas Oficiais
+                    </p>
                   </div>
 
                   <button
@@ -906,7 +886,7 @@ export default function HomePage() {
                                   onError={(e) => {
                                     e.currentTarget.style.display = "none";
                                   }}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                 />
                               )}
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/70 to-black/30 z-10" />
