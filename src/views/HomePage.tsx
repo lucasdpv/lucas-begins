@@ -284,12 +284,12 @@ export default function HomePage() {
                 <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)] shrink-0">
                   <Flame className="w-5 h-5" />
                 </div>
-                <h2 className="font-retro text-xl md:text-2xl font-black uppercase tracking-wide leading-none">
-                  Top 5 Em Alta Hoje
+                <h2 className="mag-title mag-title-amber font-retro text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-wide leading-none">
+                  Top 5 Mais Lidas
                 </h2>
               </div>
               <p className="text-[10px] font-mono uppercase tracking-[0.25em] mt-1 pl-12 text-slate-400">
-                Os títulos mais acessados pela comunidade
+                As matérias favoritas da galera
               </p>
             </div>
           </div>
@@ -416,7 +416,7 @@ export default function HomePage() {
                   <Sparkles className="w-5 h-5" />
                 )}
               </div>
-              <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-tight [overflow-wrap:anywhere]">
+              <h2 className="mag-title mag-title-purple font-retro text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-wide leading-tight [overflow-wrap:anywhere]">
                 {isLoadingPosts
                   ? "Sincronizando Catálogo..."
                   : searchQuery
