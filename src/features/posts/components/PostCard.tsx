@@ -242,7 +242,7 @@ export default function PostCard({
     );
   }
 
-  // Variant Vintage (Recém-Adicionados): pôster com o texto sobre a arte, no mesmo padrão
+  // Variant Vintage (Novidades e Catálogo): pôster com o texto sobre a arte, no mesmo padrão
   // dos cards de RetroCafé e Dossiê.
   if (isVintage) {
     return (

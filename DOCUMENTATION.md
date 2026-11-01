@@ -43,7 +43,7 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 - Tudo é estático: não adicione `blur` grande nem animação infinita nessas camadas.
 
 ### 4. Cards Pôster (`PostCard` com `variant="vintage"`)
-- Usado no Recém-Adicionados (Home) e no Catálogo (`ArchivePage`). A arte ocupa o card inteiro com degradê na parte de baixo; nota (★) no canto esquerdo, views e tempo de leitura no direito; categoria, data, título e subtítulo inteiros embaixo.
+- Usado na seção Novidades (Home) e no Catálogo (`ArchivePage`). A arte ocupa o card inteiro com degradê na parte de baixo; nota (★) no canto esquerdo, views e tempo de leitura no direito; categoria, data, título e subtítulo inteiros embaixo.
 - Grade padrão: `grid-cols-1 sm:grid-cols-2 xl:grid-cols-4`. O Catálogo carrega 8 por página (`usePosts({ pageSize: 8 })`) para fechar fileiras completas.
 - RetroCafé e Dossiês usam o mesmo formato, montado direto em `HomePage.tsx`.
 

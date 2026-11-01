@@ -423,7 +423,7 @@ export default function HomePage() {
                   ? `Resultados: "${searchQuery}"`
                   : activeCategory !== "Todos"
                   ? activeCategory
-                  : "Recém-Adicionados"}
+                  : "Novidades"}
               </h2>
             </div>
             {!searchQuery && activeCategory !== "Todos" && getCategoryDescription(activeCategory) ? (
@@ -437,7 +437,7 @@ export default function HomePage() {
               </p>
             ) : (
               <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 pl-12 text-slate-400">
-                Novos lançamentos, análises e especiais do portal
+                O que acabou de sair no portal
               </p>
             )}
           </div>
@@ -452,7 +452,7 @@ export default function HomePage() {
                   : "border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 bg-white"
               )}
             >
-              Explorar Tudo <ChevronRight className="w-3.5 h-3.5" />
+              Ver todos <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           )}
         </div>

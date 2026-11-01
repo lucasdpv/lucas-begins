@@ -23,7 +23,7 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 ## 📰 Novidades da Versão 6.2.0
 
 - **Seções com cara de revista dos anos 90**: RetroCafé, Dossiês e Reviews com retícula colorida e títulos de capa inclinados (`MagazineBackdrop.tsx`).
-- **Cards em formato pôster** no Recém-Adicionados, no Catálogo e no Dossiês, com títulos inteiros.
+- **Cards em formato pôster** nas Novidades, no Catálogo e no Dossiês, com títulos inteiros.
 - **Sumário de capítulos** com tempo de cada capítulo e, no celular, lista que sobe do rodapé; botão Topo no mesmo visual.
 - **Celular e tablet revisados**: carrossel mais limpo no celular, design de computador a partir de 1024px e barra de rolagem nativa em telas de toque.
 - **Correção**: o "voltar" do navegador depois de "Ver todos" volta para a home normal (a categoria agora vai na URL do catálogo).
