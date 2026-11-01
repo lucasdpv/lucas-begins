@@ -73,6 +73,13 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Google AdSense: <script> simples no <head>, como o Google recomenda. Via next/script
+            ele recebe o atributo data-nscript, que o AdSense não aceita (aviso no console). */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2196854476924119"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         {/* Google Analytics 4 */}
@@ -88,13 +95,6 @@ export default function RootLayout({
             gtag('config', 'G-JVB43T20R3');
           `}
         </Script>
-
-        {/* Google AdSense */}
-        <Script
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2196854476924119"
-          crossOrigin="anonymous"
-        />
 
         <Providers>
           <Suspense fallback={null}>

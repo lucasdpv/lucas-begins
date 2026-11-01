@@ -27,6 +27,7 @@ import {
 import { usePostsFilter } from "../hooks/usePostsFilter";
 import { getCategoryDescription } from "../features/posts/utils/categoryInfo";
 import { getCategoryIcon } from "../features/posts/utils/categoryIcons";
+import MagazineBackdrop from "../components/home/MagazineBackdrop";
 import {
   cn,
   slugify,
@@ -38,6 +39,22 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { PostService } from "../services/postService";
 import { Post } from "../features/posts/schemas";
+
+let sharedAudioContext: AudioContext | null = null;
+
+// Um único AudioContext, criado só depois da primeira interação do visitante:
+// antes disso o navegador bloqueia o áudio e registra um aviso a cada tentativa.
+function getAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return null;
+  if (!sharedAudioContext) {
+    const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtor) return null;
+    sharedAudioContext = new AudioCtor();
+  }
+  if (sharedAudioContext.state === "suspended") sharedAudioContext.resume().catch(() => {});
+  return sharedAudioContext;
+}
 
 export default function HomePage() {
   const { isDark } = useThemeStore();
@@ -57,7 +74,8 @@ export default function HomePage() {
 
   const playEjectSound = () => {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const ctx = getAudioContext();
+      if (!ctx) return;
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -90,7 +108,8 @@ export default function HomePage() {
 
   const playClickSound = useCallback(() => {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const ctx = getAudioContext();
+      if (!ctx) return;
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -174,10 +193,9 @@ export default function HomePage() {
 
   const goToCategory = useCallback(
     (category: string) => {
-      setActiveCategory(category);
-      navigate("/archive", { state: { category } });
+      navigate(`/archive?categoria=${encodeURIComponent(category)}`);
     },
-    [navigate, setActiveCategory]
+    [navigate]
   );
 
   const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
@@ -205,7 +223,13 @@ export default function HomePage() {
 
   const posts = allPosts as Post[];
 
+  // Só rola para o topo quando a categoria/busca muda; no carregamento (ex.: "voltar" do navegador)
+  // a posição de rolagem anterior é preservada.
+  const lastView = useRef(`${activeCategory}|${searchQuery}`);
   useEffect(() => {
+    const view = `${activeCategory}|${searchQuery}`;
+    if (view === lastView.current) return;
+    lastView.current = view;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeCategory, searchQuery]);
 
@@ -237,7 +261,7 @@ export default function HomePage() {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateScrollState]);
 
-  const gridPosts = isLocalMode ? filteredPosts.slice(0, 6) : latestPosts.slice(0, 4);
+  const gridPosts = isLocalMode ? filteredPosts.slice(0, 8) : latestPosts.slice(0, 4);
   const isLoadingPosts = isLocalMode ? isLoadingAll : isLoadingLatest;
 
   return (
@@ -335,7 +359,7 @@ export default function HomePage() {
                           </div>
 
                           <div className="relative z-20 space-y-1 pl-3">
-                            <h3 className="font-retro font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors leading-snug line-clamp-2 uppercase">
+                            <h3 className="font-retro font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors leading-snug uppercase">
                               {mainTitle || subtitle}
                             </h3>
                             <div className="flex items-center gap-2 text-[9px] font-mono uppercase tracking-wider text-slate-300/80">
@@ -392,13 +416,13 @@ export default function HomePage() {
                   <Sparkles className="w-5 h-5" />
                 )}
               </div>
-              <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none truncate">
+              <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-tight [overflow-wrap:anywhere]">
                 {isLoadingPosts
                   ? "Sincronizando Catálogo..."
                   : searchQuery
                   ? `Resultados: "${searchQuery}"`
                   : activeCategory !== "Todos"
-                  ? `Setor: ${activeCategory}`
+                  ? activeCategory
                   : "Recém-Adicionados"}
               </h2>
             </div>
@@ -412,7 +436,7 @@ export default function HomePage() {
                 {getCategoryDescription(activeCategory)}
               </p>
             ) : (
-              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 pl-12 text-slate-400 truncate">
+              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 pl-12 text-slate-400">
                 Novos lançamentos, análises e especiais do portal
               </p>
             )}
@@ -420,7 +444,7 @@ export default function HomePage() {
 
           {!isLoadingPosts && (
             <Link
-              to="/archive"
+              to={activeCategory !== "Todos" ? `/archive?categoria=${encodeURIComponent(activeCategory)}` : "/archive"}
               className={cn(
                 "flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-full transition-all duration-200 hover:translate-x-0.5 shrink-0",
                 isDark
@@ -434,13 +458,13 @@ export default function HomePage() {
         </div>
 
         {isLoadingPosts ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <PostSkeleton key={i} isDark={isDark} variant="vintage" />
+              <PostSkeleton key={i} isDark={isDark} variant="compact" />
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             {gridPosts.map((post, i) => (
               <motion.div
                 key={post.id}
@@ -481,6 +505,8 @@ export default function HomePage() {
                 )}
                 onMouseLeave={() => setHoveredRetrocafeIndex(null)}
               >
+                <MagazineBackdrop tone="orange" />
+
                 {/* Ambient Hover Backdrop */}
                 <AnimatePresence>
                   {hoveredRetrocafeIndex !== null && displayRetrocafe[hoveredRetrocafeIndex] && (
@@ -514,7 +540,7 @@ export default function HomePage() {
                 </AnimatePresence>
 
                 {/* Header */}
-                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
+                <div className="flex items-start justify-between relative z-10 gap-2 sm:gap-3">
                   <div
                     className="cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("RetroCafé")}
@@ -523,12 +549,9 @@ export default function HomePage() {
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 shadow-[0_0_20px_rgba(249,115,22,0.15)]">
                         {getCategoryIcon("RetroCafé", 20)}
                       </div>
-                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-400 transition-colors">
+                      <h2 className="mag-title mag-title-orange font-retro text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-orange-200 transition-colors">
                         RetroCafé
                       </h2>
-                      <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/25">
-                        Série Original
-                      </span>
                     </div>
                     <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
                       Crônicas & Memórias Geek
@@ -538,7 +561,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => goToCategory("RetroCafé")}
-                    className="px-3 py-1.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
                   >
                     Ver todos <ChevronRight className="w-3.5 h-3.5" />
                   </button>
@@ -617,15 +640,15 @@ export default function HomePage() {
 
                                 {mainTitle ? (
                                   <div className="flex flex-col gap-0.5">
-                                    <span className="font-retro font-black uppercase text-xs tracking-wider text-orange-400 drop-shadow">
+                                    <span className="font-retro font-black uppercase text-[10px] sm:text-[11px] tracking-wider text-orange-400 drop-shadow">
                                       {mainTitle}
                                     </span>
-                                    <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-2 group-hover:text-orange-200 transition-colors drop-shadow">
+                                    <h3 className="font-retro font-bold uppercase text-xs sm:text-[13px] text-white leading-snug [text-wrap:balance] group-hover:text-orange-200 transition-colors drop-shadow">
                                       {subtitle}
                                     </h3>
                                   </div>
                                 ) : (
-                                  <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-3 group-hover:text-orange-200 transition-colors drop-shadow">
+                                  <h3 className="font-retro font-bold uppercase text-xs sm:text-[13px] text-white leading-snug [text-wrap:balance] group-hover:text-orange-200 transition-colors drop-shadow">
                                     {subtitle}
                                   </h3>
                                 )}
@@ -659,8 +682,10 @@ export default function HomePage() {
                 )}
                 onMouseLeave={() => setHoveredDossieIndex(null)}
               >
+                <MagazineBackdrop tone="sky" />
+
                 {/* Header */}
-                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
+                <div className="flex items-start justify-between relative z-10 gap-2 sm:gap-3">
                   <div
                     className="cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("Dossiê")}
@@ -669,12 +694,9 @@ export default function HomePage() {
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
                         {getCategoryIcon("Dossiê", 20)}
                       </div>
-                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-sky-400 transition-colors">
+                      <h2 className="mag-title mag-title-sky font-retro text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-wide leading-none group-hover/title:text-sky-200 transition-colors">
                         Dossiês
                       </h2>
-                      <span className="hidden sm:inline-flex text-[9px] font-retro font-bold uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/25">
-                        Documentários & Lore
-                      </span>
                     </div>
                     <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
                       Documentários & Lore de Franquias
@@ -684,7 +706,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => goToCategory("Dossiê")}
-                    className="px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
                   >
                     Ver todos <ChevronRight className="w-3.5 h-3.5" />
                   </button>
@@ -758,15 +780,15 @@ export default function HomePage() {
 
                                 {mainTitle ? (
                                   <div className="flex flex-col gap-0.5">
-                                    <span className="font-retro font-black uppercase text-xs tracking-wider text-sky-400 drop-shadow">
+                                    <span className="font-retro font-black uppercase text-[10px] sm:text-[11px] tracking-wider text-sky-400 drop-shadow">
                                       {mainTitle}
                                     </span>
-                                    <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-2 group-hover:text-sky-200 transition-colors drop-shadow">
+                                    <h3 className="font-retro font-bold uppercase text-xs sm:text-[13px] text-white leading-snug [text-wrap:balance] group-hover:text-sky-200 transition-colors drop-shadow">
                                       {subtitle}
                                     </h3>
                                   </div>
                                 ) : (
-                                  <h3 className="font-retro font-bold uppercase text-sm md:text-base text-white leading-snug line-clamp-3 group-hover:text-sky-200 transition-colors drop-shadow">
+                                  <h3 className="font-retro font-bold uppercase text-xs sm:text-[13px] text-white leading-snug [text-wrap:balance] group-hover:text-sky-200 transition-colors drop-shadow">
                                     {subtitle}
                                   </h3>
                                 )}
@@ -802,8 +824,10 @@ export default function HomePage() {
                 )}
                 onMouseLeave={() => setHoveredReviewsIndex(null)}
               >
+                <MagazineBackdrop tone="amber" />
+
                 {/* Header */}
-                <div className="flex items-center justify-between relative z-10 gap-2 sm:gap-3">
+                <div className="flex items-start justify-between relative z-10 gap-2 sm:gap-3">
                   <div
                     className="cursor-pointer group/title min-w-0 flex-1"
                     onClick={() => goToCategory("Reviews")}
@@ -812,11 +836,11 @@ export default function HomePage() {
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
                         {getCategoryIcon("Reviews", 20)}
                       </div>
-                      <h2 className="font-retro text-lg sm:text-xl md:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-amber-400 transition-colors">
+                      <h2 className="mag-title mag-title-amber font-retro text-xl sm:text-2xl md:text-3xl lg:max-xl:text-2xl font-black uppercase tracking-wide leading-none group-hover/title:text-amber-200 transition-colors">
                         Reviews
                       </h2>
                     </div>
-                    <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
+                    <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.2em] lg:max-xl:tracking-[0.12em] mt-1 pl-12 sm:pl-[52px] text-slate-400">
                       Vereditos & Notas Oficiais
                     </p>
                   </div>
@@ -824,9 +848,11 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => goToCategory("Reviews")}
-                    className="px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    title="Ver todas as reviews"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 lg:max-xl:p-0 lg:max-xl:w-8 lg:max-xl:h-8 lg:max-xl:justify-center rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
                   >
-                    Ver todos <ChevronRight className="w-3.5 h-3.5" />
+                    <span className="lg:max-xl:sr-only">Ver todos</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
@@ -920,15 +946,15 @@ export default function HomePage() {
                               <div className="relative z-20 mt-auto w-full pt-2">
                                 {mainTitle ? (
                                   <div className="flex flex-col gap-0.5">
-                                    <h4 className="font-retro font-black text-xs sm:text-sm leading-tight line-clamp-1 uppercase text-amber-300 group-hover:text-amber-200 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                    <h4 className="font-retro font-black text-xs sm:text-sm leading-tight uppercase text-amber-300 group-hover:text-amber-200 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                                       {mainTitle}
                                     </h4>
-                                    <span className="font-sans font-semibold text-xs leading-snug line-clamp-2 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                    <span className="font-sans font-semibold text-xs leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                                       {subtitle}
                                     </span>
                                   </div>
                                 ) : (
-                                  <h4 className="font-retro font-bold text-xs sm:text-sm leading-snug line-clamp-2 uppercase text-white group-hover:text-amber-300 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                  <h4 className="font-retro font-bold text-xs sm:text-sm leading-snug uppercase text-white group-hover:text-amber-300 transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                                     {subtitle}
                                   </h4>
                                 )}

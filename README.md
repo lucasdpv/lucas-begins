@@ -1,4 +1,4 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.1.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.2.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
@@ -11,7 +11,7 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.1.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.2.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
@@ -19,6 +19,14 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 - **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
 
 ---
+
+## 📰 Novidades da Versão 6.2.0
+
+- **Seções com cara de revista dos anos 90**: RetroCafé, Dossiês e Reviews com retícula colorida e títulos de capa inclinados (`MagazineBackdrop.tsx`).
+- **Cards em formato pôster** no Recém-Adicionados, no Catálogo e no Dossiês, com títulos inteiros.
+- **Sumário de capítulos** com tempo de cada capítulo e, no celular, lista que sobe do rodapé; botão Topo no mesmo visual.
+- **Celular e tablet revisados**: carrossel mais limpo no celular, design de computador a partir de 1024px e barra de rolagem nativa em telas de toque.
+- **Correção**: o "voltar" do navegador depois de "Ver todos" volta para a home normal (a categoria agora vai na URL do catálogo).
 
 ## 🧭 Novidades da Versão 6.1.0
 
@@ -42,7 +50,7 @@ Detalhes completos no [Histórico de Versões](./HISTORY.md).
 - **Top 5 Em Alta Hoje**: Trilho horizontal com numerais gigantes vazados (`.netflix-rank`) que se preenchem com **dourado sólido (`#fbbf24`)** e *glow* âmbar ao passar o mouse.
 - **Séries & Coleções Originais**:
   - **RetroCafé**: Posters verticais `3:4` estilo série original (`EPISÓDIO #01`) com aura laranja reativa.
-  - **Dossiês**: Posters verticais no mesmo formato do RetroCafé, com aura azul (atualizado na v6.1.0).
+  - **Dossiês**: Posters verticais no mesmo formato do RetroCafé, com aura azul (atualizado na v6.1.0/v6.2.0).
   - **Reviews**: Vitrine de análises com nota em destaque e máscara de gradiente suave.
 
 ### 🔄 Recomendações Dinâmicas ("Continue Explorando")

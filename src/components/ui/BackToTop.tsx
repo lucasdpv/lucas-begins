@@ -34,24 +34,23 @@ export default function BackToTop() {
         <div className="fixed inset-x-0 bottom-0 z-[60] pointer-events-none flex justify-center items-end">
           <div className="layout-container relative h-24 md:h-28 flex justify-end items-end">
             <motion.button
-              initial={{ opacity: 0, scale: 0.85, y: 30 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.85, y: 30 }}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.94 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
               onClick={scrollToTop}
               className={cn(
-                "pointer-events-auto mb-6 md:mb-8 inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border backdrop-blur-xl transition-all cursor-pointer select-none",
+                "pointer-events-auto mb-6 md:mb-8 inline-flex items-center gap-1.5 h-[42px] px-4 rounded-full border backdrop-blur-xl transition-colors cursor-pointer select-none outline-none",
+                "shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_4px_rgba(168,85,247,0.12)] focus-visible:shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_4px_rgba(168,85,247,0.4)]",
                 isDark
-                  ? "bg-[#141226]/90 border-purple-500/40 text-white hover:bg-purple-600 hover:border-purple-400 shadow-[0_14px_30px_rgba(0,0,0,0.85),0_0_20px_rgba(168,85,247,0.3)]"
-                  : "bg-white/95 border-slate-200 text-slate-900 hover:bg-purple-600 hover:text-white shadow-lg"
+                  ? "bg-[#13112a]/90 border-purple-500/35 text-slate-100 hover:border-purple-400/60 hover:text-white"
+                  : "bg-white/95 border-slate-200 text-slate-900 hover:border-purple-400"
               )}
               aria-label="Voltar ao topo"
             >
-              <ChevronUp className="w-4 h-4 text-purple-300" />
-              <span className="font-retro text-[10px] font-black uppercase tracking-widest">
-                Topo
-              </span>
+              <ChevronUp className="w-3.5 h-3.5 text-purple-300" />
+              <span className="font-retro text-[10px] font-semibold uppercase tracking-[0.14em]">Topo</span>
             </motion.button>
           </div>
         </div>

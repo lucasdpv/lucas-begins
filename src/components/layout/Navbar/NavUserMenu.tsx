@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link } from "@/lib/router-compat";
 import { ShieldCheck, LogOut } from "lucide-react";
@@ -19,6 +19,15 @@ export default function NavUserMenu({
   onLoginClick,
   isDark,
 }: NavUserMenuProps) {
+  // O usuário chega do Firebase depois do HTML do servidor; renderizar "Login" ou o avatar já na
+  // hidratação faz o React descartar o HTML do servidor (erro de hydration). Até montar, só um espaço reservado.
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
+  if (!isMounted) {
+    return <div aria-hidden="true" className="w-[88px] h-9" />;
+  }
+
   if (!currentUser) {
     return (
       <button

@@ -4,6 +4,47 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 📰 [v6.2.0] - The Magazine & Responsive Update
+*Data: 1º de Novembro de 2026*
+
+### 🗞️ Seções Editoriais com Cara de Revista dos Anos 90 (`MagazineBackdrop.tsx`)
+- **RetroCafé, Dossiês e Reviews** ganharam fundo inspirado em revistas de games dos anos 90 (Ação Games, SuperGamePower, Herói): retícula colorida (halftone) em dois cantos, brilho suave e um filete fino na cor da seção. Tudo em CSS estático, sem blur nem animação.
+- **Títulos de capa**: itálico inclinado com sombra deslocada colorida ("impressão desalinhada") — laranja/magenta no RetroCafé, azul/amarelo no Dossiês e dourado/vermelho no Reviews.
+- Removidos o feixe de laser azul dos cards de Dossiê e os selos de "explosão" testados durante o redesign.
+
+### 🃏 Cards em Formato Pôster
+- **Dossiês** passou a usar o mesmo pôster vertical do RetroCafé (sem o selo "Arquivo #0X").
+- **Recém-Adicionados e Catálogo** trocaram o card horizontal/widescreen pelo pôster: arte ocupando o card, nota e pílulas de views/tempo de leitura no topo, categoria, data, título e subtítulo inteiros embaixo. Curtir e favoritar ficam dentro da matéria.
+- Grade de 1 coluna (celular), 2 (tablet) e 4 (a partir de 1280px). Recém-Adicionados mostra 4 matérias; o Catálogo, 8 por página.
+- Títulos dos cards de RetroCafé/Dossiê/Top 5/Reviews deixaram de ser cortados com "…" e foram padronizados em tamanho menor.
+
+### 📚 Sumário de Capítulos Refinado (`ChapterPill.tsx`)
+- Lista em estilo "Sumário": linha do tempo fina com bolinhas (lidos, atual e próximos), títulos em fonte normal e **tempo estimado de cada capítulo** (200 palavras/minuto, mesma base do `calculateReadingTime`).
+- Pílula mais fina mostrando "X de Y · ~N min restantes".
+- **No celular**, a lista abre como uma folha que sobe do rodapé, com fundo escurecido; fecha com toque fora, Esc ou arrastando a alça.
+- O botão **Topo** (`BackToTop.tsx`) passou a seguir o mesmo visual da pílula (42px, redondo, halo roxo), alinhado na mesma linha.
+- Borda amarela de foco do navegador substituída por um brilho roxo.
+
+### 📱 Responsividade (Celular & Tablet)
+- **Carrossel**: no celular, sem resumo, sem pílula de curtidas e sem o escurecimento lateral (a arte aparece inteira). As miniaturas e o título grande se ajustam entre 1024 e 1279px; o resumo aparece só a partir de 1280px.
+- **Tablet (≥ 1024px)** usa o design de computador (3 colunas nas seções editoriais, miniaturas no carrossel). Abaixo disso as seções empilham com o **Reviews primeiro**.
+- **Barra de rolagem personalizada só em computador** (`@media (hover: hover) and (pointer: fine)`): em telas de toque volta a barra nativa, que não ocupa espaço.
+- Cabeçalho "Recém-Adicionados" quebra linha em vez de cortar com "…".
+
+### 🐛 Correções
+- **"Voltar" após "Ver todos"**: o botão gravava a categoria num estado global e, ao voltar, a home abria presa na tela da categoria. Agora a categoria vai na URL do catálogo (`/archive?categoria=Dossiê`), o que também torna o link compartilhável.
+- **`.line-clamp-2` com `!important`** (regra antiga em `index.css`) impedia esconder qualquer texto com esse corte. Removida — o Tailwind 3.4 já fornece o utilitário.
+- O cabeçalho da categoria na Home mostra só o nome da categoria (sem "Setor:"); "Ver todos" alinhado à linha do título em todas as seções.
+- **Carrossel no computador (≥ 1280px)**: resumo exibido inteiro em área fixa de 4 linhas, deixando todos os slides com a mesma altura e o botão "Ler matéria" sempre no mesmo lugar. Entre 1024 e 1279px a pílula de curtidas/tempo some para o botão não mudar de posição entre slides.
+
+### 🧹 Console Limpo
+- **Erro de hydration no menu do usuário** (`NavUserMenu.tsx`): o usuário chega do Firebase depois do HTML do servidor; o menu agora só mostra "Login"/avatar depois de montado, evitando que o React descarte e refaça a página inteira.
+- **AdSense**: carregado com `<script async>` simples no `<head>` (via `next/script` recebia `data-nscript`, que o AdSense não aceita).
+- **Som de clique**: um único `AudioContext` compartilhado, criado só depois da primeira interação do visitante (antes, cada hover criava um contexto novo e o navegador avisava que o áudio estava bloqueado).
+- **Imagens**: removido `quality={40}` (não configurado no Next 16) e a primeira arte do carrossel carrega com `loading="eager"` por ser o maior elemento da tela (LCP).
+
+---
+
 ## 🧭 [v6.1.0] - The Categories, Chapters & Performance Update
 *Data: 31 de Outubro de 2026*
 
@@ -11,7 +52,7 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 - **Novas categorias oficiais**: `Reviews`, `Dossiê`, `Animes & TV` e `RetroCafé`. As antigas (`Especial`, `Nostalgia`, `Cultura Pop`, `RPG & MMO`, `Retro`, `Notícias`, `Tech & Futuro`, `Artigos`) foram descontinuadas.
 - **Migração dos dados**: As 37 matérias reais foram reclassificadas no Firestore (Reviews 7 · Dossiê 10 · Animes & TV 10 · RetroCafé 10). As 3 matérias de teste vindas do antigo `mockData.ts` (SNK NeoGeo, Soulslike, Mídia Física) ficam marcadas para exclusão manual.
 - **Fonte única no código (`src/features/posts/utils/categoryInfo.ts`)**: `SITE_CATEGORIES`, descrição de cada categoria (`getCategoryDescription`) e frase curta (`getCategoryTagline`). Navbar, MobileMenu, Catálogo, filtro do Painel e editor de posts deixaram de ler a coleção `categories` do Firestore.
-- **Descrição da categoria**: Ao abrir uma categoria no Catálogo ou na Home (`Setor: …`), um texto curto explica o que o leitor vai encontrar ali.
+- **Descrição da categoria**: Ao abrir uma categoria no Catálogo ou na Home, um texto curto explica o que o leitor vai encontrar ali.
 - **Identidade visual**: `Animes & TV` ganhou cor rosa e ícone de TV; `RetroCafé` passou a usar o ícone de xícara. Os ícones das seções da Home agora são os mesmos do menu de categorias.
 
 ### 📚 Pílula Flutuante de Capítulos (`ChapterPill.tsx`)

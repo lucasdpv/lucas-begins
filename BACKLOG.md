@@ -1,6 +1,17 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.1.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.2.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.1.0 (Categories, Chapters & Performance Update)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.2.0 (Magazine & Responsive Update)**.
+
+---
+
+## 📰 Pendências da v6.2.0
+
+- [ ] **Remover o card antigo (`PostCard` com `variant="default"`)**
+  * **Contexto**: Desde a v6.2.0 o Catálogo usa o card pôster (`variant="vintage"`); o formato widescreen antigo não é usado em nenhum lugar.
+- [ ] **Renomear `variant="vintage"` para `variant="poster"`**
+  * **Contexto**: O nome vem do antigo card horizontal e não descreve mais o formato atual.
+- [ ] **Verificar no celular de verdade**
+  * **Contexto**: A responsividade da v6.2.0 foi testada em telas simuladas (390px, 820px, 1024px, 1440px). Vale abrir o site publicado num celular e num tablet reais, principalmente a folha de capítulos e a barra de rolagem nativa.
 
 ---
 

@@ -1,4 +1,4 @@
-# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.1.0)
+# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.2.0)
 
 Este guia foi criado para que você entenda rapidamente como o **BeginsProject** funciona e como contribuir mantendo a consistência visual e arquitetural do portal.
 
@@ -13,6 +13,8 @@ O **BeginsProject** é um portal dedicado a **Games, Animes e Nostalgia**. Nossa
 - **Tema**: Atualmente o portal opera exclusivamente no **Modo Escuro** (`isDark: true` fixado em `useThemeStore.ts`) até a futura refatoração dedicada do sistema de temas Claro/Escuro.
 - **Categorias**: 4 categorias oficiais (`Reviews`, `Dossiê`, `Animes & TV`, `RetroCafé`) definidas em `src/features/posts/utils/categoryInfo.ts`. Veja [MAINTENANCE.md](./MAINTENANCE.md) para adicionar ou renomear.
 - **Tailwind 3.4**: Use apenas valores da escala padrão (ex.: `w-16`, `w-20`, `scale-105`) ou valores arbitrários (`w-[4.5rem]`, `scale-[1.08]`). Classes como `w-18` ou `scale-108` não existem nesta versão e são ignoradas sem erro.
+- **`line-clamp` + responsivo**: para esconder um texto cortado só no celular, use `max-sm:hidden` (e não `hidden sm:block`, que anula o `line-clamp`).
+- **Breakpoints de layout**: celular `< 640px`, tablet com design de computador a partir de `lg` (1024px) e ajustes finos de computador em `xl` (1280px). Teste sempre nas três faixas.
 
 ---
 
@@ -26,7 +28,7 @@ O **BeginsProject** é um portal dedicado a **Games, Animes e Nostalgia**. Nossa
 
 ---
 
-## 📂 3. Estrutura de Pastas (v6.1.0)
+## 📂 3. Estrutura de Pastas (v6.2.0)
 
 ```text
 src/

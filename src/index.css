@@ -394,32 +394,37 @@ blockquote p {
   text-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
+/* Barra de rolagem personalizada só em computador (mouse). Em telas de toque, estilizar
+   ::-webkit-scrollbar troca a barra nativa (fina, sobreposta e que some sozinha) por uma
+   barra fixa que ocupa espaço na lateral. */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #090812;
-}
+  ::-webkit-scrollbar-track {
+    background: #090812;
+  }
 
-.light ::-webkit-scrollbar-track {
-  background: #e2e8f0;
-}
+  .light ::-webkit-scrollbar-track {
+    background: #e2e8f0;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #2e2654;
-  border: 2px solid #090812;
-  border-radius: 9999px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #2e2654;
+    border: 2px solid #090812;
+    border-radius: 9999px;
+  }
 
-.light ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border: 2px solid #e2e8f0;
-  border-radius: 9999px;
-}
+  .light ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border: 2px solid #e2e8f0;
+    border-radius: 9999px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a855f7;
+  }
 }
 
 .trending-number {
@@ -432,27 +437,61 @@ blockquote p {
   transform: scale(1.08);
 }
 
+/* Fundo editorial das seções RetroCafé e Dossiê (MagazineBackdrop.tsx) — retícula de revista dos anos 90 */
+.mag-halftone {
+  background-image: radial-gradient(var(--mag-dot) 2px, transparent 2.6px);
+  background-size: 11px 11px;
+  -webkit-mask-image: radial-gradient(ellipse 55% 80% at 100% 0%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 80% at 100% 0%, #000 0%, transparent 75%);
+}
+
+.mag-halftone-alt {
+  background-image: radial-gradient(var(--mag-dot-alt) 2px, transparent 2.6px);
+  background-size: 11px 11px;
+  background-position: 5px 5px;
+  -webkit-mask-image: radial-gradient(ellipse 45% 70% at 0% 100%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 45% 70% at 0% 100%, #000 0%, transparent 75%);
+}
+
+/* Título com "impressão desalinhada" (offset colorido), como nas capas de revista */
+.mag-title {
+  font-style: italic;
+  transform: skewX(-6deg);
+}
+.mag-title-orange {
+  text-shadow: 2px 2px 0 #f97316, 4px 4px 0 rgba(236, 72, 153, 0.75);
+}
+.mag-title-amber {
+  text-shadow: 2px 2px 0 #f59e0b, 4px 4px 0 rgba(239, 68, 68, 0.75);
+}
+.mag-title-sky {
+  text-shadow: 2px 2px 0 #0ea5e9, 4px 4px 0 rgba(250, 204, 21, 0.7);
+}
+
+
 /* Barra de progresso do autoplay do Carousel (animação CSS pura, sem re-render do React) */
 @keyframes carousel-progress {
   from { width: 0%; }
   to { width: 100%; }
 }
 
-.retro-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.retro-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-}
-.light .retro-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-}
-.retro-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.4);
-  border-radius: 9999px;
-}
-.retro-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.8);
+@media (hover: hover) and (pointer: fine) {
+  .retro-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .retro-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .light .retro-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .retro-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.4);
+    border-radius: 9999px;
+  }
+  .retro-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.8);
+  }
 }
 
 @keyframes carouselProgress {
@@ -498,12 +537,6 @@ blockquote p {
   font-family: 'Courier New', Courier, monospace;
 }
 
-.line-clamp-2 {
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
-}
 
 .toc-collapsible {
   block-size: 0;

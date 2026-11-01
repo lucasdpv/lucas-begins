@@ -242,12 +242,13 @@ export default function PostCard({
     );
   }
 
-  // Variant Vintage: Card Horizontal Estilo Streaming / Cyber-Editorial (Usado em Recém-Adicionados)
+  // Variant Vintage (Recém-Adicionados): pôster com o texto sobre a arte, no mesmo padrão
+  // dos cards de RetroCafé e Dossiê.
   if (isVintage) {
     return (
       <article
         className={cn(
-          "flex items-stretch h-[180px] sm:h-[195px] md:h-[210px] group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1 select-none",
+          "flex flex-col justify-end min-h-[300px] xl:min-h-[340px] h-full group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1 select-none",
           isDark
             ? "bg-[#121024]/90 border-white/[0.08] text-white shadow-[0_14px_34px_-12px_rgba(0,0,0,0.65)]"
             : "bg-white border-slate-200/80 text-slate-900 shadow-[0_10px_28px_-10px_rgba(15,23,42,0.08)]",
@@ -258,177 +259,83 @@ export default function PostCard({
       >
         <Link
           to={targetPath}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-[1]"
           aria-label={`Ler matéria: ${post.title}`}
         />
 
-        {/* Subtle Left Accent Gradient Bar */}
-        <div className={cn("w-1.5 shrink-0 bg-gradient-to-b", cardStyles.accentBar)} />
-
-        {/* Thumbnail Box */}
-        <div className="w-36 sm:w-44 md:w-52 xl:w-64 2xl:w-72 h-full relative overflow-hidden flex items-center justify-center z-10 pointer-events-none shrink-0 bg-slate-950">
+        <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none bg-slate-950">
           {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
             <Image
               src={post.imageUrl}
               alt={post.title}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
               style={{ objectPosition: post.imagePosition || "center" }}
               fill
-              sizes="(max-width: 640px) 160px, (max-width: 1024px) 200px, 260px"
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
               priority={priority}
             />
           )}
-
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/25 pointer-events-none" />
-
-          {post.score && (
-            <div className="absolute top-2.5 left-2.5 z-20 pointer-events-none select-none">
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full font-retro font-black text-[10px] bg-amber-400 text-slate-950 uppercase tracking-wider shadow-md">
-                ★ {post.score}
-              </div>
-            </div>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#090812]/95 from-5% via-[#090812]/50 via-45% to-transparent" />
         </div>
 
-        {/* Content Block */}
-        <div className="flex flex-col flex-grow relative z-10 pointer-events-none py-3.5 px-4 sm:py-4 sm:px-5 min-w-0">
-          {/* Header Row: Category Pill & Date */}
-          <div className="flex items-center justify-between text-[10px] font-retro font-bold uppercase tracking-wider select-none mb-2 shrink-0 gap-2">
-            <div className="flex items-center gap-2 overflow-hidden min-w-0">
-              <span
-                className={cn(
-                  "text-[9px] font-retro font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border shrink-0",
-                  isDark ? cardStyles.pillBg : cardStyles.pillLight
-                )}
-              >
-                {post.category}
-              </span>
-              <span className="whitespace-nowrap truncate text-slate-500 dark:text-slate-400 text-[10px]">
-                {formatDate(post.createdAt, post.date ?? undefined)}
-              </span>
-            </div>
-
-            <div className="font-mono text-[9px] text-slate-400 dark:text-slate-500 whitespace-nowrap shrink-0 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {calculateReadingTime(post.content || "").replace(" min de leitura", " min")}
+        {post.score && (
+          <div className="absolute top-3 left-3 z-10 pointer-events-none select-none">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full font-retro font-black text-[10px] bg-amber-400 text-slate-950 uppercase tracking-wider shadow-md">
+              ★ {post.score}
             </div>
           </div>
+        )}
 
-          {/* Title & Excerpt */}
-          <div className="flex-grow flex flex-col justify-center min-w-0">
-            {mainTitle ? (
-              <div className="flex flex-col gap-0.5 mb-1.5 shrink-0">
-                <h3
-                  className={cn(
-                    "font-retro font-bold uppercase line-clamp-1 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-base",
-                    cardStyles.textHover,
-                    isDark ? "text-white" : "text-slate-900"
-                  )}
-                >
-                  {mainTitle}
-                </h3>
-                <span
-                  className={cn(
-                    "font-sans text-[11px] sm:text-xs leading-snug font-semibold line-clamp-1",
-                    cardStyles.textLabel
-                  )}
-                >
-                  {subtitle}
-                </span>
-              </div>
-            ) : (
+        <div className="absolute top-3 right-3 z-10 pointer-events-none flex items-center gap-1.5 font-mono text-[9px] text-slate-200">
+          <span className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+            <Eye className="w-3 h-3" />
+            {formatNumber(post.views || 0)}
+          </span>
+          <span className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 uppercase">
+            <Clock className="w-3 h-3" />
+            {calculateReadingTime(post.content || "").replace(" min de leitura", " min")}
+          </span>
+        </div>
+
+        <div className="relative z-10 pointer-events-none flex flex-col gap-2 p-4 sm:p-5 min-w-0 [text-shadow:0_1px_10px_rgba(0,0,0,0.85)]">
+          <div className="flex items-center gap-2 min-w-0 text-[10px] font-retro font-bold uppercase tracking-wider">
+            <span
+              className={cn(
+                "text-[9px] font-black tracking-widest px-2.5 py-0.5 rounded-full border shrink-0 [text-shadow:none]",
+                isDark ? cardStyles.pillBg : cardStyles.pillLight
+              )}
+            >
+              {post.category}
+            </span>
+            <span className="whitespace-nowrap truncate text-slate-300">
+              {formatDate(post.createdAt, post.date ?? undefined)}
+            </span>
+          </div>
+
+          {mainTitle ? (
+            <div className="flex flex-col gap-0.5 min-w-0">
               <h3
                 className={cn(
-                  "font-retro font-bold uppercase line-clamp-2 leading-snug transition-colors duration-300 text-xs sm:text-sm md:text-base mb-1.5 shrink-0",
-                  cardStyles.textHover,
-                  isDark ? "text-white" : "text-slate-900"
+                  "font-retro font-bold uppercase leading-snug transition-colors duration-300 text-sm xl:text-base text-white [text-wrap:balance]",
+                  cardStyles.textHover
                 )}
               >
-                {subtitle}
+                {mainTitle}
               </h3>
-            )}
-
-            {post.excerpt && (
-              <p
-                className={cn(
-                  "text-xs mb-1 line-clamp-2 leading-relaxed hidden sm:block shrink-0",
-                  isDark ? "text-slate-400" : "text-slate-500"
-                )}
-              >
-                {post.excerpt}
-              </p>
-            )}
-          </div>
-
-          {/* Footer controls row */}
-          <div className="pt-2.5 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3.5 font-mono text-xs text-slate-400">
-              <div className="flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-purple-400" />
-                <span>{formatNumber(post.views || 0)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-sky-400" />
-                <span>{formatNumber(commentCount)}</span>
-              </div>
+              <span className={cn("font-sans text-xs leading-snug font-semibold", cardStyles.textLabel)}>
+                {subtitle}
+              </span>
             </div>
-
-            <div
-              className="flex items-center gap-3.5 relative z-20 pointer-events-auto"
-              onClick={(e) => e.stopPropagation()}
+          ) : (
+            <h3
+              className={cn(
+                "font-retro font-bold uppercase leading-snug transition-colors duration-300 text-sm xl:text-base text-white [text-wrap:balance]",
+                cardStyles.textHover
+              )}
             >
-              <button
-                className={cn(
-                  "flex items-center gap-1.5 font-bold transition-all active:scale-95 cursor-pointer text-xs",
-                  hasLiked
-                    ? "text-rose-500 scale-105"
-                    : isDark
-                    ? "text-slate-400 hover:text-rose-400 hover:scale-105"
-                    : "text-slate-500 hover:text-rose-500 hover:scale-105"
-                )}
-                onClick={() =>
-                  currentUser
-                    ? likeMutation.mutate({ postId: post.id, userId: currentUser.id })
-                    : setIsLoginModalOpen(true)
-                }
-                title={currentUser ? "Curtir" : "Faça login para curtir"}
-              >
-                <Heart className={cn("w-4 h-4", hasLiked && "fill-current")} />
-                <span>{formatNumber(post.likes || 0)}</span>
-              </button>
-
-              <button
-                className={cn(
-                  "flex items-center transition-all active:scale-95 cursor-pointer",
-                  profile?.favorites?.includes(post.id)
-                    ? "text-amber-400 scale-105"
-                    : isDark
-                    ? "text-slate-400 hover:text-amber-400 hover:scale-105"
-                    : "text-slate-500 hover:text-amber-500 hover:scale-105"
-                )}
-                onClick={() => {
-                  if (currentUser) {
-                    const isFavorited = profile?.favorites?.includes(post.id) || false;
-                    favoriteMutation.mutate({
-                      userId: currentUser.id,
-                      postId: post.id,
-                      isFavorited,
-                    });
-                  } else {
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-                title={currentUser ? "Salvar na Minha Lista" : "Faça login para salvar"}
-              >
-                <Bookmark
-                  className={cn(
-                    "w-4 h-4",
-                    profile?.favorites?.includes(post.id) && "fill-current"
-                  )}
-                />
-              </button>
-            </div>
-          </div>
+              {subtitle}
+            </h3>
+          )}
         </div>
       </article>
     );

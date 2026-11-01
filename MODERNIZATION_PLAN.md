@@ -1,14 +1,25 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.1.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.2.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.1.0 — The Categories, Chapters & Performance Update`
-- **Status**: `Fase 8 Concluída e Documentada! ✅`
-- **Última Atualização**: 31 de Outubro de 2026
+- **Versão Atual**: `v6.2.0 — The Magazine & Responsive Update`
+- **Status**: `Fase 9 Concluída e Documentada! ✅`
+- **Última Atualização**: 1º de Novembro de 2026
 - **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** sem borda recortada, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`) e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## 📰 Fase 9 — Revista & Responsividade (v6.2.0) (✅ CONCLUÍDA)
+- [x] **9.1. Seções RetroCafé, Dossiês e Reviews com cara de revista dos anos 90** (`MagazineBackdrop.tsx` + `.mag-title-*`).
+- [x] **9.2. Cards pôster** no Dossiês, Recém-Adicionados e Catálogo (grade 1/2/4 colunas), com títulos inteiros.
+- [x] **9.3. Sumário de capítulos refinado** com tempo por capítulo e folha no celular; botão Topo no mesmo visual.
+- [x] **9.4. Responsividade revisada**: celular limpo, design de computador a partir de 1024px, Reviews primeiro quando empilhado, barra de rolagem nativa em telas de toque.
+- [x] **9.5. Correções**: "voltar" após "Ver todos" (categoria na URL), `line-clamp` que não escondia, hydration do menu do usuário e avisos do console (AdSense, áudio, imagens).
+
+> Pendências desta fase estão na seção **"Pendências da v6.2.0"** do [`BACKLOG.md`](./BACKLOG.md).
 
 ---
 

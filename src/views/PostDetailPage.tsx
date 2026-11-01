@@ -122,10 +122,9 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
 
   const headings = useMemo(() => {
     if (!post?.content) return [];
-    return post.content
-      .split("\n")
-      .filter((line) => line.startsWith("## "))
-      .map((line) => {
+    const result: { id: string; label: string; words: number }[] = [];
+    for (const line of post.content.split("\n")) {
+      if (line.startsWith("## ")) {
         const label = line.slice(3).trim().replace(/\*\*/g, "").replace(/\*/g, "");
         const id = `sec-${label
           .toLowerCase()
@@ -133,8 +132,13 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
           .replace(/[\u0300-\u036f]/g, "")
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)/g, "")}`;
-        return { id, label };
-      });
+        result.push({ id, label, words: 0 });
+      } else if (result.length > 0 && line.trim()) {
+        result[result.length - 1].words += line.trim().split(/\s+/).length;
+      }
+    }
+    // Mesma base do calculateReadingTime: 200 palavras por minuto.
+    return result.map(({ id, label, words }) => ({ id, label, minutes: Math.max(1, Math.round(words / 200)) }));
   }, [post?.content]);
 
   useEffect(() => {

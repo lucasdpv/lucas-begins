@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gamepad2, ArrowLeft, Sparkles } from "lucide-react";
-import { useNavigate, useLocation } from "@/lib/router-compat";
+import { useSearchParams } from "next/navigation";
+import { useNavigate } from "@/lib/router-compat";
 import { useQueryClient } from "@tanstack/react-query";
 
 import PostCard from "../features/posts/components/PostCard";
@@ -17,6 +18,13 @@ import { cn } from "../lib/utils";
 import { Post } from "../features/posts/schemas";
 
 const CATALOG_CATEGORIES = ["Todos", ...SITE_CATEGORIES];
+
+const normalizeCategory = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/s$/, "");
 
 const getCategoryChipActiveStyle = (cat: string) => {
   const norm = cat.toLowerCase();
@@ -55,19 +63,21 @@ const getCategoryDotColor = (cat: string) => {
 
 export default function ArchivePage() {
   const { isDark } = useThemeStore();
-  const { activeCategory, setActiveCategory, setSearchQuery } = useUIStore();
+  const { setActiveCategory, setSearchQuery } = useUIStore();
   const navigate = useNavigate();
-  const location = useLocation();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+
+  // A categoria vem da URL (?categoria=...) para o "voltar" do navegador funcionar e o link ser compartilhável.
+  const categoryParam = normalizeCategory(searchParams?.get("categoria") || "");
+  const activeCategory = CATALOG_CATEGORIES.find((c) => normalizeCategory(c) === categoryParam) || "Todos";
+
+  const selectCategory = (cat: string) => {
+    navigate(cat === "Todos" ? "/archive" : `/archive?categoria=${encodeURIComponent(cat)}`, { replace: true });
+  };
 
   useEffect(() => {
     queryClient.removeQueries({ queryKey: postKeys.list({ category: activeCategory, search: "" }) });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const cat = (location.state as any)?.category;
-    if (cat) setActiveCategory(cat);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -98,13 +108,7 @@ export default function ArchivePage() {
   const publishedPosts = useMemo(() => (allPosts as Post[]).filter((p) => !p.isDraft), [allPosts]);
   const getCategoryCount = (cat: string) => {
     if (cat === "Todos") return publishedPosts.length;
-    const norm = (s: string) =>
-      s
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/s$/, "");
-    return publishedPosts.filter((p) => norm(p.category || "") === norm(cat)).length;
+    return publishedPosts.filter((p) => normalizeCategory(p.category || "") === normalizeCategory(cat)).length;
   };
 
   const categoryDescription = activeCategory !== "Todos" ? getCategoryDescription(activeCategory) : undefined;
@@ -157,7 +161,7 @@ export default function ArchivePage() {
               <button
                 key={cat}
                 type="button"
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => selectCategory(cat)}
                 className={cn(
                   "flex items-center gap-2 px-3.5 py-1.5 rounded-full border font-retro font-bold text-[11px] uppercase tracking-wider transition-all shrink-0 cursor-pointer focus:outline-none",
                   isActive
@@ -210,14 +214,14 @@ export default function ArchivePage() {
 
       {/* Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <PostSkeleton key={i} isDark={isDark} />
+            <PostSkeleton key={i} isDark={isDark} variant="compact" />
           ))}
         </div>
       ) : currentPosts.length > 0 ? (
         <div className="flex flex-col gap-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             <AnimatePresence mode="popLayout">
               {currentPosts.map((post, idx) => (
                 <motion.div
@@ -229,7 +233,7 @@ export default function ArchivePage() {
                   transition={{ duration: 0.2 }}
                   className="h-full"
                 >
-                  <PostCard post={post} variant="default" priority={idx < 3} />
+                  <PostCard post={post} variant="vintage" priority={idx < 3} />
                 </motion.div>
               ))}
             </AnimatePresence>

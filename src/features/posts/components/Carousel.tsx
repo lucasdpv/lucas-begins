@@ -109,7 +109,6 @@ export default function Carousel({ posts }: CarouselProps) {
                 alt=""
                 fill
                 sizes="96px"
-                quality={40}
                 className="object-cover"
                 style={{ objectPosition: post.imagePosition || "center" }}
               />
@@ -176,6 +175,7 @@ export default function Carousel({ posts }: CarouselProps) {
                     style={{ objectPosition: post.imagePosition || "center" }}
                     fill
                     priority={idx === 0}
+                    loading={idx === 0 ? "eager" : undefined}
                     fetchPriority={idx === 0 ? "high" : "auto"}
                     sizes="100vw"
                   />
@@ -193,11 +193,11 @@ export default function Carousel({ posts }: CarouselProps) {
 
           {/* 3. Vinhetas Cinematográficas Fixas (Não piscam na troca de slide) */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent pointer-events-none z-[5]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#090812]/95 via-[#090812]/55 to-transparent pointer-events-none z-[5]" />
+          <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[#090812]/95 via-[#090812]/55 to-transparent pointer-events-none z-[5]" />
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#090812]/60 to-transparent pointer-events-none z-[5]" />
 
           {/* 4. Conteúdo Inferior: Texto Animado + Strip de Miniaturas Estável */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-12 lg:p-14 z-[15] pointer-events-none flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 md:p-12 lg:p-14 z-[15] pointer-events-none flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             {/* Bloco de Texto com Transição Suave (Fade + Glide Vertical + Blur Sutil) */}
             <div className="max-w-2xl flex-1 min-w-0">
               <AnimatePresence mode="wait" initial={false}>
@@ -228,12 +228,12 @@ export default function Carousel({ posts }: CarouselProps) {
                   {/* Dramatic Title & Colored Subtitle */}
                   {mainTitle ? (
                     <div className="flex flex-col gap-1.5 mb-3.5">
-                      <h2 className="font-retro font-black text-2xl sm:text-3xl md:text-5xl lg:text-[52px] leading-[1.05] text-white tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+                      <h2 className="font-retro font-black text-2xl sm:text-3xl md:text-5xl lg:text-4xl xl:text-[52px] leading-[1.05] text-white tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
                         {mainTitle}
                       </h2>
                       <span
                         className={cn(
-                          "font-sans text-sm sm:text-base md:text-lg lg:text-xl leading-snug font-semibold drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]",
+                          "font-sans text-sm sm:text-base md:text-lg lg:text-base xl:text-xl leading-snug font-semibold drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]",
                           currentPost.category.toLowerCase().includes("reviews")
                             ? "text-amber-300"
                             : currentPost.category.toLowerCase().includes("dossi")
@@ -249,14 +249,14 @@ export default function Carousel({ posts }: CarouselProps) {
                       </span>
                     </div>
                   ) : (
-                    <h2 className="font-retro font-black text-2xl sm:text-3xl md:text-5xl lg:text-[52px] leading-[1.05] text-white tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] mb-3.5">
+                    <h2 className="font-retro font-black text-2xl sm:text-3xl md:text-5xl lg:text-4xl xl:text-[52px] leading-[1.05] text-white tracking-tight drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] mb-3.5">
                       {subtitle}
                     </h2>
                   )}
 
                   {/* Excerpt */}
                   {currentPost.excerpt && (
-                    <p className="text-xs sm:text-sm md:text-base text-slate-200/85 leading-relaxed line-clamp-2 mb-6 max-w-xl drop-shadow">
+                    <p className="text-xs sm:text-sm md:text-base text-slate-200/85 leading-relaxed line-clamp-4 h-[6.5rem] mb-6 max-w-2xl drop-shadow max-xl:hidden">
                       {currentPost.excerpt}
                     </p>
                   )}
@@ -265,13 +265,13 @@ export default function Carousel({ posts }: CarouselProps) {
                   <div className="flex flex-wrap items-center gap-4 pointer-events-auto">
                     <Link
                       to={targetUrl}
-                      className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-white text-slate-950 hover:bg-purple-500 hover:text-white font-retro font-black text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:shadow-[0_10px_30px_rgba(168,85,247,0.5)] hover:scale-[1.03] active:scale-95"
+                      className="inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-slate-950 hover:bg-purple-500 hover:text-white font-retro font-black text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:shadow-[0_10px_30px_rgba(168,85,247,0.5)] hover:scale-[1.03] active:scale-95"
                     >
                       <Play className="w-4 h-4 fill-current" />
                       Ler Matéria
                     </Link>
 
-                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-black/45 border border-white/10 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-slate-200">
+                    <div className="hidden sm:flex lg:max-xl:hidden items-center gap-3 px-4 py-2.5 rounded-xl bg-black/45 border border-white/10 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-slate-200">
                       <span className="flex items-center gap-1.5">
                         <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" fill="currentColor" />
                         {formatNumber(currentPost.likes || 0)}
@@ -289,7 +289,7 @@ export default function Carousel({ posts }: CarouselProps) {
 
             {/* Desktop Streaming Thumbnail Rail — Estável no Canto Inferior Direito */}
             {posts.length > 1 && (
-              <div className="hidden lg:flex items-center gap-2.5 pointer-events-auto shrink-0 bg-black/45 p-2 rounded-2xl border border-white/10 backdrop-blur-xl">
+              <div className="hidden lg:flex items-center gap-2 xl:gap-2.5 pointer-events-auto shrink-0 bg-black/45 p-2 rounded-2xl border border-white/10 backdrop-blur-xl">
                 {posts.map((post, idx) => {
                   const isActive = idx === currentIndex;
                   const thumbTitle = splitTitle(post.title).mainTitle || post.title;
@@ -304,7 +304,7 @@ export default function Carousel({ posts }: CarouselProps) {
                       onMouseEnter={() => setHoveredThumbIndex(idx)}
                       onMouseLeave={() => setHoveredThumbIndex(null)}
                       className={cn(
-                        "relative w-28 xl:w-36 h-16 xl:h-20 rounded-xl overflow-hidden transition-all duration-500 ease-out cursor-pointer group/thumb focus:outline-none text-left bg-purple-950/60",
+                        "relative w-24 h-14 xl:w-28 xl:h-16 2xl:w-36 2xl:h-20 rounded-xl overflow-hidden transition-all duration-500 ease-out cursor-pointer group/thumb focus:outline-none text-left bg-purple-950/60",
                         isActive
                           ? "ring-2 ring-purple-400 scale-[1.04] shadow-[0_0_20px_rgba(168,85,247,0.45)] opacity-100"
                           : "opacity-55 hover:opacity-95 hover:scale-[1.02]"
