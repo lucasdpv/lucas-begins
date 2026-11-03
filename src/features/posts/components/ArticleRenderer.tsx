@@ -37,6 +37,7 @@ function ArticleImage({
   priority = false
 }: ArticleImageProps) {
   const [error, setError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [naturalAspect, setNaturalAspect] = useState<number | null>(null);
 
@@ -122,6 +123,7 @@ function ArticleImage({
         onError={() => setError(true)}
         style={getShapeStyle()}
         loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
         className={cn(
           "pixelated animate-in fade-in duration-1000",
           layout === 'full' && "mx-auto block"
@@ -199,13 +201,18 @@ function ArticleImage({
         onClick={() => !error && setIsZoomed(true)}
       >
         <div className={containerClass}>
+          {!loaded && !error && (
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-950/20 via-slate-800/20 to-slate-900/40 animate-pulse pointer-events-none" />
+          )}
           {!error && isValidImageUrl(src) ? (
             <img
               src={src}
               alt={alt || "Imagem do artigo"}
               loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
               decoding="async"
               onLoad={(e) => {
+                setLoaded(true);
                 const { naturalWidth, naturalHeight } = e.currentTarget;
                 if (naturalWidth && naturalHeight) {
                   setNaturalAspect(naturalWidth / naturalHeight);
@@ -214,7 +221,8 @@ function ArticleImage({
               onError={() => setError(true)}
               style={aspectStyle}
               className={cn(
-                "pixelated block mx-auto",
+                "pixelated block mx-auto transition-opacity duration-500 ease-out",
+                !loaded ? "opacity-0" : "opacity-100",
                 aspect === 'original' 
                   ? (naturalAspect !== null && naturalAspect < 1.2)
                     ? "w-auto max-w-full h-auto max-h-[450px] md:max-h-[550px] object-contain" 
@@ -582,7 +590,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
         i++;
       }
 
-      const isPriority = imageCount === 0;
+      const isPriority = imageCount < 4;
       if (rowImage) imageCount++;
 
       renderedLines.push(
@@ -619,7 +627,7 @@ export default function ArticleRenderer({ content, isDark }: ArticleRendererProp
       const frameMatch = line.match(/\{#frame-(normal|crt|sticker|none)\}/);
       const scanlinesMatch = line.includes('{#scanlines-false}');
       
-      const isPriority = imageCount === 0;
+      const isPriority = imageCount < 4;
       imageCount++;
 
       renderedLines.push(

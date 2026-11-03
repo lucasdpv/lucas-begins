@@ -1,9 +1,9 @@
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, UploadMetadata } from "firebase/storage";
 import { storage } from "../lib/firebase";
 import imageCompression from 'browser-image-compression';
 
 /**
- * Faz o upload de um arquivo para o Firebase Storage com compressão automática.
+ * Faz o upload de um arquivo para o Firebase Storage com compressão automática e cabeçalhos de cache.
  * @param file O arquivo a ser enviado.
  * @param path O caminho dentro do bucket (ex: 'posts/minha-imagem.jpg').
  * @param onProgress Callback opcional para acompanhar o progresso (0-100).
@@ -16,29 +16,37 @@ export const uploadFile = async (
 ): Promise<string> => {
   let fileToUpload: File | Blob = file;
   let finalPath = path;
+  let detectedType = file.type || 'image/webp';
 
-  // Se for uma imagem (e não for um GIF), tenta comprimir e converter para WebP
+  // Se for uma imagem (e não for um GIF), comprime e converte para WebP leve de alta fidelidade
   if (file.type.startsWith('image/') && file.type !== 'image/gif') {
     try {
       const options = {
-        maxSizeMB: 0.8, // Tenta manter abaixo de 800KB
-        maxWidthOrHeight: 1920, // Full HD max
+        maxSizeMB: 0.35, // Mantém abaixo de 350KB (ótimo equilíbrio entre qualidade editorial e velocidade web)
+        maxWidthOrHeight: 1440, // Largura ideal para banners e visualização retina sem desperdício de banda
         useWebWorker: true,
-        initialQuality: 0.8, // 80% de qualidade
-        fileType: 'image/webp' as any // Força saída em WebP para melhor performance e tamanho
+        initialQuality: 0.78, // 78% de qualidade visual (imperceptível a olho nu, mas economiza até 60% de peso)
+        fileType: 'image/webp' as any // Força saída em WebP moderno
       };
       
       fileToUpload = await imageCompression(file, options);
       // Substitui a extensão original do caminho por .webp
       finalPath = path.replace(/\.[^/.]+$/, "") + ".webp";
+      detectedType = 'image/webp';
     } catch (error) {
       console.warn("Falha na compressão, enviando original...", error);
     }
   }
 
+  // Metadados HTTP com cache imutável de 1 ano para navegadores e CDNs
+  const metadata: UploadMetadata = {
+    contentType: detectedType,
+    cacheControl: "public, max-age=31536000, immutable",
+  };
+
   return new Promise((resolve, reject) => {
     const storageRef = ref(storage, finalPath);
-    const uploadTask = uploadBytesResumable(storageRef, fileToUpload);
+    const uploadTask = uploadBytesResumable(storageRef, fileToUpload, metadata);
 
     uploadTask.on(
       "state_changed",

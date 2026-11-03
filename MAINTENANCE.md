@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — BeginsProject (v6.2.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.3.0)
 
 Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 
@@ -64,4 +64,4 @@ O progresso dos leitores é salvo nos campos `xp` e `level` da coleção `users`
 - **Zod Schemas (`src/features/posts/schemas.ts`)**: Todos os posts passam por validação Zod com fallbacks seguros. Se adicionar um novo campo aos posts no Firestore, lembre-se de incluí-lo no `PostSchema`.
 
 ---
-**Atualizado em: 1º de Novembro de 2026 (v6.2.0).**
+**Atualizado em: 3 de Novembro de 2026 (v6.3.0).**

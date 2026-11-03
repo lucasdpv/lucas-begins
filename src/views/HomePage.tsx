@@ -10,6 +10,7 @@ import {
   Eye,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "@/lib/router-compat";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
@@ -28,6 +29,7 @@ import { usePostsFilter } from "../hooks/usePostsFilter";
 import { getCategoryDescription } from "../features/posts/utils/categoryInfo";
 import { getCategoryIcon } from "../features/posts/utils/categoryIcons";
 import MagazineBackdrop from "../components/home/MagazineBackdrop";
+import RetroCardImage from "../components/ui/RetroCardImage";
 import {
   cn,
   slugify,
@@ -59,7 +61,6 @@ function getAudioContext(): AudioContext | null {
 export default function HomePage() {
   const { isDark } = useThemeStore();
   const queryClient = useQueryClient();
-  const [isSecondarySectionsReady, setIsSecondarySectionsReady] = useState(false);
 
   const handlePrefetch = useCallback(
     (slug: string) => {
@@ -161,28 +162,7 @@ export default function HomePage() {
   const location = useLocation();
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
-
-  useEffect(() => {
-    let cancelled = false;
-    const markReady = () => {
-      if (!cancelled) setIsSecondarySectionsReady(true);
-    };
-    if (typeof window === "undefined") return;
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(markReady, { timeout: 900 });
-      return () => {
-        cancelled = true;
-        window.cancelIdleCallback(id);
-      };
-    }
-    const timer = setTimeout(markReady, 600);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, []);
-
-  const shouldLoadSecondary = isDefaultView && isSecondarySectionsReady;
+  const shouldLoadSecondary = isDefaultView;
 
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
@@ -334,22 +314,15 @@ export default function HomePage() {
                               : "bg-slate-900 border-slate-200 group-hover:border-amber-500 shadow-md"
                           )}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/75 via-[#181336] to-[#090812]" />
-                          {post.imageUrl ? (
-                            <img
-                              src={post.imageUrl}
-                              alt={post.title}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900 to-slate-950" />
-                          )}
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent" />
+                          <RetroCardImage
+                            src={post.imageUrl}
+                            alt={post.title}
+                            fill
+                            sizes="(max-width: 640px) 270px, 20vw"
+                            tone="purple"
+                            className="group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent z-10" />
 
                           {/* Category Top Tag */}
                           <div className="absolute top-3 right-3 z-20">
@@ -466,14 +439,9 @@ export default function HomePage() {
         ) : gridPosts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             {gridPosts.map((post, i) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04, type: "spring", stiffness: 110 }}
-              >
+              <div key={post.id}>
                 <PostCard post={post} variant="vintage" priority={i < 2} />
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
@@ -583,11 +551,8 @@ export default function HomePage() {
                         const targetSlug = post.slug || slugify(post.title);
                         const { mainTitle, subtitle } = splitTitle(post.title);
                         return (
-                          <motion.div
+                          <div
                             key={post.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
                               "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
                               hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
@@ -606,17 +571,14 @@ export default function HomePage() {
                               to={`/post/${targetSlug}`}
                               className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-orange-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(249,115,22,0.35)]"
                             >
-                              {post.imageUrl && (
-                                <img
-                                  src={post.imageUrl}
-                                  alt={post.title}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = "none";
-                                  }}
-                                />
-                              )}
+                              <RetroCardImage
+                                src={post.imageUrl}
+                                alt={post.title}
+                                fill
+                                sizes="(max-width: 640px) 265px, (max-width: 1024px) 33vw, 25vw"
+                                tone="orange"
+                                className="group-hover:scale-[1.08]"
+                              />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
                               {/* Top Glass Pill Bar */}
@@ -664,7 +626,7 @@ export default function HomePage() {
                                 </div>
                               </div>
                             </Link>
-                          </motion.div>
+                          </div>
                         );
                       })
                     ) : null}
@@ -728,11 +690,8 @@ export default function HomePage() {
                         const targetSlug = post.slug || slugify(post.title);
                         const { mainTitle, subtitle } = splitTitle(post.title);
                         return (
-                          <motion.div
+                          <div
                             key={post.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className={cn(
                               "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
                               hoveredDossieIndex !== null && hoveredDossieIndex !== i
@@ -751,17 +710,14 @@ export default function HomePage() {
                               to={`/post/${targetSlug}`}
                               className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-sky-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.35)]"
                             >
-                              {post.imageUrl && (
-                                <img
-                                  src={post.imageUrl}
-                                  alt={post.title}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = "none";
-                                  }}
-                                />
-                              )}
+                              <RetroCardImage
+                                src={post.imageUrl}
+                                alt={post.title}
+                                fill
+                                sizes="(max-width: 640px) 265px, (max-width: 1024px) 33vw, 25vw"
+                                tone="sky"
+                                className="group-hover:scale-[1.08]"
+                              />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
                               <div className="relative z-20 p-3.5 flex justify-end items-center">
@@ -804,7 +760,7 @@ export default function HomePage() {
                                 </div>
                               </div>
                             </Link>
-                          </motion.div>
+                          </div>
                         );
                       })
                     ) : null}
@@ -880,11 +836,8 @@ export default function HomePage() {
                         const { mainTitle, subtitle } = splitTitle(post.title);
 
                         return (
-                          <motion.div
+                          <div
                             key={post.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05, type: "spring", stiffness: 100 }}
                             className="w-[270px] sm:w-[300px] lg:w-full h-[152px] lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-start snap-always transition-all duration-300 relative"
                             onMouseEnter={() => {
                               setHoveredReviewsIndex(i);
@@ -903,18 +856,14 @@ export default function HomePage() {
                               )}
                             >
                               {/* Full-Bleed Artwork with Rich Cinematic Vignette */}
-                              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/40 via-[#16142b] to-[#090812]" />
-                              {post.imageUrl && (
-                                <img
-                                  src={post.imageUrl}
-                                  alt={post.title}
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = "none";
-                                  }}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-                                />
-                              )}
+                              <RetroCardImage
+                                src={post.imageUrl}
+                                alt={post.title}
+                                fill
+                                sizes="(max-width: 640px) 300px, (max-width: 1024px) 50vw, 33vw"
+                                tone="amber"
+                                className="group-hover:scale-[1.08]"
+                              />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/70 to-black/30 z-10" />
                               <div className="absolute inset-0 bg-gradient-to-r from-[#090812]/90 via-[#090812]/45 to-transparent z-10" />
 
@@ -960,7 +909,7 @@ export default function HomePage() {
                                 )}
                               </div>
                             </Link>
-                          </motion.div>
+                          </div>
                         );
                       })
                     ) : null}

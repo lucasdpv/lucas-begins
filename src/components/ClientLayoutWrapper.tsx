@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { useThemeStore } from "../store/useThemeStore";
@@ -10,10 +11,16 @@ import { useUIStore } from "../store/useUIStore";
 import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 import Toast from "./ui/Toast";
-import LoginModal from "../features/auth/components/LoginModal";
 import BackToTop from "./ui/BackToTop";
-import CookieConsent from "./ui/CookieConsent";
 import NavigationProgress from "./ui/NavigationProgress";
+
+// Modais e Overlays carregados sob demanda (Code-splitting)
+const LoginModal = dynamic(() => import("../features/auth/components/LoginModal"), {
+  ssr: false,
+});
+const CookieConsent = dynamic(() => import("./ui/CookieConsent"), {
+  ssr: false,
+});
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const { isDark } = useThemeStore();

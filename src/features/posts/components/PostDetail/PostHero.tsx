@@ -6,9 +6,10 @@ import { Post } from "../../schemas";
 interface PostHeroProps {
   post: Post;
   imgError: boolean;
+  onImageError?: () => void;
 }
 
-export default function PostHero({ post, imgError }: PostHeroProps) {
+export default function PostHero({ post, imgError, onImageError }: PostHeroProps) {
   const { mainTitle, subtitle } = splitTitle(post.title);
 
   const aspectClass =
@@ -22,26 +23,6 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
 
   return (
     <div className={cn("relative", aspectClass)}>
-      {/* TV Ambilight / Scene Light Extension para a Capa da Matéria */}
-      {post.imageUrl && !imgError && (
-        <div className="absolute inset-0 pointer-events-none -z-10" aria-hidden="true">
-          <div
-            className="absolute -inset-6 md:-inset-12 lg:-inset-14 rounded-[3.5rem] bg-cover bg-center blur-[70px] md:blur-[105px] saturate-[1.85] scale-105 opacity-40"
-            style={{
-              backgroundImage: `url(${post.imageUrl})`,
-              backgroundPosition: post.imagePosition || "center",
-            }}
-          />
-          <div
-            className="absolute -inset-2 md:-inset-4 rounded-[2.5rem] bg-cover bg-center blur-[32px] md:blur-[45px] saturate-[1.6] opacity-30"
-            style={{
-              backgroundImage: `url(${post.imageUrl})`,
-              backgroundPosition: post.imagePosition || "center",
-            }}
-          />
-        </div>
-      )}
-
       <div
         className={cn(
           "w-full h-full rounded-2xl md:rounded-3xl relative overflow-hidden flex items-center justify-center border border-white/[0.1] shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)] bg-[#090812] transform-gpu",
@@ -59,6 +40,7 @@ export default function PostHero({ post, imgError }: PostHeroProps) {
             priority
             fetchPriority="high"
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px"
+            onError={onImageError}
           />
         )}
 

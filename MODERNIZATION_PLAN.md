@@ -1,14 +1,24 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.2.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.3.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.2.0 — The Magazine & Responsive Update`
-- **Status**: `Fase 9 Concluída e Documentada! ✅`
-- **Última Atualização**: 1º de Novembro de 2026
-- **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** sem borda recortada, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`) e foco total nas artes de games, animes e nostalgia.
+- **Versão Atual**: `v6.3.0 — The Hyper-Speed & Visual Polish Update`
+- **Status**: `Fase 10 Concluída e Documentada! ✅`
+- **Última Atualização**: 3 de Novembro de 2026
+- **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** leve sem sobrecarga de GPU, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`), shimmer skeletons temáticos e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## ⚡ Fase 10 — Hiper-Performance, Shimmer Skeletons & Entrega de Imagens (v6.3.0) (✅ CONCLUÍDA)
+- [x] **10.1. Shimmer Skeletons Temáticos**: Fim das caixas pretas durante carregamento com `RetroCardImage.tsx` e fade-in suave por seção (RetroCafé, Dossiês, Reviews e Catálogo).
+- [x] **10.2. Fim de piscadas e recarregamentos na Home**: Remoção de delays artificiais e consultas concorrentes cacheadas via React Query.
+- [x] **10.3. Abertura sub-segundo de matérias**: Fim do bloqueio de hidratação no `PostDetailPage.tsx`, renderização instantânea via SSR e busca otimizada de recomendados.
+- [x] **10.4. Aceleração de imagens no corpo da matéria**: Pré-carregamento imediato das primeiras 4 imagens (`eager` e `fetchPriority="high"`).
+- [x] **10.5. Pipeline moderno de imagens**: Formatos AVIF/WebP, compressão client-side a 0.78 e cache-control imutável de 1 ano no Firebase Storage.
+- [x] **10.6. Code-splitting e alívio de GPU**: Modais secundários carregados sob demanda (`next/dynamic`) e camadas de desfoque difuso otimizadas.
 
 ---
 

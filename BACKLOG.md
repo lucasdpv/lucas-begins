@@ -1,10 +1,22 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.2.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.3.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.2.0 (Magazine & Responsive Update)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.3.0 (The Hyper-Speed & Visual Polish Update)**.
 
 ---
 
-## 📰 Pendências da v6.2.0
+## ⚡ Concluído na v6.3.0
+- [x] **Renderizar o conteúdo da matéria no servidor (SEO & Performance)**
+  * **Concluído**: Removido o bloqueio de hidratação (`if (!isHydrated && initialPost) return null`) em `PostDetailPage.tsx`. A matéria agora renderiza instantaneamente no primeiro frame (SSR puro) sem tela branca.
+- [x] **Eliminação de caixas pretas e placeholders de imagem**
+  * **Concluído**: Criado `RetroCardImage.tsx` com shimmer skeleton temático e fade-in suave em todas as seções da Home e cards do Catálogo.
+- [x] **Fim da piscada e recarregamento da Home**
+  * **Concluído**: Consultas simultâneas sem delay artificial, aproveitando o cache em memória do TanStack Query.
+- [x] **Pipeline de Imagens com AVIF, WebP e Cache de 1 ano**
+  * **Concluído**: `next.config.js` com AVIF/WebP e headers de 1 ano (`immutable`) no Firebase Storage com WebP client-side a 0.78.
+
+---
+
+## 📰 Pendências da v6.2.0 / v6.3.0
 
 - [ ] **Remover o card antigo (`PostCard` com `variant="default"`)**
   * **Contexto**: Desde a v6.2.0 o Catálogo usa o card pôster (`variant="vintage"`); o formato widescreen antigo não é usado em nenhum lugar.

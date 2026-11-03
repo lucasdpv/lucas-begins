@@ -1,8 +1,8 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.2.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.3.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
-O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.0.0**, o portal recebe um redesign completo **Cyber-Editorial + Streaming Geek** (inspirado em *Netflix*, *Crunchyroll*, *Polygon* e *The Verge*), com projeção de luz ambiente estilo **TV Ambilight**, layout widescreen (`1760px`), transições cinematográficas e recomendações dinâmicas por universo.
+O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.3.0**, o portal atinge maturidade de alta performance com carregamento instantâneo de artigos, entrega de imagens em formatos modernos (AVIF/WebP) com cache persistente de 1 ano, shimmer skeleton temático e otimização total de GPU.
 
 ---
 
@@ -11,7 +11,7 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.2.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.3.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
@@ -19,6 +19,15 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 - **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
 
 ---
+
+## ⚡ Novidades da Versão 6.3.0 (The Hyper-Speed & Visual Polish Update)
+
+- **Shimmer Skeletons Temáticos (`RetroCardImage.tsx`)**: Fim das caixas pretas durante o carregamento de imagens. Cada seção exibe um placeholder com pulso e tons temáticos (Laranja no RetroCafé, Azul em Dossiês, Dourado em Reviews e Roxo no Catálogo) com fade-in suave ao finalizar o download.
+- **Fim da Piscada/Recarregamento na Home**: Consultas secundárias simultâneas com cache inteligente de 10 minutos, eliminando saltos de layout tardios.
+- **Abertura Sub-Segundo de Matérias**: Remoção do bloqueio de hidratação no `PostDetailPage` com exibição instantânea via SSR.
+- **Imagens da Matéria Aceleradas**: As 4 primeiras imagens do corpo do artigo carregam antecipadamente (`loading="eager"` / `fetchPriority="high"`).
+- **Pipeline de Imagens com Formatos Modernos**: Suporte nativo a AVIF/WebP com `minimumCacheTTL` de 30 dias e cache de 1 ano no Firebase Storage (`cacheControl: immutable`).
+- **Code-Splitting de Modais**: Modais como `LoginModal`, `CookieConsent` e `ShareModal` agora utilizam carregamento dinâmico (`next/dynamic`), enxugando o bundle JavaScript inicial.
 
 ## 📰 Novidades da Versão 6.2.0
 

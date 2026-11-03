@@ -1,6 +1,6 @@
-# 📜 Documentação Técnica — BeginsProject (v6.2.0)
+# 📜 Documentação Técnica — BeginsProject (v6.3.0)
 
-Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.2.0**.
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.3.0**.
 
 ---
 
@@ -99,8 +99,16 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 - **`src/views/`**: Páginas principais (`HomePage`, `ArchivePage`, `PostDetailPage`, `AboutPage`, `ContactPage`, `DashboardPage`, `PrivacyPolicyPage`, `NotFoundPage`, `PostEditorPage`, `AdminDashboard`).
 - **`src/features/posts/`**: `Carousel`, `PostCard`, `ArticleRenderer`, `PostDetail/` (`PostHero`, `PostActions`, `PostVerdict`, `PostAuthorBox`, `PostRelated`, `PostComments`, `ChapterPill`), Skeletons, hooks do React Query (`usePostsQuery.ts`) e utilitários de categoria (`utils/categoryInfo.ts`, `utils/categoryIcons.tsx`).
 - **`src/components/layout/`**: `Navbar`, `Footer` e subcomponentes (`NavCategoryMenu`, `NavUserMenu`, `MobileMenu`).
-- **`src/components/ui/`**: `Badge`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`, `ImageUpload`, `ImageCropper`.
+- **`src/components/ui/`**: `RetroCardImage`, `Badge`, `ShareModal`, `CookieConsent`, `BackToTop`, `Toast`, `ImageUpload`, `ImageCropper`.
 - **`src/components/home/`**: `MagazineBackdrop` (fundo das seções editoriais).
+
+---
+
+## 🖼️ Pipeline de Imagens & Shimmer Skeletons (v6.3.0)
+- **`RetroCardImage.tsx`**: Componente unificado para exibição de artes e pôsteres com skeleton animado (`animate-pulse`) em tom temático por categoria (Laranja para RetroCafé, Azul para Dossiês, Âmbar para Reviews, Roxo para Novidades) e fade-in suave (`opacity-0` ➔ `opacity-100` em 700ms). Elimina caixas pretas vazias durante o download de imagens.
+- **Next.js Image Formats**: Formatos modernos `image/avif` e `image/webp` configurados no `next.config.js` com `minimumCacheTTL: 2592000` (30 dias).
+- **Firebase Cache & WebP Upload**: Headers de `cacheControl: "public, max-age=31536000, immutable"` aplicados no `uploadService.ts` com compressão client-side em `.webp` (qualidade 0.78, limite 1440px / 350KB).
+- **Tratamento de Erro Nativo**: Substituição do hook legado `useImageFallback` por handlers nativos `onError` em tags `<Image>`, eliminando requisições duplicadas.
 
 ---
 
@@ -114,4 +122,4 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 - **Hydration**: componentes que dependem do usuário logado (que chega do Firebase só no navegador) devem esperar montar antes de renderizar o conteúdo dependente, como faz o `NavUserMenu`.
 
 ---
-**Documentação atualizada em: 1º de Novembro de 2026 (v6.2.0).**
+**Documentação atualizada em: 3 de Novembro de 2026 (v6.3.0).**

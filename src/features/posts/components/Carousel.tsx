@@ -114,26 +114,15 @@ export default function Carousel({ posts }: CarouselProps) {
               />
             );
             return (
-              <React.Fragment key={`ambilight-${post.id}`}>
-                {/* Camada 1: Projeção Ampla de Parede (Wall Wash Longo) */}
-                <div
-                  className={cn(
-                    "absolute -inset-6 md:-inset-12 lg:-inset-16 rounded-[3.5rem] overflow-hidden blur-[70px] md:blur-[110px] saturate-[1.85] scale-105 transition-opacity duration-[1400ms] ease-out",
-                    isActive ? "opacity-45" : "opacity-0"
-                  )}
-                >
-                  {glowImage}
-                </div>
-                {/* Camada 2: Halo de Borda Próximo (Intensa nas extremidades da tela) */}
-                <div
-                  className={cn(
-                    "absolute -inset-2 md:-inset-4 rounded-[2.5rem] overflow-hidden blur-[32px] md:blur-[48px] saturate-[1.6] transition-opacity duration-[1100ms] ease-out",
-                    isActive ? "opacity-35" : "opacity-0"
-                  )}
-                >
-                  {glowImage}
-                </div>
-              </React.Fragment>
+              <div
+                key={`ambilight-${post.id}`}
+                className={cn(
+                  "absolute -inset-4 md:-inset-8 rounded-[3rem] overflow-hidden blur-2xl md:blur-3xl saturate-150 scale-105 transition-opacity duration-1000 ease-out transform-gpu",
+                  isActive ? "opacity-40" : "opacity-0"
+                )}
+              >
+                {glowImage}
+              </div>
             );
           })}
         </div>
@@ -191,10 +180,10 @@ export default function Carousel({ posts }: CarouselProps) {
             aria-label={`Ler matéria: ${currentPost.title}`}
           />
 
-          {/* 3. Vinhetas Cinematográficas Fixas (Não piscam na troca de slide) */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent pointer-events-none z-[5]" />
-          <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-[#090812]/95 via-[#090812]/55 to-transparent pointer-events-none z-[5]" />
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#090812]/60 to-transparent pointer-events-none z-[5]" />
+          {/* 3. Vinhetas Cinematográficas Suaves (Protegem a leitura do texto sem apagar a arte) */}
+          <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#090812]/90 via-[#090812]/35 to-transparent pointer-events-none z-[5]" />
+          <div className="hidden sm:block absolute inset-y-0 left-0 w-3/4 max-w-2xl bg-gradient-to-r from-[#090812]/85 via-[#090812]/30 to-transparent pointer-events-none z-[5]" />
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#090812]/30 to-transparent pointer-events-none z-[5]" />
 
           {/* 4. Conteúdo Inferior: Texto Animado + Strip de Miniaturas Estável */}
           <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 md:p-12 lg:p-14 z-[15] pointer-events-none flex flex-col lg:flex-row lg:items-end justify-between gap-8">

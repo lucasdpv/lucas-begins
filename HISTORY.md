@@ -4,6 +4,38 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## ⚡ [v6.3.0] - The Hyper-Speed & Visual Polish Update
+*Data: 3 de Novembro de 2026*
+
+### 🚀 Aceleração de Entrega de Imagens & Formatos Modernos
+- **Next.js Image Pipeline**: Habilitados formatos modernos `image/avif` e `image/webp` no `next.config.js` com tempo mínimo de cache TTL de 30 dias (`minimumCacheTTL: 2592000`).
+- **Firebase Storage Cache-Control**: Novo header `public, max-age=31536000, immutable` adicionado em todos os uploads de imagens no `uploadService.ts`, permitindo que os navegadores e CDNs façam cache das imagens por até 1 ano.
+- **Compressão Automática em WebP**: Otimização do upload para saída sempre em `.webp` a 0.78 de qualidade e resolução máxima de 1440px (limite de 350KB), acelerando dramaticamente o upload e download das artes de capa.
+- **Fim das Requisições Duplicadas**: Removido o hook `useImageFallback` que baixava imagens duas vezes via `new Image()`. Substituído pelo evento nativo `onError` do componente `<Image>` do Next.js.
+
+### 🎨 Shimmer Skeleton Temático & Fim das Caixas Pretas (`RetroCardImage.tsx`)
+- **Fim do Vazio Preto**: Criado o componente unificado `RetroCardImage` com skeleton animado suave e paletas temáticas por seção:
+  - ☕ **RetroCafé**: Tons de âmbar/laranja com ícone retro em pulso suave.
+  - 📖 **Dossiês**: Tons azul/sky com ícone temático de arquivo confidencial.
+  - ⭐ **Reviews**: Tons dourados/amber com ícone de veredito oficial.
+  - 🎮 **Novidades / Catálogo / Top 5**: Tons roxos e neons.
+- **Transição Crossfade Elegante**: As imagens agora entram com fade-in suave (`opacity-0` ➔ `opacity-100` em 700ms) sem estouros visuais repentinos ao terminar o download.
+
+### ⏱️ Fim da Piscada / Recarregamento na Home (`HomePage.tsx`)
+- **Remoção de Delay Artificial**: Eliminado o temporizador de 900ms em `requestIdleCallback` que provocava saltos de layout e re-renderizações após o primeiro carregamento da Home.
+- **Consultas Simultâneas**: Todas as seções iniciam imediatamente e aproveitam o cache em memória do TanStack Query (10 minutos de `staleTime`), mantendo a navegação entre páginas fluida e instantânea.
+
+### 📖 Abertura Sub-Segundo e Aceleração de Artigos (`PostDetailPage.tsx` & `ArticleRenderer.tsx`)
+- **Remoção do Bloqueio de Hidratação**: O leitor visualiza o artigo imediatamente no primeiro frame via SSR (`initialPost`), eliminando o breve flash de tela branca.
+- **Consultas Otimizadas no "Continue Explorando"**: A consulta de posts recomendados foi enxugada de 32 posts completos para apenas 4 a 6 posts da mesma categoria, carregados de forma diferida.
+- **Pré-carregamento de Imagens do Artigo**: As 4 primeiras imagens do corpo do artigo agora carregam com `loading="eager"` e `fetchPriority="high"`, acompanhadas de placeholders pulsantes, acabando com a espera ao rolar a página.
+
+### 🧩 Alívio de GPU & Code-Splitting
+- **Clareamento e Otimização do Carrossel Hero**: Redução dos filtros pesados de desfoque (Ambilight) de 3 camadas para 1 camada leve (`blur-2xl`), sem sobrecarga na GPU de celulares e laptops.
+- **Code-Splitting de Modais**: `LoginModal`, `CookieConsent` e `ShareModal` migrados para `next/dynamic` (`ssr: false`), reduzindo o tamanho do bundle JavaScript inicial.
+
+---
+
 ## 📰 [v6.2.0] - The Magazine & Responsive Update
 *Data: 1º de Novembro de 2026*
 

@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Heart, MessageSquare, Clock, Eye, Bookmark } from "lucide-react";
 import { Link } from "@/lib/router-compat";
+import RetroCardImage, { CardTone } from "../../../components/ui/RetroCardImage";
 import {
   calculateReadingTime,
   formatDate,
@@ -15,7 +16,6 @@ import { useAuth } from "../../../context/AuthProvider";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useLikeMutation, useFavoriteMutation } from "../hooks/usePostsQuery";
 import { useUserProfile } from "../../../hooks/useUserQuery";
-import { useImageFallback } from "../../../hooks/useImageFallback";
 import { useUIStore } from "../../../store/useUIStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { PostService } from "../../../services/postService";
@@ -112,7 +112,7 @@ export default function PostCard({
   const { data: profile } = useUserProfile(currentUser?.id);
   const likeMutation = useLikeMutation();
   const favoriteMutation = useFavoriteMutation();
-  const imgError = useImageFallback(post.imageUrl ?? undefined);
+  const [imgError, setImgError] = React.useState(false);
   const [randomSector] = React.useState(() => Math.floor(Math.random() * 99));
   const queryClient = useQueryClient();
 
@@ -160,18 +160,17 @@ export default function PostCard({
             isDark ? "bg-slate-900" : "bg-slate-100"
           )}
         >
-          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
-            <Image
-              src={post.imageUrl}
-              alt={post.title}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              style={{ objectPosition: post.imagePosition || "center" }}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
-              priority={priority}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <RetroCardImage
+            src={post.imageUrl}
+            alt={post.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
+            priority={priority}
+            tone={post.category?.toLowerCase().includes("retro") ? "orange" : post.category?.toLowerCase().includes("dossi") ? "sky" : post.category?.toLowerCase().includes("review") ? "amber" : "purple"}
+            imagePosition={post.imagePosition}
+            className="group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
         </div>
 
         <div className="flex flex-col flex-grow p-4 relative z-10 pointer-events-none">
@@ -263,19 +262,18 @@ export default function PostCard({
           aria-label={`Ler matéria: ${post.title}`}
         />
 
-        <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none bg-slate-950">
-          {post.imageUrl && isValidImageUrl(post.imageUrl) && !imgError && (
-            <Image
-              src={post.imageUrl}
-              alt={post.title}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-              style={{ objectPosition: post.imagePosition || "center" }}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-              priority={priority}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#090812]/95 from-5% via-[#090812]/50 via-45% to-transparent" />
+        <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
+          <RetroCardImage
+            src={post.imageUrl}
+            alt={post.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+            priority={priority}
+            tone={post.category?.toLowerCase().includes("retro") ? "orange" : post.category?.toLowerCase().includes("dossi") ? "sky" : post.category?.toLowerCase().includes("review") ? "amber" : "purple"}
+            imagePosition={post.imagePosition}
+            className="group-hover:scale-[1.06]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#090812]/95 from-5% via-[#090812]/50 via-45% to-transparent z-10" />
         </div>
 
         {post.score && (
@@ -371,6 +369,7 @@ export default function PostCard({
             fill
             sizes="(max-width: 1024px) 100vw, 33vw"
             priority={priority}
+            onError={() => setImgError(true)}
           />
         )}
 

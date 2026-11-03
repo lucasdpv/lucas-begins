@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "@/lib/router-compat";
 import { ArrowLeft, Compass, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -14,9 +15,8 @@ import {
   useLikeMutation,
   useCommentMutation,
   useIncrementViewMutation,
-  usePopularPosts,
-  useLatestPosts,
   usePostsByCategory,
+  useLatestPosts,
   useFavoriteMutation,
   useDeleteCommentMutation,
   useLikeCommentMutation,
@@ -24,13 +24,12 @@ import {
   useDeleteReplyMutation,
   useLikeReplyMutation,
 } from "../features/posts/hooks/usePostsQuery";
-import { useImageFallback } from "../hooks/useImageFallback";
 import { useUserProfile } from "../hooks/useUserQuery";
 
 // Components
 import ArticleRenderer from "../features/posts/components/ArticleRenderer";
 import PostDetailSkeleton from "../features/posts/components/PostDetailSkeleton";
-import ShareModal from "../components/ui/ShareModal";
+const ShareModal = dynamic(() => import("../components/ui/ShareModal"), { ssr: false });
 import PostHero from "../features/posts/components/PostDetail/PostHero";
 import PostActions from "../features/posts/components/PostDetail/PostActions";
 import PostVerdict from "../features/posts/components/PostDetail/PostVerdict";
@@ -54,14 +53,18 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   const { currentUser, authLoading } = useAuth();
   const { data: profile } = useUserProfile(currentUser?.id);
   const { isDark } = useThemeStore();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [shouldLoadRelated, setShouldLoadRelated] = useState(false);
 
+  // Carrega recomendações de forma diferida (depois que a matéria já estiver visível e renderizada)
   useEffect(() => {
-    setIsHydrated(true);
+    if (typeof window === "undefined") return;
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(() => setShouldLoadRelated(true), { timeout: 1200 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(() => setShouldLoadRelated(true), 800);
+    return () => clearTimeout(timer);
   }, []);
-
-  const { data: popularPosts = [] } = usePopularPosts(12);
-  const { data: latestPosts = [] } = useLatestPosts(12);
 
   const likeMutation = useLikeMutation();
   const commentMutation = useCommentMutation();
@@ -85,21 +88,27 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
 
   const post = previewPost || postBySlug || postById || initialPost;
 
+  // Busca apenas 6 matérias da mesma categoria (e se faltar, 4 recentes como apoio), de forma diferida
   const { data: categoryPosts = [] } = usePostsByCategory(
     post?.category || "",
-    8,
-    !!post?.category && !previewPost
+    6,
+    shouldLoadRelated && !!post?.category && !previewPost
+  );
+
+  const { data: fallbackRecentPosts = [] } = useLatestPosts(
+    4,
+    shouldLoadRelated && !previewPost && categoryPosts.length < 3
   );
 
   const candidateRelatedPosts = useMemo(() => {
     const map = new Map<string, Post>();
-    [...categoryPosts, ...latestPosts, ...popularPosts].forEach((item) => {
+    [...categoryPosts, ...fallbackRecentPosts].forEach((item) => {
       if (item && item.id && !map.has(item.id)) {
         map.set(item.id, item);
       }
     });
     return Array.from(map.values());
-  }, [categoryPosts, latestPosts, popularPosts]);
+  }, [categoryPosts, fallbackRecentPosts]);
 
   const isFetchingLocal = isLoadingSlug || (!postBySlug && isLoadingId);
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -117,7 +126,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   const [activeHeadingId, setActiveHeadingId] = useState<string>("");
   const [isTocOpen, setIsTocOpen] = useState(true);
   const [isChapterPillVisible, setIsChapterPillVisible] = useState(false);
-  const imgError = useImageFallback(post?.imageUrl ?? undefined);
+  const [imgError, setImgError] = useState(false);
   const hasIncremented = useRef(false);
 
   const headings = useMemo(() => {
@@ -211,10 +220,6 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
     return null;
   }
 
-  if (!isHydrated && initialPost) {
-    return null;
-  }
-
   const isAdmin = currentUser?.role === USER_ROLES.ADMIN;
   const isPostDraft = post?.isDraft;
   const isPreview = !!previewPost;
@@ -269,7 +274,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
       </button>
 
       <div className="w-full space-y-12">
-        <PostHero post={post} imgError={imgError} />
+        <PostHero post={post} imgError={imgError} onImageError={() => setImgError(true)} />
 
         <div id="article-content" className="space-y-10 w-full">
           <PostActions
