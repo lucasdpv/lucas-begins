@@ -1,6 +1,20 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.3.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.4.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.3.0 (The Hyper-Speed & Visual Polish Update)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.4.0 (The Editorial Refinement & Floating Navigation Update)**.
+
+---
+
+## 💎 Concluído na v6.4.0
+- [x] **Navegação Flutuante Mobile & Sincronia de Altura (`ChapterPill.tsx` + `BackToTop.tsx`)**
+  * **Concluído**: Modo compacto circular 40x40px (`w-10 h-10 rounded-full`) no celular, sincronia milimétrica de elevação e baseline (`mb-5 md:mb-7`), e auto-hide por inatividade sincronizado de 2.5s ao ler matérias.
+- [x] **Redesign do Veredito Oficial (`PostVerdict.tsx`)**
+  * **Concluído**: Selo quadrado (`w-24 sm:w-28 rounded-2xl`) com nota em destaque e tag `/10` na quina inferior posicionado à direita (`float-right`), permitindo fluxo do texto de análise em volta sem áreas vazias.
+- [x] **Perfil Minimalista do Autor no Sobre Nós (`AboutPage.tsx`)**
+  * **Concluído**: Redesenho horizontal compacto, foto arredondada com status online integrado, foco direto no criador e plataformas PlayStation & Nintendo, com remoção de hashtags estáticas.
+- [x] **Prevenção de Hydration Mismatch no SSR (`PostActions.tsx` + `PostComments.tsx`)**
+  * **Concluído**: Implementação do guard `isMounted` para componentes autenticados com Firebase Auth.
+- [x] **Limpeza do Menu Mobile & Desativação do Dev Indicator**
+  * **Concluído**: Removido "Todos" da lista de categorias mobile em `MobileMenu.tsx` e desativado o badge de dev em `next.config.js` (`devIndicators: false`).
 
 ---
 

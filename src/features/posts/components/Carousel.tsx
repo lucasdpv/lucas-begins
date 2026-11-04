@@ -29,6 +29,8 @@ export default function Carousel({ posts }: CarouselProps) {
   const [isPaused, setIsPaused] = useState(false);
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
 
   const goTo = useCallback(
     (idx: number) => {
@@ -77,16 +79,28 @@ export default function Carousel({ posts }: CarouselProps) {
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEnd.current = null;
+    touchEndY.current = null;
     touchStart.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
   };
   const onTouchMove = (e: React.TouchEvent) => {
     touchEnd.current = e.targetTouches[0].clientX;
+    touchEndY.current = e.targetTouches[0].clientY;
   };
   const onTouchEnd = () => {
-    if (!touchStart.current || !touchEnd.current) return;
-    const dist = touchStart.current - touchEnd.current;
-    if (dist > 50) next();
-    else if (dist < -50) prev();
+    if (touchStart.current === null || touchEnd.current === null) return;
+    const diffX = touchStart.current - touchEnd.current;
+    const diffY = (touchStartY.current ?? 0) - (touchEndY.current ?? 0);
+    // Só avança se o movimento foi predominantemente horizontal e superior a 45px,
+    // evitando conflito com a rolagem vertical de página no mobile.
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 45) {
+      if (diffX > 0) next();
+      else prev();
+    }
+    touchStart.current = null;
+    touchEnd.current = null;
+    touchStartY.current = null;
+    touchEndY.current = null;
   };
 
   const currentPost = posts[currentIndex];
@@ -97,9 +111,9 @@ export default function Carousel({ posts }: CarouselProps) {
 
   return (
     <div className="relative group/carousel select-none">
-      {/* TV Ambilight / Scene Light Extension — Projeção Difusa da Cena sem borda recortada */}
+      {/* TV Ambilight / Scene Light Extension — Projeção Difusa no Desktop (desativado no mobile para máxima fluidez a 120Hz) */}
       {isDark && (
-        <div className="absolute inset-0 pointer-events-none -z-10" aria-hidden="true">
+        <div className="hidden md:block absolute inset-0 pointer-events-none -z-10" aria-hidden="true">
           {posts.map((post, idx) => {
             if (!post.imageUrl || !isSlideMounted(idx)) return null;
             const isActive = idx === currentIndex;
@@ -132,8 +146,8 @@ export default function Carousel({ posts }: CarouselProps) {
         className={cn(
           "relative rounded-2xl md:rounded-3xl overflow-hidden border transition-all duration-500",
           isDark
-            ? "bg-[#0d0b1a] border-white/[0.1] shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)]"
-            : "bg-slate-950 border-slate-200/80 shadow-[0_24px_50px_-12px_rgba(15,23,42,0.25)]"
+            ? "bg-[#0d0b1a] border-white/[0.1] shadow-xl md:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.85)]"
+            : "bg-slate-950 border-slate-200/80 shadow-md md:shadow-[0_24px_50px_-12px_rgba(15,23,42,0.25)]"
         )}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -143,7 +157,7 @@ export default function Carousel({ posts }: CarouselProps) {
       >
         {/* Main Billboard Stage */}
         <div className="relative w-full h-[400px] sm:h-[460px] md:h-[560px] lg:h-[600px] xl:h-[640px] 2xl:h-[680px] overflow-hidden bg-[#090812]">
-          {/* 1. Camadas de Imagem Pré-Montadas (Crossfade + Ken Burns Suave sem piscar) */}
+          {/* 1. Camadas de Imagem Pré-Montadas (Crossfade leve no mobile, Ken Burns no Desktop) */}
           {posts.map((post, idx) => {
             if (!isSlideMounted(idx)) return null;
             const isActive = idx === currentIndex;
@@ -152,8 +166,8 @@ export default function Carousel({ posts }: CarouselProps) {
                 key={post.id}
                 aria-hidden={!isActive}
                 className={cn(
-                  "absolute inset-0 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  isActive ? "opacity-100 scale-100 z-[1]" : "opacity-0 scale-[1.04] z-0 pointer-events-none"
+                  "absolute inset-0 transition-opacity duration-700 md:transition-[opacity,transform] md:duration-[1100ms] md:ease-[cubic-bezier(0.22,1,0.36,1)] transform-gpu",
+                  isActive ? "opacity-100 scale-100 z-[1]" : "opacity-0 md:scale-[1.04] z-0 pointer-events-none"
                 )}
               >
                 {post.imageUrl && (
@@ -166,7 +180,7 @@ export default function Carousel({ posts }: CarouselProps) {
                     priority={idx === 0}
                     loading={idx === 0 ? "eager" : undefined}
                     fetchPriority={idx === 0 ? "high" : "auto"}
-                    sizes="100vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1400px"
                   />
                 )}
               </div>
@@ -187,15 +201,15 @@ export default function Carousel({ posts }: CarouselProps) {
 
           {/* 4. Conteúdo Inferior: Texto Animado + Strip de Miniaturas Estável */}
           <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 md:p-12 lg:p-14 z-[15] pointer-events-none flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            {/* Bloco de Texto com Transição Suave (Fade + Glide Vertical + Blur Sutil) */}
+            {/* Bloco de Texto com Transição Suave (Fade + Glide Vertical Otimizado sem repaints de blur) */}
             <div className="max-w-2xl flex-1 min-w-0">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={currentPost.id}
-                  initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
-                  transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
                   className="flex flex-col items-start"
                 >
                   {/* Top Streaming Badges Row */}

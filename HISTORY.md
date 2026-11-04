@@ -4,6 +4,40 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 💎 [v6.4.0] - The Editorial Refinement & Floating Navigation Update
+*Data: 4 de Novembro de 2026*
+
+### 🧭 Pílula de Capítulos & Botão Topo Sincronizados (`ChapterPill.tsx` & `BackToTop.tsx`)
+- **Modo Compacto no Celular**: No celular (`< sm`), o indicador de capítulos agora é um botão circular de 40x40px (`w-10 h-10 rounded-full`) exibindo o anel de progresso e o número do capítulo atual (`01`, `02`, etc.), eliminando a barra que ocupava quase toda a largura da tela.
+- **Geometria e Baseline Pixel-Perfect**: `ChapterPill` (lado esquerdo) e `BackToTop` (lado direito) agora compartilham exatamente a mesma altura de container (`h-20 md:h-24`), margem inferior (`mb-5 md:mb-7`) e elevação (`h-10 rounded-full`).
+- **Auto-Hide por Inatividade Inteligente (2.5s)**: Ao parar de rolar para ler o texto do artigo, ambos os botões desaparecem suavemente juntos após 2,5 segundos, desobstruindo totalmente a visão de leitura. Qualquer rolagem ou toque na tela os traz de volta imediatamente. Se o menu de capítulos estiver aberto, o auto-hide é suspenso.
+
+### ⭐ Redesign Minimalista do Veredito Oficial (`PostVerdict.tsx`)
+- **Selo Quadrado com Presença**: O bloco da nota foi movido para o canto superior direito (`float-right ml-4 mb-3 sm:ml-6 sm:mb-4`) em um formato quadrado perfeito (`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl`).
+- **Nota Protagonista & Selo `/10` na Quina**: O número (ex: `7.5`) ganha destaque absoluto no centro em tipografia encorpada (`text-4xl sm:text-5xl font-black text-amber-400 font-retro`), acompanhado da tag `/10` encaixada no canto inferior direito.
+- **Texto Fluido sem Espaço Vazio**: O parágrafo de veredito flui em volta do bloco de pontuação, expandindo para 100% da largura logo abaixo dele, eliminando a antiga coluna vazia à esquerda.
+
+### 👤 Perfil do Autor Enxuto & Minimalista (`AboutPage.tsx`)
+- **Avatar Proporcional com Status Integrado**: Redimensionado para escala moderna (`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl`) com anel verde de status `Online` no canto inferior.
+- **Fim dos Cards Empilhados**: Substituídos os 3 blocos gigantes que ocupavam mais de 300px verticais por um cabeçalho horizontal elegante lado a lado no celular e no desktop.
+- **Informações Personalizadas**: Foco direto em *Lucas Vieira · Criador do BeginsProject · Plataformas: PlayStation & Nintendo*. Removidas hashtags estáticas e decorativas desnecessárias.
+
+### 🛡️ Prevenção de Hydration Mismatch no SSR (`PostActions.tsx` & `PostComments.tsx`)
+- **Montagem Segura do Cliente**: Adicionado guard `isMounted` com `useEffect` para sincronizar os componentes de ações de post e comentários dependentes de autenticação do Firebase.
+- **Fim dos Conflitos de Hidratação**: O HTML renderizado pelo servidor (esqueleto em loading) e o primeiro ciclo de renderização no cliente permanecem 100% idênticos, ativando os botões de curtir/favoritar e o formulário de comentários sem disparar avisos no console.
+
+### 📱 Menu Mobile, Carrossel Otimizado & Configurações Next.js
+- **Menu de Categorias Enxuto (`MobileMenu.tsx`)**: Removido o item redundante "Todos" da lista de categorias mobile, mantendo apenas as 4 seções editoriais, já que a navegação global é coberta pelo botão "Catálogo Completo".
+- **Carrossel Otimizado para Celulares 120Hz (`Carousel.tsx`)**:
+  - **Desativação do Ambilight no Mobile**: O efeito difuso de projeção traseira com múltiplos filtros pesados (`blur-2xl/3xl` + `saturate-150`) agora fica restrito a telas médias/grandes (`hidden md:block`), poupando a GPU de celulares intermediários (como Samsung Galaxy M23 e similares) do cálculo de blur contínuo.
+  - **Crossfade Leve e Fim do Ken Burns em Telas Pequenas**: A transição de slides no celular passou a usar transição pura de opacidade com aceleração via `transform-gpu`, mantendo o zoom Ken Burns apenas no desktop (`md:scale-[1.04]`).
+  - **Fim do Repaint por Blur no Framer Motion**: A troca de títulos agora anima exclusivamente `opacity` e deslocamento vertical (`y`), removendo o filtro `filter: blur()` que causava re-rasterização quadro a quadro no Android.
+  - **Suporte Inteligente ao Gesto Touch**: Detecção de arraste melhorada com análise de vetor cartesiano (`|diffX| > |diffY|` e > 45px), impedindo que a rolagem vertical de página dispare trocas acidentais de slides.
+  - **Dimensionamento Responsivo de Imagens**: Atualizado o atributo `sizes` do Next.js Image para requisitar resoluções otimizadas no celular em vez de imagens gigantescas de desktop.
+- **Desativação do Dev Indicator (`next.config.js`)**: Adicionado `devIndicators: false` para desabilitar o badge de desenvolvimento do Next.js no canto inferior da tela em modo de desenvolvimento.
+
+---
+
 ## ⚡ [v6.3.0] - The Hyper-Speed & Visual Polish Update
 *Data: 3 de Novembro de 2026*
 

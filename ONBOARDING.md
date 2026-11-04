@@ -1,4 +1,4 @@
-# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.3.0)
+# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.4.0)
 
 Este guia foi criado para que você entenda rapidamente como o **BeginsProject** funciona e como contribuir mantendo a consistência visual e arquitetural do portal.
 

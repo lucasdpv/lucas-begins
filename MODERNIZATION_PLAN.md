@@ -1,14 +1,24 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.3.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.4.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.3.0 — The Hyper-Speed & Visual Polish Update`
-- **Status**: `Fase 10 Concluída e Documentada! ✅`
-- **Última Atualização**: 3 de Novembro de 2026
+- **Versão Atual**: `v6.4.0 — The Editorial Refinement & Floating Navigation Update`
+- **Status**: `Fase 11 Concluída e Documentada! ✅`
+- **Última Atualização**: 4 de Novembro de 2026
 - **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** leve sem sobrecarga de GPU, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`), shimmer skeletons temáticos e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## 💎 Fase 11 — Refinamento Editorial & Navegação Flutuante (v6.4.0) (✅ CONCLUÍDA)
+- [x] **11.1. Navegação Flutuante Mobile & Sincronia**: Modo circular compacto de 40x40px para a pílula de capítulos no celular (`ChapterPill.tsx`), com alinhamento pixel-perfect de baseline e elevação com o botão Topo (`BackToTop.tsx`).
+- [x] **11.2. Auto-Hide por Inatividade Sincronizado**: Temporizador inteligente de 2.5s que esconde suavemente ambos os botões flutuantes durante a leitura para desobstruir o texto, reativando ao menor toque ou rolagem.
+- [x] **11.3. Redesign do Veredito Oficial (`PostVerdict.tsx`)**: Selo quadrado (`rounded-2xl`) com nota em destaque e tag `/10` na quina inferior posicionado à direita (`float-right`), permitindo fluxo do texto editorial ao redor sem espaços vazios.
+- [x] **11.4. Perfil Minimalista do Autor (`AboutPage.tsx`)**: Formato horizontal moderno com foto arredondada, status online discreto, foco direto nas plataformas e criador, e remoção de hashtags estáticas.
+- [x] **11.5. Prevenção de Hydration Mismatch no SSR**: Proteção `isMounted` em `PostActions.tsx` e `PostComments.tsx` eliminando erros de renderização inicial com Firebase Auth.
+- [x] **11.6. Otimizações Mobile & Next.js**: Remoção do item redundante "Todos" em `MobileMenu.tsx` e desativação do dev indicator no `next.config.js`.
 
 ---
 

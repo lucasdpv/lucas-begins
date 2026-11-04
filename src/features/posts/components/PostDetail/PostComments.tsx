@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MessageSquare, Send, Trash2, Heart, CornerDownRight, Smile, X } from "lucide-react";
 import { cn, formatNumber, formatDate, getPixelAvatar } from "../../../../lib/utils";
 import AuthGate from "../../../auth/components/AuthGate";
@@ -39,6 +39,10 @@ export default function PostComments({
   onDeleteReply,
   onLikeReply,
 }: PostCommentsProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
+  const effectiveUser = isMounted ? currentUser : null;
   const comments = post.comments || [];
   const hasMore = visibleComments < comments.length;
 
@@ -73,7 +77,7 @@ export default function PostComments({
         </p>
       </div>
 
-      {currentUser ? (
+      {effectiveUser ? (
         <div
           className={cn(
             "mb-10 p-6 md:p-8 rounded-2xl border",

@@ -1,6 +1,6 @@
-# 📜 Documentação Técnica — BeginsProject (v6.3.0)
+# 📜 Documentação Técnica — BeginsProject (v6.4.0)
 
-Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.3.0**.
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.4.0**.
 
 ---
 
@@ -19,7 +19,7 @@ Este documento detalha a arquitetura de software, o sistema de design **Cyber-Ed
 
 ## 🎨 Design System v6.0: Cyber-Editorial + Streaming Geek
 
-Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-brutalistas em favor de uma estética **Cyber-Editorial + Streaming Geek** inspirada em plataformas modernas (*Netflix*, *Crunchyroll*, *Apple TV+*, *Polygon*, *The Verge*):
+Na versão **v6.0.0** em diante, o portal abandonou as antigas bordas pretas grossas neo-brutalistas em favor de uma estética **Cyber-Editorial + Streaming Geek** inspirada em plataformas modernas (*Netflix*, *Crunchyroll*, *Apple TV+*, *Polygon*, *The Verge*):
 
 ### 1. Paleta, Superfícies & Container Widescreen
 - **Backdrop Cinematográfico**: Fundo escuro profundo (`#090812`) com malha radial sutil e superfícies translúcidas (`#121024/90` com `backdrop-blur-xl`).
@@ -34,7 +34,7 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
   - **Camada 1 (Wall Wash Longo)**: `-inset-6 md:-inset-12 lg:-inset-16 blur-[70px] md:blur-[110px] saturate-[1.85] scale-105`.
   - **Camada 2 (Edge Halo Curto)**: `-inset-2 md:-inset-4 blur-[32px] md:blur-[48px] saturate-[1.6]`.
 - Na troca de slides do carrossel, a luz ambiente realiza um crossfade suave de `1400ms` sincronizado com a nova arte.
-- **Performance (v6.1.0)**: O carrossel só monta o slide atual, o anterior (fade-out), o próximo (pré-carregado) e o da miniatura sob o mouse (`isSlideMounted`). As camadas de luz usam `next/image` com `sizes="96px"`, já que a arte é desfocada, e as miniaturas usam `sizes="144px"`.
+- **Performance**: O carrossel só monta o slide atual, o anterior (fade-out), o próximo (pré-carregado) e o da miniatura sob o mouse (`isSlideMounted`). As camadas de luz do carrossel são desativadas no mobile (`hidden md:block`) para garantir 120 FPS cravados em celulares intermediários (Adreno GPUs). No desktop usam `next/image` com `sizes="96px"`, já que a arte é desfocada, e as miniaturas usam `sizes="144px"`. No celular, a transição é feita por opacidade pura com aceleração de hardware (`transform-gpu`) sem recalcular escala contínua (Ken Burns).
 - **Cuidado ao evoluir**: desfoques grandes (`blur-[100px]+`) e animações infinitas em elementos grandes custam caro na GPU. Prefira gradientes radiais estáticos (como o fundo global em `ClientLayoutWrapper.tsx`) e nunca anime `top`/`left` em loop.
 
 ### 3. Seções Editoriais com Cara de Revista (`src/components/home/MagazineBackdrop.tsx`)
@@ -51,11 +51,13 @@ Na versão **v6.0.0**, o portal abandonou as antigas bordas pretas grossas neo-b
 - Numerais gigantes posicionados à esquerda de cada poster (`1` a `5`).
 - Em repouso, exibem contorno roxo translúcido; no `:hover` do card (`.group:hover .netflix-rank`), preenchem-se com **dourado sólido (`#fbbf24`)**, contorno `#fef08a` e *drop-shadow* âmbar luminoso.
 
-### 6. Modern Web Platform Enhancements
+### 6. Modern Web Platform Enhancements & Navegação Flutuante
 - **Tipografia Equilibrada**: `text-wrap: balance` em títulos (`h1`–`h4`) e `text-wrap: pretty` em parágrafos de leitura (`.article-paragraph`, `.magazine-article`).
 - **Animação Intrínseca do Índice de Capítulos**: Uso de `interpolate-size: allow-keywords` e `calc-size(auto, size)` na classe `.toc-collapsible`.
-- **Sumário Flutuante de Capítulos (`PostDetail/ChapterPill.tsx`)**: Aparece quando o índice (`#post-toc`) sai da tela e some ao fim de `#article-content`. Cada capítulo traz o tempo estimado (palavras entre títulos `##` ÷ 200, calculado em `PostDetailPage.tsx`); a pílula mostra os minutos restantes. No computador abre um painel acima da pílula; no celular (`< sm`) abre uma folha fixa no rodapé com fundo escurecido, que fecha com toque fora, Esc ou arrastando a alça (`useDragControls`). Tudo é renderizado via `createPortal(..., document.body)` porque a animação de entrada das páginas aplica `transform` em um ancestral, o que faria `position: fixed` rolar junto com o conteúdo — e a folha do celular fica fora do container animado da pílula pelo mesmo motivo.
-- **Botão Topo (`BackToTop.tsx`)**: mesma altura (42px), forma e halo da pílula de capítulos, alinhado na mesma linha (`mb-6 md:mb-8`).
+- **Sumário Flutuante de Capítulos (`PostDetail/ChapterPill.tsx`)**: Aparece quando o índice (`#post-toc`) sai da tela e some ao fim de `#article-content`. Cada capítulo traz o tempo estimado; a pílula mostra os minutos restantes. No computador abre um painel acima da pílula; no celular (`< sm`) vira uma pílula compacta circular (`40x40px`) que abre uma folha fixa no rodapé com fundo escurecido ao toque. Renderizado via `createPortal(..., document.body)`.
+- **Botão Topo (`BackToTop.tsx`) & Auto-Hide Sincronizado**: Ambos os botões compartilham altura (`h-10`), elevação e margem inferior (`mb-5 md:mb-7`). Após 2.5s de inatividade na rolagem durante a leitura, ambos desaparecem suavemente juntos para liberar o texto, reaparecendo com qualquer toque ou rolagem.
+- **Veredito Oficial (`PostVerdict.tsx`)**: Selo quadrado (`w-24 sm:w-28 rounded-2xl`) com a nota em destaque e tag `/10` na quina inferior posicionado à direita (`float-right`), permitindo que a resenha contorne o selo sem criar colunas vazias.
+- **Proteção contra Hydration Mismatch**: `PostActions.tsx` e `PostComments.tsx` contam com verificação de montagem (`isMounted`), garantindo que a renderização inicial do cliente seja 100% fiel ao HTML do SSR com Firebase Auth.
 
 ### 7. Responsividade
 - **Celular (< 640px)**: carrossel sem resumo, sem pílula de curtidas e sem escurecimento lateral; cards em pôster de 1 coluna.

@@ -1,8 +1,8 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.3.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.4.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
-O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.3.0**, o portal atinge maturidade de alta performance com carregamento instantâneo de artigos, entrega de imagens em formatos modernos (AVIF/WebP) com cache persistente de 1 ano, shimmer skeleton temático e otimização total de GPU.
+O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.4.0**, a interface alcança refinamento editorial completo com navegação flutuante sincronizada (pílula de capítulos compacta e botão topo com auto-hide inteligente), novo veredito quadrado minimalista, perfil gamer enxuto no Sobre Nós e blindagem contra erros de hidratação SSR.
 
 ---
 
@@ -11,7 +11,7 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.3.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.4.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
@@ -20,14 +20,30 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 
 ---
 
-## ⚡ Novidades da Versão 6.3.0 (The Hyper-Speed & Visual Polish Update)
+## 💎 Novidades da Versão 6.4.0 (The Editorial Refinement & Floating Navigation Update)
 
-- **Shimmer Skeletons Temáticos (`RetroCardImage.tsx`)**: Fim das caixas pretas durante o carregamento de imagens. Cada seção exibe um placeholder com pulso e tons temáticos (Laranja no RetroCafé, Azul em Dossiês, Dourado em Reviews e Roxo no Catálogo) com fade-in suave ao finalizar o download.
-- **Fim da Piscada/Recarregamento na Home**: Consultas secundárias simultâneas com cache inteligente de 10 minutos, eliminando saltos de layout tardios.
-- **Abertura Sub-Segundo de Matérias**: Remoção do bloqueio de hidratação no `PostDetailPage` com exibição instantânea via SSR.
-- **Imagens da Matéria Aceleradas**: As 4 primeiras imagens do corpo do artigo carregam antecipadamente (`loading="eager"` / `fetchPriority="high"`).
-- **Pipeline de Imagens com Formatos Modernos**: Suporte nativo a AVIF/WebP com `minimumCacheTTL` de 30 dias e cache de 1 ano no Firebase Storage (`cacheControl: immutable`).
-- **Code-Splitting de Modais**: Modais como `LoginModal`, `CookieConsent` e `ShareModal` agora utilizam carregamento dinâmico (`next/dynamic`), enxugando o bundle JavaScript inicial.
+- **Navegação Flutuante Sincronizada (`ChapterPill.tsx` & `BackToTop.tsx`)**:
+  - No celular (`< sm`), o botão de capítulos vira uma badge circular compacta de 40x40px mostrando o progresso e o número do capítulo atual.
+  - Alinhamento pixel-perfect de baseline e elevação entre o botão de capítulos (esquerda) e o botão Topo (direita).
+  - Auto-hide por inatividade sincronizado: após 2.5s lendo a matéria, ambos os botões desaparecem suavemente juntos, reaparecendo imediatamente com qualquer rolagem ou toque.
+- **Redesign do Veredito Oficial (`PostVerdict.tsx`)**:
+  - Selo quadrado minimalista (`w-24 sm:w-28 rounded-2xl`) posicionado à direita (`float-right`) com a nota gigante em destaque (`text-4xl sm:text-5xl`) e tag `/10` na quina inferior.
+  - O texto do veredito flui em volta do selo, eliminando o espaço vazio.
+- **Perfil do Autor Enxuto (`AboutPage.tsx`)**:
+  - Redesenho do cabeçalho da página "Sobre Nós" em formato horizontal minimalista com avatar proporcional (`rounded-2xl`), dot verde de status e foco direto no autor, criador e plataformas PlayStation & Nintendo.
+- **Prevenção de Hydration Mismatch (`PostActions.tsx` & `PostComments.tsx`)**:
+  - Guard `isMounted` implementado para garantir correspondência idêntica entre o HTML gerado no SSR e o primeiro frame do cliente, eliminando avisos no console com autenticação Firebase.
+- **Otimizações Mobile & Next.js**:
+  - Removido "Todos" da lista de categorias mobile em `MobileMenu.tsx` para evitar redundância com o Catálogo Completo.
+  - Dev indicator desativado em `next.config.js` (`devIndicators: false`).
+
+## ⚡ Novidades da Versão 6.3.0
+
+- **Shimmer Skeletons Temáticos (`RetroCardImage.tsx`)**: Fim das caixas pretas durante o carregamento de imagens com fade-in suave ao finalizar o download.
+- **Fim da Piscada/Recarregamento na Home**: Consultas secundárias simultâneas com cache inteligente de 10 minutos.
+- **Abertura Sub-Segundo de Matérias**: Exibição instantânea via SSR no `PostDetailPage`.
+- **Pipeline de Imagens com Formatos Modernos**: Suporte nativo a AVIF/WebP com `minimumCacheTTL` de 30 dias e cache de 1 ano no Firebase Storage.
+- **Code-Splitting de Modais**: Modais como `LoginModal`, `CookieConsent` e `ShareModal` agora utilizam `next/dynamic`.
 
 ## 📰 Novidades da Versão 6.2.0
 

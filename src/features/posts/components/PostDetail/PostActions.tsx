@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Clock, Share2, Eye, Heart, Bookmark, Lock } from "lucide-react";
 import { cn, formatDate, calculateReadingTime, formatNumber } from "../../../../lib/utils";
 import { Post } from "../../schemas";
@@ -28,7 +28,13 @@ export default function PostActions({
   authLoading,
   isPreview = false,
 }: PostActionsProps) {
-  const hasLiked = currentUser && post.likedBy?.includes(currentUser.id);
+  // Evita hydration mismatch entre o HTML estático do servidor e o estado de autenticação no cliente
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
+  const showLoading = !isMounted || authLoading;
+  const effectiveUser = isMounted ? currentUser : null;
+  const hasLiked = effectiveUser && post.likedBy?.includes(effectiveUser.id);
 
   return (
     <div
@@ -97,11 +103,11 @@ export default function PostActions({
           <span className="font-mono">{formatNumber(post.views || 0)}</span>
         </div>
 
-        {authLoading ? (
+        {showLoading ? (
           <div className="h-12 w-24 bg-white/[0.05] animate-pulse rounded-2xl border border-white/10" />
         ) : (
           <>
-            {currentUser ? (
+            {effectiveUser ? (
               <button
                 type="button"
                 onClick={onLike}
@@ -137,7 +143,7 @@ export default function PostActions({
               </div>
             )}
 
-            {currentUser && (
+            {effectiveUser && (
               <button
                 type="button"
                 onClick={onFavorite}
@@ -169,7 +175,7 @@ export default function PostActions({
               </button>
             )}
 
-            {!currentUser && (
+            {!effectiveUser && (
               <button
                 type="button"
                 onClick={onLoginClick}

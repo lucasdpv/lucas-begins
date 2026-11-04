@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sparkles, Gamepad2, Trophy, Wifi } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useThemeStore } from "../store/useThemeStore";
 import { cn } from "../lib/utils";
 
@@ -13,7 +13,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-[80vh] flex items-start justify-center py-6 md:py-12 relative">
-      <div className="w-full max-w-5xl relative z-10 space-y-10">
+      <div className="w-full max-w-5xl relative z-10 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-retro font-black uppercase tracking-widest bg-purple-500/15 text-purple-300 border border-purple-500/30">
@@ -37,59 +37,44 @@ export default function AboutPage() {
           {/* Ambient Glow */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 space-y-10">
-            {/* Profile Header */}
-            <div className="flex flex-col md:flex-row items-center md:items-stretch gap-8 md:gap-10 pb-10 border-b border-white/[0.08]">
+          <div className="relative z-10 space-y-8">
+            {/* Profile Header: Minimalista, elegante e com foto da Opção 1 */}
+            <div className="flex items-center gap-4 sm:gap-6 pb-6 border-b border-white/[0.08]">
+              {/* Foto quadrada arredondada com indicador online */}
               <div className="relative shrink-0">
-                <div className="w-40 h-40 md:w-52 md:h-52 rounded-3xl border border-purple-500/40 shadow-[0_20px_50px_-10px_rgba(168,85,247,0.3)] relative overflow-hidden group">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl border border-purple-500/40 shadow-[0_8px_25px_-5px_rgba(168,85,247,0.35)] overflow-hidden">
                   <img
                     src="/lucas-profile.jpg"
                     alt="Lucas Vieira"
-                    className="w-full h-full object-cover scale-[1.25] origin-center transition-transform duration-500 group-hover:scale-[1.32]"
+                    className="w-full h-full object-cover scale-[1.25] origin-center"
                     style={{ objectPosition: "center 20%" }}
                     onError={(e) => {
                       e.currentTarget.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas";
                     }}
                   />
                 </div>
+                <span
+                  className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#121024] shadow"
+                  title="Online"
+                />
               </div>
 
-              <div className="flex-1 text-center md:text-left flex flex-col justify-between py-1">
-                <div>
-                  <h2 className="font-retro font-black text-3xl md:text-5xl uppercase mb-2 text-white tracking-tight">
+              {/* Informações limpas e personalizadas */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="font-retro font-black text-2xl sm:text-3xl uppercase text-white tracking-tight leading-none">
                     Lucas Vieira
                   </h2>
-                  <p className="font-mono text-xs md:text-sm font-bold uppercase tracking-[0.25em] text-purple-400 mb-8">
-                    A.K.A. Lucas Begins 🎮🦇
-                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full">
-                  <div className="p-4 rounded-2xl border border-purple-500/25 bg-purple-500/10 flex flex-col gap-1">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-purple-300/70 flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5 text-purple-400" /> Classe
-                    </span>
-                    <span className="text-sm font-retro font-black uppercase text-purple-300">
-                      Loot Hunter
-                    </span>
-                  </div>
-                  <div className="p-4 rounded-2xl border border-sky-500/25 bg-sky-500/10 flex flex-col gap-1">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-sky-300/70 flex items-center gap-1.5">
-                      <Gamepad2 className="w-3.5 h-3.5 text-sky-400" /> Main
-                    </span>
-                    <span className="text-sm font-retro font-black uppercase text-sky-300">
-                      PlayStation
-                    </span>
-                  </div>
-                  <div className="p-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/10 flex flex-col gap-1">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300/70 flex items-center gap-1.5">
-                      <Wifi className="w-3.5 h-3.5 text-emerald-400" /> Status
-                    </span>
-                    <span className="text-sm font-retro font-black uppercase text-emerald-400 animate-pulse">
-                      Online Now
-                    </span>
-                  </div>
-                </div>
+                <p className="text-sm sm:text-base font-medium text-purple-300 mt-1 leading-snug">
+                  Criador do <span className="notranslate" translate="no">BeginsProject</span>
+                </p>
+
+                <p className="font-mono text-[11px] sm:text-xs text-slate-400 mt-1.5 flex items-center gap-1.5 font-bold">
+                  <span className="text-purple-400">Plataformas:</span>
+                  <span className="text-slate-200">PlayStation & Nintendo</span>
+                </p>
               </div>
             </div>
 
@@ -123,17 +108,6 @@ export default function AboutPage() {
                 O apelido Lucas Begins nasceu de uma admiração por recomeços e grandes histórias.
                 Para mim, cada vez que ligamos um console, é um novo começo. 🎮✨
               </p>
-
-              <div className="flex flex-wrap gap-2.5 pt-4">
-                {["RPG", "Action", "Retro", "PlayStation", "Loot Hunter", "Anime", "Nostalgia"].map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 font-retro text-xs uppercase font-bold text-purple-300"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
         </div>

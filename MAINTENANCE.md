@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — BeginsProject (v6.3.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.4.0)
 
 Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 

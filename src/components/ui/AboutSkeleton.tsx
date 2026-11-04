@@ -87,13 +87,6 @@ export default function AboutSkeleton({ isDark }: AboutSkeletonProps) {
               <SkeletonItem isDark={isDark} height="h-4" />
               <SkeletonItem width="w-4/5" isDark={isDark} height="h-4" />
             </div>
-
-            {/* Tags simulation */}
-            <div className="flex flex-wrap gap-3 pt-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className={cn("w-20 h-8 border-2 border-purple-500/20 shadow-[2px_2px_0px_rgba(0,0,0,0.2)]", isDark ? "bg-black/10" : "bg-gray-200")} />
-              ))}
-            </div>
           </div>
         </div>
       </div>

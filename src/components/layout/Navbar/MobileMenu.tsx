@@ -169,7 +169,7 @@ export default function MobileMenu({
                   <span>Categorias</span>
                 </div>
                 <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full">
-                  {categories.length + 1}
+                  {categories.length}
                 </span>
               </button>
 
@@ -181,7 +181,7 @@ export default function MobileMenu({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden flex flex-col gap-1.5 mt-2"
                   >
-                    {["Todos", ...categories].map((cat) => (
+                    {categories.map((cat) => (
                       <button
                         key={cat}
                         type="button"

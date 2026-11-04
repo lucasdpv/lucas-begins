@@ -379,9 +379,10 @@ export default function HomePage() {
 
       {/* ── 4. RECÉM-ADICIONADOS AO CATÁLOGO (ÚLTIMAS NOTÍCIAS) ── */}
       <section className="flex flex-col gap-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 sm:gap-2.5">
+          {/* Top Row: Ícone + Título e Ação "Ver todos" */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
                 {!searchQuery && activeCategory !== "Todos" ? (
                   getCategoryIcon(activeCategory, 18)
@@ -399,34 +400,53 @@ export default function HomePage() {
                   : "Novidades"}
               </h2>
             </div>
-            {!searchQuery && activeCategory !== "Todos" && getCategoryDescription(activeCategory) ? (
+
+            {!isLoadingPosts && (
+              <Link
+                to={activeCategory !== "Todos" ? `/archive?categoria=${encodeURIComponent(activeCategory)}` : "/archive"}
+                className={cn(
+                  "flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-full transition-all duration-200 hover:translate-x-0.5 shrink-0",
+                  isDark
+                    ? "border-white/10 text-slate-300 hover:border-purple-400/50 hover:text-white bg-white/[0.03]"
+                    : "border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 bg-white"
+                )}
+              >
+                Ver todos <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+
+          {/* Bottom Row: Apresentação da descrição editorial refinada com ponto luminoso e pílula glassmorphism */}
+          {!searchQuery && activeCategory !== "Todos" && getCategoryDescription(activeCategory) ? (
+            <div className="flex items-center gap-2.5 px-3 py-1 sm:py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md w-fit max-w-full">
+              <span
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full shrink-0",
+                  activeCategory === "Reviews"
+                    ? "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]"
+                    : activeCategory === "Dossiê"
+                    ? "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"
+                    : activeCategory === "RetroCafé"
+                    ? "bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.8)]"
+                    : "bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]"
+                )}
+              />
               <p
                 className={cn(
-                  "text-sm leading-relaxed mt-2 pl-12 max-w-3xl",
-                  isDark ? "text-slate-300" : "text-slate-600"
+                  "text-xs sm:text-[13px] font-sans font-medium tracking-wide",
+                  isDark ? "text-slate-200" : "text-slate-700"
                 )}
               >
                 {getCategoryDescription(activeCategory)}
               </p>
-            ) : (
-              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 pl-12 text-slate-400">
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" />
+              <p className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] text-slate-400">
                 O que acabou de sair no portal
               </p>
-            )}
-          </div>
-
-          {!isLoadingPosts && (
-            <Link
-              to={activeCategory !== "Todos" ? `/archive?categoria=${encodeURIComponent(activeCategory)}` : "/archive"}
-              className={cn(
-                "flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 font-retro font-bold text-[10px] uppercase tracking-widest border rounded-full transition-all duration-200 hover:translate-x-0.5 shrink-0",
-                isDark
-                  ? "border-white/10 text-slate-300 hover:border-purple-400/50 hover:text-white bg-white/[0.03]"
-                  : "border-slate-200 text-slate-700 hover:border-purple-500 hover:text-purple-700 bg-white"
-              )}
-            >
-              Ver todos <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
+            </div>
           )}
         </div>
 

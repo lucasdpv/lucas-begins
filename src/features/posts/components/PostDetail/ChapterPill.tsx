@@ -119,6 +119,11 @@ function ChapterList({ headings, activeIndex, totalMinutes, onSelect, listClassN
 
 export default function ChapterPill({ headings, activeHeadingId, isVisible, isDark }: ChapterPillProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isIdleHidden, setIsIdleHidden] = useState(false);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
+
   const pillAreaRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
@@ -129,9 +134,51 @@ export default function ChapterPill({ headings, activeHeadingId, isVisible, isDa
   const totalMinutes = headings.reduce((sum, h) => sum + h.minutes, 0);
   const remainingMinutes = headings.slice(activeIndex).reduce((sum, h) => sum + h.minutes, 0);
 
+  // Auto-hide após 2.5s sem interação (rolagem ou toque), sincronizado com o botão Topo
   useEffect(() => {
-    if (!isVisible) setIsOpen(false);
+    if (!isVisible) {
+      setIsOpen(false);
+      setIsIdleHidden(false);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      return;
+    }
+
+    const resetIdleTimer = () => {
+      setIsIdleHidden(false);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      if (isOpenRef.current) return;
+
+      hideTimerRef.current = setTimeout(() => {
+        if (!isOpenRef.current) {
+          setIsIdleHidden(true);
+        }
+      }, 2500);
+    };
+
+    resetIdleTimer();
+
+    window.addEventListener("scroll", resetIdleTimer, { passive: true });
+    window.addEventListener("touchstart", resetIdleTimer, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", resetIdleTimer);
+      window.removeEventListener("touchstart", resetIdleTimer);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
   }, [isVisible]);
+
+  // Se o menu/sheet de capítulos estiver aberto, não esconde por inatividade
+  useEffect(() => {
+    if (isOpen) {
+      setIsIdleHidden(false);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    } else if (isVisible) {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => {
+        setIsIdleHidden(true);
+      }, 2500);
+    }
+  }, [isOpen, isVisible]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -159,6 +206,7 @@ export default function ChapterPill({ headings, activeHeadingId, isVisible, isDa
   if (headings.length < 2 || !active || typeof document === "undefined") return null;
 
   const listProps = { headings, activeIndex, totalMinutes, onSelect: goTo };
+  const shouldShowPill = isVisible && (!isIdleHidden || isOpen);
 
   return createPortal(
     <>
@@ -210,18 +258,20 @@ export default function ChapterPill({ headings, activeHeadingId, isVisible, isDa
         )}
       </AnimatePresence>
 
-      {/* Pílula (todas as larguras) + painel flutuante (computador) */}
+      {/* Pílula / Botão de Capítulos (sincronizado em altura e baseline com o botão Topo) */}
       <AnimatePresence>
-        {isVisible && (
+        {shouldShowPill && (
           <div className="fixed inset-x-0 bottom-0 z-[60] pointer-events-none flex justify-center items-end">
-            <div className="layout-container relative flex justify-start items-end">
+            <div className="layout-container relative h-20 md:h-24 flex justify-start items-end">
               <motion.div
                 ref={pillAreaRef}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                className="pointer-events-auto relative mb-6 md:mb-8 w-[calc(100%-5.75rem)] sm:w-80"
+                initial={{ opacity: 0, scale: 0.85, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.85, y: 16 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.94 }}
+                className="pointer-events-auto relative mb-5 md:mb-7 w-10 sm:w-80"
               >
                 <AnimatePresence>
                   {isOpen && (
@@ -245,8 +295,8 @@ export default function ChapterPill({ headings, activeHeadingId, isVisible, isDa
                   aria-expanded={isOpen}
                   aria-label={`Capítulo ${activeIndex + 1} de ${headings.length}: ${active.label}. Ver sumário`}
                   className={cn(
-                    "w-full flex items-center gap-2.5 pl-[5px] pr-3.5 py-[5px] rounded-full border backdrop-blur-xl transition-colors cursor-pointer select-none outline-none",
-                    "shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_4px_rgba(168,85,247,0.12)] focus-visible:shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_4px_rgba(168,85,247,0.4)]",
+                    "h-10 w-10 sm:w-full flex items-center justify-center sm:justify-start gap-2.5 p-0 sm:pl-[5px] sm:pr-3.5 sm:py-[5px] rounded-full border backdrop-blur-xl transition-all cursor-pointer select-none outline-none",
+                    "shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_3px_rgba(168,85,247,0.12)] focus-visible:shadow-[0_10px_26px_rgba(0,0,0,0.7),0_0_0_4px_rgba(168,85,247,0.4)]",
                     isDark
                       ? "bg-[#13112a]/90 text-white border-purple-500/35 hover:border-purple-400/60"
                       : "bg-white/95 text-slate-900 border-slate-200 hover:border-purple-400",
@@ -268,19 +318,18 @@ export default function ChapterPill({ headings, activeHeadingId, isVisible, isDa
                         strokeDashoffset={RING_LENGTH * (1 - progress)}
                       />
                     </svg>
-                    <span className="font-mono text-[9.5px] text-purple-300">
+                    <span className="font-mono text-[9.5px] font-bold text-purple-300">
                       {String(activeIndex + 1).padStart(2, "0")}
                     </span>
                   </span>
-                  <span className="flex flex-col gap-0.5 min-w-0 flex-1 text-left">
+                  <span className="hidden sm:flex flex-col gap-0.5 min-w-0 flex-1 text-left">
                     <span className="font-mono text-[9.5px] tracking-[0.04em] text-slate-400 leading-none">
-                      {activeIndex + 1} de {headings.length} · ~{remainingMinutes} min
-                      <span className="hidden sm:inline"> restantes</span>
+                      {activeIndex + 1} de {headings.length} · ~{remainingMinutes} min restantes
                     </span>
                     <span className="text-[12.5px] font-medium truncate leading-tight">{active.label}</span>
                   </span>
                   <ChevronDown
-                    className={cn("w-3.5 h-3.5 shrink-0 text-purple-300 transition-transform duration-200", !isOpen && "rotate-180")}
+                    className={cn("hidden sm:block w-3.5 h-3.5 shrink-0 text-purple-300 transition-transform duration-200", !isOpen && "rotate-180")}
                   />
                 </button>
               </motion.div>
