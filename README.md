@@ -1,8 +1,8 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.4.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.5.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
-O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.4.0**, a interface alcança refinamento editorial completo com navegação flutuante sincronizada (pílula de capítulos compacta e botão topo com auto-hide inteligente), novo veredito quadrado minimalista, perfil gamer enxuto no Sobre Nós e blindagem contra erros de hidratação SSR.
+O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.5.0**, o portal inaugura o novo **Scorecard Veredito Begins** (com coluna arquitetônica lateral, barra HUD de 10 segmentos, selo de classificação automática e colunas dedicadas de *Prós & Contras*), migração completa de todo o acervo de análises e um **Extrator Inteligente de Prós & Contras** integrado ao Editor de Matérias.
 
 ---
 
@@ -11,7 +11,7 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.4.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.5.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
@@ -19,6 +19,17 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 - **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
 
 ---
+
+## 🏆 Novidades da Versão 6.5.0 (The Scorecard Verdict & Smart Review Extractor Update)
+
+- **Novo Scorecard "Veredito Begins" (`PostVerdict.tsx`)**:
+  - **Selo Editorial na Borda Superior**: Crachá `VEREDITO BEGINS` cravado na borda superior esquerda (`-top-4 left-6`) seguindo o mesmo padrão clássico das caixas de curiosidades (`magazine-info-box`) da revista.
+  - **Banner com Arte & Tipografia Refinada**: Arte de capa em destaque com gradiente lateral suave, título do jogo em *Title Case* equilibrado e suporte a frase curta opcional (até 140 caracteres).
+  - **Coluna Arquitetônica de Pontuação**: Painel lateral integrado com nota em destaque (`8.5/10`), pílula de classificação automática (*★ Obra-Prima*, *Excelente*, *Recomendado*) e barra de progresso HUD segmentada em 10 blocos.
+  - **Grid Lado a Lado de Prós & Contras**: Seções **"O Que Brilha (Prós)"** em verde esmeralda e **"O Que Pesa (Contras)"** em rosa/vermelho, com suporte híbrido automático para reviews legados.
+- **Migração de 100% dos Reviews & Extrator Inteligente (`reviewVerdictHelper.ts` & `PostEditorPage.tsx`)**:
+  - Todas as 8 análises publicadas no acervo (*Chrono Trigger*, *Top Gear*, *Turtles in Time*, *Radiata Stories*, *Jackie Chan Stuntmaster*, *Naruto Ultimate Ninja*, *Diablo 4: Lord of Hatred* e *Lufia and the Fortress of Doom*) foram analisadas e migradas com seus Prós e Contras fiéis ao texto de cada matéria.
+  - Novo painel de Veredito no Editor (`PostEditorPage.tsx`) com prévia ao vivo do selo/barra de nota, listas dinâmicas de Prós e Contras e botão **`✨ Gerar Prós & Contras da Análise`** que lê o artigo e sugere pontos fortes e fracos sucintos automaticamente.
 
 ## 💎 Novidades da Versão 6.4.0 (The Editorial Refinement & Floating Navigation Update)
 

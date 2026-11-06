@@ -64,6 +64,8 @@ export const PostSchema = z.object({
   updatedAt: z.any().optional(),
   score: z.union([z.string(), z.number()]).optional().nullable(),
   verdict: z.string().optional().nullable(),
+  pros: z.array(z.string()).catch([]),
+  cons: z.array(z.string()).catch([]),
   showAuthorBox: z.boolean().catch(true),
   gradient: z.string().optional().nullable(),
   date: z.string().optional().nullable(),

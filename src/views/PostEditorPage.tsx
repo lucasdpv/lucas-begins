@@ -7,6 +7,11 @@ import {
   Eye,
   Save,
   Star,
+  Award,
+  Check,
+  X,
+  Trash2,
+  Sparkles,
   Image as ImageIcon,
 } from "lucide-react";
 import { calculateReadingTime, cn, splitTitle } from "../lib/utils";
@@ -16,6 +21,7 @@ import { useThemeStore } from "../store/useThemeStore";
 import { useUIStore } from "../store/useUIStore";
 import { useCreatePostMutation, useUpdatePostMutation, useAllPosts } from "../features/posts/hooks/usePostsQuery";
 import { SITE_CATEGORIES } from "../features/posts/utils/categoryInfo";
+import { resolvePostProsCons, generateProsConsFromArticle } from "../features/posts/utils/reviewVerdictHelper";
 import BlockEditor from "../components/editor/BlockEditor";
 import ImageUpload from "../components/ui/ImageUpload";
 import { Helmet } from "react-helmet-async";
@@ -50,26 +56,52 @@ export default function PostEditorPage() {
 
   // Inicializa com o post existente ou com o rascunho salvo
   const [formData, setFormData] = useState<Partial<Post>>(() => {
-    if (post) return post;
+    if (post) {
+      const resolved = resolvePostProsCons(post);
+      return { ...post, pros: resolved.pros, cons: resolved.cons };
+    }
     try {
       const savedDraft = localStorage.getItem(DRAFT_KEY);
       return savedDraft
         ? JSON.parse(savedDraft)
-        : { title: "", excerpt: "", content: "", category: (categories as string[])[0] || "", imageUrl: "", score: undefined, verdict: "", isDraft: false, showAuthorBox: false };
+        : { title: "", excerpt: "", content: "", category: (categories as string[])[0] || "", imageUrl: "", score: undefined, verdict: "", pros: [], cons: [], isDraft: false, showAuthorBox: false };
     } catch {
       localStorage.removeItem(DRAFT_KEY);
-      return { title: "", excerpt: "", content: "", category: (categories as string[])[0] || "", imageUrl: "", score: undefined, verdict: "", isDraft: false, showAuthorBox: false };
+      return { title: "", excerpt: "", content: "", category: (categories as string[])[0] || "", imageUrl: "", score: undefined, verdict: "", pros: [], cons: [], isDraft: false, showAuthorBox: false };
     }
   });
   const [hasLoadedPost, setHasLoadedPost] = useState(false);
+  const [isGeneratingProsCons, setIsGeneratingProsCons] = useState(false);
 
   // Sincroniza o post carregado assincronamente com o estado do form (uma única vez)
   useEffect(() => {
     if (post && !hasLoadedPost) {
-      setFormData(post);
+      const resolved = resolvePostProsCons(post);
+      setFormData({ ...post, pros: resolved.pros, cons: resolved.cons });
       setHasLoadedPost(true);
     }
   }, [post, hasLoadedPost]);
+
+  const handleGenerateProsCons = async () => {
+    if (!formData.content && !formData.verdict && !formData.title) {
+      showToast("Escreva o conteúdo ou título da análise primeiro para gerar os Prós e Contras.", "error");
+      return;
+    }
+    setIsGeneratingProsCons(true);
+    try {
+      const generated = await generateProsConsFromArticle(formData);
+      setFormData((prev) => ({
+        ...prev,
+        pros: generated.pros,
+        cons: generated.cons,
+      }));
+      showToast("Prós & Contras gerados com sucesso! Revise e ajuste como preferir.", "success");
+    } catch {
+      showToast("Não foi possível gerar automaticamente os pontos.", "error");
+    } finally {
+      setIsGeneratingProsCons(false);
+    }
+  };
 
   // Auto-save do rascunho com debounce de 1s (só para novos posts)
   useEffect(() => {
@@ -99,6 +131,8 @@ export default function PostEditorPage() {
     
     const postToSave = { 
       ...formData, 
+      pros: (formData.pros || []).map((s) => s.trim()).filter(Boolean),
+      cons: (formData.cons || []).map((s) => s.trim()).filter(Boolean),
       isDraft: forceDraft,
       author: {
         id: currentUser?.id || "",
@@ -272,43 +306,339 @@ export default function PostEditorPage() {
             </div>
 
             {/* Categoria */}
-            <div className="space-y-3">
+            <div className="md:col-span-2 space-y-3">
               <label className="text-sm font-bold uppercase font-retro opacity-80">Categoria *</label>
               <select name="category" value={formData.category || ""} onChange={handleChange} className={inputClass}>
                 {(categories as string[]).map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
-            {/* Score */}
-            <div className="space-y-3">
-              <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500 flex items-center gap-2">
-                <Star className="w-4 h-4" /> Nota / Score (0 a 10)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                name="score"
-                value={formData.score ?? ""}
-                onChange={handleChange}
-                className={inputClass}
-                placeholder="Opcional. Ex: 9.5"
-              />
-            </div>
+            {/* =================================================================
+                PAINEL DE VEREDITO BEGINS (Novo Formato Scorecard para Reviews)
+               ================================================================= */}
+            <div
+              className={cn(
+                "md:col-span-2 p-5 sm:p-6 rounded-2xl border-2 space-y-6 transition-all",
+                isDark
+                  ? "bg-[#121024]/90 border-amber-500/25"
+                  : "bg-amber-50/40 border-amber-300"
+              )}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-2 rounded-xl bg-amber-400 text-slate-950">
+                    <Star className="w-4 h-4 fill-slate-950" />
+                  </span>
+                  <div>
+                    <h3 className="font-retro font-black text-sm sm:text-base uppercase tracking-wider text-amber-400 m-0">
+                      Ficha de Veredito Begins (Reviews)
+                    </h3>
+                    <p className="text-xs opacity-70 m-0">
+                      Preencha a nota apenas se esta matéria for uma análise/review com pontuação.
+                    </p>
+                  </div>
+                </div>
 
-            {/* Veredito */}
-            <div className="space-y-3">
-              <label className="text-sm font-bold uppercase font-retro opacity-80 text-yellow-500">Veredito</label>
-              <input
-                type="text"
-                name="verdict"
-                value={formData.verdict || ""}
-                onChange={handleChange}
-                className={inputClass}
-                placeholder="Ex: Obra-prima, Fraco..."
-                disabled={!formData.score}
-              />
+                {Boolean(formData.score) && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        score: undefined,
+                        verdict: "",
+                        pros: [],
+                        cons: [],
+                      }))
+                    }
+                    className="text-xs font-retro font-bold uppercase text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Remover Nota
+                  </button>
+                )}
+              </div>
+
+              {/* Linha 1: Nota + Prévia do Selo Automático e Barras */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                <div className="md:col-span-5 space-y-2">
+                  <label className="text-xs font-bold uppercase font-retro text-amber-400 flex items-center gap-1.5">
+                    Nota Final (0 a 10)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    name="score"
+                    value={formData.score ?? ""}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="Opcional. Ex: 8.5"
+                  />
+                </div>
+
+                {/* Prévia ao vivo do Selo e das 10 Barrinhas */}
+                <div className="md:col-span-7">
+                  {Boolean(formData.score) ? (
+                    (() => {
+                      const s = Number(formData.score) || 0;
+                      const tier =
+                        s >= 9.0
+                          ? "Obra-Prima"
+                          : s >= 8.0
+                          ? "Excelente"
+                          : s >= 7.0
+                          ? "Recomendado"
+                          : "Regular";
+                      return (
+                        <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-4">
+                          <div className="flex items-baseline gap-1">
+                            <span className="font-retro font-black text-3xl text-white leading-none">
+                              {s.toFixed(1)}
+                            </span>
+                            <span className="font-retro font-bold text-xs text-amber-400">
+                              /10
+                            </span>
+                          </div>
+                          <div className="flex-1 max-w-[220px] space-y-2">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 font-retro font-black text-[10px] uppercase tracking-widest">
+                              <Award className="w-3 h-3 text-amber-400" />
+                              Selo Automático: {tier}
+                            </div>
+                            <div className="flex gap-1">
+                              {Array.from({ length: 10 }).map((_, i) => (
+                                <div
+                                  key={i}
+                                  className={cn(
+                                    "h-1.5 flex-1 rounded-sm",
+                                    i + 1 <= Math.floor(s)
+                                      ? "bg-amber-400"
+                                      : i < s
+                                      ? "bg-amber-400/50"
+                                      : "bg-white/10"
+                                  )}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="p-4 rounded-xl border border-dashed border-white/10 text-xs text-slate-400 italic">
+                      Digite uma nota ao lado para desbloquear os Prós, Contras e a Frase de Síntese.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Campos Extras da Review (Aparecem quando há Nota preenchida) */}
+              {Boolean(formData.score) && (
+                <div className="space-y-6 pt-2 border-t border-white/10">
+                  {/* Frase Curta Opcional (Com limite de 140 caracteres para não ficar gigante) */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="text-xs font-bold uppercase font-retro text-amber-400">
+                        Frase Curta do Banner (Opcional — Máx. 140 caracteres)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        {Boolean(formData.verdict) && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData((prev) => ({ ...prev, verdict: "" }))}
+                            className="text-[11px] font-retro font-bold uppercase text-slate-400 hover:text-white underline cursor-pointer"
+                          >
+                            Deixar sem frase
+                          </button>
+                        )}
+                        <span
+                          className={cn(
+                            "text-[11px] font-mono font-bold",
+                            (formData.verdict || "").length > 140
+                              ? "text-rose-400"
+                              : "text-slate-400"
+                          )}
+                        >
+                          {(formData.verdict || "").length} / 140
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      name="verdict"
+                      maxLength={140}
+                      value={formData.verdict || ""}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder="Opcional! Deixe em branco para destacar só o título e a arte, ou escreva 1 linha curta."
+                    />
+                    <p className="text-[11px] text-slate-400 m-0">
+                      💡 <strong>Dica:</strong> Deixar este campo em branco deixa o topo do card mais limpo e destaca 100% a arte do jogo!
+                    </p>
+                  </div>
+
+                  {/* Barra de Ação: Gerar Prós & Contras a partir da Análise */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/25">
+                    <div className="space-y-0.5">
+                      <span className="font-retro font-bold text-xs uppercase text-purple-300 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        Extrator Inteligente da Análise
+                      </span>
+                      <p className="text-[11px] text-slate-400 m-0">
+                        Lê o texto da sua matéria e resume de 3 a 4 pontos fortes e 1 a 2 pontos fracos sucintos para você revisar.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isGeneratingProsCons}
+                      onClick={handleGenerateProsCons}
+                      className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-retro font-black text-xs uppercase tracking-wider border border-purple-400/40 shadow-[2px_2px_0px_#000] flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      {isGeneratingProsCons ? "Analisando Matéria..." : "Gerar Prós & Contras da Análise"}
+                    </button>
+                  </div>
+
+                  {/* Prós & Contras Interativos Lado a Lado */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Coluna Prós */}
+                    <div className="p-4 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/25 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-black uppercase font-retro text-emerald-400 flex items-center gap-1.5">
+                          <Check className="w-4 h-4 stroke-[3]" /> O Que Brilha (Prós)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              pros: [...(prev.pros || []), ""],
+                            }))
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-300 font-retro font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <Plus className="w-3 h-3" /> Adicionar Pró
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {(formData.pros && formData.pros.length > 0 ? formData.pros : [""]).map(
+                          (item, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="text-emerald-400 font-bold text-xs shrink-0">✓</span>
+                              <input
+                                type="text"
+                                value={item}
+                                onChange={(e) => {
+                                  const nextPros = [
+                                    ...(formData.pros && formData.pros.length > 0
+                                      ? formData.pros
+                                      : [""]),
+                                  ];
+                                  nextPros[idx] = e.target.value;
+                                  setFormData((prev) => ({ ...prev, pros: nextPros }));
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      pros: [...(prev.pros || [""]), ""],
+                                    }));
+                                  }
+                                }}
+                                className={cn(inputClass, "py-2 px-3 text-sm")}
+                                placeholder={`Ponto positivo #${idx + 1} (Enter adiciona outro)`}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const nextPros = (formData.pros || []).filter(
+                                    (_, i) => i !== idx
+                                  );
+                                  setFormData((prev) => ({ ...prev, pros: nextPros }));
+                                }}
+                                className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
+                                title="Remover item"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Coluna Contras */}
+                    <div className="p-4 rounded-xl bg-rose-500/[0.04] border border-rose-500/25 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-black uppercase font-retro text-rose-400 flex items-center gap-1.5">
+                          <X className="w-4 h-4 stroke-[3]" /> O Que Pesa (Contras)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              cons: [...(prev.cons || []), ""],
+                            }))
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/30 text-rose-300 font-retro font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <Plus className="w-3 h-3" /> Adicionar Contra
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {(formData.cons && formData.cons.length > 0 ? formData.cons : [""]).map(
+                          (item, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="text-rose-400 font-bold text-xs shrink-0">✕</span>
+                              <input
+                                type="text"
+                                value={item}
+                                onChange={(e) => {
+                                  const nextCons = [
+                                    ...(formData.cons && formData.cons.length > 0
+                                      ? formData.cons
+                                      : [""]),
+                                  ];
+                                  nextCons[idx] = e.target.value;
+                                  setFormData((prev) => ({ ...prev, cons: nextCons }));
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      cons: [...(prev.cons || [""]), ""],
+                                    }));
+                                  }
+                                }}
+                                className={cn(inputClass, "py-2 px-3 text-sm")}
+                                placeholder={`Ponto negativo #${idx + 1} (Enter adiciona outro)`}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const nextCons = (formData.cons || []).filter(
+                                    (_, i) => i !== idx
+                                  );
+                                  setFormData((prev) => ({ ...prev, cons: nextCons }));
+                                }}
+                                className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
+                                title="Remover item"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Resumo */}

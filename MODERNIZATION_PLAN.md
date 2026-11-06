@@ -1,14 +1,22 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.4.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.5.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.4.0 — The Editorial Refinement & Floating Navigation Update`
-- **Status**: `Fase 11 Concluída e Documentada! ✅`
-- **Última Atualização**: 4 de Novembro de 2026
+- **Versão Atual**: `v6.5.0 — The Scorecard Verdict & Smart Review Extractor Update`
+- **Status**: `Fase 12 Concluída e Documentada! ✅`
+- **Última Atualização**: 6 de Novembro de 2026
 - **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** leve sem sobrecarga de GPU, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`), shimmer skeletons temáticos e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## 🏆 Fase 12 — Ficha de Veredito Scorecard & Extrator Inteligente de Reviews (v6.5.0) (✅ CONCLUÍDA)
+- [x] **12.1. Novo Scorecard "Veredito Begins" (`PostVerdict.tsx`)**: Layout integrado com crachá editorial na borda superior esquerda (`-top-4 left-6`), banner com arte de capa e título em *Title Case*, coluna arquitetônica lateral com nota `/10`, insígnia automática (*★ Obra-Prima*, *Excelente*, *Recomendado*) e barra HUD de 10 segmentos.
+- [x] **12.2. Grid de Prós & Contras (`schemas.ts` + `PostVerdict.tsx`)**: Campos `pros` e `cons` adicionados ao `PostSchema` com exibição lado a lado (*O Que Brilha* vs *O Que Pesa*) e fallback híbrido para reviews antigos.
+- [x] **12.3. Migração Completa das 8 Reviews do Acervo (`reviewVerdictHelper.ts`)**: Extração fiel dos pontos fortes e fracos a partir do texto real de cada uma das 8 análises publicadas (*Chrono Trigger*, *Top Gear*, *Turtles in Time*, *Radiata Stories*, *Jackie Chan Stuntmaster*, *Naruto Ultimate Ninja*, *Diablo 4: Lord of Hatred* e *Lufia and the Fortress of Doom*).
+- [x] **12.4. Novo Painel de Veredito & Gerador Automático no Editor (`PostEditorPage.tsx`)**: Prévia ao vivo da nota/selo, frase curta opcional limitada a 140 caracteres, listas interativas de Prós/Contras e botão **`✨ Gerar Prós & Contras da Análise`**.
 
 ---
 

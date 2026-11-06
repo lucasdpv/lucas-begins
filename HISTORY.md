@@ -4,6 +4,30 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🏆 [v6.5.0] - The Scorecard Verdict & Smart Review Extractor Update
+*Data: 6 de Novembro de 2026*
+
+### ⭐ Novo Scorecard "Veredito Begins" (`PostVerdict.tsx` & `schemas.ts`)
+- **Crachá na Borda Superior (`VEREDITO BEGINS`)**: O selo de identificação agora fica cravado exatamente sobre a borda superior esquerda do card (`absolute -top-4 left-6 z-30 bg-black text-white border-2 border-white shadow-[3px_3px_0px_#6b21a8]`), mantendo consistência visual direta com os blocos editoriais `:::info-box` de `ArticleRenderer.tsx`.
+- **Banner Cinematográfico com Tipografia Refinada**:
+  - Arte do jogo integrada ao fundo do cabeçalho com máscara de gradiente suave da esquerda para a direita, preservando a visibilidade dos personagens.
+  - Título do jogo formatado em *Title Case* natural (`text-xl sm:text-2xl lg:text-[26px] font-bold tracking-tight`) em vez de caixa alta excessiva, acompanhado de subtítulo em violeta suave e frase curta opcional (até 140 caracteres).
+- **Coluna Arquitetônica de Pontuação**:
+  - Painel lateral dedicado (`lg:col-span-3`) com iluminação radial âmbar, nota em destaque (`8.5/10`), insígnia de classificação automática (*★ Obra-Prima* para `>= 9.0`, *Excelente* para `>= 8.0`, *Recomendado* para `>= 7.0`, *Regular* abaixo de `7.0`) e barra de progresso HUD segmentada em 10 blocos.
+- **Grid de Prós & Contras + Modo Híbrido**:
+  - Rodapé dividido em duas colunas: **O Que Brilha (Prós)** em verde esmeralda (`✓`) e **O Que Pesa (Contras)** em rosa/vermelho (`✕`).
+  - Adicionados os campos `pros: z.array(z.string()).catch([])` e `cons: z.array(z.string()).catch([])` ao `PostSchema` em `src/features/posts/schemas.ts`, mantendo fallback automático para o bloco de *Síntese* caso algum review possua apenas texto corrido.
+
+### 🧠 Migração Completa do Acervo & Extrator Inteligente (`reviewVerdictHelper.ts` & `PostEditorPage.tsx`)
+- **Curadoria e Migração das 8 Reviews Publicadas**: Todas as análises existentes no banco (*Chrono Trigger*, *Top Gear*, *Turtles in Time*, *Radiata Stories*, *Jackie Chan Stuntmaster*, *Naruto Ultimate Ninja*, *Diablo 4: Lord of Hatred* e *Lufia and the Fortress of Doom*) tiveram seu texto integral analisado e seus respectivos Prós & Contras mapeados em `src/features/posts/utils/reviewVerdictHelper.ts` (`resolvePostProsCons`).
+- **Novo Painel de Veredito no Editor (`PostEditorPage.tsx`)**:
+  - Prévia ao vivo da Nota Final com cálculo automático do selo (*Obra-Prima*, *Excelente*, etc.) e da barra de 10 segmentos.
+  - Campo de *Frase Curta do Banner* opcional com contador e trava em `140 caracteres` (mais botão rápido *"Deixar sem frase"*).
+  - Editor interativo linha a linha para adicionar, editar (com `Enter` para nova linha) e remover itens de **Prós** e **Contras**.
+  - Botão **`✨ Gerar Prós & Contras da Análise`** (`generateProsConsFromArticle`): analisa o texto da matéria (via Gemini 2.0 Flash quando configurado ou analisador heurístico contextual em português) e preenche automaticamente de 3 a 4 pontos fortes e 1 a 2 pontos fracos sucintos para revisão do autor.
+
+---
+
 ## 💎 [v6.4.0] - The Editorial Refinement & Floating Navigation Update
 *Data: 4 de Novembro de 2026*
 

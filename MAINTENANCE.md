@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — BeginsProject (v6.4.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.5.0)
 
 Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 
@@ -61,7 +61,8 @@ O progresso dos leitores é salvo nos campos `xp` e `level` da coleção `users`
 
 ## 💾 Segurança & Validação
 - **Regras de Views (`firestore.rules`)**: Atualizações anônimas de visualizações são permitidas apenas se alterarem exclusivamente o campo `views` com incremento estrito de `+1`.
-- **Zod Schemas (`src/features/posts/schemas.ts`)**: Todos os posts passam por validação Zod com fallbacks seguros. Se adicionar um novo campo aos posts no Firestore, lembre-se de incluí-lo no `PostSchema`.
+- **Zod Schemas (`src/features/posts/schemas.ts`)**: Todos os posts passam por validação Zod com fallbacks seguros (`pros`, `cons`, `score`, `verdict`). Se adicionar um novo campo aos posts no Firestore, lembre-se de incluí-lo no `PostSchema`.
+- **Reviews & Scorecard Veredito (`PostVerdict.tsx` & `reviewVerdictHelper.ts`)**: Ao preencher a **Nota Final (0 a 10)** no editor (`PostEditorPage.tsx`), o botão **`✨ Gerar Prós & Contras da Análise`** analisa o texto da matéria e sugere automaticamente de 3 a 4 Prós e 1 a 2 Contras sucintos para revisão. A frase curta do banner é opcional (máx. 140 caracteres).
 
 ---
-**Atualizado em: 3 de Novembro de 2026 (v6.3.0).**
+**Atualizado em: 6 de Novembro de 2026 (v6.5.0).**

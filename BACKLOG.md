@@ -1,6 +1,16 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.4.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.5.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.4.0 (The Editorial Refinement & Floating Navigation Update)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.5.0 (The Scorecard Verdict & Smart Review Extractor Update)**.
+
+---
+
+## 🏆 Concluído na v6.5.0
+- [x] **Novo Scorecard "Veredito Begins" (`PostVerdict.tsx` + `schemas.ts`)**
+  * **Concluído**: Card de análise com crachá na borda superior esquerda (`VEREDITO BEGINS`), arte de capa integrada com título em *Title Case*, coluna arquitetônica lateral com nota `/10`, selo automático (*★ Obra-Prima*, *Excelente*, *Recomendado*), barra HUD de 10 segmentos e colunas dedicadas de **Prós ("O Que Brilha")** e **Contras ("O Que Pesa")**.
+- [x] **Migração de 100% dos Reviews Publicados (`reviewVerdictHelper.ts`)**
+  * **Concluído**: Leitura e extração fiel dos pontos fortes e fracos das 8 análises do acervo (*Chrono Trigger*, *Top Gear*, *Turtles in Time*, *Radiata Stories*, *Jackie Chan Stuntmaster*, *Naruto Ultimate Ninja*, *Diablo 4: Lord of Hatred* e *Lufia and the Fortress of Doom*).
+- [x] **Painel de Veredito & Gerador Inteligente no Editor (`PostEditorPage.tsx`)**
+  * **Concluído**: Prévia ao vivo do selo/barra de nota, frase curta opcional (máx. 140 caracteres), listas interativas de Prós & Contras e botão **`✨ Gerar Prós & Contras da Análise`**.
 
 ---
 

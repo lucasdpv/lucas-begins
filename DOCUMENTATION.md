@@ -1,6 +1,6 @@
-# 📜 Documentação Técnica — BeginsProject (v6.4.0)
+# 📜 Documentação Técnica — BeginsProject (v6.5.0)
 
-Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.4.0**.
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.5.0**.
 
 ---
 
@@ -56,7 +56,7 @@ Na versão **v6.0.0** em diante, o portal abandonou as antigas bordas pretas gro
 - **Animação Intrínseca do Índice de Capítulos**: Uso de `interpolate-size: allow-keywords` e `calc-size(auto, size)` na classe `.toc-collapsible`.
 - **Sumário Flutuante de Capítulos (`PostDetail/ChapterPill.tsx`)**: Aparece quando o índice (`#post-toc`) sai da tela e some ao fim de `#article-content`. Cada capítulo traz o tempo estimado; a pílula mostra os minutos restantes. No computador abre um painel acima da pílula; no celular (`< sm`) vira uma pílula compacta circular (`40x40px`) que abre uma folha fixa no rodapé com fundo escurecido ao toque. Renderizado via `createPortal(..., document.body)`.
 - **Botão Topo (`BackToTop.tsx`) & Auto-Hide Sincronizado**: Ambos os botões compartilham altura (`h-10`), elevação e margem inferior (`mb-5 md:mb-7`). Após 2.5s de inatividade na rolagem durante a leitura, ambos desaparecem suavemente juntos para liberar o texto, reaparecendo com qualquer toque ou rolagem.
-- **Veredito Oficial (`PostVerdict.tsx`)**: Selo quadrado (`w-24 sm:w-28 rounded-2xl`) com a nota em destaque e tag `/10` na quina inferior posicionado à direita (`float-right`), permitindo que a resenha contorne o selo sem criar colunas vazias.
+- **Veredito Oficial Scorecard (`PostVerdict.tsx` & `reviewVerdictHelper.ts`)**: Card estruturado em formato Scorecard com crachá `VEREDITO BEGINS` cravado na borda superior esquerda (idêntico ao `magazine-info-box`), banner com arte de capa e título em *Title Case*, coluna arquitetônica lateral com nota `/10`, insígnia automática (*Obra-Prima*, *Excelente*, *Recomendado*) e barra HUD de 10 segmentos, além de grid de 2 colunas para **Prós ("O Que Brilha")** e **Contras ("O Que Pesa")**. Inclui resolução automática do acervo legado e gerador inteligente de Prós & Contras no `PostEditorPage.tsx`.
 - **Proteção contra Hydration Mismatch**: `PostActions.tsx` e `PostComments.tsx` contam com verificação de montagem (`isMounted`), garantindo que a renderização inicial do cliente seja 100% fiel ao HTML do SSR com Firebase Auth.
 
 ### 7. Responsividade
