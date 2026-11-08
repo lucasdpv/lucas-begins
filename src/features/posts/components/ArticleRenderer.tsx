@@ -238,15 +238,12 @@ function ArticleImage({
             </div>
           )}
           
-          {/* Scanlines overlays based on scanlines checkbox state */}
-          {scanlines !== false && !error && (
-            <div className={cn(
-              "absolute inset-0 scanline-overlay pointer-events-none z-10",
-              frameStyle === 'crt' ? "opacity-40" : "opacity-20"
-            )} />
-          )}
-          {frameStyle === 'crt' && !error && (
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] z-10" />
+          {/* Scanline overlay apenas para molduras CRT (otimiza rolagem de artigos longos com muitas imagens) */}
+          {frameStyle === 'crt' && scanlines !== false && !error && (
+            <>
+              <div className="absolute inset-0 scanline-overlay opacity-35 pointer-events-none z-10" />
+              <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] z-10" />
+            </>
           )}
         </div>
         {alt && !error && (
@@ -308,7 +305,7 @@ interface ArticleVideoProps {
 }
 
 /**
- * Sub-componente para renderizar vídeos do YouTube com fallback gamificado.
+ * Sub-componente para renderizar vídeos do YouTube com carregamento diferido nativo (loading="lazy").
  */
 function ArticleVideo({ url, isDark }: ArticleVideoProps) {
   const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.*v=))([^&]{11})/)?.[1];
@@ -322,10 +319,11 @@ function ArticleVideo({ url, isDark }: ArticleVideoProps) {
           className="w-full h-full relative z-10"
           src={`https://www.youtube.com/embed/${videoId}`}
           title="YouTube video player"
+          loading="lazy"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
-        ></iframe>
+        />
       ) : (
         <div className="flex flex-col items-center justify-center p-10 text-center z-10">
           <div className="text-yellow-500 font-retro text-xl mb-4 animate-pulse bg-black/40 px-4 py-2 rounded border-2 border-yellow-500">
@@ -334,12 +332,8 @@ function ArticleVideo({ url, isDark }: ArticleVideoProps) {
           <p className={cn("font-retro text-sm uppercase tracking-wide max-w-md", isDark ? "text-gray-400" : "text-gray-500")}>
             Sinal de vídeo instável ou link de teletransporte inválido. Verifique se o endereço do YouTube não foi interceptado por piratas espaciais.
           </p>
-          <div className="mt-6 w-48 h-2 bg-gray-800 rounded-full overflow-hidden border border-white/10">
-            <div className="h-full bg-yellow-500 animate-[loading_4s_infinite]" style={{ width: '15%' }} />
-          </div>
         </div>
       )}
-      <div className="absolute inset-0 scanline-overlay opacity-40 pointer-events-none z-20" />
     </div>
   );
 }

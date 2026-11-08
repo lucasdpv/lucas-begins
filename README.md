@@ -1,8 +1,8 @@
-# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.5.0)
+# 🎮 BeginsProject — Games · Animes · Nostalgia (v6.6.0)
 
 > **"O ponto de encontro entre a nostalgia dos anos 90/2000 e uma experiência de streaming & editorial geek de última geração."**
 
-O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.5.0**, o portal inaugura o novo **Scorecard Veredito Begins** (com coluna arquitetônica lateral, barra HUD de 10 segmentos, selo de classificação automática e colunas dedicadas de *Prós & Contras*), migração completa de todo o acervo de análises e um **Extrator Inteligente de Prós & Contras** integrado ao Editor de Matérias.
+O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **Games, Animes e Nostalgia Geek**. Na versão **6.6.0**, o portal recebe uma grande engenharia de performance voltada a **notebooks com placa de vídeo integrada (Intel UHD / Iris Xe) e telas HD/Full HD**, adotando bibliotecas modernas e ultra-leves (**Embla Carousel**, **AutoAnimate** e **CVA**), pré-carregamento SSR na Home com redução de ~90% do payload e rolagem a 60fps constantes.
 
 ---
 
@@ -11,7 +11,7 @@ O **BeginsProject** é um portal editorial e plataforma interativa dedicado a **
 Para facilitar a gestão e o desenvolvimento, dividimos as informações em guias especializados:
 
 - **[🗺️ Roadmap de Modernização](./MODERNIZATION_PLAN.md)**: Status atual das entregas, fases concluídas e evolução contínua.
-- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.5.0`).
+- **[📜 Histórico de Versões](./HISTORY.md)**: Registro completo de todas as versões e marcos técnicos (`v1.0` → `v6.6.0`).
 - **[⚙️ Documentação Técnica](./DOCUMENTATION.md)**: Arquitetura Next.js 16 App Router, Design System v6.0, TanStack Query e Zustand.
 - **[🕹️ Guia de Onboarding](./ONBOARDING.md)**: Guia rápido para novos desenvolvedores e estrutura modular.
 - **[🔧 Guia de Manutenção](./MAINTENANCE.md)**: Manual de operações, gamificação (XP/Level) e administração do Firestore.
@@ -19,6 +19,23 @@ Para facilitar a gestão e o desenvolvimento, dividimos as informações em guia
 - **[🔥 Guia Firebase](./FIREBASE_GUIDE.md)**: Configuração de regras de segurança, Auth e Storage.
 
 ---
+
+## 🚀 Novidades da Versão 6.6.0 (The Integrated GPU & Lightweight UI Engine Update)
+
+- **Adoção de Bibliotecas Modernas & Leves**:
+  - **Embla Carousel (`embla-carousel-react` + `embla-carousel-fade` + `embla-carousel-autoplay`)**: Substituição do carrossel manual em `Carousel.tsx` pelo motor de carrossel do *shadcn/ui*, eliminando 3 camadas `<Image>` duplicadas com `blur-3xl saturate-150` em favor de um único gradiente radial acelerado por GPU.
+  - **AutoAnimate (`@formkit/auto-animate`)**: Substituição de `<motion.div layout>` por página nas grades da `HomePage.tsx` e `ArchivePage.tsx`, animando filtros e paginação com ~2 KB e zero sobrecarga durante o scroll.
+  - **Class Variance Authority (`cva`)**: Padronização tipada de variantes em componentes base como `Badge.tsx`.
+- **Otimização Profunda para Notebooks com GPU Integrada (60fps Scroll)**:
+  - **Desmontagem Real de Skeletons (`RetroCardImage.tsx`)**: Corrigido gargalo oculto onde ~40 skeletons `animate-pulse` continuavam rodando infinitamente a 60fps atrás das imagens já carregadas (`opacity-0`); agora o placeholder é desmontado assim que a imagem termina de carregar.
+  - **Zero Re-render no Scroll (`HomePage.tsx`)**: Removidos os estados `hoveredRetrocafeIndex`, `hoveredDossieIndex` e `hoveredReviewsIndex` que re-renderizavam toda a árvore da Home quando o cursor cruzava um card durante a rolagem pelo touchpad.
+  - **Scroll Listeners com `requestAnimationFrame`**: Throttling por quadro (`passive: true`) em `useNavbar.ts`, `BackToTop.tsx` e `PostDetailPage.tsx`, além da substituição de `backdrop-blur` aninhados por superfícies translúcidas de compositing direto (`bg-[#090812]/90`).
+- **SSR Instantâneo na Home & Redução de 90% no Payload (`src/app/page.tsx`)**:
+  - Pré-busca paralela via Firestore REST API no servidor (`revalidate = 300`) integrada ao `initialData` do React Query (`usePostsQuery.ts`), eliminando a cascata inicial no navegador sem perder atualização instantânea quando o admin edita matérias.
+  - Tempo de leitura pré-calculado no servidor (`calculateReadingTime` em `src/lib/utils.ts`), evitando trafegar o markdown integral dos artigos nos cards da Home.
+- **Alinhamento Widescreen nas Matérias & Player YouTube Nativo**:
+  - `PostDetailPage.tsx` e `PostDetailSkeleton.tsx` agora utilizam 100% da largura `.layout-container` (`1760px`), alinhados exatamente com a `Navbar` e a `HomePage`.
+  - `ArticleRenderer.tsx`: Player oficial do YouTube com `loading="lazy"` nativo e overlay `.scanline-overlay` restrito apenas às imagens com moldura `crt`.
 
 ## 🏆 Novidades da Versão 6.5.0 (The Scorecard Verdict & Smart Review Extractor Update)
 

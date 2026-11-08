@@ -18,16 +18,25 @@ export function useNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Controle de scroll para esconder/mostrar a navbar
+  // Controle de scroll otimizado com requestAnimationFrame + zona morta (evita re-renders durante a rolagem)
   useEffect(() => {
+    let ticking = false;
     const controlNavbar = () => {
-      const currentY = window.scrollY;
-      if (currentY > lastScrollY.current && currentY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      lastScrollY.current = currentY;
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const diff = currentY - lastScrollY.current;
+        if (Math.abs(diff) >= 12) {
+          if (diff > 0 && currentY > 110) {
+            setIsVisible((prev) => (prev ? false : prev));
+          } else if (diff < 0 || currentY <= 80) {
+            setIsVisible((prev) => (!prev ? true : prev));
+          }
+          lastScrollY.current = currentY;
+        }
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", controlNavbar, { passive: true });

@@ -30,12 +30,14 @@ export const formatDate = (createdAt: any, oldDate?: string): string => {
 };
 
 /**
- * Calcula o tempo de leitura estimado de um texto.
+ * Calcula o tempo de leitura estimado de um texto (ou retorna se já vier pré-calculado do SSR).
  */
 export const calculateReadingTime = (text: string): string => {
   if (!text || !text.trim()) return "1 min de leitura";
+  const trimmed = text.trim();
+  if (/^\d+\s*min/i.test(trimmed)) return trimmed;
   const wordsPerMinute = 200;
-  const words = text.trim().split(/\s+/).length;
+  const words = trimmed.split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
   return `${minutes} min de leitura`;
 };

@@ -76,28 +76,23 @@ export default function RetroCardImage({
   const ToneIcon = currentTone.Icon;
   const valid = src && isValidImageUrl(src) && !hasError;
 
+  const showSkeleton = !isLoaded || !valid;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-      {/* ── 1. SKELETON SHIMMER PLACEHOLDER (Ativo enquanto a imagem baixa) ── */}
-      <div
-        className={cn(
-          "absolute inset-0 bg-gradient-to-br transition-opacity duration-700 ease-out z-0 flex items-center justify-center",
-          currentTone.gradient,
-          isLoaded && valid ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}
-      >
-        {/* Shimmer sweep animation */}
+      {/* ── 1. SKELETON SHIMMER PLACEHOLDER (Desmontado assim que a imagem carrega para zerar uso de GPU/CPU) ── */}
+      {showSkeleton && (
         <div
           className={cn(
-            "absolute inset-0 bg-gradient-to-r from-transparent to-transparent animate-pulse",
-            currentTone.shimmer
+            "absolute inset-0 bg-gradient-to-br z-0 flex items-center justify-center",
+            currentTone.gradient
           )}
-        />
-        {/* Retro watermarked icon */}
-        <ToneIcon className={cn("w-10 h-10 animate-pulse transition-transform", currentTone.iconColor)} />
-      </div>
+        >
+          <ToneIcon className={cn("w-10 h-10 animate-pulse", currentTone.iconColor)} />
+        </div>
+      )}
 
-      {/* ── 2. NEXT.JS IMAGE COM FADE-IN ELEGANTE ── */}
+      {/* ── 2. NEXT.JS IMAGE COM FADE-IN LEVE (Apenas opacidade no load, zero repaints de escala) ── */}
       {valid && (
         <Image
           src={src}
@@ -112,8 +107,8 @@ export default function RetroCardImage({
           onLoad={() => setIsLoaded(true)}
           onError={() => setHasError(true)}
           className={cn(
-            "object-cover transition-all duration-700 ease-out",
-            isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]",
+            "object-cover transition-[opacity,transform] duration-500 ease-out",
+            isLoaded ? "opacity-100" : "opacity-0",
             className
           )}
         />

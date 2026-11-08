@@ -4,6 +4,40 @@ Este documento registra os marcos de desenvolvimento, melhorias de interface e i
 
 ---
 
+## 🚀 [v6.6.0] - The Integrated GPU & Lightweight UI Engine Update
+*Data: 8 de Novembro de 2026*
+
+### 🧩 Adoção de Bibliotecas Modernas & Leves (`Embla`, `AutoAnimate`, `CVA`)
+- **Embla Carousel (`Carousel.tsx`)**:
+  - Substituição da lógica manual de timers, gestos e múltiplos estados do carrossel por **`embla-carousel-react`**, **`embla-carousel-fade`** e **`embla-carousel-autoplay`**.
+  - Remoção das 3 camadas de `<Image>` em tela cheia com `filter: blur(64px) saturate(150%)` que sobrecarregavam GPUs integradas; substituídas por uma iluminação ambiente leve em `radial-gradient` estático acelerado por hardware.
+- **AutoAnimate (`HomePage.tsx` & `ArchivePage.tsx`)**:
+  - Substituição dos wrappers `<motion.div layout>` e `<AnimatePresence mode="popLayout">` em cada card das grades de Novidades e Catálogo pelo hook **`useAutoAnimate`** (`@formkit/auto-animate/react`), mantendo animações suaves de filtragem com zero custo de CPU durante a rolagem.
+- **Class Variance Authority (`Badge.tsx`)**:
+  - Refatoração das variantes de tamanho e estilo utilizando **`class-variance-authority` (`cva`)**.
+
+### ⚡ Otimização de Rolagem (60fps) para Notebooks com GPU Integrada
+- **Desmontagem Real de Skeletons (`RetroCardImage.tsx`)**:
+  - Corrigido gargalo em que ~40 skeletons com `animate-pulse` permaneciam montados infinitamente atrás das imagens já carregadas (`opacity-0`). Agora o bloco de skeleton é completamente desmontado da árvore DOM assim que `isLoaded && valid` é verdadeiro.
+- **Fim dos Re-Renders da Home Durante o Scroll (`HomePage.tsx`)**:
+  - Removidos os estados `hoveredRetrocafeIndex`, `hoveredDossieIndex` e `hoveredReviewsIndex` (e o fundo dinâmico `<motion.div className="blur-2xl">` do RetroCafé) que disparavam re-renderização completa da `HomePage` sempre que o ponteiro do mouse cruzava um card durante a rolagem. Todos os efeitos de hover agora rodam em CSS puro (`group-hover:` + `transform-gpu`).
+- **Redução de Overdraw & `backdrop-blur` Aninhados**:
+  - Substituídos mais de 25 `backdrop-blur-md` / `backdrop-blur-2xl` internos em badges, pílulas de leitura, botão Topo e header fixo por fundos de alta opacidade (`bg-[#090812]/90` e `bg-[#090812]/95`), mantendo a estética escura sem re-amostrar os pixels em movimento a cada frame.
+  - Simplificada a máscara CSS `.mag-halftone` em `src/index.css` e removido `content-visibility: auto` (`.deferred-below-fold`) que causava micro-engasgos ao recalcular o layout no meio da rolagem.
+- **Scroll Listeners com `requestAnimationFrame`**:
+  - `useNavbar.ts`, `BackToTop.tsx` e `PostDetailPage.tsx` agora processam eventos de scroll dentro de `requestAnimationFrame` (`passive: true`) com comparação de estado para evitar reflows síncronos.
+
+### 🌐 SSR Instantâneo na Home & Alinhamento Widescreen nas Matérias
+- **Pré-carregamento SSR na Home (`src/app/page.tsx` & `usePostsQuery.ts`)**:
+  - `src/app/page.tsx` agora busca em paralelo no servidor (`revalidate = 300`) os dados de Destaques, Top 5, Reviews, Dossiês, RetroCafé e Novidades via Firestore REST API, injetando-os como `initialData` nos hooks do React Query (`usePostsQuery.ts`).
+  - O conteúdo markdown completo dos artigos é convertido no servidor diretamente para a string de tempo de leitura (`"X min de leitura"` compatível com `calculateReadingTime` em `src/lib/utils.ts`), reduzindo em ~90% o JSON serializado na Home.
+- **Alinhamento de Largura nas Matérias (`PostDetailPage.tsx` & `PostDetailSkeleton.tsx`)**:
+  - Removido o limitador interno `max-w-[1520px] mx-auto` da página de matéria e de seu skeleton, alinhando 100% da largura com o container `.layout-container` (`1760px`) da Navbar e da Home.
+- **Player do YouTube & Imagens de Artigo (`ArticleRenderer.tsx`)**:
+  - Adicionado `loading="lazy"` nativo ao `<iframe>` oficial do YouTube em `ArticleVideo` e restrita a camada `.scanline-overlay` apenas para imagens com `frameStyle === 'crt'`.
+
+---
+
 ## 🏆 [v6.5.0] - The Scorecard Verdict & Smart Review Extractor Update
 *Data: 6 de Novembro de 2026*
 

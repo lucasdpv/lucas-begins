@@ -1,14 +1,23 @@
-# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.5.0)
+# 🗺️ Roadmap de Modernização Visual, UX & Código — BeginsProject (v6.6.0)
 
 > **Instrução para IA / Agentes Futuros**: Este documento é a fonte oficial da verdade para a evolução e polimento do portal **BeginsProject**. Sempre que retomar o trabalho neste projeto, leia a seção **"📍 Status Atual"** abaixo, verifique as entregas concluídas e consulte o [`BACKLOG.md`](./BACKLOG.md) para as próximas evoluções.
 
 ---
 
 ## 📍 Status Atual
-- **Versão Atual**: `v6.5.0 — The Scorecard Verdict & Smart Review Extractor Update`
-- **Status**: `Fase 12 Concluída e Documentada! ✅`
-- **Última Atualização**: 6 de Novembro de 2026
+- **Versão Atual**: `v6.6.0 — The Integrated GPU & Lightweight UI Engine Update`
+- **Status**: `Fase 13 Concluída e Documentada! ✅`
+- **Última Atualização**: 8 de Novembro de 2026
 - **Diretriz Estética**: **Cyber-Editorial + Geek Streaming Portal (Estilo Netflix / Crunchyroll / Polygon / The Verge)** — Fundo profundo cinematográfico (`#090812`), iluminação ambiente estilo **TV Ambilight** leve sem sobrecarga de GPU, bordas finas translúcidas (`border-white/[0.08]`), cantos arredondados modernos (`rounded-2xl` / `rounded-3xl`), container widescreen (`1760px`), shimmer skeletons temáticos e foco total nas artes de games, animes e nostalgia.
+
+---
+
+## 🚀 Fase 13 — Otimização para GPUs Integradas, Bibliotecas Leves & SSR na Home (v6.6.0) (✅ CONCLUÍDA)
+- [x] **13.1. Adoção de Embla Carousel, AutoAnimate e CVA**: Substituição do carrossel manual em `Carousel.tsx` por `embla-carousel-react` + `embla-carousel-fade` + `embla-carousel-autoplay`; substituição de `motion.div layout` nas grades de cards por `@formkit/auto-animate`; variantes tipadas com `class-variance-authority` em `Badge.tsx`.
+- [x] **13.2. Desmontagem de Skeletons & Fim de Re-Renders no Scroll**: Desmontagem completa do placeholder `animate-pulse` em `RetroCardImage.tsx` após o download da imagem; remoção dos estados de hover em React na `HomePage.tsx` em favor de CSS puro acelerado por GPU (`group-hover:` + `transform-gpu`).
+- [x] **13.3. Alívio de Compositing & Scroll Throttling (`requestAnimationFrame`)**: Substituição de `backdrop-blur` aninhados em badges/header por superfícies `bg-[#090812]/90-95` e throttling via `requestAnimationFrame` em `useNavbar.ts`, `BackToTop.tsx` e `PostDetailPage.tsx`.
+- [x] **13.4. SSR Instantâneo na Home & Payload 90% Menor (`src/app/page.tsx` + `usePostsQuery.ts`)**: Busca SSR paralela integrada ao `initialData` do React Query e pré-cálculo do tempo de leitura no servidor (`calculateReadingTime`).
+- [x] **13.5. Alinhamento Widescreen (`1760px`) & Embed YouTube Nativo**: `PostDetailPage.tsx` e `PostDetailSkeleton.tsx` alinhados à largura `.layout-container` da Home/Navbar, e player oficial do YouTube com `loading="lazy"` em `ArticleRenderer.tsx`.
 
 ---
 

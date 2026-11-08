@@ -1,4 +1,4 @@
-# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.5.0)
+# 🕹️ Bem-vindo ao BeginsProject — Guia do Desenvolvedor (v6.6.0)
 
 Este guia foi criado para que você entenda rapidamente como o **BeginsProject** funciona e como contribuir mantendo a consistência visual e arquitetural do portal.
 
@@ -28,7 +28,7 @@ O **BeginsProject** é um portal dedicado a **Games, Animes e Nostalgia**. Nossa
 
 ---
 
-## 📂 3. Estrutura de Pastas (v6.5.0)
+## 📂 3. Estrutura de Pastas (v6.6.0)
 
 ```text
 src/

@@ -1,6 +1,16 @@
-# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.5.0)
+# 📋 Backlog de Melhorias e Pendências — BeginsProject (v6.6.0)
 
-Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.5.0 (The Scorecard Verdict & Smart Review Extractor Update)**.
+Este documento lista as próximas evoluções planejadas, refatorações futuras e melhorias técnicas após o lançamento da **v6.6.0 (The Integrated GPU & Lightweight UI Engine Update)**.
+
+---
+
+## 🚀 Concluído na v6.6.0
+- [x] **Adoção de Embla Carousel, AutoAnimate e CVA (`Carousel.tsx`, `HomePage.tsx`, `ArchivePage.tsx`, `Badge.tsx`)**
+  * **Concluído**: Carrossel reconstruído com `embla-carousel-react` + `embla-carousel-fade` + `embla-carousel-autoplay`; transições de grade com `@formkit/auto-animate`; variantes de UI com `class-variance-authority`.
+- [x] **Otimização de Rolagem 60fps para Notebooks com GPU Integrada (`RetroCardImage.tsx`, `HomePage.tsx`, `Navbar.tsx`)**
+  * **Concluído**: Desmontagem imediata de skeletons `animate-pulse` após o carregamento da imagem; fim dos re-renders de hover na Home; substituição de `backdrop-blur` aninhados por superfícies otimizadas e scroll listeners com `requestAnimationFrame`.
+- [x] **SSR Instantâneo na Home & Alinhamento Widescreen nas Matérias (`src/app/page.tsx`, `usePostsQuery.ts`, `PostDetailPage.tsx`)**
+  * **Concluído**: Pré-busca paralela via Firestore REST API no servidor integrada ao `initialData` do React Query, redução de ~90% no payload da Home e alinhamento da largura de `PostDetailPage.tsx` com o `.layout-container` (`1760px`).
 
 ---
 

@@ -95,10 +95,10 @@ export default function Navbar() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 transition-all duration-300 border-b",
+          "sticky top-0 z-50 transition-transform duration-300 ease-out transform-gpu border-b",
           isDark
-            ? "border-white/[0.08] bg-[#090812]/85 backdrop-blur-2xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]"
-            : "border-slate-200/80 bg-white/90 backdrop-blur-2xl shadow-sm",
+            ? "border-white/[0.08] bg-[#090812]/95 shadow-[0_10px_28px_-12px_rgba(0,0,0,0.85)]"
+            : "border-slate-200/80 bg-white/95 shadow-sm",
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}
       >

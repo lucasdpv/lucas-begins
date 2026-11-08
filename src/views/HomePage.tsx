@@ -10,8 +10,7 @@ import {
   Eye,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "@/lib/router-compat";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Carousel from "../features/posts/components/Carousel";
 import PostCard from "../features/posts/components/PostCard";
 import PostSkeleton from "../features/posts/components/PostSkeleton";
@@ -42,25 +41,23 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PostService } from "../services/postService";
 import { Post } from "../features/posts/schemas";
 
-let sharedAudioContext: AudioContext | null = null;
-
-// Um único AudioContext, criado só depois da primeira interação do visitante:
-// antes disso o navegador bloqueia o áudio e registra um aviso a cada tentativa.
-function getAudioContext(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return null;
-  if (!sharedAudioContext) {
-    const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtor) return null;
-    sharedAudioContext = new AudioCtor();
-  }
-  if (sharedAudioContext.state === "suspended") sharedAudioContext.resume().catch(() => {});
-  return sharedAudioContext;
+export interface InitialHomeData {
+  featured: Post[];
+  mostViewed: Post[];
+  reviews: Post[];
+  dossies: Post[];
+  retrocafe: Post[];
+  latest: Post[];
 }
 
-export default function HomePage() {
+interface HomePageProps {
+  initialData?: InitialHomeData;
+}
+
+export default function HomePage({ initialData }: HomePageProps) {
   const { isDark } = useThemeStore();
   const queryClient = useQueryClient();
+  const [gridParentRef] = useAutoAnimate<HTMLDivElement>({ duration: 240 });
 
   const handlePrefetch = useCallback(
     (slug: string) => {
@@ -73,60 +70,8 @@ export default function HomePage() {
     [queryClient]
   );
 
-  const playEjectSound = () => {
-    try {
-      const ctx = getAudioContext();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(659.25, now);
-      osc.frequency.setValueAtTime(987.77, now + 0.04);
-      gain.gain.setValueAtTime(0.03, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.12);
-    } catch {
-      // ignore audio block
-    }
-  };
-
-  const retrocafeRef = useRef<HTMLDivElement>(null);
-  const dossieRef = useRef<HTMLDivElement>(null);
-  const reviewsRef = useRef<HTMLDivElement>(null);
   const mostViewedRef = useRef<HTMLDivElement>(null);
-
-  const [retrocafeScroll, setRetrocafeScroll] = useState({ left: false, right: true });
-  const [dossieScroll, setDossieScroll] = useState({ left: false, right: true });
-  const [reviewsScroll, setReviewsScroll] = useState({ left: false, right: true });
   const [mostViewedScroll, setMostViewedScroll] = useState({ left: false, right: true });
-  const [hoveredRetrocafeIndex, setHoveredRetrocafeIndex] = useState<number | null>(null);
-  const [hoveredDossieIndex, setHoveredDossieIndex] = useState<number | null>(null);
-  const [hoveredReviewsIndex, setHoveredReviewsIndex] = useState<number | null>(null);
-
-  const playClickSound = useCallback(() => {
-    try {
-      const ctx = getAudioContext();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
-      gain.gain.setValueAtTime(0.03, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.08);
-    } catch {
-      // ignore
-    }
-  }, []);
 
   const updateScrollState = useCallback(
     (
@@ -135,10 +80,13 @@ export default function HomePage() {
     ) => {
       if (ref.current) {
         const { scrollLeft, scrollWidth, clientWidth } = ref.current;
-        setScroll({
-          left: scrollLeft > 5,
-          right: scrollLeft < scrollWidth - clientWidth - 10,
-        });
+        const nextLeft = scrollLeft > 5;
+        const nextRight = scrollLeft < scrollWidth - clientWidth - 10;
+        setScroll((prev) =>
+          prev.left === nextLeft && prev.right === nextRight
+            ? prev
+            : { left: nextLeft, right: nextRight }
+        );
       }
     },
     []
@@ -162,7 +110,7 @@ export default function HomePage() {
   const location = useLocation();
 
   const isDefaultView = activeCategory === "Todos" && searchQuery === "";
-  const shouldLoadSecondary = isDefaultView;
+  const hasSSRData = Boolean(initialData && initialData.latest.length > 0);
 
   useEffect(() => {
     if ((location.state as any)?.resetCategory) {
@@ -178,24 +126,38 @@ export default function HomePage() {
     [navigate]
   );
 
-  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(isDefaultView);
-  const { data: mostViewedPosts = [] } = useMostViewedPosts(5, shouldLoadSecondary);
+  const { data: featuredPosts = [], isLoading: isLoadingFeatured } = useFeaturedPosts(
+    isDefaultView,
+    hasSSRData ? initialData?.featured : undefined
+  );
+  const { data: mostViewedPosts = [] } = useMostViewedPosts(
+    5,
+    isDefaultView,
+    hasSSRData ? initialData?.mostViewed : undefined
+  );
   const { data: reviewPosts = [], isLoading: isLoadingReviews } = usePostsByCategory(
     "Reviews",
     5,
-    shouldLoadSecondary
+    isDefaultView,
+    hasSSRData ? initialData?.reviews : undefined
   );
   const { data: dossiePosts = [], isLoading: isLoadingDossies } = usePostsByCategory(
     "Dossiês",
     3,
-    shouldLoadSecondary
+    isDefaultView,
+    hasSSRData ? initialData?.dossies : undefined
   );
   const { data: retrocafePosts = [], isLoading: isLoadingRetrocafe } = usePostsByCategory(
     "RetroCafé",
     3,
-    shouldLoadSecondary
+    isDefaultView,
+    hasSSRData ? initialData?.retrocafe : undefined
   );
-  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(4, isDefaultView);
+  const { data: latestPosts = [], isLoading: isLoadingLatest } = useLatestPosts(
+    4,
+    isDefaultView,
+    hasSSRData ? initialData?.latest : undefined
+  );
 
   const isSearching = searchQuery.trim() !== "";
   const isLocalMode = isSearching || activeCategory !== "Todos";
@@ -222,19 +184,13 @@ export default function HomePage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      updateScrollState(retrocafeRef, setRetrocafeScroll);
-      updateScrollState(dossieRef, setDossieScroll);
-      updateScrollState(reviewsRef, setReviewsScroll);
       updateScrollState(mostViewedRef, setMostViewedScroll);
     }, 400);
     return () => clearTimeout(timer);
-  }, [displayRetrocafe, displayDossie, displayReviews, mostViewedPosts, updateScrollState]);
+  }, [mostViewedPosts, updateScrollState]);
 
   useEffect(() => {
     const handleResize = () => {
-      updateScrollState(retrocafeRef, setRetrocafeScroll);
-      updateScrollState(dossieRef, setDossieScroll);
-      updateScrollState(reviewsRef, setReviewsScroll);
       updateScrollState(mostViewedRef, setMostViewedScroll);
     };
     window.addEventListener("resize", handleResize);
@@ -308,7 +264,7 @@ export default function HomePage() {
                         {/* Poster Card */}
                         <div
                           className={cn(
-                            "relative w-full h-full rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col justify-end p-4 z-10 group-hover:-translate-y-1.5",
+                            "relative w-full h-full rounded-2xl overflow-hidden border transition-[transform,border-color,box-shadow] duration-300 flex flex-col justify-end p-4 z-10 group-hover:-translate-y-1.5 transform-gpu",
                             isDark
                               ? "bg-[#141226] border-white/[0.1] group-hover:border-amber-400/50 shadow-[0_14px_32px_-10px_rgba(0,0,0,0.8)] group-hover:shadow-[0_18px_40px_-10px_rgba(245,158,11,0.3)]"
                               : "bg-slate-900 border-slate-200 group-hover:border-amber-500 shadow-md"
@@ -320,13 +276,13 @@ export default function HomePage() {
                             fill
                             sizes="(max-width: 640px) 270px, 20vw"
                             tone="purple"
-                            className="group-hover:scale-110"
+                            className="group-hover:scale-105"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-transparent z-10" />
 
                           {/* Category Top Tag */}
                           <div className="absolute top-3 right-3 z-20">
-                            <span className="text-[8px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-black/65 text-amber-300 border border-white/10 backdrop-blur-md">
+                            <span className="text-[8px] font-retro font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#090812]/85 text-amber-300 border border-white/10">
                               {post.category}
                             </span>
                           </div>
@@ -457,7 +413,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : gridPosts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+          <div ref={gridParentRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
             {gridPosts.map((post, i) => (
               <div key={post.id}>
                 <PostCard post={post} variant="vintage" priority={i < 2} />
@@ -486,46 +442,13 @@ export default function HomePage() {
               {/* ── COLEÇÃO 1: RETROCAFÉ (POSTERS VERTICAIS ESTILO STREAMING / REVISTA) ── */}
               <div
                 className={cn(
-                  "order-2 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10",
+                  "order-2 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden flex flex-col gap-4 sm:gap-5 z-10",
                   isDark
-                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    ? "bg-[#110f22] border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
                     : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
-                onMouseLeave={() => setHoveredRetrocafeIndex(null)}
               >
                 <MagazineBackdrop tone="orange" />
-
-                {/* Ambient Hover Backdrop */}
-                <AnimatePresence>
-                  {hoveredRetrocafeIndex !== null && displayRetrocafe[hoveredRetrocafeIndex] && (
-                    <motion.div
-                      key={displayRetrocafe[hoveredRetrocafeIndex].id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute inset-0 z-0 pointer-events-none"
-                    >
-                      <div
-                        className={cn(
-                          "absolute inset-0 bg-cover bg-center blur-2xl scale-110 transition-all duration-700",
-                          isDark ? "opacity-25" : "opacity-10"
-                        )}
-                        style={{
-                          backgroundImage: `url(${displayRetrocafe[hoveredRetrocafeIndex].imageUrl})`,
-                        }}
-                      />
-                      <div
-                        className={cn(
-                          "absolute inset-0",
-                          isDark
-                            ? "bg-gradient-to-t from-[#110f22] via-[#110f22]/80 to-[#110f22]/60"
-                            : "bg-gradient-to-t from-white via-white/85 to-white/70"
-                        )}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
 
                 {/* Header */}
                 <div className="flex items-start justify-between relative z-10 gap-2 sm:gap-3">
@@ -549,19 +472,15 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => goToCategory("RetroCafé")}
-                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
                   >
                     Ver todos <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                {/* Cards RetroCafé (Vertical Streaming Posters) */}
+                {/* Cards RetroCafé (Vertical Streaming Posters — Hover via CSS puro sem re-render da página) */}
                 <div className="relative group/scroll-container w-full z-10">
-                  <div
-                    ref={retrocafeRef}
-                    onScroll={() => updateScrollState(retrocafeRef, setRetrocafeScroll)}
-                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
-                  >
+                  <div className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                     {isLoadingRetrocafe ? (
                       [1, 2, 3].map((idx) => (
                         <PostSkeleton key={idx} isDark={isDark} variant="compact" />
@@ -573,23 +492,12 @@ export default function HomePage() {
                         return (
                           <div
                             key={post.id}
-                            className={cn(
-                              "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
-                              hoveredRetrocafeIndex !== null && hoveredRetrocafeIndex !== i
-                                ? "opacity-65 scale-[0.98]"
-                                : hoveredRetrocafeIndex === i
-                                ? "scale-[1.02] z-10"
-                                : ""
-                            )}
-                            onMouseEnter={() => {
-                              setHoveredRetrocafeIndex(i);
-                              playClickSound();
-                              handlePrefetch(targetSlug);
-                            }}
+                            className="w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always"
+                            onMouseEnter={() => handlePrefetch(targetSlug)}
                           >
                             <Link
                               to={`/post/${targetSlug}`}
-                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-orange-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(249,115,22,0.35)]"
+                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-orange-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 transform-gpu bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(249,115,22,0.35)]"
                             >
                               <RetroCardImage
                                 src={post.imageUrl}
@@ -597,16 +505,16 @@ export default function HomePage() {
                                 fill
                                 sizes="(max-width: 640px) 265px, (max-width: 1024px) 33vw, 25vw"
                                 tone="orange"
-                                className="group-hover:scale-[1.08]"
+                                className="group-hover:scale-105"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
-                              {/* Top Glass Pill Bar */}
+                              {/* Top Pill Bar */}
                               <div className="relative z-20 p-3.5 flex justify-between items-center">
                                 <span className="px-2.5 py-0.5 rounded-full text-[9px] font-retro font-black uppercase tracking-wider bg-orange-500 text-slate-950 shadow">
                                   EPISÓDIO #0{i + 1}
                                 </span>
-                                <span className="text-[9px] font-mono text-slate-200 bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+                                <span className="text-[9px] font-mono text-slate-200 bg-[#090812]/85 px-2.5 py-0.5 rounded-full border border-white/10">
                                   {calculateReadingTime(post.content || "").replace(
                                     " min de leitura",
                                     " MIN"
@@ -657,12 +565,11 @@ export default function HomePage() {
               {/* ── COLEÇÃO 2: DOSSIÊS (ARQUIVOS CONFIDENCIAIS CYBER-EDITORIAL) ── */}
               <div
                 className={cn(
-                  "order-3 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10 lg:flex-1",
+                  "order-3 lg:order-none p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden flex flex-col gap-4 sm:gap-5 z-10 lg:flex-1",
                   isDark
-                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    ? "bg-[#110f22] border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
                     : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
-                onMouseLeave={() => setHoveredDossieIndex(null)}
               >
                 <MagazineBackdrop tone="sky" />
 
@@ -688,7 +595,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => goToCategory("Dossiê")}
-                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
                   >
                     Ver todos <ChevronRight className="w-3.5 h-3.5" />
                   </button>
@@ -696,39 +603,24 @@ export default function HomePage() {
 
                 {/* Cards Dossiês */}
                 <div className="relative group/scroll-container w-full z-10">
-                  <div
-                    ref={dossieRef}
-                    onScroll={() => updateScrollState(dossieRef, setDossieScroll)}
-                    className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full"
-                  >
+                  <div className="flex lg:grid overflow-x-auto lg:overflow-x-visible lg:grid-cols-3 gap-3.5 sm:gap-4 pb-1 lg:pb-0 scrollbar-hide snap-x snap-mandatory w-full">
                     {isLoadingDossies ? (
                       [1, 2, 3].map((idx) => (
                         <PostSkeleton key={idx} isDark={isDark} variant="compact" />
                       ))
                     ) : displayDossie.length > 0 ? (
-                      displayDossie.map((post, i) => {
+                      displayDossie.map((post) => {
                         const targetSlug = post.slug || slugify(post.title);
                         const { mainTitle, subtitle } = splitTitle(post.title);
                         return (
                           <div
                             key={post.id}
-                            className={cn(
-                              "w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always transition-all duration-300",
-                              hoveredDossieIndex !== null && hoveredDossieIndex !== i
-                                ? "opacity-65 scale-[0.98]"
-                                : hoveredDossieIndex === i
-                                ? "scale-[1.02] z-10"
-                                : ""
-                            )}
-                            onMouseEnter={() => {
-                              setHoveredDossieIndex(i);
-                              playClickSound();
-                              handlePrefetch(targetSlug);
-                            }}
+                            className="w-[255px] sm:w-[265px] lg:w-auto shrink-0 snap-start snap-always"
+                            onMouseEnter={() => handlePrefetch(targetSlug)}
                           >
                             <Link
                               to={`/post/${targetSlug}`}
-                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-sky-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-all duration-300 bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.35)]"
+                              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl border border-white/10 hover:border-sky-400/60 flex flex-col justify-between overflow-hidden cursor-pointer group transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 transform-gpu bg-slate-950 shadow-[0_14px_34px_-10px_rgba(0,0,0,0.75)] hover:shadow-[0_18px_40px_-10px_rgba(56,189,248,0.35)]"
                             >
                               <RetroCardImage
                                 src={post.imageUrl}
@@ -736,12 +628,12 @@ export default function HomePage() {
                                 fill
                                 sizes="(max-width: 640px) 265px, (max-width: 1024px) 33vw, 25vw"
                                 tone="sky"
-                                className="group-hover:scale-[1.08]"
+                                className="group-hover:scale-105"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/55 to-black/35 z-10" />
 
                               <div className="relative z-20 p-3.5 flex justify-end items-center">
-                                <span className="text-[9px] font-mono text-slate-200 bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+                                <span className="text-[9px] font-mono text-slate-200 bg-[#090812]/85 px-2.5 py-0.5 rounded-full border border-white/10">
                                   {calculateReadingTime(post.content || "").replace(
                                     " min de leitura",
                                     " MIN"
@@ -793,12 +685,11 @@ export default function HomePage() {
             <div className="order-1 lg:order-none flex flex-col gap-5 lg:contents">
               <div
                 className={cn(
-                  "p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden transition-all duration-300 flex flex-col gap-4 sm:gap-5 z-10 lg:col-span-1 lg:h-full",
+                  "p-4 sm:p-6 rounded-2xl sm:rounded-3xl border relative overflow-hidden flex flex-col gap-4 sm:gap-5 z-10 lg:col-span-1 lg:h-full",
                   isDark
-                    ? "bg-[#110f22]/90 border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
+                    ? "bg-[#110f22] border-white/[0.08] text-slate-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.75)]"
                     : "bg-white border-slate-200/80 text-slate-900 shadow-lg"
                 )}
-                onMouseLeave={() => setHoveredReviewsIndex(null)}
               >
                 <MagazineBackdrop tone="amber" />
 
@@ -825,7 +716,7 @@ export default function HomePage() {
                     type="button"
                     onClick={() => goToCategory("Reviews")}
                     title="Ver todas as reviews"
-                    className="mt-1 sm:mt-1.5 px-3 py-1.5 lg:max-xl:p-0 lg:max-xl:w-8 lg:max-xl:h-8 lg:max-xl:justify-center rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer shrink-0 transition-all"
+                    className="mt-1 sm:mt-1.5 px-3 py-1.5 lg:max-xl:p-0 lg:max-xl:w-8 lg:max-xl:h-8 lg:max-xl:justify-center rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 text-[10px] font-retro font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer shrink-0 transition-colors"
                   >
                     <span className="lg:max-xl:sr-only">Ver todos</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -834,11 +725,7 @@ export default function HomePage() {
 
                 {/* Cards Reviews — Full-Bleed Cinematic Banners */}
                 <div className="relative group/scroll-container w-full lg:flex-1 lg:flex lg:flex-col z-10">
-                  <div
-                    ref={reviewsRef}
-                    onScroll={() => updateScrollState(reviewsRef, setReviewsScroll)}
-                    className="flex lg:flex lg:flex-col gap-3.5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1"
-                  >
+                  <div className="flex lg:flex lg:flex-col gap-3.5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 snap-x snap-mandatory scrollbar-hide w-full lg:flex-1">
                     {isLoadingReviews ? (
                       [1, 2, 3, 4, 5].map((idx) => (
                         <div
@@ -850,29 +737,21 @@ export default function HomePage() {
                         />
                       ))
                     ) : displayReviews.length > 0 ? (
-                      displayReviews.map((post, i) => {
+                      displayReviews.map((post) => {
                         const targetSlug = post.slug || slugify(post.title);
-                        const isHovered = hoveredReviewsIndex === i;
                         const { mainTitle, subtitle } = splitTitle(post.title);
 
                         return (
                           <div
                             key={post.id}
-                            className="w-[270px] sm:w-[300px] lg:w-full h-[152px] lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-start snap-always transition-all duration-300 relative"
-                            onMouseEnter={() => {
-                              setHoveredReviewsIndex(i);
-                              playEjectSound();
-                              handlePrefetch(targetSlug);
-                            }}
+                            className="w-[270px] sm:w-[300px] lg:w-full h-[152px] lg:h-0 lg:flex-1 lg:min-h-[112px] shrink-0 snap-start snap-always relative"
+                            onMouseEnter={() => handlePrefetch(targetSlug)}
                           >
                             <Link
                               to={`/post/${targetSlug}`}
                               className={cn(
-                                "relative w-full h-full flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden cursor-pointer rounded-2xl border transition-all duration-300 group bg-[#141226]",
-                                isDark ? "border-white/[0.1]" : "border-slate-200/90",
-                                isHovered
-                                  ? "border-amber-400/60 shadow-[0_14px_34px_-8px_rgba(245,158,11,0.35)] -translate-y-0.5"
-                                  : "shadow-[0_10px_26px_-10px_rgba(0,0,0,0.75)]"
+                                "relative w-full h-full flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden cursor-pointer rounded-2xl border transition-[transform,border-color,box-shadow] duration-300 group bg-[#141226] transform-gpu shadow-[0_10px_26px_-10px_rgba(0,0,0,0.75)] hover:border-amber-400/60 hover:shadow-[0_14px_34px_-8px_rgba(245,158,11,0.35)] hover:-translate-y-0.5",
+                                isDark ? "border-white/[0.1]" : "border-slate-200/90"
                               )}
                             >
                               {/* Full-Bleed Artwork with Rich Cinematic Vignette */}
@@ -882,30 +761,20 @@ export default function HomePage() {
                                 fill
                                 sizes="(max-width: 640px) 300px, (max-width: 1024px) 50vw, 33vw"
                                 tone="amber"
-                                className="group-hover:scale-[1.08]"
+                                className="group-hover:scale-105"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#090812] via-[#090812]/70 to-black/30 z-10" />
                               <div className="absolute inset-0 bg-gradient-to-r from-[#090812]/90 via-[#090812]/45 to-transparent z-10" />
 
                               {/* Top Row: Veredito Pill + Score Badge */}
                               <div className="relative z-20 flex items-center justify-between gap-2 w-full">
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-md text-[8px] font-mono font-bold uppercase tracking-widest text-amber-300">
-                                  <span
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      isHovered ? "bg-amber-400 animate-ping" : "bg-amber-400"
-                                    )}
-                                  />
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#090812]/85 border border-white/10 text-[8px] font-mono font-bold uppercase tracking-widest text-amber-300">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                                   Veredito Begins
                                 </span>
 
                                 {post.score && (
-                                  <div
-                                    className={cn(
-                                      "inline-flex items-center gap-1 text-slate-950 px-2.5 py-0.5 rounded-full font-retro font-black text-xs bg-gradient-to-r from-amber-300 to-yellow-400 shadow-[0_4px_14px_rgba(0,0,0,0.6)] transition-transform duration-300 shrink-0",
-                                      isHovered ? "scale-105" : ""
-                                    )}
-                                  >
+                                  <div className="inline-flex items-center gap-1 text-slate-950 px-2.5 py-0.5 rounded-full font-retro font-black text-xs bg-gradient-to-r from-amber-300 to-yellow-400 shadow-[0_4px_14px_rgba(0,0,0,0.6)] transition-transform duration-300 group-hover:scale-105 shrink-0">
                                     ★ {post.score}
                                   </div>
                                 )}

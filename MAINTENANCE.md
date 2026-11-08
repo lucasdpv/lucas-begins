@@ -1,4 +1,4 @@
-# 🔧 Guia de Manutenção — BeginsProject (v6.5.0)
+# 🔧 Guia de Manutenção — BeginsProject (v6.6.0)
 
 Este documento é o manual de operações para manter a gamificação, o conteúdo editorial e a integridade do banco de dados do portal **BeginsProject**.
 
@@ -65,4 +65,4 @@ O progresso dos leitores é salvo nos campos `xp` e `level` da coleção `users`
 - **Reviews & Scorecard Veredito (`PostVerdict.tsx` & `reviewVerdictHelper.ts`)**: Ao preencher a **Nota Final (0 a 10)** no editor (`PostEditorPage.tsx`), o botão **`✨ Gerar Prós & Contras da Análise`** analisa o texto da matéria e sugere automaticamente de 3 a 4 Prós e 1 a 2 Contras sucintos para revisão. A frase curta do banner é opcional (máx. 140 caracteres).
 
 ---
-**Atualizado em: 6 de Novembro de 2026 (v6.5.0).**
+**Atualizado em: 8 de Novembro de 2026 (v6.6.0).**

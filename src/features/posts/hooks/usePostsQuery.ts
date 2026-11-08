@@ -66,24 +66,26 @@ export function usePosts({ category = 'Todos', search = '', enabled = true, page
 /**
  * Hook para buscar posts em destaque (Carrossel).
  */
-export function useFeaturedPosts(enabled = true) {
+export function useFeaturedPosts(enabled = true, initialData?: Post[]) {
   return useQuery({
     queryKey: postKeys.featured(),
     queryFn: () => PostService.getFeaturedPosts(),
     staleTime: 1000 * 60 * 10,
     enabled,
+    initialData,
   });
 }
 
 /**
  * Hook para buscar os posts mais recentes.
  */
-export function useLatestPosts(count: number = 5, enabled = true) {
+export function useLatestPosts(count: number = 5, enabled = true, initialData?: Post[]) {
   return useQuery({
     queryKey: postKeys.latest(count),
     queryFn: () => PostService.getLatestPosts(count),
     staleTime: 1000 * 60 * 5,
     enabled,
+    initialData,
   });
 }
 
@@ -101,12 +103,13 @@ export function usePopularPosts(count: number = 4) {
 /**
  * Hook para buscar posts mais lidos (views desc).
  */
-export function useMostViewedPosts(count: number = 5, enabled = true) {
+export function useMostViewedPosts(count: number = 5, enabled = true, initialData?: Post[]) {
   return useQuery({
     queryKey: ['posts', 'most-viewed', count],
     queryFn: () => PostService.getMostViewedPosts(count),
     staleTime: 1000 * 60 * 10,
     enabled,
+    initialData,
   });
 }
 
@@ -124,12 +127,18 @@ export function useTopReviews(count: number = 3) {
 /**
  * Hook para buscar posts de uma categoria específica (ordenados por createdAt desc).
  */
-export function usePostsByCategory(category: string, count: number = 3, enabled = true) {
+export function usePostsByCategory(
+  category: string,
+  count: number = 3,
+  enabled = true,
+  initialData?: Post[]
+) {
   return useQuery({
     queryKey: ['posts', 'by-category', category, count],
     queryFn: () => PostService.getPostsByCategory(category, count),
     enabled: enabled && !!category,
     staleTime: 1000 * 60 * 10,
+    initialData,
   });
 }
 

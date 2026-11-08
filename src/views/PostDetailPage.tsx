@@ -151,7 +151,8 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   }, [post?.content]);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+    const updateScrollMetrics = () => {
       if (headings.length > 0) {
         let current = headings[0].id;
         for (const h of headings) {
@@ -163,21 +164,28 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
             }
           }
         }
-        setActiveHeadingId(current);
+        setActiveHeadingId((prev) => (prev === current ? prev : current));
       }
 
       const toc = document.getElementById("post-toc");
       const article = document.getElementById("article-content");
-      setIsChapterPillVisible(
+      const nextVisible =
         !!toc &&
-          !!article &&
-          toc.getBoundingClientRect().bottom < 0 &&
-          article.getBoundingClientRect().bottom > window.innerHeight * 0.4
-      );
+        !!article &&
+        toc.getBoundingClientRect().bottom < 0 &&
+        article.getBoundingClientRect().bottom > window.innerHeight * 0.4;
+      setIsChapterPillVisible((prev) => (prev === nextVisible ? prev : nextVisible));
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateScrollMetrics);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    updateScrollMetrics();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [headings]);
 
@@ -255,7 +263,7 @@ export default function PostDetailPage({ previewPost, initialPost }: PostDetailP
   const isFavorited = profile?.favorites?.includes(post.id) || false;
 
   return (
-    <article className="w-full max-w-[1520px] mx-auto relative">
+    <article className="w-full relative">
       {/* Voltar */}
       <button
         onClick={() => {

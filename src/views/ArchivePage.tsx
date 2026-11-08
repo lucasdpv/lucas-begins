@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Gamepad2, ArrowLeft, Sparkles } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useNavigate } from "@/lib/router-compat";
@@ -67,6 +67,7 @@ export default function ArchivePage() {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const [catalogGridRef] = useAutoAnimate<HTMLDivElement>({ duration: 220 });
 
   // A categoria vem da URL (?categoria=...) para o "voltar" do navegador funcionar e o link ser compartilhável.
   const categoryParam = normalizeCategory(searchParams?.get("categoria") || "");
@@ -192,24 +193,18 @@ export default function ArchivePage() {
           })}
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          {categoryDescription && (
-            <motion.p
-              key={activeCategory}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
-              className={cn(
-                "flex items-start gap-3 max-w-3xl text-sm leading-relaxed",
-                isDark ? "text-slate-300" : "text-slate-600"
-              )}
-            >
-              <span className={cn("mt-1.5 w-2 h-2 rounded-full shrink-0", getCategoryDotColor(activeCategory))} />
-              {categoryDescription}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {categoryDescription && (
+          <p
+            key={activeCategory}
+            className={cn(
+              "flex items-start gap-3 max-w-3xl text-sm leading-relaxed animate-bg-fade",
+              isDark ? "text-slate-300" : "text-slate-600"
+            )}
+          >
+            <span className={cn("mt-1.5 w-2 h-2 rounded-full shrink-0", getCategoryDotColor(activeCategory))} />
+            {categoryDescription}
+          </p>
+        )}
       </header>
 
       {/* Grid */}
@@ -221,22 +216,12 @@ export default function ArchivePage() {
         </div>
       ) : currentPosts.length > 0 ? (
         <div className="flex flex-col gap-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
-            <AnimatePresence mode="popLayout">
-              {currentPosts.map((post, idx) => (
-                <motion.div
-                  key={post.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.2 }}
-                  className="h-full"
-                >
-                  <PostCard post={post} variant="vintage" priority={idx < 3} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+          <div ref={catalogGridRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+            {currentPosts.map((post, idx) => (
+              <div key={post.id} className="h-full">
+                <PostCard post={post} variant="vintage" priority={idx < 3} />
+              </div>
+            ))}
           </div>
 
           {!isLocalMode && hasNextPage && (

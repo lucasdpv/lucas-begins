@@ -10,24 +10,28 @@ export default function BackToTop() {
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    let ticking = false;
     const handleScrollOrMove = () => {
-      const scrollY = window.scrollY;
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
 
-      // Se estiver no topo inicial (< 500px), esconde imediatamente
-      if (scrollY <= 500) {
-        setIsVisible(false);
+        if (scrollY <= 500) {
+          setIsVisible((prev) => (prev ? false : prev));
+          if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+          ticking = false;
+          return;
+        }
+
+        setIsVisible((prev) => (prev ? prev : true));
+
         if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-        return;
-      }
-
-      // Mostra o botão assim que detectar rolagem/movimento além de 500px
-      setIsVisible(true);
-
-      // Limpa qualquer timer anterior e agenda o auto-hide após 2.5s parado
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = setTimeout(() => {
-        setIsVisible(false);
-      }, 2500);
+        hideTimerRef.current = setTimeout(() => {
+          setIsVisible(false);
+        }, 2500);
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", handleScrollOrMove, { passive: true });

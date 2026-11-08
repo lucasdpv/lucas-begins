@@ -1,17 +1,17 @@
-# 📜 Documentação Técnica — BeginsProject (v6.5.0)
+# 📜 Documentação Técnica — BeginsProject (v6.6.0)
 
-Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.5.0**.
+Este documento detalha a arquitetura de software, o sistema de design **Cyber-Editorial + Streaming Geek** e as decisões de engenharia da versão **v6.6.0**.
 
 ---
 
 ## 🚀 Tecnologias Core
 - **Frontend & SSR**: React 19 + Next.js 16 (App Router + Server Components) + TypeScript 6.
-- **Roteamento & Renderização**: Server-Side Rendering (SSR) híbrido com Incremental Static Regeneration (`revalidate = 300`) e Static Site Generation (`generateStaticParams`).
-- **Estilização**: Tailwind CSS + CSS Moderno (`interpolate-size`, `text-wrap: balance/pretty`, `content-visibility: auto`, Scroll-Driven Animations).
+- **Roteamento & Renderização**: Server-Side Rendering (SSR) híbrido na Home (`src/app/page.tsx`) e nas Matérias (`src/app/post/[slug]/page.tsx`) com Incremental Static Regeneration (`revalidate = 300`) e Static Site Generation (`generateStaticParams`).
+- **Estilização & Primitivos UI**: Tailwind CSS + `class-variance-authority` (`cva`) + `@radix-ui/react-slot` + CSS Moderno (`interpolate-size`, `text-wrap: balance/pretty`).
 - **Backend**: Firebase (Cloud Firestore + Authentication + Cloud Storage).
-- **Gerenciamento de Dados**: TanStack Query v5 (React Query).
+- **Gerenciamento de Dados**: TanStack Query v5 (React Query) com hidratação `initialData` a partir do SSR.
 - **Estado Global**: Zustand v5 (`useUIStore`, `useThemeStore`) + Context API (`AuthProvider`).
-- **Animações**: Framer Motion + GPU-accelerated CSS transitions.
+- **Carrossel & Animações Leves**: `embla-carousel-react` (`embla-carousel-fade`, `embla-carousel-autoplay`) + `@formkit/auto-animate` + Framer Motion + GPU-accelerated CSS transitions (`transform-gpu`).
 - **Busca Instantânea**: Fuse.js (tolerância a erros de digitação e acentuação na Spotlight Search Bar da Navbar).
 - **Síntese de Áudio**: Web Audio API (efeitos sonoros retrô sintetizados nativamente sem arquivos externos).
 

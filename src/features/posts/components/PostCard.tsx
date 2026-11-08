@@ -247,9 +247,9 @@ export default function PostCard({
     return (
       <article
         className={cn(
-          "flex flex-col justify-end min-h-[300px] xl:min-h-[340px] h-full group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1 select-none",
+          "flex flex-col justify-end min-h-[300px] xl:min-h-[340px] h-full group relative overflow-hidden rounded-2xl border transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 select-none transform-gpu",
           isDark
-            ? "bg-[#121024]/90 border-white/[0.08] text-white shadow-[0_14px_34px_-12px_rgba(0,0,0,0.65)]"
+            ? "bg-[#121024] border-white/[0.08] text-white shadow-[0_14px_34px_-12px_rgba(0,0,0,0.65)]"
             : "bg-white border-slate-200/80 text-slate-900 shadow-[0_10px_28px_-10px_rgba(15,23,42,0.08)]",
           cardStyles.hoverGlow
         )}
@@ -271,7 +271,7 @@ export default function PostCard({
             priority={priority}
             tone={post.category?.toLowerCase().includes("retro") ? "orange" : post.category?.toLowerCase().includes("dossi") ? "sky" : post.category?.toLowerCase().includes("review") ? "amber" : "purple"}
             imagePosition={post.imagePosition}
-            className="group-hover:scale-[1.06]"
+            className="group-hover:scale-[1.05]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#090812]/95 from-5% via-[#090812]/50 via-45% to-transparent z-10" />
         </div>
@@ -285,11 +285,11 @@ export default function PostCard({
         )}
 
         <div className="absolute top-3 right-3 z-10 pointer-events-none flex items-center gap-1.5 font-mono text-[9px] text-slate-200">
-          <span className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+          <span className="flex items-center gap-1 bg-[#090812]/85 px-2 py-0.5 rounded-full border border-white/10">
             <Eye className="w-3 h-3" />
             {formatNumber(post.views || 0)}
           </span>
-          <span className="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10 uppercase">
+          <span className="flex items-center gap-1 bg-[#090812]/85 px-2 py-0.5 rounded-full border border-white/10 uppercase">
             <Clock className="w-3 h-3" />
             {calculateReadingTime(post.content || "").replace(" min de leitura", " min")}
           </span>

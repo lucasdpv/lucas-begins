@@ -59,18 +59,11 @@ blockquote p {
 }
 
 /* ============================================================
-   Efeito scanline sutil (overlay CRT)
+   Efeito scanline sutil (overlay CRT simplificado para GPUs integradas)
    ============================================================ */
 .scanline-overlay {
-  background:
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%),
-    linear-gradient(
-      90deg,
-      rgba(255, 0, 0, 0.03),
-      rgba(0, 255, 0, 0.01),
-      rgba(0, 0, 255, 0.03)
-    );
-  background-size: 100% 4px, 3px 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+  background-size: 100% 4px;
   pointer-events: none;
 }
 
@@ -437,20 +430,11 @@ blockquote p {
   transform: scale(1.08);
 }
 
-/* Fundo editorial das seções RetroCafé e Dossiê (MagazineBackdrop.tsx) — retícula de revista dos anos 90 */
+/* Fundo editorial das seções RetroCafé, Dossiês e Reviews (MagazineBackdrop.tsx) — otimizado sem mask-image para scroll leve */
 .mag-halftone {
-  background-image: radial-gradient(var(--mag-dot) 2px, transparent 2.6px);
-  background-size: 11px 11px;
-  -webkit-mask-image: radial-gradient(ellipse 55% 80% at 100% 0%, #000 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 55% 80% at 100% 0%, #000 0%, transparent 75%);
-}
-
-.mag-halftone-alt {
-  background-image: radial-gradient(var(--mag-dot-alt) 2px, transparent 2.6px);
-  background-size: 11px 11px;
-  background-position: 5px 5px;
-  -webkit-mask-image: radial-gradient(ellipse 45% 70% at 0% 100%, #000 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 45% 70% at 0% 100%, #000 0%, transparent 75%);
+  background-image: radial-gradient(var(--mag-dot) 1.5px, transparent 2px);
+  background-size: 14px 14px;
+  opacity: 0.35;
 }
 
 /* Título com "impressão desalinhada" (offset colorido), como nas capas de revista */
@@ -563,8 +547,7 @@ blockquote p {
 }
 
 .deferred-below-fold {
-  content-visibility: auto;
-  contain-intrinsic-size: auto none auto 520px;
+  /* Removido content-visibility: auto para evitar engasgo de layout (scroll hitch) ao chegar nas seções inferiores em GPUs integradas */
 }
 
 /* ============================================================

@@ -1,13 +1,25 @@
 import React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
-const retroSizes = {
-  sm: "text-xs px-4 py-1.5 shadow-[2px_2px_0px_rgba(0,0,0,1)]",
-  md: "text-xs md:text-sm px-5 py-2 shadow-[3px_3px_0px_rgba(0,0,0,1)]",
-};
+const badgeSizeVariants = cva(
+  "font-retro font-bold uppercase tracking-widest transition-colors",
+  {
+    variants: {
+      size: {
+        sm: "text-xs px-4 py-1.5 shadow-[2px_2px_0px_rgba(0,0,0,1)]",
+        md: "text-xs md:text-sm px-5 py-2 shadow-[3px_3px_0px_rgba(0,0,0,1)]",
+      },
+    },
+    defaultVariants: {
+      size: "sm",
+    },
+  }
+);
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  size?: keyof typeof retroSizes;
+interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeSizeVariants> {
   isDark?: boolean;
 }
 
@@ -43,9 +55,19 @@ const getCategoryBadgeClass = (category: string) => {
 };
 
 export function CategoryBadge({ children, size = "sm", className }: BadgeProps) {
-  const categoryColorClass = typeof children === "string" ? getCategoryBadgeClass(children) : "bg-purple-600 text-white";
+  const categoryColorClass =
+    typeof children === "string"
+      ? getCategoryBadgeClass(children)
+      : "bg-purple-600 text-white";
   return (
-    <span className={cn("font-retro font-bold uppercase tracking-widest rounded-none border-2 border-black transition-all", categoryColorClass, retroSizes[size], className)}>
+    <span
+      className={cn(
+        "rounded-none border-2 border-black",
+        badgeSizeVariants({ size }),
+        categoryColorClass,
+        className
+      )}
+    >
       {children}
     </span>
   );
@@ -57,7 +79,13 @@ interface ScoreBadgeProps extends BadgeProps {
 
 export function ScoreBadge({ score, size = "sm", className }: ScoreBadgeProps) {
   return (
-    <span className={cn("bg-yellow-400 text-black font-retro font-bold rounded-none border-2 border-black flex items-center gap-1 transition-all", retroSizes[size], className)}>
+    <span
+      className={cn(
+        "bg-yellow-400 text-black rounded-none border-2 border-black flex items-center gap-1",
+        badgeSizeVariants({ size }),
+        className
+      )}
+    >
       ★ {score}
     </span>
   );
@@ -67,8 +95,15 @@ interface DefaultBadgeProps extends BadgeProps {
   variant?: "default" | "active";
 }
 
-export default function Badge({ children, variant = "default", isDark, className, ...props }: DefaultBadgeProps) {
-  const baseStyle = "px-4 py-1.5 rounded-none font-retro text-xs font-bold uppercase tracking-wider border-2 transition-all";
+export default function Badge({
+  children,
+  variant = "default",
+  isDark,
+  className,
+  ...props
+}: DefaultBadgeProps) {
+  const baseStyle =
+    "px-4 py-1.5 rounded-none font-retro text-xs font-bold uppercase tracking-wider border-2 transition-colors";
 
   const variants = {
     default: isDark
@@ -80,10 +115,7 @@ export default function Badge({ children, variant = "default", isDark, className
   };
 
   return (
-    <span
-      className={cn(baseStyle, variants[variant], className)}
-      {...props}
-    >
+    <span className={cn(baseStyle, variants[variant], className)} {...props}>
       {children}
     </span>
   );

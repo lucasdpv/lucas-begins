@@ -10,7 +10,7 @@ export default function PostDetailSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Carregando artigo..."
-      className="animate-pulse w-full max-w-[1520px] mx-auto"
+      className="animate-pulse w-full"
     >
       {/* Botão Voltar */}
       <div className={cn("w-36 h-4 mb-8 rounded-md", shimmerDim)} />
