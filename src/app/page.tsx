@@ -92,7 +92,8 @@ async function fetchInitialHomeData(): Promise<InitialHomeData | undefined> {
   try {
     const queryUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/posts?pageSize=100`;
     const response = await fetch(queryUrl, {
-      next: { revalidate: 300 },
+      // Tag "posts" é invalidada por revalidateHomeCache() (src/app/actions/revalidate.ts) ao salvar um post
+      next: { revalidate: 300, tags: ["posts"] },
     });
     if (!response.ok) return undefined;
 

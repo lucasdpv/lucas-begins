@@ -6,6 +6,17 @@ import { userService } from '../../../services/userService';
 import { useAuth } from '../../../context/AuthProvider';
 import { useMemo } from 'react';
 import { trackEvent } from '../../../lib/analytics';
+import { revalidateHomeCache } from '../../../app/actions/revalidate';
+
+/**
+ * Invalida o cache ISR da Home no servidor (carrossel, novidades etc.).
+ * Falhas aqui não devem quebrar o fluxo de salvamento.
+ */
+function refreshHomeServerCache() {
+  revalidateHomeCache().catch((err) => {
+    console.warn('[usePostsQuery] Falha ao revalidar cache da Home:', err);
+  });
+}
 
 /**
  * Keys para gerenciamento do cache do React Query.
@@ -197,6 +208,7 @@ export function useCreatePostMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      refreshHomeServerCache();
       showToast("Post publicado com sucesso! 🚀");
     },
     onError: () => {
@@ -217,6 +229,7 @@ export function useDeletePostMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      refreshHomeServerCache();
       showToast("Post deletado permanentemente. 🗑️");
     },
     onError: () => {
@@ -238,6 +251,7 @@ export function useUpdatePostMutation() {
       queryClient.invalidateQueries({ queryKey: postKeys.all });
       queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: ['postBySlug'] });
+      refreshHomeServerCache();
       showToast("Post atualizado com sucesso! ✨");
     },
     onError: () => {
